@@ -14,9 +14,7 @@ Notes:
 	- SGDs (classify_sgd) can sometimes fail on certain parameter settings as well. Don't worry, they 
 	train SUPER fast, and the worker.py will simply log the error and continue. 
 """
-#algorithm_codes = ['classify_sgd', 'classify_dt', 'classify_dbn'] # commented out by Bryan
-algorithm_codes = ['classify_svm', 'classify_dbn', 'classify_rf', 'classify_pa', 'classify_et', 'classify_sgd', 'classify_gnb', 'classify_mnb', 'classify_bnb', 'classify_knn', 'classify_logreg']
-
+algorithm_codes = ['classify_svm', 'classify_sgd', 'classify_dbn'] 
 
 """
 This is where you list CSV files to train on. Follow the CSV conventions on the ALFA online
@@ -32,24 +30,14 @@ and add them as a tuple of string, with the TRAINING set as the first item and t
 as the second string in the tuple. 
 """
 csvfiles = [
-	#"data/binary/banknote.csv",
-	# ("data/binary/congress_train.csv", "data/binary/congress_test.csv"),
+	"../demodata/genderfeatures.csv"
 ]
-# Added by Bryan(bcollazo@mit.edu) to run 800dataset experiment
-path = "/home/bryan/800datasets"
-trains = os.listdir(path)
-for t in trains:
-    if "test" in t: continue
-    trainpath = os.path.join(path, t)
-    testpath = os.path.join(path, t[:-9] + "test.csv")
-    csvfiles.append((trainpath, testpath))
-# End of addition
 
 """
 How many learners would you like Delphi to train in this run? Be aware some classifiers are very
 quick to train and others take a long time depending on the size and dimensionality of the data. 
 """
-nlearners = 500
+nlearners = 250
 
 
 """
@@ -79,9 +67,9 @@ the thesis to understand what those mean, but essentially:
 """
 sample_selectors = [
 	# sample selection, r_min
-	("uniform", -1),
+	#("uniform", -1),
 	("gp_ei", 3),
-	("gp_eitime", 3),
+	#("gp_eitime", 3),
 ]
 
 
@@ -94,10 +82,10 @@ Delphi considers for certain frozen selection logics.
 """
 frozen_selectors = [
 	# frozen selection, k_window
-	("uniform", -1),
-	("ucb1", -1),
-	("bestkvel", 5),
-	("purebestkvel", 5),
+	#("uniform", -1),
+	#("ucb1", -1),
+	#("bestkvel", 5),
+	#("purebestkvel", 5),
 	("hieralg", -1),
 ]
 	
@@ -117,35 +105,31 @@ metric = "cv"
 # now create the runs and populate the database
 # you'll need to start workers after this finishes (or
 # before, they will wait patiently!)
-# Added by Bryan(bcollazo@mit.edu) for 800dataset Experiment
-num_runs = 10
-for i in xrange(num_runs): 
-# End of Addition
-    for csv in csvfiles:
-            for sampler, r_min in sample_selectors:
-                    for fsampler, k_window in frozen_selectors:
-                            args = {
-                                    "metric" : metric,
-                                    "r_min" : r_min,
-                                    "algorithm_codes" : algorithm_codes,
-                                    "k_window" : k_window,
-                                    "sample_selection" : sampler,
-                                    "frozen_selection" : fsampler,
-                                    "description" : "__".join([sampler, fsampler]),
-                                    "priority" : priority,
-                                    "budget_type" : budget_type,
-                                    "learner_budget" : nlearners,
-                                    "frozens_separately" : False,}
-                            
-                            if isinstance(csv, tuple):
-                                    args["trainpath"] = csv[0]
-                                    args["testpath"] = csv[1]
-                                    runname = os.path.basename(csv[0])
-                                    runname = runname.replace("_train", "")
-                                    runname = runname.replace(".csv", "")
-                                    args["runname"] = runname
-                            else:
-                                    args["alldatapath"] = csv
-                                    args["runname"] = os.path.basename(csv).replace(".csv", "")
-                            
-                            Run(**args)  # start this run
+for csv in csvfiles:
+        for sampler, r_min in sample_selectors:
+                for fsampler, k_window in frozen_selectors:
+                        args = {
+                                "metric" : metric,
+                                "r_min" : r_min,
+                                "algorithm_codes" : algorithm_codes,
+                                "k_window" : k_window,
+                                "sample_selection" : sampler,
+                                "frozen_selection" : fsampler,
+                                "description" : "__".join([sampler, fsampler]),
+                                "priority" : priority,
+                                "budget_type" : budget_type,
+                                "learner_budget" : nlearners,
+                                "frozens_separately" : False,}
+                    
+                        if isinstance(csv, tuple):
+                                args["trainpath"] = csv[0]
+                                args["testpath"] = csv[1]
+                                runname = os.path.basename(csv[0])
+                                runname = runname.replace("_train", "")
+                                runname = runname.replace(".csv", "")
+                                args["runname"] = runname
+                        else:
+                                args["alldatapath"] = csv
+                                args["runname"] = os.path.basename(csv).replace(".csv", "")
+                    
+                        Run(**args)  # start this run

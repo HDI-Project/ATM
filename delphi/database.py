@@ -21,18 +21,20 @@ if ENV == "DEV":
     PASSWORD = "alfa2015delphiHyper"
     HOST = "128.52.188.165"
     PORT = 3306
+    QUERY = ""
     
 elif ENV == "LOCAL":
     DIALECT = "mysql"
     DATABASE = "delphi_db"
-    USER = "root"
+    USER = ""
     PASSWORD = ""
-    HOST = "localhost"
+    HOST = "127.0.0.1"
     PORT = 3306
+    QUERY = "read_default_file=/home/swearin3/.my.cnf"
 
 Base = declarative_base()
-DB_STRING = '%s://%s:%s@%s:%d/%s' % (
-    DIALECT, USER, PASSWORD, HOST, PORT, DATABASE)
+DB_STRING = '%s://%s:%s@%s:%d/%s?%s' % (
+    DIALECT, USER, PASSWORD, HOST, PORT, DATABASE, QUERY)
 engine = create_engine(DB_STRING)
 metadata = MetaData(bind=engine)
 Session = sessionmaker(bind=engine, expire_on_commit=False)
