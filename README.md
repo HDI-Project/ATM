@@ -3,69 +3,58 @@ delphi
 
 ## Setup
 
-Only Unix machines have been tested with Delphi. 
+These instructions are specific to the `dai-desk1` and `dai-desk2` machines.
+Since there is no sudo privileges, the setup instructions are somewhat different than the original instructions.
 
-### 1) Install `virtualenvwrapper`
+### 1) Create a virtual environment
 
-```bash
-$ sudo apt-get install python-pip
-$ sudo pip install virtualenv 
-$ sudo pip install virtualenvwrapper
+Create a file called `reqs.txt` with the following contents:
+
+```
+MySQL-python
+SQLAlchemy
+matplotlib
+numpy
+numpydoc
+pandas
+scikit-learn
+scipy
+ipython
 ```
 
-Add into ~/.bash_profil:e
+Create a new environment using those requirements:
 
 ```bash
-# for vitrualenvwrapper
-export WORKON_HOME=$HOME/.virtualenvs
-source /usr/local/bin/virtualenvwrapper_lazy.sh
+$ conda create -n delphi-env --file reqs.txt
 ```
 
-Create the virtual environment and:
+You will probably see a lot of errors like "Failed to create lock, do not run conda in parallel processes [errno 30]".
+That's ok, it appears to be a known bug with site-wide anaconda installations.
+
+Activate the environment (you should see your bash prompt change)
 
 ```bash
-$ mkvirtualenv delphi-env
-$ workon delphi-env
-(delphi-env)$ 
+$ source activate delphi-env
 ```
 
-## 2) Install MySQL 
-
-For ubuntu, this is easy. For Mac OSX, not so much. 
-
-Ubuntu:
+Install nolearn. It has to be done seperately from the `reqs.txt` file to get the correct version.
 
 ```bash
-$ sudo apt-get install git python-dev mysql-server mysql-client gfortran libatlas-base-dev libmysqlclient-dev build-essential python-dev python-setuptools python-numpy python-scipy libatlas-dev libatlas3gf-base libfreetype6-dev libxft-dev
+(delphi-env) $ pip install nolearn
 ```
 
-and follow instructions. To install on Mac OSX, go [here](http://dev.mysql.com/downloads/mysql/5.5.html#macosx-dmg).
 
-## 3) Install Python libraries
+## 2) MySQL Setup
 
-```bash
-$ workon delphi-env
-(delphi-env)$ pip install -r config/requirements.txt
-```
-
-and verify the libraries are installed:
+MySQL is already install on dai-desk1 and dai-desk2. To setup the Delphi database:
 
 ```bash
-$ python
->>> import numpy as np
->>> import scipy
->>> import sklearn
->>> import pandas as pd
-```
-
-## 4) Create a MySQL database and load the tables
-
-```bash
-$ mysql -u <username> -p <password-if-needed>
+$ mysql
 mysql> create database delphi_db;
 mysql> exit;
-$ mysql -u <username> -p <password-if-needed> delphi_db < config/hyperdelphi.sql
+$ mysql delphi_db < config/hyperdelphi.sql
 ```
+
 
 ## Compiling Datasets for Classification
 
@@ -104,7 +93,14 @@ def CreateCSVHeader(n_features, name, class_label_name):
 
 ## Running Data! (locally)
 
-Now you'd like to start a run. First off, you'll need to add your `datarun` to the database. A datarun consists of all the parameters for a single experiment run, including where the find the data, what the budget is for number of learners to train, the majoirty class benchmark, and other things. The datarun ID in the database also ties together the `hyperpartitions` (frozen sets) which delinate how Delphi can explore different subtypes of classifiers to maximize their performance. 
+Now you'd like to start a run. First off, you'll need to add your `datarun` to the database.
+A datarun consists of all the parameters for a single experiment run, including where the find the data, what the budget is for number of learners to train, the majoirty class benchmark, and other things.
+The datarun ID in the database also ties together the `hyperpartitions` (frozen sets) which delinate how Delphi can explore different subtypes of classifiers to maximize their performance.
+First, you must set the enviromental variable to `LOCAL`:
+
+```bash
+$ export DELPHI_ENV=LOCAL
+```
 
 Tweaking parameters of your run is quite normal. Here I've copied the header of the `run.py` file for you to get an idea of the parameters here. 
 
@@ -221,34 +217,35 @@ To start, run `run.py`:
 $ python run.py
 ```
 
-You should see a great deal of description about what was loaded, the frozen hyperpartitions created, etc. You might also see something demanding you upload your data in CSV files to an HTTP address, but don't worry about that for now. That only matters when deploying onto a cloud. 
+You should see a great deal of description about what was loaded, the frozen hyperpartitions created, etc.
+You might also see something demanding you upload your data in CSV files to an HTTP address, but don't worry about that for now.
+That only matters when deploying onto a cloud. 
 
 The next step is to run a (or multiple) workers to actually train models and report progress back to the MySQL DataHub. 
 
 ```bash
-$ export DELPHI_ENV=LOCAL
 $ python worker.py
 ```
 
-This will create a worker that will automatically work on any uncompleted frozen set / datarun in the database. You might notice that in `run.py` you can change not only the type of budget (number of learners vs. walltime), but also the priority. The HIGHER the priority means that any workers in the pool will try to finish the higher prioritied dataruns FIRST. This is helpful if your needs change (maybe a paper deadline!) and you want to switch the focus of your worker cloud to a different experiment. 
+This will create a worker that will automatically work on any uncompleted frozen set / datarun in the database.
+You might notice that in `run.py` you can change not only the type of budget (number of learners vs. walltime), but also the priority.
+The HIGHER the priority means that any workers in the pool will try to finish the higher prioritied dataruns FIRST.
+This is helpful if your needs change (maybe a paper deadline!) and you want to switch the focus of your worker cloud to a different experiment.
 
-## Running Data! (on the cloud!)
-
-Navigate to the [Nimbus portal for creating nodes](https://nimbus.csail.mit.edu/horizon/project/instances/). Here, create a few nodes with the following specifications:
-
-* Boot from snapshot `scikit-postgres-user-setup-ALL`
-* Choose `m1.4core` for the size
-* Select a keypair you have access to and is placed in your `~/.ssh/` folder with `0644` permissions
-* Name the instance `delphi-worker` (important)
-
-Once you've launched it, wait until the status is "Active". If you like, you can SSH into the node:
+You can use the [tmux](https://tmux.github.io) package to run workers while you are not connected to `dai-desk1` or `dai-desk2`.
+So instead of launching the `worker.py` script from the bash line, instead:
 
 ```bash
-ssh ubuntu@<IP address from Nimbus> -i <path-to-pem-file>
+$ tmux
+$ source activate delphi-env
+$ export DELPHI_ENV=LOCAL
+$ python worker &
+$ python worker &
+$ python worker &
 ```
 
-Uses `fabric` to deploy nodes and apply updates.
-
-	$ fab openstack deploy
-
-
+This will start three workers in the background.
+You can create as many workers as the system can handle.
+To see how many workers are running, type `jobs` into the command line.
+To detach from the tmux session (and let the workers continue in the background), type `CTRL+B`, `D` and then `exit`.
+This will return you to the bash command line where you can logout as you normally would.
