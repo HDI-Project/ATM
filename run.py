@@ -1,20 +1,8 @@
 from delphi.run import Run
+import argparse
 import os
 
-"""
-Add here the algorithm codes you'd like to run and compare. Look these up in the 
-`algorithms` table in the MySQL database, or alternatively, in the config/hyperdelphi.sql 
-file in this repository. You must spell them correctly!
-
-Add each algorithm as a string to the list. 
-
-Notes:
-	- SVMs (classify_svm) can take a long time to train. It's not an error. It's just part of what
-	happens when the algorithm happens to explore a crappy set of parameters on a powerful algo like this. 
-	- SGDs (classify_sgd) can sometimes fail on certain parameter settings as well. Don't worry, they 
-	train SUPER fast, and the worker.py will simply log the error and continue. 
-"""
-algorithm_codes = ['classify_svm', 'classify_sgd', 'classify_dbn'] 
+parser = argparse.ArgumentParser(description='Find best classifier for a given dataset.',epilog='See README.md for further information.')
 
 """
 This is where you list CSV files to train on. Follow the CSV conventions on the ALFA online
@@ -29,16 +17,22 @@ CSV path to the list. If you've already got it split into two files, name them
 and add them as a tuple of string, with the TRAINING set as the first item and the TESTING 
 as the second string in the tuple. 
 """
-csvfiles = [
-	"../demodata/genderfeatures.csv"
-]
+parser.add_argument('-data', dest='csvfiles', nargs='+', required=True, help='data file(s)')
 
 """
-How many learners would you like Delphi to train in this run? Be aware some classifiers are very
-quick to train and others take a long time depending on the size and dimensionality of the data. 
-"""
-nlearners = 250
+Add here the algorithm codes you'd like to run and compare. Look these up in the 
+`algorithms` table in the MySQL database, or alternatively, in the config/hyperdelphi.sql 
+file in this repository. You must spell them correctly!
 
+Add each algorithm as a string to the list. 
+
+Notes:
+	- SVMs (classify_svm) can take a long time to train. It's not an error. It's just part of what
+	happens when the algorithm happens to explore a crappy set of parameters on a powerful algo like this. 
+	- SGDs (classify_sgd) can sometimes fail on certain parameter settings as well. Don't worry, they 
+	train SUPER fast, and the worker.py will simply log the error and continue. 
+"""
+parser.add_argument('-algorithms', dest='algorithm_codes', nargs='+', choices=['classify_svm','classify_et','classify_pa','classify_sgd','classify_rf','classify_mnb','classify_bnb','classify_dbn','classify_logreg','classify_gnb','classify_dt','classify_knn','all'], default='all', help='classifiers to test')
 
 """
 Should there be a 
@@ -47,8 +41,13 @@ Should there be a
 
 budget? You decide here. 
 """
-budget_type = "learner"
+parser.add_argument('-b', dest='budget_type', choices=['learner','walltime'], nargs=1, default='learner', help='budget type')
 
+"""
+How many learners would you like Delphi to train in this run? Be aware some classifiers are very
+quick to train and others take a long time depending on the size and dimensionality of the data. 
+"""
+parser.add_argument('-N', dest='nlearners', type=int, nargs=1, default=250, help='budget amount')
 
 """
 How should Delphi sample a frozen set that it must explore?
@@ -65,13 +64,8 @@ the thesis to understand what those mean, but essentially:
 	else
 		# train using uniform (baseline)
 """
-sample_selectors = [
-	# sample selection, r_min
-	#("uniform", -1),
-	("gp_ei", 3),
-	#("gp_eitime", 3),
-]
-
+parser.add_argument('-gp', dest='gp', choices=['uniform','gp_ei','gp_eitime'], nargs=1, default='gp_ei', help='parameter estimation strategy')
+parser.add_argument('-r_min', dest='r_min', type=int, nargs=1, default=3, help='minimum trials before mab')
 
 """
 How should Delphi select a hyperpartition (frozen set) from the current options it has? 
@@ -80,56 +74,61 @@ Again, each is a different method, consult the thesis. The second numerical entr
 tuple is similar to r_min, except it is called k_window and determines how much "history"
 Delphi considers for certain frozen selection logics. 
 """
-frozen_selectors = [
-	# frozen selection, k_window
-	#("uniform", -1),
-	#("ucb1", -1),
-	#("bestkvel", 5),
-	#("purebestkvel", 5),
-	("hieralg", -1),
-]
-	
+parser.add_argument('-mab', dest='mab', choices=['uniform','ucb1','bestkvel','purebestkvel','hieralg'], nargs=1, default='ucb1', help='hyperpartition selection strategy')
+parser.add_argument('-k_window', dest='k_window', type=int, nargs=1, default=-1, help='gp memory size')
 
 """
 What is the priority of this run? Higher is more important. 
 """
-priority = 10
-
+parser.add_argument('-priority', dest='priority', type=int, nargs=1, default=10, help='job priority (higher = more important)')
 
 """
 What metric should Delphi use to score? Keep this as "cv".
 """
 metric = "cv"
 
+clargs = parser.parse_args()
+
+if(clargs.algorithm_codes == 'all'):
+    algorithm_codes = ['classify_svm','classify_et','classify_pa','classify_sgd','classify_rf','classify_mnb','classify_bnb','classify_dbn','classify_logreg','classify_gnb','classify_dt','classify_knn']
+else:
+    algorithm_codes = clargs.algorithm_codes
+
+csvfiles = clargs.csvfiles
+nlearners = clargs.nlearners
+budget_type = clargs.budget_type
+sample_selectors = [(clargs.gp, clargs.r_min)]
+frozen_selectors = [(clargs.mab, clargs.k_window)]
+priority = clargs.priority
 
 # now create the runs and populate the database
 # you'll need to start workers after this finishes (or
 # before, they will wait patiently!)
 for csv in csvfiles:
-        for sampler, r_min in sample_selectors:
-                for fsampler, k_window in frozen_selectors:
-                        args = {
-                                "metric" : metric,
-                                "r_min" : r_min,
-                                "algorithm_codes" : algorithm_codes,
-                                "k_window" : k_window,
-                                "sample_selection" : sampler,
-                                "frozen_selection" : fsampler,
-                                "description" : "__".join([sampler, fsampler]),
-                                "priority" : priority,
-                                "budget_type" : budget_type,
-                                "learner_budget" : nlearners,
-                                "frozens_separately" : False,}
-                    
-                        if isinstance(csv, tuple):
-                                args["trainpath"] = csv[0]
-                                args["testpath"] = csv[1]
-                                runname = os.path.basename(csv[0])
-                                runname = runname.replace("_train", "")
-                                runname = runname.replace(".csv", "")
-                                args["runname"] = runname
-                        else:
-                                args["alldatapath"] = csv
-                                args["runname"] = os.path.basename(csv).replace(".csv", "")
-                    
-                        Run(**args)  # start this run
+    for sampler, r_min in sample_selectors:
+        for fsampler, k_window in frozen_selectors:
+            args = {
+                "metric" : metric,
+                "r_min" : r_min,
+                "algorithm_codes" : algorithm_codes,
+                "k_window" : k_window,
+                "sample_selection" : sampler,
+                "frozen_selection" : fsampler,
+                "description" : "__".join([sampler, fsampler]),
+                "priority" : priority,
+                "budget_type" : budget_type,
+                "learner_budget" : nlearners,
+                "frozens_separately" : False,}
+            
+            if isinstance(csv, tuple):
+                args["trainpath"] = csv[0]
+                args["testpath"] = csv[1]
+                runname = os.path.basename(csv[0])
+                runname = runname.replace("_train", "")
+                runname = runname.replace(".csv", "")
+                args["runname"] = runname
+            else:
+                args["alldatapath"] = csv
+                args["runname"] = os.path.basename(csv).replace(".csv", "")
+                
+                Run(**args)  # start this run
