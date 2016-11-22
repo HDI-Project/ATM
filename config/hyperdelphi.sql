@@ -64,6 +64,7 @@ CREATE TABLE `dataruns` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL DEFAULT '',
   `description` varchar(200) NOT NULL DEFAULT '',
+  `dataset_description` varchar(1000) NOT NULL DEFAULT '',
   `trainpath` varchar(200) NOT NULL DEFAULT '',
   `testpath` varchar(200) NOT NULL DEFAULT '',
   `local_trainpath` varchar(300) DEFAULT NULL,

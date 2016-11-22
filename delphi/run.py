@@ -14,7 +14,7 @@ PREFIX = "http://people.csail.mit.edu/drevo/datasets-v2/"
 PREFIX = "http://people.csail.mit.edu/bcollazo/datasets/"   # Added by bcollazo
 
 def Run(runname, description, metric, sample_selection, frozen_selection, budget_type, priority,
-		k_window, r_min, algorithm_codes, learner_budget=None, walltime_budget=None, alldatapath=None,
+		k_window, r_min, algorithm_codes, learner_budget=None, walltime_budget=None, alldatapath=None, dataset_description=None,
 		trainpath=None, testpath=None, configpath="config/experiments.cnf", verbose=True, frozens_separately=False):
 			
 	EnsureDirectory("models")
@@ -64,6 +64,10 @@ def Run(runname, description, metric, sample_selection, frozen_selection, budget
 		"size_kb" : int(stats["datasize_bytes"]),
 		"k_window" : k_window,
 		"r_min" : r_min,}
+		
+	### dataset description ###
+	if priority:
+		values["dataset_description"] = dataset_description
 
 	### priority ###
 	if priority:

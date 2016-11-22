@@ -1,6 +1,7 @@
 from delphi.run import Run
 import argparse
 import os
+import pdb
 
 parser = argparse.ArgumentParser(description='Find best classifier for a given dataset.',epilog='See README.md for further information.')
 
@@ -18,6 +19,11 @@ and add them as a tuple of string, with the TRAINING set as the first item and t
 as the second string in the tuple. 
 """
 parser.add_argument('-data', dest='csvfiles', nargs='+', required=True, help='data file(s)')
+
+"""
+Description of the dataset. This helps with the analysis of classifier performances across many different problems.
+"""
+parser.add_argument('-description', dest='dataset_description', type=str, nargs=1, default='', help='description of the dataset (string that must be bookended by quotes ("")')
 
 """
 Add here the algorithm codes you'd like to run and compare. Look these up in the 
@@ -95,11 +101,15 @@ else:
     algorithm_codes = clargs.algorithm_codes
 
 csvfiles = clargs.csvfiles
+dataset_description = clargs.dataset_description
 nlearners = clargs.nlearners
 budget_type = clargs.budget_type
 sample_selectors = [(clargs.gp, clargs.r_min)]
 frozen_selectors = [(clargs.mab, clargs.k_window)]
 priority = clargs.priority
+
+if(len(dataset_description[0]) > 1000):
+    raise ValueError('Dataset description is more than 1000 characters.')
 
 # now create the runs and populate the database
 # you'll need to start workers after this finishes (or
@@ -118,6 +128,7 @@ for csv in csvfiles:
                 "priority" : priority,
                 "budget_type" : budget_type,
                 "learner_budget" : nlearners,
+                "dataset_description" : dataset_description,
                 "frozens_separately" : False,}
             
             if isinstance(csv, tuple):
