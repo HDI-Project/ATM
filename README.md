@@ -8,6 +8,7 @@ Since there is no sudo privileges, the setup instructions are somewhat different
 
 ### 1) Create a virtual environment
 
+#### Option 1 - Anaconda Python (pre-installed on dai-desktops)
 Create a file called `reqs.txt` with the following contents:
 
 ```
@@ -43,6 +44,31 @@ Install nolearn. It has to be done seperately from the `reqs.txt` file to get th
 (delphi-env) $ pip install nolearn
 ```
 
+#### Option 2 - Regular Python
+
+Install `virtualenvwrapper`
+
+```bash
+$ sudo apt-get install python-pip
+$ sudo pip install virtualenv 
+$ sudo pip install virtualenvwrapper
+```
+
+Add into ~/.bash_profil:e
+
+```bash
+# for vitrualenvwrapper
+export WORKON_HOME=$HOME/.virtualenvs
+source /usr/local/bin/virtualenvwrapper_lazy.sh
+```
+
+Create the virtual environment and:
+
+```bash
+$ mkvirtualenv delphi-env
+$ workon delphi-env
+(delphi-env)$ 
+```
 
 ## 2) MySQL Setup
 
