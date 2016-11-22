@@ -2,8 +2,6 @@
 *.pem
 *.csv
 logs/*
-config/*
 data/*
 models/*
 .DS_Store
-

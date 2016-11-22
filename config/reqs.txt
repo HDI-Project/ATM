@@ -1,0 +1,9 @@
+MySQL-python
+SQLAlchemy
+matplotlib
+numpy
+numpydoc
+pandas
+scikit-learn
+scipy
+ipython
