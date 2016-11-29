@@ -18,7 +18,9 @@ CSV path to the list. If you've already got it split into two files, name them
 and add them as a tuple of string, with the TRAINING set as the first item and the TESTING 
 as the second string in the tuple. 
 """
-parser.add_argument('-data', dest='csvfiles', nargs='+', required=True, help='data file(s)')
+parser.add_argument('-data', dest='csvfiles', nargs='+', help='data file(s)')
+parser.add_argument('-train', dest='trainfiles', nargs='+', help='data training file(s)')
+parser.add_argument('-test', dest='testfiles', nargs='+', help='data test file(s)')
 
 """
 Description of the dataset. This helps with the analysis of classifier performances across many different problems.
@@ -70,7 +72,7 @@ the thesis to understand what those mean, but essentially:
 	else
 		# train using uniform (baseline)
 """
-parser.add_argument('-gp', dest='gp', choices=['uniform','gp_ei','gp_eitime'], nargs=1, default='gp_ei', help='parameter estimation strategy')
+parser.add_argument('-gp', dest='gp', choices=['uniform','gp_ei','gp_eitime'], type=str, nargs=1, default='gp_ei', help='parameter estimation strategy')
 parser.add_argument('-r_min', dest='r_min', type=int, nargs=1, default=3, help='minimum trials before mab')
 
 """
@@ -80,7 +82,7 @@ Again, each is a different method, consult the thesis. The second numerical entr
 tuple is similar to r_min, except it is called k_window and determines how much "history"
 Delphi considers for certain frozen selection logics. 
 """
-parser.add_argument('-mab', dest='mab', choices=['uniform','ucb1','bestkvel','purebestkvel','hieralg'], nargs=1, default='ucb1', help='hyperpartition selection strategy')
+parser.add_argument('-mab', dest='mab', choices=['uniform','ucb1','bestkvel','purebestkvel','hieralg'], nargs=1, type=str, default='ucb1', help='hyperpartition selection strategy')
 parser.add_argument('-k_window', dest='k_window', type=int, nargs=1, default=-1, help='gp memory size')
 
 """
@@ -95,20 +97,38 @@ metric = "cv"
 
 clargs = parser.parse_args()
 
+if(bool(clargs.csvfiles)):
+    csvfiles = clargs.csvfiles
+    
+if(bool(clargs.trainfiles) and bool(clargs.testfiles)):
+    csvfiles = [(clargs.trainfiles[0], clargs.testfiles[0])]
+
+
 if(clargs.algorithm_codes == 'all'):
     algorithm_codes = ['classify_svm','classify_et','classify_pa','classify_sgd','classify_rf','classify_mnb','classify_bnb','classify_dbn','classify_logreg','classify_gnb','classify_dt','classify_knn']
 else:
     algorithm_codes = clargs.algorithm_codes
+    
+if(type(clargs.mab) == list):
+    mab = clargs.mab[0]
+else:
+    mab = clargs.mab
+    
+if(type(clargs.gp) == list):
+    gp = clargs.gp[0]
+else:
+    gp = clargs.gp
+    
 
-csvfiles = clargs.csvfiles
+
 dataset_description = clargs.dataset_description
 nlearners = clargs.nlearners
 budget_type = clargs.budget_type
-sample_selectors = [(clargs.gp, clargs.r_min)]
-frozen_selectors = [(clargs.mab, clargs.k_window)]
+sample_selectors = [(gp, clargs.r_min)]
+frozen_selectors = [(mab, clargs.k_window)]
 priority = clargs.priority
 
-if(len(dataset_description[0]) > 1000):
+if(bool(dataset_description) and (len(dataset_description[0]) > 1000)):
     raise ValueError('Dataset description is more than 1000 characters.')
 
 # now create the runs and populate the database
@@ -142,4 +162,5 @@ for csv in csvfiles:
                 args["alldatapath"] = csv
                 args["runname"] = os.path.basename(csv).replace(".csv", "")
                 
-                Run(**args)  # start this run
+            #Run(**args)  # start this run
+            pdb.run('Run(**args)')
