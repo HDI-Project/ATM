@@ -1,7 +1,6 @@
 from delphi.run import Run
 import argparse
 import os
-import pdb
 
 parser = argparse.ArgumentParser(description='Find best classifier for a given dataset.',epilog='See README.md for further information.')
 
@@ -162,5 +161,4 @@ for csv in csvfiles:
                 args["alldatapath"] = csv
                 args["runname"] = os.path.basename(csv).replace(".csv", "")
                 
-            #Run(**args)  # start this run
-            pdb.run('Run(**args)')
+            Run(**args)  # start this run
