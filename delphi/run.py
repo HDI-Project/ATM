@@ -4,6 +4,7 @@ from delphi.utilities import *
 from delphi.database import *
 from delphi.mapping import FrozenSetsFromAlgorithmCodes
 import datetime
+import pdb
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -66,7 +67,7 @@ def Run(runname, description, metric, sample_selection, frozen_selection, budget
 		"r_min" : r_min,}
 		
 	### dataset description ###
-	if priority:
+	if dataset_description:
 		values["dataset_description"] = dataset_description
 
 	### priority ###
