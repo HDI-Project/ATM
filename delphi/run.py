@@ -13,6 +13,7 @@ OUTPUT_FOLDER = "data/processed"
 LABEL_COLUMN = 0
 PREFIX = "http://people.csail.mit.edu/drevo/datasets-v2/"
 PREFIX = "http://people.csail.mit.edu/bcollazo/datasets/"   # Added by bcollazo
+PREFIX = "http://web.mit.edu/swearin3/www/"   # Added by swearin3
 
 def Run(runname, description, metric, sample_selection, frozen_selection, budget_type, priority,
 		k_window, r_min, algorithm_codes, learner_budget=None, walltime_budget=None, alldatapath=None, dataset_description=None,
