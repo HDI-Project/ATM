@@ -117,10 +117,12 @@ def LoadData(datarun):
     """
     # download data if necessary
     basepath = os.path.basename(datarun.local_trainpath)
+    print basepath
     if not os.path.isfile(datarun.local_trainpath):
         if not DownloadFileHTTP(datarun.trainpath) == basepath:
             raise Exception("Something about train dataset caching is wrong...")
         else:
+            EnsureDirectory("data/processed/")
             os.rename(basepath, "data/processed/"+basepath)
     
     # load the data into matrix format
