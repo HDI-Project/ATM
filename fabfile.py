@@ -74,7 +74,6 @@ def deploy():
                 config.get(Config.GIT, Config.GIT_REPO), code_dir,))
             with cd(code_dir):
                 run("git pull")
-                run("git checkout dai-desktops")
                 for i in range(1, WORKERS_PER_MACHINE + 1, 1):
                     run("screen -dm -S worker%d python worker.py; sleep 2" % (i,))
         else:
