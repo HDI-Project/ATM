@@ -117,11 +117,13 @@ def LoadData(datarun):
     """
     # download data if necessary
     basepath = os.path.basename(datarun.local_trainpath)
+    print basepath
     if not os.path.isfile(datarun.local_trainpath):
         if not DownloadFileHTTP(datarun.trainpath) == basepath:
             raise Exception("Something about train dataset caching is wrong...")
         else:
-            os.rename(basename, "data/processed/"+basename)
+            EnsureDirectory("data/processed/")
+            os.rename(basepath, "data/processed/"+basepath)
     
     # load the data into matrix format
     trainX = np.genfromtxt(datarun.local_trainpath, delimiter=",")
@@ -134,7 +136,7 @@ def LoadData(datarun):
         if not DownloadFileHTTP(datarun.testpath) == basepath:
             raise Exception("Something about test dataset caching is wrong...")
         else:
-            os.rename(basename, "data/processed/"+basepath)
+            os.rename(basepath, "data/processed/"+basepath)
     
     # load the data into matrix format
     testX = np.genfromtxt(datarun.local_testpath, delimiter=",")

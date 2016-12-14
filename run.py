@@ -120,7 +120,11 @@ else:
     
 
 
-dataset_description = clargs.dataset_description
+if(bool(clargs.dataset_description)):
+    dataset_description = clargs.dataset_description[0]
+else:
+    dataset_description = clargs.dataset_description
+    
 nlearners = clargs.nlearners
 budget_type = clargs.budget_type
 sample_selectors = [(gp, clargs.r_min)]

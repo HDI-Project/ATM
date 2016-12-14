@@ -10,6 +10,7 @@ class Config(ConfigParser):
     RUN = "run"
     BUDGET = "budget"
     STRATEGY = "strategy"
+    AWS = "aws"
     
     # subheading: images
     IMG_WORKER = "worker-image"
@@ -52,6 +53,18 @@ class Config(ConfigParser):
     STRATEGY_K = "k_window"
     STRATEGY_R = "r_min"
     
+    # subheading: aws
+    AWS_ACCESS_KEY = "access_key"
+    AWS_SECRET_KEY = "secret_key"
+    AWS_NUM_INSTANCES = "num_instances"
+    AWS_NUM_WORKERS_PER_INSTACNCES = "num_workers_per_instance"
+    AWS_EC2_KEY_PAIR = "ec2_key_pair"
+    AWS_EC2_INSTANCE_TYPE = "ec2_instance_type"
+    AWS_EC2_REGION = "ec2_region"
+    AWS_EC2_AMIS = "ec2_amis"
+    AWS_EC2_USERNAME = "ec2_username"
+    AWS_EC2_KEYFILE = "ec2_keyfile"
+        
     ###########################
     # constants
     CONST_NONE = "none"

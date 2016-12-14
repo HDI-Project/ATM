@@ -17,9 +17,9 @@ ENV = os.getenv('DELPHI_ENV', 'DEV')
 if ENV == "DEV":
     DIALECT = "mysql"
     DATABASE = "delphi_db"
-    USER = "root"
-    PASSWORD = "alfa2015delphiHyper"
-    HOST = "128.52.188.165"
+    USER = "delphi_db_admin"
+    PASSWORD = "(R!pS~h,y<w9J!SG"
+    HOST = "delphi-db.csinfrxuu8fu.us-east-1.rds.amazonaws.com"
     PORT = 3306
     QUERY = ""
     
