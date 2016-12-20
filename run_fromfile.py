@@ -48,4 +48,4 @@ description =  "__".join([sample_selection, frozen_selection])
 if(bool(dataset_description) and (len(dataset_description[0]) > 1000)):
     raise ValueError('Dataset description is more than 1000 characters.')
     
-Run(runname, description, metric, sample_selection, frozen_selection, budget_type, priority, k_window, r_min, algorithm_codes, learner_budget, walltime_budget, alldatapath, dataset_description, trainpath, testpath)
+Run(runname, description, metric, sample_selection, frozen_selection, budget_type, priority, k_window, r_min, algorithm_codes, learner_budget, walltime_budget, alldatapath, dataset_description, trainpath, testpath, configpath)

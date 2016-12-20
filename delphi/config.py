@@ -71,6 +71,7 @@ class Config(ConfigParser):
     AWS_SECRET_KEY = "secret_key"
     AWS_NUM_INSTANCES = "num_instances"
     AWS_NUM_WORKERS_PER_INSTACNCES = "num_workers_per_instance"
+    AWS_S3_BUCKET = "s3_bucket"
     AWS_EC2_KEY_PAIR = "ec2_key_pair"
     AWS_EC2_INSTANCE_TYPE = "ec2_instance_type"
     AWS_EC2_REGION = "ec2_region"

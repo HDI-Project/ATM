@@ -1,6 +1,7 @@
 from delphi.selection.samples import SELECTION_SAMPLES_UNIFORM, SELECTION_SAMPLES_GP
 from delphi.selection.samples import SELECTION_SAMPLES_GP_EI, SELECTION_SAMPLES_GP_EI_TIME, SELECTION_SAMPLES_GP_EI_VEL
 from delphi.selection.frozens import SELECTION_FROZENS_UNIFORM, SELECTION_FROZENS_UCB1
+from delphi.config import Config
 from delphi.database import *
 from delphi.utilities import *
 from delphi.mapping import Mapping, CreateWrapper
@@ -23,9 +24,11 @@ os.environ["GNUMPY_IMPLICIT_CONVERSION"] = "allow"
 # grab the command line arguments
 parser = argparse.ArgumentParser(description='Add more learners to database')
 parser.add_argument('-d','--datarunid', help='Only train on datasets with this id', default=None, required=False)
+parser.add_argument('-c','--configpath', help='Location of config file', default='config/delphi.cnf', required=False)
 args = parser.parse_args()
 
 # setup
+config = Config(args.configpath)
 EnsureDirectory("models")
 EnsureDirectory("logs")
 hostname = GetPublicIP() or random.randint(1, 1e12)
@@ -119,7 +122,7 @@ def LoadData(datarun):
     basepath = os.path.basename(datarun.local_trainpath)
     print basepath
     if not os.path.isfile(datarun.local_trainpath):
-        if not DownloadFileHTTP(datarun.trainpath) == basepath:
+        if not DownloadFileS3(config, basepath,) == basepath:
             raise Exception("Something about train dataset caching is wrong...")
         else:
             EnsureDirectory("data/processed/")
@@ -133,9 +136,10 @@ def LoadData(datarun):
     
     basepath = os.path.basename(datarun.local_testpath)
     if not os.path.isfile(datarun.local_testpath):
-        if not DownloadFileHTTP(datarun.testpath) == basepath:
+        if not DownloadFileS3(config, basepath) == basepath:
             raise Exception("Something about test dataset caching is wrong...")
         else:
+            EnsureDirectory("data/processed/")
             os.rename(basepath, "data/processed/"+basepath)
     
     # load the data into matrix format

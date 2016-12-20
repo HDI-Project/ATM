@@ -6,6 +6,7 @@ import hashlib
 import numpy as np
 import os, random
 import base64
+from boto.s3.connection import S3Connection, Key
 
 PUBLIC_IP_URL = "http://ifconfig.me/ip" # "http://ipecho.net/plain"
 
@@ -130,6 +131,21 @@ def Base64ToObject(b64str):
     decoded = base64.b64decode(b64str)
     return pickle.loads(decoded)
     
+def DownloadFileS3(config, keyname):
+    aws_key = config.get(Config.AWS, Config.AWS_ACCESS_KEY)
+    aws_secret = config.get(Config.AWS, Config.AWS_SECRET_KEY)
+    
+    conn = S3Connection(aws_key, aws_secret)
+    s3_bucket = config.get(Config.AWS, Config.AWS_S3_BUCKET)
+    bucket = conn.get_bucket(s3_bucket)
+    
+    s3key = Key(bucket)
+    s3key.key = keyname
+    
+    s3key.get_contents_to_filename(keyname)
+    
+    return keyname
+
 def DownloadFileHTTP(url, verbose=False):
     """
     http://stackoverflow.com/questions/22676/how-do-i-download-a-file-over-http-using-python

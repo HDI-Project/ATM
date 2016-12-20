@@ -3,6 +3,7 @@ from delphi.config import Config
 from delphi.utilities import *
 from delphi.database import *
 from delphi.mapping import FrozenSetsFromAlgorithmCodes
+from boto.s3.connection import S3Connection, Key
 import datetime
 import pdb
 
@@ -45,7 +46,7 @@ def Run(runname, description, metric, sample_selection, frozen_selection, budget
 	testing_http = PREFIX + os.path.basename(testing_path)
 	
 	# create all combinations necessary
-	# config = Config(configpath)
+	config = Config(configpath)
 	frozen_sets = FrozenSetsFromAlgorithmCodes(algorithm_codes, verbose=verbose)
 	
 	### create datarun ###
@@ -133,10 +134,23 @@ def Run(runname, description, metric, sample_selection, frozen_selection, budget
 	session.commit()
 	session.close()
 	
-	# tell user to upload files to web PREFIX
-	print "Upload: %s => %s" % (training_path, training_http)
-	print "Upload: %s => %s" % (testing_path, testing_http)
-
+	run_mode = config.get(Config.MODE, Config.MODE_RUNMODE)
+	if(run_mode == 'cloud'):
+	    aws_key = config.get(Config.AWS, Config.AWS_ACCESS_KEY)
+	    aws_secret = config.get(Config.AWS, Config.AWS_SECRET_KEY)
+	    conn = S3Connection(aws_key, aws_secret)
+	    s3_bucket = config.get(Config.AWS, Config.AWS_S3_BUCKET)
+	    bucket = conn.get_bucket(s3_bucket)
+	    ktrain = Key(bucket)
+	    ktrain.key = os.path.basename(training_path)
+	    ktrain.set_contents_from_filename(training_path)
+	    ktest = Key(bucket)
+	    ktrain.key = os.path.basename(testing_path)
+	    ktrain.set_contents_from_filename(testing_path)
+	    print 'CLOUD MODE: Train and test files uploaded to AWS S3 Bucket {}'.format(s3_bucket)
+	else:
+	    print 'LOCAL MODE: Train and test files only on local drive'
+		
 	return datarun_ids
 
 	
