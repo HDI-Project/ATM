@@ -11,6 +11,18 @@ class Config(ConfigParser):
     BUDGET = "budget"
     STRATEGY = "strategy"
     AWS = "aws"
+    DATAHUB = "datahub"
+    DATA = "data"
+    MODE = "mode"
+    
+    # subheading: data
+    DATA_ALLDATAPATH = "alldatapath"
+    DATA_TRAINPATH = "trainpath"
+    DATA_TESTPATH = "testpath"
+    DATA_DESCRIPTION = "data-description"
+
+    # subheading: mode
+    MODE_RUNMODE = "run-mode"
     
     # subheading: images
     IMG_WORKER = "worker-image"
@@ -40,6 +52,7 @@ class Config(ConfigParser):
     RUN_DROP_VALUES = "drop-values"
     RUN_TEST_RATIO = 'test-ratio'
     RUN_NAME = 'name'
+    RUN_PRIORITY = "priority"
     
     # subheading: budget
     BUDGET_TYPE = "budget-type"
@@ -64,6 +77,15 @@ class Config(ConfigParser):
     AWS_EC2_AMIS = "ec2_amis"
     AWS_EC2_USERNAME = "ec2_username"
     AWS_EC2_KEYFILE = "ec2_keyfile"
+    
+    # subheading: datahub
+    DATAHUB_DIALECT = "dialect"
+    DATAHUB_DATABASE = "database"
+    DATAHUB_USERNAME = "username"
+    DATAHUB_PASSWORD = "password"
+    DATAHUB_HOST = "host"
+    DATAHUB_PORT = "port"
+    DATAHUB_QUERY = "query"
         
     ###########################
     # constants
