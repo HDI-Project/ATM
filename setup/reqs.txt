@@ -7,3 +7,5 @@ pandas
 scikit-learn
 scipy
 ipython
+boto
+fabric

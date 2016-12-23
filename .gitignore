@@ -6,3 +6,4 @@ data/*
 models/*
 config/*
 .DS_Store
+doc/_build/*
