@@ -1,0 +1,139 @@
+#################################
+#   DELPHI CONFIGURATION FILE   #
+#################################
+
+[data]
+# Path to CSV file that contains all data (train & test)
+alldatapath: 
+# Path to CSV file that contains the train data (ignored if alldatapath non-blank)
+trainpath: 
+# Path to CSV file that contains the test data (ignored if alldatapath non-blank)
+testpath: 
+# Description of the data and classification task (limit 1000 characters)
+data-description: 
+
+
+
+[mode]
+# delphi run mode (cloud or local)
+run-mode: 
+
+
+
+[datahub]
+# Database dialect
+dialect: mysql
+# Name of the database
+database:
+# Username to gain access to the database
+username: 
+# Password to gain access to the database
+password: 
+# Host name of the device hosting the database
+host: 
+# Port on host listening for database connections
+port: 
+# Optional field for specifying login details
+query: 
+
+
+
+[run]
+# Add here the algorithm codes you'd like to run and compare. Look these up in 
+# the 'algorithms' tables in the database, or alternatively, in the 
+# config/hyperdelphi.sql file in this repository. You must spell them correctly!
+# 
+# Add each algorithm code as a text string separated by a comma.
+# 
+# Notes:
+#   - SVMs (classify_svm) can take a long time to train. It's not an error. 
+#     It's justpart of what happens  when the algorithm happens to explore a 
+#     crappy set of parameters on a powerful algo like this.
+#   - SGDs (classify_sgd) can sometimes fail on certain parameter settings as 
+#     well. Don't worry, they train SUPER fast, and the worker.py will simply 
+#     log the error and continue. 
+algorithms: 
+# directory to store trained models
+models-dir: 
+# not sure this is used
+drop-values: 
+# not sure this is used
+test-ratio: 
+# priority (higher number is more important)
+priority: 
+
+
+
+[budget]
+# Should there be a learner or walltime budget?
+budget-type: 
+# If budget-type is learner, how many learners to try?
+learner-budget: 
+# If budget-type is walltime, how long to search (in seconds)?
+walltime-budget:
+
+
+
+[strategy]
+# How should Delphi sample a hyperpartition (frozen set) that it must explore?
+# 	- uniform: pick randomly! (baseline)
+# 	- gp_ei: Gaussian Process expected improvement criterion
+# 	- gp_eitime: Gaussian Process expected improvement criterion per unit time
+sample_selection: 
+# r_min is the number of random runs performed in each hyperpartition before 
+# allowing bayesian opt to select parameters. Consult the thesis to understand
+# what those mean, but essentially: 
+# 
+# 	if (num_learners_trained_in_hyperpartition >= r_min)
+# 		# train using sample criteria 
+# 	else
+# 		# train using uniform (baseline)
+r_min: 
+# How should Delphi select a particular hyperpartition (frozen set) from the 
+# set of all hyperpartitions? 
+# 
+# Again, each is a different method, consult the thesis.
+frozen_selection: 
+# k is number that xxx-k methods use. It is similar to r_min, except it is 
+# called k_window and determines how much "history" Delphi considers for certain
+# frozen selection logics.
+k_window: 
+# Which field to use for judgement of performance
+# cv = Cross-Validated performance on training data
+metric: cv
+
+
+
+[git]
+# git username
+username: 
+# git password
+password:
+# Delphi git location (http)
+repo: 
+
+
+
+[aws]
+# AWS access key
+access_key: 
+# AWS secret key
+secret_key: 
+# Number of AWS instances to start
+num_instances: 
+# Number of Delphi workers per instances
+num_workers_per_instance: 
+# AWS S3 bucket to store data
+s3_bucket: 
+# Region to start instances in
+ec2_region: 
+# Name of Delphi AMI
+ec2_amis: 
+# AWS key pair to use for EC2 instances
+ec2_key_pair: 
+# Local path to key file (mist match ec2_key_pair)
+ec2_keyfile: 
+# Type of EC2 instance to start
+ec2_instance_type: 
+# Username to log into EC2 instance
+ec2_username: 

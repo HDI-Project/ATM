@@ -4,6 +4,8 @@
 logs/*
 data/*
 models/*
+# ignore configuration files except the template
 config/*
+!config/delphi.cnf.template
 .DS_Store
 doc/_build/*
