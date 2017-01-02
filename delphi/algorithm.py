@@ -1,3 +1,9 @@
+"""
+.. module:: algorithm
+   :synopsis: Wrapper around classification algorithm.
+
+"""
+
 from sklearn.cross_validation import train_test_split, cross_val_score
 from sklearn.pipeline import Pipeline
 from sklearn.externals import joblib

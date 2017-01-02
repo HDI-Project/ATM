@@ -26,11 +26,11 @@ if ENV == "DEV":
 elif ENV == "LOCAL":
     DIALECT = "mysql"
     DATABASE = "delphi_db"
-    USER = ""
+    USER = "root"
     PASSWORD = ""
     HOST = "127.0.0.1"
     PORT = 3306
-    QUERY = "read_default_file=/home/swearin3/.my.cnf"
+    QUERY = ""
 
 Base = declarative_base()
 DB_STRING = '%s://%s:%s@%s:%d/%s?%s' % (

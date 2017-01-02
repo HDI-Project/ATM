@@ -9,3 +9,4 @@ config/*
 !config/delphi.cnf.template
 .DS_Store
 doc/_build/*
+doc/_autosummary/*

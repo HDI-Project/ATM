@@ -14,6 +14,7 @@ Contents:
    intro
    setup
    tutorial
+   code
 
 Indices and tables
 ==================
