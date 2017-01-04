@@ -8,29 +8,20 @@ from sqlalchemy import func
 import traceback
 import random, sys
 from delphi.utilities import *
+from delphi.config import Config
 import os
 from datetime import datetime
 
-# configuration
-ENV = os.getenv('DELPHI_ENV', 'DEV')
+configpath = 'config/{}'.format(os.getenv('DELPHI_CONFIG_FILE', 'delphi.cnf'))
+config = Config(configpath)
 
-if ENV == "DEV":
-    DIALECT = "mysql"
-    DATABASE = "delphi_db"
-    USER = "delphi_db_admin"
-    PASSWORD = "(R!pS~h,y<w9J!SG"
-    HOST = "delphi-db.csinfrxuu8fu.us-east-1.rds.amazonaws.com"
-    PORT = 3306
-    QUERY = ""
-    
-elif ENV == "LOCAL":
-    DIALECT = "mysql"
-    DATABASE = "delphi_db"
-    USER = "root"
-    PASSWORD = ""
-    HOST = "127.0.0.1"
-    PORT = 3306
-    QUERY = ""
+DIALECT = config.get(Config.DATAHUB, Config.DATAHUB_DIALECT)
+DATABASE = config.get(Config.DATAHUB, Config.DATAHUB_DATABASE)
+USER = config.get(Config.DATAHUB, Config.DATAHUB_USERNAME)
+PASSWORD = config.get(Config.DATAHUB, Config.DATAHUB_PASSWORD)
+HOST = config.get(Config.DATAHUB, Config.DATAHUB_HOST)
+PORT = int(config.get(Config.DATAHUB, Config.DATAHUB_PORT))
+QUERY = config.get(Config.DATAHUB, Config.DATAHUB_QUERY)
 
 Base = declarative_base()
 DB_STRING = '%s://%s:%s@%s:%d/%s?%s' % (
