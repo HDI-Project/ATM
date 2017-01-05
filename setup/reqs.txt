@@ -9,3 +9,4 @@ scipy
 ipython
 boto
 fabric
+sklearn-pandas
