@@ -1,3 +1,4 @@
+warnings_are_errors: false
 language: python - "2.7"
 
 # before_install will simply setup a conda enviroment for installing python packages, if you

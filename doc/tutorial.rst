@@ -43,13 +43,10 @@ The git repository is setup to ignore all files in the ``config`` folder except 
 
 .. literalinclude:: ../config/delphi.cnf.template
 
-The configuration file must be in the ``config/`` directory.
 The name of the file must also be a environmental variable called ``DELPHI_CONFIG_FILE``.
-For example if the configuration file is called ``delphi.cnf`` then an environmental variable would created with the command::
+For example if the configuration file is called ``delphi.cnf`` in the ``config`` directory of the root delphi directory, then an environmental variable would created with the command::
 
-    (delphi-env) $ export DELPHI_CONFIG_FILE=delphi.cnf
-
-This also requires that delphi commands be executed in the root delphi directory.
+    (delphi-env) $ export DELPHI_CONFIG_FILE=/path_to_delphi_root/config/delphi.cnf
 
 DataRun Creation
 ^^^^^^^^^^^^^^^^
