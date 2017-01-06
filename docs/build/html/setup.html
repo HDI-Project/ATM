@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Setup &#8212; delphi 0.9 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="delphi 0.9 documentation" href="index.html" />
+    <link rel="next" title="Tutorial" href="tutorial.html" />
+    <link rel="prev" title="Introduction" href="intro.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tutorial.html" title="Tutorial"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">delphi 0.9 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="setup">
+<h1>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="package-installation">
+<h2>1. Package Installation<a class="headerlink" href="#package-installation" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://www.python.org">Python</a>, <a class="reference external" href="https://pip.pypa.io/en/stable">pip</a>, and <a class="reference external" href="https://virtualenvwrapper.readthedocs.io/en/latest/">virtualenvwrapper</a> must be installed manually.
+All other packages can be installed automatically with <code class="docutils literal"><span class="pre">virtualenvwrapper</span></code>.
+After installing <code class="docutils literal"><span class="pre">Python</span></code> and <code class="docutils literal"><span class="pre">pip</span></code>, <code class="docutils literal"><span class="pre">virtualenvwrapper</span></code> can be installed by:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ sudo apt-get install python-pip
+$ sudo pip install virtualenv
+$ sudo pip install virtualenvwrapper
+</pre></div>
+</div>
+<p>Add into <code class="docutils literal"><span class="pre">~/.bash_profile</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span># for vitrualenvwrapper
+export WORKON_HOME=$HOME/.virtualenvs
+source /usr/local/bin/virtualenvwrapper_lazy.sh
+</pre></div>
+</div>
+<div class="section" id="virtual-environment-setup">
+<h3>Virtual Environment Setup<a class="headerlink" href="#virtual-environment-setup" title="Permalink to this headline">¶</a></h3>
+<p>Create the virtual environment and enter into it:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ mkvirtualenv delphi-env
+$ workon delphi-env
+(delphi-env) $
+</pre></div>
+</div>
+<p>Install the required packages:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>(delphi-env) $ pip install -r setup/reqs.txt
+</pre></div>
+</div>
+<p>The required packages are:</p>
+</div>
+</div>
+<div class="section" id="mysql-setup">
+<h2>2. MySQL Setup<a class="headerlink" href="#mysql-setup" title="Permalink to this headline">¶</a></h2>
+<p>On Ubuntu, MySQL can be installed with the command:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ sudo apt-get install git python-dev mysql-server mysql-client gfortran libatlas-base-dev libmysqlclient-dev build-essential python-dev python-setuptools python-numpy python-scipy libatlas-dev libatlas3gf-base libfreetype6-dev libxft-dev
+</pre></div>
+</div>
+<p>and following the instructions.
+Once MySQL is installed, setup the Delphi DataHub database:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ mysql
+mysql&gt; create database delphi_db;
+mysql&gt; exit;
+$ mysql delphi_db &lt; setup/hyperdelphi.sql
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Setup</a><ul>
+<li><a class="reference internal" href="#package-installation">1. Package Installation</a><ul>
+<li><a class="reference internal" href="#virtual-environment-setup">Virtual Environment Setup</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mysql-setup">2. MySQL Setup</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="intro.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tutorial.html"
+                        title="next chapter">Tutorial</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/setup.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="tutorial.html" title="Tutorial"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">delphi 0.9 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright MIT Data to AI Lab.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+    </div>
+  </body>
+</html>
