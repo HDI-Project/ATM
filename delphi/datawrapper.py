@@ -8,7 +8,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.externals import joblib
 from sklearn.cross_validation import train_test_split
 from sklearn_pandas import DataFrameMapper
-import pdb
 
 class DataWrapper(object):
 
@@ -22,8 +21,11 @@ class DataWrapper(object):
         self.testing_ratio = testing_ratio
 
         # special objects
+        self.categoricalcols = [] # names of columns that are categorical
+        self.categoricalcolsidxs = []
+        self.categoricalcolsvectorizers = []
         self.encoder = None # discretizes labels
-        self.vectorizer = None # discretizes examples
+        self.vectorizer = None # discretizes examples (after categoricals vectorized)
 
         # can do either
         assert traintestfile or (trainfile and testfile), \
@@ -109,6 +111,8 @@ class DataWrapper(object):
         for column in data.columns.values:
             dtype = data[column].dtype
             if dtype == "object":
+                self.categoricalcols.append(column)
+                self.categoricalcolsidxs.append(data.columns.get_loc(column))
                 nvalues = len(np.unique(np.array(data[column].values)))
                 if nvalues > 2:
                     dummies += nvalues
@@ -116,12 +120,20 @@ class DataWrapper(object):
             else:
                 ordinal += 1
 
-        data = pd.get_dummies( data )
+        for column in self.categoricalcols:
+            le = preprocessing.LabelEncoder()
+            le.fit(data[column])
+            data[column] = le.transform(data[column])
+            self.categoricalcolsvectorizers.append(le)
+
+        self.vectorizer = preprocessing.OneHotEncoder(categorical_features = self.categoricalcolsidxs,sparse = False) # don't use sparse because then then can't test for NaNs
+        self.vectorizer.fit(data)
+        data = self.vectorizer.transform(data)
         newd = d - categorical + dummies
 
-
         # ensure data integrity
-        assert pd.isnull(data).any().any() == False, \
+        assert newd == data.shape[1], "One hot encoding failed"
+        assert np.sum(np.isnan(data)) == 0, \
             "Cannot have NaN values in the cleaned data!"
         assert np.sum(np.isnan(np.array(training_discretized_labels))) == 0, \
             "Cannot have NaN values for labels!"
@@ -131,8 +143,8 @@ class DataWrapper(object):
         # now save training and testing as separate files
         EnsureDirectory(self.outfolder)
 
-        training = data.head(num_train_samples)
-        testing = data.tail(num_test_samples)
+        training = data[:num_train_samples,:]
+        testing = data[-num_test_samples:,:]
 
         # training
         self.training_path = os.path.join(self.outfolder, "%s_train.csv" % self.dataname)
@@ -175,7 +187,9 @@ class DataWrapper(object):
 
         # now load both files and stack together
         data = pd.read_csv(self.traintestfile, skipinitialspace=True, na_values=self.dropvals, sep=self.sep)
-        data = data.dropna(how='any')
+        data = data.dropna(how='any') # drop rows with any NA values
+
+        # Get labels and encode into numerical values
         labels = np.array(data[[self.labelcol]]) # gets data frame instead of series
         self.encoder = preprocessing.LabelEncoder()
         discretized_labels = self.encoder.fit_transform(labels)
@@ -198,18 +212,31 @@ class DataWrapper(object):
         for column in data.columns.values:
             dtype = data[column].dtype
             if dtype == "object":
-                nvalues = len(np.unique(np.array(data[column].values)))
+                self.categoricalcols.append(column)
+                self.categoricalcolsidxs.append(data.columns.get_loc(column))
+                nvalues = len(np.unique(data[column]))
                 if nvalues > 2:
                     dummies += nvalues
                 categorical += 1
             else:
                 ordinal += 1
 
-        data = pd.get_dummies( data )
+        #data = pd.get_dummies( data )
+
+        for column in self.categoricalcols:
+            le = preprocessing.LabelEncoder()
+            le.fit(data[column])
+            data[column] = le.transform(data[column])
+            self.categoricalcolsvectorizers.append(le)
+
+        self.vectorizer = preprocessing.OneHotEncoder(categorical_features = self.categoricalcolsidxs, sparse = False) # don't use sparse because then then can't test for NaNs
+        self.vectorizer.fit(data)
+        data = self.vectorizer.transform(data)
         newd = d - categorical + dummies
 
         # ensure data integrity
-        assert pd.isnull(data).any().any() == False, \
+        assert newd == data.shape[1], "One hot encoding failed"
+        assert np.sum(np.isnan(data)) == 0, \
             "Cannot have NaN values in the cleaned data!"
         assert np.sum(np.isnan(np.array(discretized_labels))) == 0, \
             "Cannot have NaN values for labels!"
