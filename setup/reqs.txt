@@ -10,3 +10,4 @@ ipython
 boto
 fabric
 sklearn-pandas
+nolearn
