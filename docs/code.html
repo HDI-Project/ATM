@@ -37,9 +37,6 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="tutorial.html" title="Tutorial"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">delphi 0.9 documentation</a> &#187;</li> 
@@ -56,13 +53,14 @@
 <div class="section" id="adding-a-classifier">
 <h2>Adding a classifier<a class="headerlink" href="#adding-a-classifier" title="Permalink to this headline">¶</a></h2>
 <p>Decide name for classifier (e.g., KNeighborsClassifier) and emuerator (e.g., EnumeratorKNN).
-Enter these names in the <cite>LEARNER_CODE_CLASS_MAP</cite> and <cite>ENUMERATOR_CODE_CLASS_MAP</cite> variables in <cite>delphi/mapping.py</cite></p>
-<p>Create Enumerator for class in the <cite>delphi/enumeration/classification</cite> folder.
+Enter these names in the <code class="docutils literal"><span class="pre">LEARNER_CODE_CLASS_MAP</span></code> and <code class="docutils literal"><span class="pre">ENUMERATOR_CODE_CLASS_MAP</span></code> variables in <code class="docutils literal"><span class="pre">delphi/mapping.py</span></code>.
+Decide a code  for the classifier (e.g., classify_knn) and enter this in the <code class="docutils literal"><span class="pre">__init__.py</span></code> file in <code class="docutils literal"><span class="pre">delphi/enumeration/classification</span></code>.</p>
+<p>Create Enumerator for class in the <code class="docutils literal"><span class="pre">delphi/enumeration/classification</span></code> folder.
 In this file:</p>
 <ol class="loweralpha simple">
-<li>define the ranges of the parameters in a variable called <cite>DEFAULT_RANGES</cite></li>
-<li>define the parameter types (int, float, etc.) in a variable called <cite>DEFAULT_KEYS</cite></li>
-<li>define the Conditional Parameter Tree (CPT) in a function called <cite>create_cpt</cite></li>
+<li>define the ranges of the parameters in a variable called <code class="docutils literal"><span class="pre">DEFAULT_RANGES</span></code></li>
+<li>define the parameter types (int, float, etc.) in a variable called <code class="docutils literal"><span class="pre">DEFAULT_KEYS</span></code></li>
+<li>define the Conditional Parameter Tree (CPT) in a function called <code class="docutils literal"><span class="pre">create_cpt</span></code></li>
 </ol>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">delphi.cpt</span> <span class="k">import</span> <span class="n">Choice</span><span class="p">,</span> <span class="n">Combination</span>
 <span class="kn">from</span> <span class="nn">delphi.enumeration</span> <span class="k">import</span> <span class="n">Enumerator</span>
@@ -75,14 +73,14 @@ In this file:</p>
     <span class="n">DEFAULT_RANGES</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;param_int&quot;</span> <span class="p">:</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span>
         <span class="s2">&quot;param_categorical&quot;</span> <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;category1&#39;</span><span class="p">,</span> <span class="s1">&#39;category2&#39;</span><span class="p">),</span>
-        <span class="s2">&quot;param_float&quot;</span> <span class="p">:</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">),</span>
+        <span class="s2">&quot;param_float&quot;</span> <span class="p">:</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span>
     <span class="p">}</span>
 
     <span class="n">DEFAULT_KEYS</span> <span class="o">=</span> <span class="p">{</span>
         <span class="c1"># KeyStruct(range, key_type, is_categorical)</span>
         <span class="s2">&quot;param_int&quot;</span> <span class="p">:</span> <span class="n">KeyStruct</span><span class="p">(</span><span class="n">DEFAULT_RANGES</span><span class="p">[</span><span class="s2">&quot;param_int&quot;</span><span class="p">],</span> <span class="n">Key</span><span class="o">.</span><span class="n">TYPE_INT</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
         <span class="s2">&quot;param_categorical&quot;</span> <span class="p">:</span> <span class="n">KeyStruct</span><span class="p">(</span><span class="n">DEFAULT_RANGES</span><span class="p">[</span><span class="s2">&quot;param_categorical&quot;</span><span class="p">],</span> <span class="n">Key</span><span class="o">.</span><span class="n">TYPE_STRING</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
-        <span class="s2">&quot;param_float&quot;</span> <span class="p">:</span> <span class="n">KeyStruct</span><span class="p">(</span><span class="n">DEFAULT_RANGES</span><span class="p">[</span><span class="s2">&quot;param_float&quot;</span><span class="p">],</span> <span class="n">Key</span><span class="o">.</span><span class="n">TYPE_STRING</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="s2">&quot;param_float&quot;</span> <span class="p">:</span> <span class="n">KeyStruct</span><span class="p">(</span><span class="n">DEFAULT_RANGES</span><span class="p">[</span><span class="s2">&quot;param_float&quot;</span><span class="p">],</span> <span class="n">Key</span><span class="o">.</span><span class="n">TYPE_FLOAT</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
     <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ranges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -103,8 +101,283 @@ In this file:</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">exampleroot</span>
 </pre></div>
 </div>
-<p>Currently, the delphi system uses classifiers in the <cite>sklearn</cite> package, so only the name of the classifier is needed.
+<p>Currently, the delphi system uses classifiers in the <code class="docutils literal"><span class="pre">sklearn</span></code> package, so only the name of the classifier is needed.
 Since sklearn uses consistent framework across classifiers (fit, predict, etc.), delphi creates an object using the name of classifier and uses the sklearn standard framework to learn the classifier and make predictions.</p>
+</div>
+<div class="section" id="adding-a-parameter-selector">
+<h2>Adding a Parameter Selector<a class="headerlink" href="#adding-a-parameter-selector" title="Permalink to this headline">¶</a></h2>
+<p>A parameter selector can be created by creating a class which inherits the <code class="docutils literal"><span class="pre">SamplesSelector</span></code> class.
+The class must have a <code class="docutils literal"><span class="pre">select</span></code> function which returns the chose parameters.
+A few examples which use a Gaussian Process to choose parameters is shown below.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">delphi.selection.samples</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">delphi.utilities</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">delphi.database</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">sklearn.gaussian_process</span> <span class="k">import</span> <span class="n">GaussianProcess</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">traceback</span>
+
+<span class="kn">from</span> <span class="nn">delphi.selection.acquisition</span> <span class="k">import</span> <span class="n">expected_improvement</span>
+<span class="kn">from</span> <span class="nn">delphi.selection.samples.uniform</span> <span class="k">import</span> <span class="n">UniformSampler</span>
+
+<span class="k">class</span> <span class="nc">GPEi</span><span class="p">(</span><span class="n">SamplesSelector</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Needs:</span>
+<span class="sd">        frozen_set, learners, metric, best_y</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GPEi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes in learner objects from database that</span>
+<span class="sd">        have been completed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">past_params</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">learners</span> <span class="o">=</span> <span class="n">GetLearnersInFrozen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frozen_set</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">learners</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">learners</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">completed</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">learner</span> <span class="ow">in</span> <span class="n">learners</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="p">))</span>
+            <span class="n">past_params</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">learner</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+            
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_selection</span><span class="p">(</span><span class="n">past_params</span><span class="p">)</span>
+            
+        
+    <span class="k">def</span> <span class="nf">do_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">past_params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Based on past parameterizations and their performances, </span>
+<span class="sd">        select a best candidate for evaluation by randomly generating </span>
+<span class="sd">        many examples and seeing which has the highest average expected</span>
+<span class="sd">        regression value. </span>
+<span class="sd">        </span>
+<span class="sd">        Example format:</span>
+<span class="sd">        </span>
+<span class="sd">            past_params = [</span>
+<span class="sd">                ({...}, y1), </span>
+<span class="sd">                ({...}, y2), </span>
+<span class="sd">                ...</span>
+<span class="sd">            ]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># etract parameters and performances</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">past_params</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">past_params</span><span class="p">])</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">ParamsToVectors</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frozen_set</span><span class="o">.</span><span class="n">optimizables</span><span class="p">)</span>
+        
+        <span class="c1"># train a GP</span>
+        <span class="n">gp</span> <span class="o">=</span> <span class="n">GaussianProcess</span><span class="p">(</span><span class="n">theta0</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">thetaL</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="n">thetaU</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">nugget</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+        <span class="n">gp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> 
+        
+        <span class="c1"># randomly generate many vectors</span>
+        <span class="n">candidates</span> <span class="o">=</span> <span class="n">GenerateRandomVectors</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frozen_set</span><span class="o">.</span><span class="n">optimizables</span><span class="p">)</span>
+        <span class="n">ys</span><span class="p">,</span> <span class="n">stdevs</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">candidates</span><span class="p">,</span> <span class="n">eval_MSE</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">stdevs</span><span class="p">)</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="p">[</span><span class="n">expected_improvement</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_y</span><span class="p">,</span> <span class="n">stdev</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">stdev</span><span class="p">)</span> <span class="ow">in</span> <span class="n">predictions</span><span class="p">]</span>
+        
+        <span class="c1">#print &quot;PREDICTIONS&quot;, np.unique(predictions)</span>
+        
+        <span class="c1"># choose one with highest average, convert, and return</span>
+        <span class="n">chosen</span> <span class="o">=</span> <span class="n">candidates</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predictions</span><span class="p">)]</span>
+        
+        <span class="k">return</span> <span class="n">VectorBackToParams</span><span class="p">(</span><span class="n">chosen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frozen_set</span><span class="o">.</span><span class="n">optimizables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frozen_set</span><span class="o">.</span><span class="n">frozens</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frozen_set</span><span class="o">.</span><span class="n">constants</span><span class="p">)</span>
+        
+<span class="k">class</span> <span class="nc">GPEiTime</span><span class="p">(</span><span class="n">SamplesSelector</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Needs:</span>
+<span class="sd">        frozen_set, metric, best_y</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GPEiTime</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes in learner objects from database that</span>
+<span class="sd">        have been completed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">past_params</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">learners</span> <span class="o">=</span> <span class="n">GetLearnersInFrozen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frozen_set</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">learners</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">learners</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">completed</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">learner</span> <span class="ow">in</span> <span class="n">learners</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="p">))</span>
+            <span class="n">elapsed</span> <span class="o">=</span> <span class="p">(</span><span class="n">learner</span><span class="o">.</span><span class="n">completed</span> <span class="o">-</span> <span class="n">learner</span><span class="o">.</span><span class="n">started</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">elapsed</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">elapsed</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="n">past_params</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">learner</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">y</span> <span class="o">/</span> <span class="n">elapsed</span><span class="p">))</span>
+            
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_selection</span><span class="p">(</span><span class="n">past_params</span><span class="p">)</span>
+            
+        
+    <span class="k">def</span> <span class="nf">do_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">past_params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Based on past parameterizations and their performances, </span>
+<span class="sd">        select a best candidate for evaluation by randomly generating </span>
+<span class="sd">        many examples and seeing which has the highest average expected</span>
+<span class="sd">        regression value.</span>
+<span class="sd">        </span>
+<span class="sd">        The value to train on is EI divided by time for expected improvement</span>
+<span class="sd">        per unit time. </span>
+<span class="sd">        </span>
+<span class="sd">        Example format:</span>
+<span class="sd">        </span>
+<span class="sd">            past_params = [</span>
+<span class="sd">                ({...}, y1), </span>
+<span class="sd">                ({...}, y2), </span>
+<span class="sd">                ...</span>
+<span class="sd">            ]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># etract parameters and performances</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">past_params</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">past_params</span><span class="p">])</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">ParamsToVectors</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frozen_set</span><span class="o">.</span><span class="n">optimizables</span><span class="p">)</span>
+        
+        <span class="c1"># train a GP</span>
+        <span class="n">gp</span> <span class="o">=</span> <span class="n">GaussianProcess</span><span class="p">(</span><span class="n">theta0</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">thetaL</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="n">thetaU</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">nugget</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+        <span class="n">gp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> 
+        
+        <span class="c1"># randomly generate many vectors</span>
+        <span class="n">candidates</span> <span class="o">=</span> <span class="n">GenerateRandomVectors</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frozen_set</span><span class="o">.</span><span class="n">optimizables</span><span class="p">)</span>
+        <span class="n">ys</span><span class="p">,</span> <span class="n">stdevs</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">candidates</span><span class="p">,</span> <span class="n">eval_MSE</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">stdevs</span><span class="p">)</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="p">[</span><span class="n">expected_improvement</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_y</span><span class="p">,</span> <span class="n">stdev</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">stdev</span><span class="p">)</span> <span class="ow">in</span> <span class="n">predictions</span><span class="p">]</span>
+        
+        <span class="c1"># choose one with highest average, convert, and return</span>
+        <span class="n">chosen</span> <span class="o">=</span> <span class="n">candidates</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predictions</span><span class="p">)]</span>
+        
+        <span class="k">return</span> <span class="n">VectorBackToParams</span><span class="p">(</span><span class="n">chosen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frozen_set</span><span class="o">.</span><span class="n">optimizables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frozen_set</span><span class="o">.</span><span class="n">frozens</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frozen_set</span><span class="o">.</span><span class="n">constants</span><span class="p">)</span>
+        
+<span class="k">class</span> <span class="nc">GPEiVelocity</span><span class="p">(</span><span class="n">SamplesSelector</span><span class="p">):</span>
+
+    <span class="n">MULTIPLIER</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span>
+    <span class="n">LIMIT</span> <span class="o">=</span> <span class="mi">5</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Needs:</span>
+<span class="sd">        frozen_set, learners, metric, best_y, velocity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GPEiVelocity</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes in learner objects from database that</span>
+<span class="sd">        have been completed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># calculate average velocity over the k window</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">probability_of_random</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+            <span class="n">learners</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Learner</span><span class="p">)</span><span class="o">.</span>\
+                <span class="nb">filter</span><span class="p">(</span><span class="n">Learner</span><span class="o">.</span><span class="n">frozen_set_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">frozen_set</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span>\
+                <span class="n">order_by</span><span class="p">(</span><span class="n">Learner</span><span class="o">.</span><span class="n">cv</span><span class="o">.</span><span class="n">desc</span><span class="p">())</span><span class="o">.</span>\
+                <span class="n">limit</span><span class="p">(</span><span class="n">GPEiVelocity</span><span class="o">.</span><span class="n">LIMIT</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="n">learners</span> <span class="o">=</span> <span class="n">learners</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1">################## hardcoded CV avg acc ##############!!!!!</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">cv</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">learners</span><span class="p">]</span>
+            <span class="nb">print</span> <span class="s2">&quot;GpEI scores in order increasing: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">scores</span>
+            <span class="n">vels</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">vels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">scores</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+            <span class="nb">print</span> <span class="s2">&quot;Velocities&quot;</span><span class="p">,</span> <span class="n">vels</span>
+
+            <span class="k">if</span> <span class="n">vels</span><span class="p">:</span>
+                <span class="n">probability_of_random</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">GPEiVelocity</span><span class="o">.</span><span class="n">MULTIPLIER</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">vels</span><span class="p">))</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="nb">print</span> <span class="s2">&quot;Probability of random: </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">probability_of_random</span>
+
+        <span class="c1"># now select a sample</span>
+        <span class="n">sampler</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">probability_of_random</span><span class="p">:</span>
+            <span class="c1"># our forward progress in this frozen set has stalled, let&#39;s </span>
+            <span class="c1"># introduce some randomness</span>
+            <span class="nb">print</span> <span class="s2">&quot;Choosing random so as to not stagnate!&quot;</span>
+            <span class="n">sampler</span> <span class="o">=</span> <span class="n">UniformSampler</span><span class="p">(</span><span class="n">frozen_set</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">frozen_set</span><span class="p">)</span>
+        
+        <span class="c1"># otherwise continue with ei + time as intended</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sampler</span> <span class="o">=</span> <span class="n">GPEi</span><span class="p">(</span><span class="n">frozen_set</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">frozen_set</span><span class="p">,</span>
+                    <span class="n">metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span> <span class="n">best_y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">best_y</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sampler</span><span class="o">.</span><span class="n">select</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="section" id="changing-the-acquisition-function">
+<h3>Changing the Acquisition Function<a class="headerlink" href="#changing-the-acquisition-function" title="Permalink to this headline">¶</a></h3>
+<p>The Gaussian Process Expected Improvement selection scheme makes use of an acquisition function to decide which parameter set will offer the best performance improvement.
+The current acquisition function (seen below) makes use of the predicted performance and the confidence of the performance to create a new metric for deciding which parameter set will likely offer the best performance.
+This metric can be altered depending on the needs of a particular problem in the <code class="docutils literal"><span class="pre">acquisition.py</span></code> file in the <code class="docutils literal"><span class="pre">delphi/selection</span></code> folder.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="k">import</span> <span class="n">norm</span>
+
+<span class="n">standard_normal</span> <span class="o">=</span> <span class="n">norm</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">expected_improvement</span><span class="p">(</span><span class="n">y_est</span><span class="p">,</span> <span class="n">y_best</span><span class="p">,</span> <span class="n">stddev</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Expected improvement criterion:</span>
+<span class="sd">	http://people.seas.harvard.edu/~jsnoek/nips2013transfer.pdf</span>
+
+<span class="sd">	y_est 	= what the GP estimates the value of y will be </span>
+<span class="sd">	y_best 	= single best y seen </span>
+<span class="sd">	stddev 	= uncertainty of the GP&#39;s prediction</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">z_score</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_best</span> <span class="o">-</span> <span class="n">y_est</span><span class="p">)</span> <span class="o">/</span> <span class="n">stddev</span>
+	<span class="n">ei</span> <span class="o">=</span> <span class="n">stddev</span> <span class="o">*</span> <span class="p">(</span><span class="n">z_score</span> <span class="o">*</span> <span class="n">standard_normal</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">z_score</span><span class="p">)</span> <span class="o">+</span> <span class="n">standard_normal</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">z_score</span><span class="p">))</span>
+	<span class="k">return</span> <span class="n">ei</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="adding-a-frozens-hyperpartition-selector">
+<h2>Adding a Frozens (Hyperpartition) Selector<a class="headerlink" href="#adding-a-frozens-hyperpartition-selector" title="Permalink to this headline">¶</a></h2>
+<p>A parameter selector can be created by creating a class which inherits the <code class="docutils literal"><span class="pre">FrozenSelector</span></code> class.
+The class must have a <code class="docutils literal"><span class="pre">select</span></code> function which returns the chose parameters.
+An example which uses the UCB1 algorithm to choose the hyperpartition is shown below.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">delphi.selection.frozens</span> <span class="k">import</span> <span class="n">FrozenSelector</span>
+<span class="kn">from</span> <span class="nn">delphi.selection.bandit</span> <span class="k">import</span> <span class="n">UCB1Bandit</span><span class="p">,</span> <span class="n">FrozenArm</span>
+<span class="kn">import</span> <span class="nn">math</span><span class="o">,</span> <span class="nn">random</span>
+
+<span class="k">class</span> <span class="nc">UCB1</span><span class="p">(</span><span class="n">FrozenSelector</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Needs:</span>
+<span class="sd">		frozen_sets</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">UCB1</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+		
+	<span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Selects the arm which has the highest score</span>
+<span class="sd">		as determined by UCB1 bandit algorithm.</span>
+<span class="sd">		</span>
+<span class="sd">		majority is the percentage of the dataset that is </span>
+<span class="sd">		the minority, representing the baseline.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">arms</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">total_count</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="n">total_rewards</span> <span class="o">=</span> <span class="mf">0.0</span>
+		<span class="k">for</span> <span class="n">fset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frozen_sets</span><span class="p">:</span>
+			<span class="n">count</span> <span class="o">=</span> <span class="n">fset</span><span class="o">.</span><span class="n">trained</span>
+			<span class="n">rewards</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">fset</span><span class="o">.</span><span class="n">rewards</span><span class="p">)</span> 
+			<span class="n">total_rewards</span> <span class="o">+=</span> <span class="n">rewards</span>
+			<span class="n">total_count</span> <span class="o">+=</span> <span class="n">fset</span><span class="o">.</span><span class="n">trained</span>
+			<span class="n">arm</span> <span class="o">=</span> <span class="n">FrozenArm</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">fset</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+			<span class="n">arms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arm</span><span class="p">)</span>
+			
+		<span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">arms</span><span class="p">)</span> <span class="c1"># so arms are not picked in ordinal ID order</span>
+		<span class="n">bandit</span> <span class="o">=</span> <span class="n">UCB1Bandit</span><span class="p">(</span><span class="n">arms</span><span class="p">,</span> <span class="n">total_count</span><span class="p">,</span> <span class="n">total_rewards</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">bandit</span><span class="o">.</span><span class="n">score_arms</span><span class="p">()</span>
+</pre></div>
+</div>
 </div>
 </div>
 
@@ -118,6 +391,11 @@ Since sklearn uses consistent framework across classifiers (fit, predict, etc.),
   <ul>
 <li><a class="reference internal" href="#">delphi</a><ul>
 <li><a class="reference internal" href="#adding-a-classifier">Adding a classifier</a></li>
+<li><a class="reference internal" href="#adding-a-parameter-selector">Adding a Parameter Selector</a><ul>
+<li><a class="reference internal" href="#changing-the-acquisition-function">Changing the Acquisition Function</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adding-a-frozens-hyperpartition-selector">Adding a Frozens (Hyperpartition) Selector</a></li>
 </ul>
 </li>
 </ul>
@@ -152,9 +430,6 @@ Since sklearn uses consistent framework across classifiers (fit, predict, etc.),
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="tutorial.html" title="Tutorial"
              >previous</a> |</li>

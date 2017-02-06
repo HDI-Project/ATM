@@ -34,7 +34,7 @@ Install the required packages::
 
 The required packages are:
 
-.. literalinclude:: ../setup/reqs.txt
+.. literalinclude:: ../../setup/reqs.txt
 
 
 2. MySQL Setup
