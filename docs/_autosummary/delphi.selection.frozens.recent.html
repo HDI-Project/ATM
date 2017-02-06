@@ -26,10 +26,7 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="top" title="delphi 0.9 documentation" href="../index.html" />
-    <link rel="up" title="delphi" href="../code.html" />
-    <link rel="next" title="delphi.selection.frozens.ucb1" href="delphi.selection.frozens.ucb1.html" />
-    <link rel="prev" title="delphi.selection.frozens.pure" href="delphi.selection.frozens.pure.html" /> 
+    <link rel="top" title="delphi 0.9 documentation" href="../index.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -41,14 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="delphi.selection.frozens.ucb1.html" title="delphi.selection.frozens.ucb1"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="delphi.selection.frozens.pure.html" title="delphi.selection.frozens.pure"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">delphi 0.9 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../code.html" accesskey="U">delphi</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">delphi 0.9 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -57,176 +47,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-delphi.selection.frozens.recent">
-<span id="delphi-selection-frozens-recent"></span><h1>delphi.selection.frozens.recent<a class="headerlink" href="#module-delphi.selection.frozens.recent" title="Permalink to this headline">¶</a></h1>
-<p class="rubric">Functions</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">AverageVelocitiyFromList</span></code>(seq,&nbsp;is_ascending)</td>
-<td>Assumes unit (1) time steps in between measurements.</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">Base64ToObject</span></code>(b64str)</td>
-<td>Inverse of ObjectToBase64.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">CreateCSVHeader</span></code>(n_features,&nbsp;name,&nbsp;...)</td>
-<td>Creates a CSV header like:</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">DelphiToScikit</span></code>(learner_params)</td>
-<td>TODO: Make this logic into subclasses</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">DownloadFileHTTP</span></code>(url[,&nbsp;verbose])</td>
-<td><a class="reference external" href="http://stackoverflow.com/questions/22676/how-do-i-download-a-file-over-http-using-python">http://stackoverflow.com/questions/22676/how-do-i-download-a-file-over-http-using-python</a></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">DownloadFileS3</span></code>(config,&nbsp;keyname)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">EnsureDirectory</span></code>(directory)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">GetBests</span></code>(sequence[,&nbsp;initBest])</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">GetConnection</span></code>()</td>
-<td>Returns a database connection.</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">GetDatarun</span></code>([datarun_id])</td>
-<td>Among the incomplete dataruns with maximal priority, returns one at random.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">GetFrozenSet</span></code>(frozen_set_id[,&nbsp;increment])</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">GetFrozenSets</span></code>(datarun_id)</td>
-<td>Returns all the frozen sets in a given datarun by id.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">GetInfo</span></code>()</td>
-<td>Returns dictionary about information of this computer for statistics.</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">GetLearners</span></code>(datarun_id)</td>
-<td>Returns all learners in datarun.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">GetLearnersInFrozen</span></code>(frozen_set_id)</td>
-<td>Returns all completed learners in</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">GetMaximumY</span></code>(datarun_id,&nbsp;metric[,&nbsp;default])</td>
-<td>Returns the maximum value of a numeric column by name.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">GetMemory</span></code>()</td>
-<td>Get node total memory and memory usage</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">GetPublicIP</span></code>()</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">GetRandomBests</span></code>(sequence[,&nbsp;n,&nbsp;initBest])</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">GroupBy</span></code>(objects,&nbsp;attribute)</td>
-<td>Groups objects by their attribute values</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">HashDict</span></code>(dictionary[,&nbsp;ignored_keys])</td>
-<td><a class="reference external" href="http://stackoverflow.com/questions/5884066/hashing-a-python-dictionary">http://stackoverflow.com/questions/5884066/hashing-a-python-dictionary</a></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">HashNestedTuple</span></code>(tup)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">HashString</span></code>(s)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">IsDictSubset</span></code>(sup,&nbsp;sub)</td>
-<td>Tests if one dictionary is a subset of another.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">IsNumeric</span></code>(obj)</td>
-<td><a class="reference external" href="http://stackoverflow.com/questions/500328/identifying-numeric-and-array-types-in-numpy">http://stackoverflow.com/questions/500328/identifying-numeric-and-array-types-in-numpy</a></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">MakeModelPath</span></code>(model_dir,&nbsp;params_hash,&nbsp;...)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">MarkDatarunDone</span></code>(datarun_id)</td>
-<td>Sets the completed field of the Learner to the current datetime for a given datarun_id.</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">ObjHasMethod</span></code>(obj,&nbsp;method)</td>
-<td><a class="reference external" href="http://stackoverflow.com/questions/34439/finding-what-methods-an-object-has">http://stackoverflow.com/questions/34439/finding-what-methods-an-object-has</a></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">ObjectToBase64</span></code>(obj)</td>
-<td>Takes object in memory, then pickles and  base64 encodes it.</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">StringToSpecial</span></code>(string)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">create_engine</span></code>(\*args,&nbsp;\*\*kwargs)</td>
-<td>Create a new <code class="xref py py-class docutils literal"><span class="pre">Engine</span></code> instance.</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">declarative_base</span></code>([bind,&nbsp;metadata,&nbsp;mapper,&nbsp;...])</td>
-<td>Construct a base class for declarative class definitions.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">relationship</span></code>(argument[,&nbsp;secondary,&nbsp;...])</td>
-<td>Provide a relationship between two mapped classes.</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Classes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">Algorithm</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">Base</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">Config</span></code>(cfgpath)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">Datarun</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">FrozenArm</span></code>(count,&nbsp;rewards,&nbsp;frozen_id)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">FrozenSelector</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">FrozenSet</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">Key</span></code>([bucket,&nbsp;name])</td>
-<td>Represents a key (object) in an S3 bucket.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">Learner</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">MetaData</span></code>([bind,&nbsp;reflect,&nbsp;schema,&nbsp;...])</td>
-<td>A collection of <code class="xref py py-class docutils literal"><span class="pre">Table</span></code> objects and their associated schema constructs.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">RecentKReward</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">RecentKVelocity</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">S3Connection</span></code>([aws_access_key_id,&nbsp;...])</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">Table</span></code>(\*args,&nbsp;\*\*kw)</td>
-<td>Represent a table in a database.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">UCB1Bandit</span></code>(arms,&nbsp;count,&nbsp;rewards)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">datetime</span></code>(year,&nbsp;month,&nbsp;day[,&nbsp;hour[,&nbsp;minute[,&nbsp;...)</td>
-<td>The year, month and day arguments are required.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">sessionmaker</span></code>([bind,&nbsp;class_,&nbsp;autoflush,&nbsp;...])</td>
-<td>A configurable <code class="xref py py-class docutils literal"><span class="pre">Session</span></code> factory.</td>
-</tr>
-</tbody>
-</table>
+  <div class="section" id="delphi-selection-frozens-recent">
+<h1>delphi.selection.frozens.recent<a class="headerlink" href="#delphi-selection-frozens-recent" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -235,12 +57,6 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="delphi.selection.frozens.pure.html"
-                        title="previous chapter">delphi.selection.frozens.pure</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="delphi.selection.frozens.ucb1.html"
-                        title="next chapter">delphi.selection.frozens.ucb1</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -271,14 +87,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="delphi.selection.frozens.ucb1.html" title="delphi.selection.frozens.ucb1"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="delphi.selection.frozens.pure.html" title="delphi.selection.frozens.pure"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">delphi 0.9 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../code.html" >delphi</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">delphi 0.9 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

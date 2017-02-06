@@ -50,29 +50,29 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started):
     tries = total
     while tries:
 	    try:
-	        # save model 
+	        # save model
 	        phash = HashDict(params)
 	        rhash = HashString(datarun.name)
 	        modelpath = MakeModelPath("models", phash, rhash, datarun.description)
 	        model.save(modelpath)
 	        _log("Saving model in: %s" % modelpath)
-	        
+
 	        # compile fields
 	        completed = time.strftime('%Y-%m-%d %H:%M:%S')
 	        trainables = model.algorithm.performance()['trainable_params']
 	        fmt_completed = datetime.datetime.strptime(completed, SQL_DATE_FORMAT)
 	        fmt_started = datetime.datetime.strptime(started, SQL_DATE_FORMAT)
 	        seconds = (fmt_completed - fmt_started).total_seconds()
-	        
-	        # connect and insert, update 
+
+	        # connect and insert, update
 	        session = GetConnection()
 	        learner = Learner(datarun_id=datarun.id, frozen_set_id=frozen_set.id, dataname=datarun.name,
-	                        algorithm=frozen_set.algorithm, trainpath=datarun.trainpath, 
-	                        testpath=datarun.testpath, modelpath=modelpath, params_hash=phash, 
-	                        params=params, trainable_params=trainables, cv=performance["cv_acc"], 
-	                        stdev=performance["stdev"], test=performance["testing_acc"], 
-	                        confusion=performance["testing_confusion"], started=started, 
-	                        completed=datetime.datetime.now(), host=GetPublicIP(), 
+	                        algorithm=frozen_set.algorithm, trainpath=datarun.trainpath,
+	                        testpath=datarun.testpath, modelpath=modelpath, params_hash=phash,
+	                        params=params, trainable_params=trainables, cv=performance["cv_acc"],
+	                        stdev=performance["stdev"], test=performance["testing_acc"],
+	                        confusion=performance["testing_confusion"], started=started,
+	                        completed=datetime.datetime.now(), host=GetPublicIP(),
 	                        dimensions=model.algorithm.dimensions, frozen_hash=frozen_set.frozen_hash,
 	                        seconds=seconds, description=datarun.description)
 	        session.add(learner)
@@ -81,7 +81,7 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started):
 	        frozen_set.rewards += Decimal(performance[datarun.metric])
 	        session.commit()
 	        break
-	            
+
 	    except Exception:
 	        msg = traceback.format_exc()
 	        _log("Error in InsertLearner():, try=%d" % (total - tries) + msg)
@@ -90,11 +90,11 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started):
 	        	tries -= 1
 	        	continue
 	        InsertError(datarun.id, frozen_set.id, params, msg)
-	        
+
 	    finally:
 	        if session:
 	            session.close()
-        
+
 def InsertError(datarun_id, frozen_set_id, params, error_msg):
     session = None
     try:
@@ -106,17 +106,17 @@ def InsertError(datarun_id, frozen_set_id, params, error_msg):
         session.add(learner)
         session.commit()
         _log("Successfully reported error")
-        
+
     except Exception:
         _log("InsertError(): Error marking this learner an error..." + traceback.format_exc())
     finally:
-        if session: 
+        if session:
             session.close()
 
 def LoadData(datarun):
     """
     Loads the data from HTTP (if necessary) and then from
-    disk into memory. 
+    disk into memory.
     """
     # download data if necessary
     basepath = os.path.basename(datarun.local_trainpath)
@@ -127,13 +127,13 @@ def LoadData(datarun):
         else:
             EnsureDirectory("data/processed/")
             os.rename(basepath, "data/processed/"+basepath)
-    
+
     # load the data into matrix format
     trainX = np.genfromtxt(datarun.local_trainpath, delimiter=",")
     labelcol = datarun.labelcol
     trainY = trainX[:, labelcol]
     trainX = np.delete(trainX, labelcol, axis=1)
-    
+
     basepath = os.path.basename(datarun.local_testpath)
     if not os.path.isfile(datarun.local_testpath):
         if not DownloadFileS3(config, basepath) == basepath:
@@ -141,7 +141,7 @@ def LoadData(datarun):
         else:
             EnsureDirectory("data/processed/")
             os.rename(basepath, "data/processed/"+basepath)
-    
+
     # load the data into matrix format
     testX = np.genfromtxt(datarun.local_testpath, delimiter=",")
     labelcol = datarun.labelcol
@@ -162,12 +162,12 @@ while True:
             _log("No datarun present in database, will wait and try again...")
             time.sleep(10)
             continue
-        
+
         # choose frozen set
         _log("Datarun: %s" % datarun)
         frozen_sets = GetFrozenSets(datarun.id)
         ncompleted = sum([f.trained for f in frozen_sets])
-        
+
         # check if we've exceeded datarun limits
         budget_type = datarun.budget
         endrun = False
@@ -183,14 +183,14 @@ while True:
                 MarkDatarunDone(datarun.id)
                 endrun = True
                 _log("Walltime budget has run out!")
-        
+
         # did we end the run?
         elif endrun == True:
             # marked the run as done successfully
             _log("This datarun has ended, let's find another")
             time.sleep(2)
             continue
-            
+
         # otherwise select a frozen set from this run
         _log("Frozen Selection: %s" % datarun.frozen_selection)
         fclass = Mapping.SELECTION_FROZENS_MAP[datarun.frozen_selection]
@@ -203,23 +203,23 @@ while True:
         if not frozen_set:
         	_log("Invalid frozen set! %s" % frozen_set)
         _log("Frozen set: %d" % frozen_set.id)
-        
+
         # choose sampler
         _log("Sample selection: %s" % datarun.sample_selection)
-        Sampler = Mapping.SELECTION_SAMPLES_MAP[datarun.sample_selection]   
+        Sampler = Mapping.SELECTION_SAMPLES_MAP[datarun.sample_selection]
         sampler = None
-        
+
         N_OPT = datarun.r_min
-        
+
         ### UNIFORM SAMPLE SELECTION ###
         if datarun.sample_selection == SELECTION_SAMPLES_UNIFORM:
             sampler = Sampler(frozen_set=frozen_set)
-        
+
         ### BASIC GP SAMPLE SELECTION ###
         elif datarun.sample_selection == SELECTION_SAMPLES_GP:
             learners = GetLearnersInFrozen(frozen_set_id)
             learners = [x.completed == None for x in learners] # only completed learners
-            
+
             # check if we have enough results to pursue this strategy
             if len(learners) < N_OPT:
                 _log("Not enough previous results, falling back onto strategy: %s" % SELECTION_SAMPLES_UNIFORM)
@@ -227,13 +227,13 @@ while True:
                 sampler = Sampler(frozen_set=frozen_set)
             else:
                 sampler = Sampler(frozen_set=frozen_set, learners=learners, metric=datarun.metric)
-        
-        ### GP EXPECTED IMPROVEMENT SAMPLE SELECTION ###    
+
+        ### GP EXPECTED IMPROVEMENT SAMPLE SELECTION ###
         elif datarun.sample_selection == SELECTION_SAMPLES_GP_EI:
             learners = GetLearnersInFrozen(frozen_set.id)
             learners = [x.completed == None for x in learners] # only completed learners
             best_y = GetMaximumY(datarun.id, datarun.metric, default=0.0)
-            
+
             # check if we have enough results to pursue this strategy
             if len(learners) < N_OPT:
                 _log("Not enough previous results for gp_ei, falling back onto strategy: %s" % SELECTION_SAMPLES_UNIFORM)
@@ -246,7 +246,7 @@ while True:
             learners = GetLearnersInFrozen(frozen_set.id)
             learners = [x.completed == None for x in learners] # only completed learners
             best_y = GetMaximumY(datarun.id, datarun.metric, default=0.0)
-            
+
             # check if we have enough results to pursue this strategy
             if len(learners) < N_OPT:
                 _log("Not enough previous results for gp_eivel, falling back onto strategy: %s (learners %d < %d)" % (
@@ -255,13 +255,13 @@ while True:
                 sampler = Sampler(frozen_set=frozen_set)
             else:
                 sampler = Sampler(frozen_set=frozen_set, learners=learners, metric=datarun.metric, best_y=best_y)
-                
-        ### GP EXPECTED IMPROVEMENT PER TIME SAMPLE SELECTION ###    
+
+        ### GP EXPECTED IMPROVEMENT PER TIME SAMPLE SELECTION ###
         elif datarun.sample_selection == SELECTION_SAMPLES_GP_EI_TIME:
             learners = GetLearnersInFrozen(frozen_set.id)
             learners = [x.completed == None for x in learners] # only completed learners
             best_y = GetMaximumY(datarun.id, datarun.metric, default=0.0)
-            
+
             # check if we have enough results to pursue this strategy
             if len(learners) < N_OPT:
                 _log("Not enough previous results for gp_eitime, falling back onto strategy: %s" % SELECTION_SAMPLES_UNIFORM)
@@ -269,24 +269,25 @@ while True:
                 sampler = Sampler(frozen_set=frozen_set)
             else:
                 sampler = Sampler(frozen_set=frozen_set, learners=learners, metric=datarun.metric, best_y=best_y)
-        
+
         # select the parameters based on the sampler
         params = sampler.select()
         _log("Params chosen: %s" % params)
-        
+
         # train learner
         params["function"] = frozen_set.algorithm
+        import pdb; pdb.set_trace()
         wrapper = CreateWrapper(params)
         trainX, testX, trainY, testY = LoadData(datarun)
         wrapper.load_data_from_objects(trainX, testX, trainY, testY)
         performance = wrapper.start()
         print "Performance: %s" % performance
         model = Model(wrapper, datarun.wrapper)
-        
+
         # insert learner into the database
         InsertLearner(datarun, frozen_set, performance, params, model, started)
         datarun, frozen_set = None, None # reset state
-        
+
     except Exception as e:
         msg = traceback.format_exc()
         if datarun and frozen_set:
@@ -294,8 +295,8 @@ while True:
             InsertError(datarun.id, frozen_set.id, params, msg)
         else:
             _log("Error in main work loop (no datarun or frozen set):" + msg)
-    
+
     finally:
         time.sleep(loop_wait)
-    
+
     continue

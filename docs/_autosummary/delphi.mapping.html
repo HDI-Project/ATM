@@ -26,9 +26,7 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="top" title="delphi 0.9 documentation" href="../index.html" />
-    <link rel="up" title="delphi" href="../code.html" />
-    <link rel="next" title="delphi.model" href="delphi.model.html" /> 
+    <link rel="top" title="delphi 0.9 documentation" href="../index.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -40,11 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="delphi.model.html" title="delphi.model"
-             accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">delphi 0.9 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../code.html" accesskey="U">delphi</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">delphi 0.9 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -53,194 +47,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-delphi.mapping">
-<span id="delphi-mapping"></span><h1>delphi.mapping<a class="headerlink" href="#module-delphi.mapping" title="Permalink to this headline">¶</a></h1>
-<p class="rubric">Functions</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">AverageVelocitiyFromList</span></code>(seq,&nbsp;is_ascending)</td>
-<td>Assumes unit (1) time steps in between measurements.</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">CreateWrapper</span></code>(params)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">DrawRandomValues</span></code>(n,&nbsp;struct)</td>
-<td>Notes np.random.random_integers(lo, hi, size=n) generates  n ints in range [lo, hi] INCLUSIVE.</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">FrozenSetsFromAlgorithmCodes</span></code>(codes[,&nbsp;verbose])</td>
-<td>Takes in string codes and outputs frozen sets.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">GenerateRandomVectors</span></code>(n,&nbsp;optimizables)</td>
-<td>Given a set of optimizable key =&gt; key struct mappings,  randomly generates N vectors but with deterministic ordering of corresponding keys in the vector given the set of keys (by sorting).</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">ParamsToVectors</span></code>(params,&nbsp;optimizables)</td>
-<td>params is a list of {}</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">VectorBackToParams</span></code>(vector,&nbsp;optimizables,&nbsp;...)</td>
-<td>vector is single example with which to convert</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Classes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">BernoulliNB</span></code>([alpha,&nbsp;binarize,&nbsp;fit_prior,&nbsp;...])</td>
-<td>Naive Bayes classifier for multivariate Bernoulli models.</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">BestKReward</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">BestKVelocity</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">ClassifierEnumerator</span></code>(hypers,&nbsp;categoricals)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">DBN</span></code>([layer_sizes,&nbsp;scales,&nbsp;fan_outs,&nbsp;...])</td>
-<td>A scikit-learn estimator based on George Dahl&#8217;s DBN implementation <cite>gdbn</cite>.</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">DecisionTreeClassifier</span></code>([criterion,&nbsp;...])</td>
-<td>A decision tree classifier.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">Enumerator</span></code>(ranges,&nbsp;keys)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">EnumeratorBNB</span></code>([ranges,&nbsp;keys])</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">EnumeratorDBN</span></code>([ranges,&nbsp;keys])</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">EnumeratorDTC</span></code>([ranges,&nbsp;keys])</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">EnumeratorETC</span></code>([ranges,&nbsp;keys])</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">EnumeratorGNB</span></code>([ranges,&nbsp;keys])</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">EnumeratorKNN</span></code>([ranges,&nbsp;keys])</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">EnumeratorLRC</span></code>([ranges,&nbsp;keys])</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">EnumeratorMNB</span></code>([ranges,&nbsp;keys])</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">EnumeratorPAC</span></code>([ranges,&nbsp;keys])</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">EnumeratorRFC</span></code>([ranges,&nbsp;keys])</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">EnumeratorSGDC</span></code>([ranges,&nbsp;keys])</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">EnumeratorSVC</span></code>([ranges,&nbsp;keys])</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">ExtraTreesClassifier</span></code>([n_estimators,&nbsp;...])</td>
-<td>An extra-trees classifier.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">FrozenSelector</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">GP</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">GPEi</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">GPEiTime</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">GPEiVelocity</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">GaussianNB</span></code></td>
-<td>Gaussian Naive Bayes (GaussianNB)</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">GaussianProcess</span></code>([regr,&nbsp;corr,&nbsp;beta0,&nbsp;...])</td>
-<td>The Gaussian Process model class.</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">HierarchicalByAlgorithm</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">HierarchicalRandom</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">KNeighborsClassifier</span></code>([n_neighbors,&nbsp;weights,&nbsp;...])</td>
-<td>Classifier implementing the k-nearest neighbors vote.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">Key</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">KeyStruct</span></code>(range,&nbsp;type,&nbsp;is_categorical)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">LogisticRegression</span></code>([penalty,&nbsp;dual,&nbsp;tol,&nbsp;C,&nbsp;...])</td>
-<td>Logistic Regression (aka logit, MaxEnt) classifier.</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">Mapping</span></code></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">MultinomialNB</span></code>([alpha,&nbsp;fit_prior,&nbsp;class_prior])</td>
-<td>Naive Bayes classifier for multinomial models</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">PassiveAggressiveClassifier</span></code>([C,&nbsp;...])</td>
-<td>Passive Aggressive Classifier</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">PureBestKVelocity</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">RandomForestClassifier</span></code>([n_estimators,&nbsp;...])</td>
-<td>A random forest classifier.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">RecentKReward</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">RecentKVelocity</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">SGDClassifier</span></code>([loss,&nbsp;penalty,&nbsp;alpha,&nbsp;...])</td>
-<td>Linear classifiers (SVM, logistic regression, a.o.) with SGD training.</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">SGDRegressor</span></code>([loss,&nbsp;penalty,&nbsp;alpha,&nbsp;...])</td>
-<td>Linear model fitted by minimizing a regularized empirical loss with SGD</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">SVC</span></code>([C,&nbsp;kernel,&nbsp;degree,&nbsp;gamma,&nbsp;coef0,&nbsp;...])</td>
-<td>C-Support Vector Classification.</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">SamplesSelector</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">Selector</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">UCB1</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">UniformFrozens</span></code></td>
-<td>alias of <code class="xref py py-class docutils literal"><span class="pre">Uniform</span></code></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">UniformSampler</span></code>(\*\*kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">Wrapper</span></code>(code,&nbsp;params,&nbsp;learner_class)</td>
-<td></td>
-</tr>
-</tbody>
-</table>
+  <div class="section" id="delphi-mapping">
+<h1>delphi.mapping<a class="headerlink" href="#delphi-mapping" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -249,9 +57,6 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h4>Next topic</h4>
-  <p class="topless"><a href="delphi.model.html"
-                        title="next chapter">delphi.model</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -282,11 +87,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="delphi.model.html" title="delphi.model"
-             >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">delphi 0.9 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../code.html" >delphi</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">delphi 0.9 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

@@ -25,13 +25,14 @@ class Wrapper(object):
     WHITEN = "_whiten"
     MINMAX = "_scale_minmax"
     PCA_DIMS = "_pca_dimensions"
-    
+
     # list of all such keys
     DELPHI_KEYS = [
         SCALE, PCA, WHITEN, MINMAX, PCA_DIMS]
 
     def __init__(self, code, params, learner_class):
-        
+
+        import pdb; pdb.set_trace()
         # configuration & database
         self.code = code
         self.params = params
@@ -58,7 +59,7 @@ class Wrapper(object):
         self.train_final_model()
         self.prepare_model()
         return self.performance()
-        
+
     def performance(self):
         self.perf = {
             "testing_acc" : self.test_score, # backward compatibility :(
@@ -83,10 +84,10 @@ class Wrapper(object):
 
     def train_final_model(self):
         self.pipeline.fit(self.trainX, self.trainY)
-        
+
         # time the training average
         self.test_score = self.pipeline.score(self.testX, self.testY)
-        
+
         # time the prediction
         starttime = time.time()
         predictions = self.pipeline.predict(self.testX)
@@ -95,28 +96,28 @@ class Wrapper(object):
 
         # make confusion matrix
         self.testing_confusion = confusion_matrix(self.testY, predictions)
-        
+
     def predict(self, examples, probability=False):
         """
             Examples should be in vectorized format
-            
-            Returns integer labels. 
+
+            Returns integer labels.
         """
         if not probability:
             return self.pipeline.predict(examples)
         else:
             return self.pipeline.predict_proba(examples)
-    
+
     def prepare_model(self):
         del self.trainX, self.trainY
-        del self.testX, self.testY 
+        del self.testX, self.testY
         del self.datapath
-        
+
     def special_conversions(self, learner_params):
         """
             TODO: Make this logic into subclasses
 
-            ORRRR, should make each enumerator handle it in a static function 
+            ORRRR, should make each enumerator handle it in a static function
             something like:
 
             @staticmethod
@@ -132,11 +133,11 @@ class Wrapper(object):
             learner_params["n_jobs"] = int(learner_params["n_jobs"])
         if "n_estimators" in learner_params:
             learner_params["n_estimators"] = int(learner_params["n_estimators"])
-            
+
         ### DT ###
         if "max_features" in learner_params:
             learner_params["max_features"] = int(float(learner_params["max_features"] * self.testX.shape[1]))
-            
+
         ### PCA ###
         if "_pca" in learner_params:
             del learner_params["_pca"]
@@ -194,24 +195,24 @@ class Wrapper(object):
 
     def make_pipeline(self):
         """
-            Makes the classifier as well as scaling or 
-            dimension reduction steps. 
+            Makes the classifier as well as scaling or
+            dimension reduction steps.
         """
-        # create a list of steps 
+        # create a list of steps
         steps = []
-        
-        # create a learner with 
+
+        # create a learner with
         learner_params = {k:v for k,v in self.params.iteritems() if k not in Wrapper.DELPHI_KEYS}
-        
+
         # do special converstions
         learner_params = self.special_conversions(learner_params)
         self.trainable_params = learner_params
         print "Training: %s" % learner_params
         learner = self.learner_class(**learner_params)
-        
+
         dimensions = None
         if Wrapper.PCA in self.params and self.params[Wrapper.PCA]:
-            whiten = False          
+            whiten = False
             if Wrapper.WHITEN in self.params and self.params[Wrapper.WHITEN]:
                 whiten = True
             # PCA dimension in our self.params is a float reprsenting percentages of features to use
@@ -221,23 +222,21 @@ class Wrapper(object):
                 print "*** Will PCA the data down from %d dimensions to %d" % (self.testX.shape[1], dimensions)
                 pca = decomposition.PCA(n_components=dimensions, whiten=whiten)
                 steps.append(('pca', pca))
-         
-        # keep track of the actual # dimensions we used     
+
+        # keep track of the actual # dimensions we used
         if dimensions:
             self.dimensions = dimensions
         else:
             self.dimensions = self.testX.shape[1]
-        
+
         # should we scale the data?
         if Wrapper.SCALE in self.params and self.params[Wrapper.SCALE]:
             steps.append(('standard_scale', StandardScaler()))
-            
+
         elif Wrapper.MINMAX in self.params and self.params[Wrapper.MINMAX]:
             steps.append(('minmax_scale', MinMaxScaler()))
-        
+
         # add the learner as the final step in the pipeline
         steps.append((self.code, learner))
+        import pdb; pdb.set_trace()
         self.pipeline = Pipeline(steps)
-        
-
-    
