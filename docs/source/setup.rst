@@ -42,7 +42,7 @@ The required packages are:
 
 On Ubuntu, MySQL can be installed with the command::
 
-    $ sudo apt-get install git python-dev mysql-server mysql-client gfortran libatlas-base-dev libmysqlclient-dev build-essential python-dev python-setuptools python-numpy python-scipy libatlas-dev libatlas3gf-base libfreetype6-dev libxft-dev
+    $ sudo apt-get install git python-dev mysql-server mysql-client gfortran libatlas-base-dev libmysqlclient-dev build-essential python-dev python-setuptools python-numpy python-scipy libatlas-dev libatlas3gf-base libfreetype6-dev libxft-dev libssl-dev
 
 and following the instructions.
 Once MySQL is installed, setup the Delphi DataHub database::
