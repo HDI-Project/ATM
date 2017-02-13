@@ -32,7 +32,6 @@ class Wrapper(object):
 
     def __init__(self, code, params, learner_class):
 
-        import pdb; pdb.set_trace()
         # configuration & database
         self.code = code
         self.params = params
@@ -238,5 +237,4 @@ class Wrapper(object):
 
         # add the learner as the final step in the pipeline
         steps.append((self.code, learner))
-        import pdb; pdb.set_trace()
         self.pipeline = Pipeline(steps)
