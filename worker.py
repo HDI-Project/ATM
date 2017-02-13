@@ -276,7 +276,6 @@ while True:
 
         # train learner
         params["function"] = frozen_set.algorithm
-        import pdb; pdb.set_trace()
         wrapper = CreateWrapper(params)
         trainX, testX, trainY, testY = LoadData(datarun)
         wrapper.load_data_from_objects(trainX, testX, trainY, testY)
