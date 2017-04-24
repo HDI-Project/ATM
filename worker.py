@@ -16,6 +16,7 @@ import ast
 import argparse
 
 import warnings
+
 warnings.filterwarnings("ignore")
 
 # for garrays
@@ -23,8 +24,8 @@ os.environ["GNUMPY_IMPLICIT_CONVERSION"] = "allow"
 
 # grab the command line arguments
 parser = argparse.ArgumentParser(description='Add more learners to database')
-parser.add_argument('-d','--datarunid', help='Only train on datasets with this id', default=None, required=False)
-parser.add_argument('-c','--configpath', help='Location of config file', default='config/delphi.cnf', required=False)
+parser.add_argument('-d', '--datarunid', help='Only train on datasets with this id', default=None, required=False)
+parser.add_argument('-c', '--configpath', help='Location of config file', default='config/delphi.cnf', required=False)
 args = parser.parse_args()
 
 # setup
@@ -36,10 +37,12 @@ logfile = "logs/%s.txt" % hostname
 loop_wait = 5
 SQL_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
+
 def _log(msg):
     with open(logfile, "a") as lf:
         lf.write(msg + "\n")
         print msg
+
 
 def InsertLearner(datarun, frozen_set, performance, params, model, started):
     """
@@ -49,51 +52,52 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started):
     total = 5
     tries = total
     while tries:
-	    try:
-	        # save model
-	        phash = HashDict(params)
-	        rhash = HashString(datarun.name)
-	        modelpath = MakeModelPath("models", phash, rhash, datarun.description)
-	        model.save(modelpath)
-	        _log("Saving model in: %s" % modelpath)
+        try:
+            # save model
+            phash = HashDict(params)
+            rhash = HashString(datarun.name)
+            modelpath = MakeModelPath("models", phash, rhash, datarun.description)
+            model.save(modelpath)
+            _log("Saving model in: %s" % modelpath)
 
-	        # compile fields
-	        completed = time.strftime('%Y-%m-%d %H:%M:%S')
-	        trainables = model.algorithm.performance()['trainable_params']
-	        fmt_completed = datetime.datetime.strptime(completed, SQL_DATE_FORMAT)
-	        fmt_started = datetime.datetime.strptime(started, SQL_DATE_FORMAT)
-	        seconds = (fmt_completed - fmt_started).total_seconds()
+            # compile fields
+            completed = time.strftime('%Y-%m-%d %H:%M:%S')
+            trainables = model.algorithm.performance()['trainable_params']
+            fmt_completed = datetime.datetime.strptime(completed, SQL_DATE_FORMAT)
+            fmt_started = datetime.datetime.strptime(started, SQL_DATE_FORMAT)
+            seconds = (fmt_completed - fmt_started).total_seconds()
 
-	        # connect and insert, update
-	        session = GetConnection()
-	        learner = Learner(datarun_id=datarun.id, frozen_set_id=frozen_set.id, dataname=datarun.name,
-	                        algorithm=frozen_set.algorithm, trainpath=datarun.trainpath,
-	                        testpath=datarun.testpath, modelpath=modelpath, params_hash=phash,
-	                        params=params, trainable_params=trainables, cv=performance["cv_acc"],
-	                        stdev=performance["stdev"], test=performance["testing_acc"],
-	                        confusion=performance["testing_confusion"], started=started,
-	                        completed=datetime.datetime.now(), host=GetPublicIP(),
-	                        dimensions=model.algorithm.dimensions, frozen_hash=frozen_set.frozen_hash,
-	                        seconds=seconds, description=datarun.description)
-	        session.add(learner)
-	        frozen_set = session.query(FrozenSet).filter(FrozenSet.id == frozen_set.id).one()
-	        #frozen_set.trained += 1 # we mark before now
-	        frozen_set.rewards += Decimal(performance[datarun.metric])
-	        session.commit()
-	        break
+            # connect and insert, update
+            session = GetConnection()
+            learner = Learner(datarun_id=datarun.id, frozen_set_id=frozen_set.id, dataname=datarun.name,
+                              algorithm=frozen_set.algorithm, trainpath=datarun.trainpath,
+                              testpath=datarun.testpath, modelpath=modelpath, params_hash=phash,
+                              params=params, trainable_params=trainables, cv=performance["cv_acc"],
+                              stdev=performance["stdev"], test=performance["testing_acc"],
+                              confusion='[THIS COLUMN REMOVED TO SAVE SPACE]', started=started,
+                              completed=datetime.datetime.now(), host=GetPublicIP(),
+                              dimensions=model.algorithm.dimensions, frozen_hash=frozen_set.frozen_hash,
+                              seconds=seconds, description=datarun.description)
+            session.add(learner)
+            frozen_set = session.query(FrozenSet).filter(FrozenSet.id == frozen_set.id).one()
+            # frozen_set.trained += 1 # we mark before now
+            frozen_set.rewards += Decimal(performance[datarun.metric])
+            session.commit()
+            break
 
-	    except Exception:
-	        msg = traceback.format_exc()
-	        _log("Error in InsertLearner():, try=%d" % (total - tries) + msg)
-	        if tries:
-	        	time.sleep((total - tries)**2)
-	        	tries -= 1
-	        	continue
-	        InsertError(datarun.id, frozen_set.id, params, msg)
+        except Exception:
+            msg = traceback.format_exc()
+            _log("Error in InsertLearner():, try=%d" % (total - tries) + msg)
+            if tries:
+                time.sleep((total - tries) ** 2)
+                tries -= 1
+                continue
+            InsertError(datarun.id, frozen_set.id, params, msg)
 
-	    finally:
-	        if session:
-	            session.close()
+        finally:
+            if session:
+                session.close()
+
 
 def InsertError(datarun_id, frozen_set_id, params, error_msg):
     session = None
@@ -101,8 +105,8 @@ def InsertError(datarun_id, frozen_set_id, params, error_msg):
         session = GetConnection()
         session.autoflush = False
         learner = Learner(datarun_id=datarun_id, frozen_set_id=frozen_set_id,
-                        errored=datetime.datetime.now(), is_error=True, params=params,
-                        error_msg=error_msg, algorithm=frozen_set.algorithm)
+                          errored=datetime.datetime.now(), is_error=True, params=params,
+                          error_msg=error_msg, algorithm=frozen_set.algorithm)
         session.add(learner)
         session.commit()
         _log("Successfully reported error")
@@ -113,6 +117,7 @@ def InsertError(datarun_id, frozen_set_id, params, error_msg):
         if session:
             session.close()
 
+
 def LoadData(datarun):
     """
     Loads the data from HTTP (if necessary) and then from
@@ -122,11 +127,11 @@ def LoadData(datarun):
     basepath = os.path.basename(datarun.local_trainpath)
     print basepath
     if not os.path.isfile(datarun.local_trainpath):
-        if not DownloadFileS3(config, basepath,) == basepath:
+        if not DownloadFileS3(config, basepath, ) == basepath:
             raise Exception("Something about train dataset caching is wrong...")
         else:
             EnsureDirectory("data/processed/")
-            os.rename(basepath, "data/processed/"+basepath)
+            os.rename(basepath, "data/processed/" + basepath)
 
     # load the data into matrix format
     trainX = np.genfromtxt(datarun.local_trainpath, delimiter=",")
@@ -140,7 +145,7 @@ def LoadData(datarun):
             raise Exception("Something about test dataset caching is wrong...")
         else:
             EnsureDirectory("data/processed/")
-            os.rename(basepath, "data/processed/"+basepath)
+            os.rename(basepath, "data/processed/" + basepath)
 
     # load the data into matrix format
     testX = np.genfromtxt(datarun.local_testpath, delimiter=",")
@@ -198,10 +203,10 @@ while True:
         fselector = fclass(frozen_sets=frozen_sets, best_y=best_y, k=datarun.k_window, metric=datarun.metric)
         frozen_set_id = fselector.select()
         if not frozen_set_id > 0:
-        	_log("Invalid frozen set id! %d" % frozen_set_id)
+            _log("Invalid frozen set id! %d" % frozen_set_id)
         frozen_set = GetFrozenSet(frozen_set_id, increment=True)
         if not frozen_set:
-        	_log("Invalid frozen set! %s" % frozen_set)
+            _log("Invalid frozen set! %s" % frozen_set)
         _log("Frozen set: %d" % frozen_set.id)
 
         # choose sampler
@@ -218,7 +223,7 @@ while True:
         ### BASIC GP SAMPLE SELECTION ###
         elif datarun.sample_selection == SELECTION_SAMPLES_GP:
             learners = GetLearnersInFrozen(frozen_set_id)
-            learners = [x.completed == None for x in learners] # only completed learners
+            learners = [x.completed == None for x in learners]  # only completed learners
 
             # check if we have enough results to pursue this strategy
             if len(learners) < N_OPT:
@@ -231,12 +236,13 @@ while True:
         ### GP EXPECTED IMPROVEMENT SAMPLE SELECTION ###
         elif datarun.sample_selection == SELECTION_SAMPLES_GP_EI:
             learners = GetLearnersInFrozen(frozen_set.id)
-            learners = [x.completed == None for x in learners] # only completed learners
+            learners = [x.completed == None for x in learners]  # only completed learners
             best_y = GetMaximumY(datarun.id, datarun.metric, default=0.0)
 
             # check if we have enough results to pursue this strategy
             if len(learners) < N_OPT:
-                _log("Not enough previous results for gp_ei, falling back onto strategy: %s" % SELECTION_SAMPLES_UNIFORM)
+                _log(
+                    "Not enough previous results for gp_ei, falling back onto strategy: %s" % SELECTION_SAMPLES_UNIFORM)
                 Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
                 sampler = Sampler(frozen_set=frozen_set)
             else:
@@ -244,7 +250,7 @@ while True:
 
         elif datarun.sample_selection == SELECTION_SAMPLES_GP_EI_VEL:
             learners = GetLearnersInFrozen(frozen_set.id)
-            learners = [x.completed == None for x in learners] # only completed learners
+            learners = [x.completed == None for x in learners]  # only completed learners
             best_y = GetMaximumY(datarun.id, datarun.metric, default=0.0)
 
             # check if we have enough results to pursue this strategy
@@ -259,12 +265,13 @@ while True:
         ### GP EXPECTED IMPROVEMENT PER TIME SAMPLE SELECTION ###
         elif datarun.sample_selection == SELECTION_SAMPLES_GP_EI_TIME:
             learners = GetLearnersInFrozen(frozen_set.id)
-            learners = [x.completed == None for x in learners] # only completed learners
+            learners = [x.completed == None for x in learners]  # only completed learners
             best_y = GetMaximumY(datarun.id, datarun.metric, default=0.0)
 
             # check if we have enough results to pursue this strategy
             if len(learners) < N_OPT:
-                _log("Not enough previous results for gp_eitime, falling back onto strategy: %s" % SELECTION_SAMPLES_UNIFORM)
+                _log(
+                    "Not enough previous results for gp_eitime, falling back onto strategy: %s" % SELECTION_SAMPLES_UNIFORM)
                 Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
                 sampler = Sampler(frozen_set=frozen_set)
             else:
@@ -285,7 +292,7 @@ while True:
 
         # insert learner into the database
         InsertLearner(datarun, frozen_set, performance, params, model, started)
-        datarun, frozen_set = None, None # reset state
+        datarun, frozen_set = None, None  # reset state
 
     except Exception as e:
         msg = traceback.format_exc()

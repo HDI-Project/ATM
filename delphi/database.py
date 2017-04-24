@@ -114,7 +114,7 @@ class Learner(Base):
 
     @confusion.setter
     def confusion(self, value):
-        self.confusion64 = ObjectToBase64(value)
+        self.confusion64 = value # This attribute was removed to save space in DataHub
 
     def __repr__(self):
         return "<%s>" % self.algorithm
