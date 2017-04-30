@@ -7,6 +7,7 @@ from delphi.utilities import *
 from delphi.mapping import Mapping, CreateWrapper
 from delphi.model import Model
 import datetime
+import pandas as pd
 from decimal import Decimal
 import traceback
 import random
@@ -117,6 +118,30 @@ def InsertError(datarun_id, frozen_set_id, params, error_msg):
         if session:
             session.close()
 
+def get_delphi_csv_num_lines(filepath):
+    with open(filepath) as f:
+        for i, _ in enumerate(f):
+            pass
+    return i + 1
+
+def get_delphi_csv_num_cols(filepath):
+    line = open(filepath).readline()
+    return len(line.split(','))
+
+# this works from the assumption the data has been preprocessed by delphi:
+# no headers, numerical data only
+def read_delphi_csv(filepath):
+    num_rows = get_delphi_csv_num_lines(filepath)
+    num_cols = get_delphi_csv_num_cols(filepath)
+
+    data = np.zeros((num_rows, num_cols))
+
+    with open(filepath) as f:
+        for i, line in enumerate(f):
+            for j, cell in enumerate(line.split(',')):
+                data[i, j] = float(cell)
+
+    return data
 
 def LoadData(datarun):
     """
@@ -134,7 +159,7 @@ def LoadData(datarun):
             os.rename(basepath, "data/processed/" + basepath)
 
     # load the data into matrix format
-    trainX = np.genfromtxt(datarun.local_trainpath, delimiter=",")
+    trainX = read_delphi_csv(datarun.local_trainpath)
     labelcol = datarun.labelcol
     trainY = trainX[:, labelcol]
     trainX = np.delete(trainX, labelcol, axis=1)
@@ -148,10 +173,11 @@ def LoadData(datarun):
             os.rename(basepath, "data/processed/" + basepath)
 
     # load the data into matrix format
-    testX = np.genfromtxt(datarun.local_testpath, delimiter=",")
+    testX = read_delphi_csv(datarun.local_testpath)
     labelcol = datarun.labelcol
     testY = testX[:, labelcol]
     testX = np.delete(testX, labelcol, axis=1)
+
     return trainX, testX, trainY, testY
 
 
