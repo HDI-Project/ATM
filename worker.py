@@ -168,11 +168,9 @@ def LoadData(datarun):
     basepath = os.path.basename(datarun.local_trainpath)
 
     if not os.path.isfile(datarun.local_trainpath):
-        if not DownloadFileS3(config, datarun.local_trainpath ) == basepath:
+        EnsureDirectory("data/processed/")
+        if not DownloadFileS3(config, datarun.local_trainpath ) == datarun.local_trainpath:
             raise Exception("Something about train dataset caching is wrong...")
-        else:
-            EnsureDirectory("data/processed/")
-            os.rename(basepath, "data/processed/" + basepath)
 
     # load the data into matrix format
     trainX = read_delphi_csv(datarun.local_trainpath)
@@ -182,11 +180,9 @@ def LoadData(datarun):
 
     basepath = os.path.basename(datarun.local_testpath)
     if not os.path.isfile(datarun.local_testpath):
-        if not DownloadFileS3(config, basepath) == basepath:
+        EnsureDirectory("data/processed/")
+        if not DownloadFileS3(config, datarun.local_testpath) == datarun.local_testpath:
             raise Exception("Something about test dataset caching is wrong...")
-        else:
-            EnsureDirectory("data/processed/")
-            os.rename(basepath, "data/processed/" + basepath)
 
     # load the data into matrix format
     testX = read_delphi_csv(datarun.local_testpath)
