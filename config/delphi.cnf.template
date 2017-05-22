@@ -131,7 +131,7 @@ ec2_region:
 ec2_amis: 
 # AWS key pair to use for EC2 instances
 ec2_key_pair: 
-# Local path to key file (mist match ec2_key_pair)
+# Local path to key file (must match ec2_key_pair)
 ec2_keyfile: 
 # Type of EC2 instance to start
 ec2_instance_type: 
