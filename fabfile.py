@@ -62,7 +62,7 @@ def create_instances():
         print(_green("Instance state: %s" % instance.state))
         print(_green("Public dns: %s" % instance.public_dns_name))
 
-@parallel
+#@parallel
 def deploy():
     code_dir = '/home/ubuntu/delphi'
     WORKERS_PER_MACHINE = int(config.get(Config.AWS, Config.AWS_NUM_WORKERS_PER_INSTACNCES))
@@ -70,7 +70,7 @@ def deploy():
         if run("test -d %s" % code_dir).failed:
             run("git clone https://%s:%s@%s %s" % (
                 config.get(Config.GIT, Config.GIT_USER), config.get(Config.GIT, Config.GIT_PASS), 
-                config.get(Config.GIT, Config.GIT_REPO), code_dir,))
+                config.get(Config.GIT, Config.GIT_REPO), code_dir))
             with cd(code_dir):
                 run("git pull")
                 run("mkdir config")
@@ -84,11 +84,11 @@ def deploy():
                     if not run("screen -ls | grep \"worker%d\";" % i):
                         run("screen -dm -S worker%d python worker.py; sleep 2" % (i,))
 
-@parallel
+#@parallel
 def killworkers():
     with settings(warn_only=True):
         run("pkill -15 screen")
-        
+
 
 config = Config('config/delphi.cnf')
 
@@ -97,6 +97,7 @@ env.user = config.get(Config.AWS, Config.AWS_EC2_USERNAME)
 env.key_filename = config.get(Config.AWS, Config.AWS_EC2_KEYFILE)
 env.skip_bad_hosts = True
 env.colorize_errors = True
+env.user = 'ubuntu'
 env.pool_size = 4
 env.timeout = 10
 env.disable_known_hosts = True

@@ -11,9 +11,12 @@ from delphi.utilities import *
 from delphi.config import Config
 import os
 from datetime import datetime
+import warnings
 
 configpath = os.getenv('DELPHI_CONFIG_FILE')
-assert (configpath != None), 'Configuration file variable (DELPHI_CONFIG_FILE) not set.'
+if configpath == None:
+    warnings.warn('No config file environmental variable, using default config/delphi.cnf')
+    configpath = 'config/delphi.cnf'
 assert os.path.isfile(configpath), 'Configuration file not found. ({})'.format(configpath)
 config = Config(configpath)
 
