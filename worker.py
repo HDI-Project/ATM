@@ -166,9 +166,9 @@ def LoadData(datarun):
     """
     # download data if necessary
     basepath = os.path.basename(datarun.local_trainpath)
-    print basepath
+
     if not os.path.isfile(datarun.local_trainpath):
-        if not DownloadFileS3(config, basepath, ) == basepath:
+        if not DownloadFileS3(config, datarun.local_trainpath ) == basepath:
             raise Exception("Something about train dataset caching is wrong...")
         else:
             EnsureDirectory("data/processed/")
