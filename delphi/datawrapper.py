@@ -94,10 +94,9 @@ class DataWrapper(object):
         data = data.append(tempdata, ignore_index=True)
 
         # remove labels, get majority percentage
-        label_col_name = data[data.columns[self.labelcol]].name
-        counts = data[label_col_name].value_counts()
+        counts = data[self.labelcol].value_counts()
         majority_percentage = float(max(counts)) / float(sum(counts))
-        data = data.drop([label_col_name], axis=1) # drop column
+        data = data.drop([self.labelcol], axis=1) # drop column
 
         # get stats for database
         n, d = data.shape
@@ -159,13 +158,12 @@ class DataWrapper(object):
         np.savetxt(self.testing_path, testing_matrix, delimiter=self.sep, fmt="%s")
 
         # statistics
-        label_col = 0
         self.statistics = {
             "unique_classes" : list(unique_classes),
             "n_examples" : n,
             "d_features" : newd,
             "k_classes" : k,
-            "label_col" : label_col,
+            "label_col" : 0, # this is 0 because the processed version of the data file store the label class at column 0
             "datasize_bytes" : np.array(data).nbytes,
             "categorical" : categorical,
             "ordinal" : ordinal,
@@ -195,10 +193,9 @@ class DataWrapper(object):
         discretized_labels = self.encoder.fit_transform(labels)
 
         # remove labels, get majority percentage
-        label_col_name = data[data.columns[self.labelcol]].name
-        counts = data[label_col_name].value_counts()
+        counts = data[self.labelcol].value_counts()
         majority_percentage = float(max(counts)) / float(sum(counts))
-        data = data.drop([label_col_name], axis=1) # drop column
+        data = data.drop([self.labelcol], axis=1) # drop column
 
         # get stats for database
         n, d = data.shape
@@ -262,13 +259,13 @@ class DataWrapper(object):
         np.savetxt(self.testing_path, testing_matrix, delimiter=self.sep, fmt="%s")
 
         # statistics
-        label_col = 0
+
         self.statistics = {
             "unique_classes" : list(unique_classes),
             "n_examples" : n,
             "d_features" : newd,
             "k_classes" : k,
-            "label_col" : label_col,
+            "label_col" : 0, # this is 0 because the processed version of the data file store the label class at column 0
             "datasize_bytes" : np.array(data).nbytes,
             "categorical" : categorical,
             "ordinal" : ordinal,

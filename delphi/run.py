@@ -12,7 +12,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 OUTPUT_FOLDER = "data/processed"
-LABEL_COLUMN = 0
+LABEL_COLUMN = 'class'
 PREFIX = "http://people.csail.mit.edu/drevo/datasets-v2/"
 PREFIX = "http://people.csail.mit.edu/bcollazo/datasets/"  # Added by bcollazo
 PREFIX = "http://web.mit.edu/swearin3/www/"  # Added by swearin3
@@ -144,11 +144,11 @@ def Run(runname, description, metric, sample_selection, frozen_selection, budget
         s3_bucket = config.get(Config.AWS, Config.AWS_S3_BUCKET)
         bucket = conn.get_bucket(s3_bucket)
         ktrain = Key(bucket)
-        ktrain.key = os.path.basename(training_path)
+        ktrain.key = training_path
         ktrain.set_contents_from_filename(training_path)
         ktest = Key(bucket)
-        ktrain.key = os.path.basename(testing_path)
-        ktrain.set_contents_from_filename(testing_path)
+        ktest.key = testing_path
+        ktest.set_contents_from_filename(testing_path)
         print 'CLOUD MODE: Train and test files uploaded to AWS S3 Bucket {}'.format(s3_bucket)
     else:
         print 'LOCAL MODE: Train and test files only on local drive'

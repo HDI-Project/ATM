@@ -4,7 +4,6 @@ import boto
 import boto.ec2
 import time
 from delphi.config import Config
-import pdb
 
 def check_instances_pending(instances):
     isPending = False

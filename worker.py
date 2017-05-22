@@ -15,6 +15,7 @@ import sys
 import time
 import ast
 import argparse
+import os
 
 import warnings
 
@@ -45,21 +46,36 @@ def _log(msg):
         print msg
 
 
-def InsertLearner(datarun, frozen_set, performance, params, model, started):
+def InsertLearner(datarun, frozen_set, performance, params, model, started, config):
     """
     Inserts a learner and also updates the frozen_sets table.
     """
     session = None
     total = 5
     tries = total
+    mode = config.get(Config.MODE, Config.MODE_RUNMODE)
     while tries:
         try:
             # save model
             phash = HashDict(params)
             rhash = HashString(datarun.name)
-            modelpath = MakeModelPath("models", phash, rhash, datarun.description)
-            model.save(modelpath)
-            _log("Saving model in: %s" % modelpath)
+            model_path = MakeModelPath("models", phash, rhash, datarun.description)
+            model.save(model_path)
+            _log("Saving model in: %s" % model_path)
+            if mode == 'cloud':
+                aws_key = config.get(Config.AWS, Config.AWS_ACCESS_KEY)
+                aws_secret = config.get(Config.AWS, Config.AWS_SECRET_KEY)
+                conn = S3Connection(aws_key, aws_secret)
+                s3_bucket = config.get(Config.AWS, Config.AWS_S3_BUCKET)
+                bucket = conn.get_bucket(s3_bucket)
+                kmodel = Key(bucket)
+                kmodel.key = model_path
+                kmodel.set_contents_from_filename(model_path)
+                _log('Uploading model to S3 bucket {} in {}'.format(s3_bucket, model_path))
+                # delete the local copy of the model so that it doesn't fill up the worker instance's hard drive
+                os.remove(model_path)
+                _log('Deleting local copy of {}'.format(model_path))
+
 
             # compile fields
             completed = time.strftime('%Y-%m-%d %H:%M:%S')
@@ -72,7 +88,7 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started):
             session = GetConnection()
             learner = Learner(datarun_id=datarun.id, frozen_set_id=frozen_set.id, dataname=datarun.name,
                               algorithm=frozen_set.algorithm, trainpath=datarun.trainpath,
-                              testpath=datarun.testpath, modelpath=modelpath, params_hash=phash,
+                              testpath=datarun.testpath, modelpath=model_path, params_hash=phash,
                               params=params, trainable_params=trainables, cv=performance["cv_acc"],
                               stdev=performance["stdev"], test=performance["testing_acc"],
                               confusion='[THIS COLUMN REMOVED TO SAVE SPACE]', started=started,
@@ -317,7 +333,7 @@ while True:
         model = Model(wrapper, datarun.wrapper)
 
         # insert learner into the database
-        InsertLearner(datarun, frozen_set, performance, params, model, started)
+        InsertLearner(datarun, frozen_set, performance, params, model, started, config)
         datarun, frozen_set = None, None  # reset state
 
     except Exception as e:
