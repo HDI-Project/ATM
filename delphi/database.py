@@ -289,3 +289,23 @@ def GetLearners(datarun_id):
         if session:
             session.close()
     return learners
+
+def GetLearner(learner_id):
+    """
+    Returns a specific learner.
+    """
+    session = None
+    learner = []
+    try:
+        session = GetConnection()
+        learner = session.query(Learner).filter(Learner.id == learner_id).all()
+    except:
+        print "Error in GetLearnersInFrozen(%d):" % learner_id, traceback.format_exc()
+    finally:
+        if session:
+            session.close()
+
+    if len(learner) > 1:
+        raise RuntimeError('Multiple learners with the same id!')
+
+    return learner[0]
