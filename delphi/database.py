@@ -133,6 +133,34 @@ def GetConnection():
     """
     return Session()
 
+def GetAllDataruns():
+    """
+    Among the incomplete dataruns with maximal priority,
+    returns one at random.
+    """
+    # get all incomplete dataruns
+    session = None
+    dataruns = []
+    try:
+        session = GetConnection()
+
+        query = session.query(Datarun)
+
+        dataruns = query.all()
+        session.close()
+
+        if not dataruns:
+            return []
+
+        return dataruns
+
+    except Exception:
+        print "Error in GetDatarun():", traceback.format_exc()
+
+    finally:
+        if session:
+            session.close()
+
 def GetDatarun(datarun_id=None):
     """
     Among the incomplete dataruns with maximal priority,
@@ -281,10 +309,9 @@ def GetLearners(datarun_id):
     learners = []
     try:
         session = GetConnection()
-        learners = session.query(Learner).\
-            filter(Learner.datarun_id == datarun_id).all()
+        learners = session.query(Learner).filter(Learner.datarun_id == datarun_id).order_by(Learner.started).all()
     except:
-        print "Error in GetLearnersInFrozen(%d):" % frozen_set_id, traceback.format_exc()
+        print "Error in GetLearners(%d):" % datarun_id, traceback.format_exc()
     finally:
         if session:
             session.close()
