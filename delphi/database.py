@@ -317,6 +317,7 @@ def GetLearners(datarun_id):
             session.close()
     return learners
 
+
 def GetLearner(learner_id):
     """
     Returns a specific learner.
