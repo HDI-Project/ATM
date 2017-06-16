@@ -6,7 +6,7 @@ class ClassifierInfo:
         self.classifier_id = -1
         self.dataset_id = -1
         self.algorithm_code = ''
-        self.parameters = []
+        self.hyperparameters = []
         self.train_accuracy = -1.0
         self.train_std = -1.0
         self.test_accuracy = -1.0
@@ -150,12 +150,12 @@ def get_classifier_struct(classifier_id):
     struct.test_accuracy = learner.test
 
     for key, value in learner.params.iteritems():
-        struct.parameters.append((key, value))
+        struct.hyperparameters.append((key, value))
 
-    for key, value in learner.trainable_params.iteritems():
-        struct.parameters.append((key, value))
-
-    for idx in range(len(frozen.frozens)):
-        struct.parameters.append((frozen.frozens[idx][0], frozen.frozens[idx][1]))
+    # for key, value in learner.trainable_params.iteritems():
+    #     struct.parameters.append((key, value))
+    #
+    # for idx in range(len(frozen.frozens)):
+    #     struct.parameters.append((frozen.frozens[idx][0], frozen.frozens[idx][1]))
 
     return struct
