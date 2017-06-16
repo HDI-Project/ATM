@@ -1,18 +1,43 @@
 from delphi.database import *
 from sqlalchemy import and_
 
+
 class ClassifierInfo:
     def __init__(self):
         self.classifier_id = -1
         self.dataset_id = -1
-        self.algorithm_code = ''
+        self.function_id = ''
         self.hyperparameters = []
         self.train_accuracy = -1.0
         self.train_std = -1.0
         self.test_accuracy = -1.0
 
+    def __repr__(self):
+        return 'Classifier{}'.format(self.classifier_id)
 
-def get_algorithms():
+    def __str__(self):
+        return self.get_string_representation()
+
+    def get_string_representation(self):
+        str = ''
+
+        str += 'Classifier - ID = {}\n'.format(self.classifier_id)
+        str += '\t{} = {}\n'.format('Dataset ID', self.dataset_id)
+        str += '\t{} = {}\n'.format('Function ID', self.function_id)
+        str += '\t{} = {}\n'.format('Dataset ID', self.dataset_id)
+        str += '\t{} = {}\n'.format('Train Accuracy', self.train_accuracy)
+        str += '\t{} = {}\n'.format('Train Standard Deviation', self.train_std)
+        str += '\t{} = {}\n'.format('Test Accuracy', self.test_accuracy)
+        str += '\tParameters:\n'
+        for key,value in self.hyperparameters:
+            str += '\t\t{} = {}\n'.format(key,value)
+
+        return str
+
+
+
+
+def get_functions():
     session = None
     algorithms = []
     try:
@@ -27,13 +52,17 @@ def get_algorithms():
     if not algorithms:
         return []
 
-    algorithm_tuple_list = []
+    function_tuple_list = []
     for algorithm in algorithms:
-        algorithm_tuple_list.append((algorithm.code, algorithm.name))
+        function_tuple_list.append((algorithm.code, algorithm.name))
 
-    return algorithm_tuple_list
+    return function_tuple_list
 
-def get_datasets(n=None, codes=None):
+
+def get_datasets_info(n=None, function_ids=None):
+    if type(function_ids) is str:
+        function_ids = [function_ids]
+
     session = None
     datasets = []
     try:
@@ -43,21 +72,21 @@ def get_datasets(n=None, codes=None):
         frozens_query = session.query(FrozenSet.datarun_id)
 
         # no arguments
-        if(n == None and codes == None):
+        if (n == None and function_ids == None):
             datasets = datarun_query.all()
         # only n given (i.e. only codes is None)
-        elif(codes==None):
+        elif (function_ids == None):
             datasets = datarun_query.limit(n).all()
         # if codes are given (for n given or not)
         else:
             dataset_ids = set()
-            for code in codes:
+            for code in function_ids:
                 temp_id_list = frozens_query.filter(FrozenSet.algorithm == code).distinct().all()
                 for id in temp_id_list:
                     if id[0] not in dataset_ids:
                         dataset_ids.add(id[0])
             # if n not given
-            if(n == None):
+            if (n == None):
                 datasets = datarun_query.filter(Datarun.id.in_(list(dataset_ids))).all()
             # if n given
             else:
@@ -77,38 +106,48 @@ def get_datasets(n=None, codes=None):
 
     datasets_tuple_list = []
     for dataset in datasets:
-        datasets_tuple_list.append((dataset.id, dataset.name))
+        datasets_tuple_list.append((int(dataset.id), dataset.name))
     return datasets_tuple_list
 
-def get_classifiers(n=None, dataset_ids=None, codes=None):
+
+def get_classifier_ids(n=None, dataset_ids=None, function_ids=None):
     session = None
     learners = []
 
     if type(dataset_ids) is int:
         dataset_ids = [dataset_ids]
 
+    if type(function_ids) is str:
+        function_ids = [function_ids]
+
     try:
         session = GetConnection()
 
-        if n==None and dataset_ids==None and codes==None:
+        if n == None and dataset_ids == None and function_ids == None:
             learners = session.query(Learner).filter(Learner.is_error == 0).all()
-        elif dataset_ids==None and codes==None:
+        elif dataset_ids == None and function_ids == None:
             learners = session.query(Learner).filter(Learner.is_error == 0).limit(n).all()
-        elif n==None and codes==None:
-            learners = session.query(Learner).filter(and_(Learner.datarun_id.in_(dataset_ids), Learner.is_error == 0)).all()
-        elif codes==None:
-            learners = session.query(Learner).filter(and_(Learner.datarun_id.in_(dataset_ids), Learner.is_error == 0)).limit(n).all()
-        elif n==None and dataset_ids==None:
-            learners = session.query(Learner).filter(and_(Learner.algorithm.in_(codes), Learner.is_error == 0)).all()
-        elif dataset_ids==None:
-                learners = session.query(Learner).filter(and_(Learner.algorithm.in_(codes), Learner.is_error == 0)).limit(n).all()
-        elif n==None:
-            learners = session.query(Learner).filter(and_(Learner.algorithm.in_(codes), Learner.is_error == 0, Learner.datarun_id.in_(dataset_ids))).all()
+        elif n == None and function_ids == None:
+            learners = session.query(Learner).filter(
+                and_(Learner.datarun_id.in_(dataset_ids), Learner.is_error == 0)).all()
+        elif function_ids == None:
+            learners = session.query(Learner).filter(
+                and_(Learner.datarun_id.in_(dataset_ids), Learner.is_error == 0)).limit(n).all()
+        elif n == None and dataset_ids == None:
+            learners = session.query(Learner).filter(
+                and_(Learner.algorithm.in_(function_ids), Learner.is_error == 0)).all()
+        elif dataset_ids == None:
+            learners = session.query(Learner).filter(
+                and_(Learner.algorithm.in_(function_ids), Learner.is_error == 0)).limit(n).all()
+        elif n == None:
+            learners = session.query(Learner).filter(and_(Learner.algorithm.in_(function_ids), Learner.is_error == 0,
+                                                          Learner.datarun_id.in_(dataset_ids))).all()
         else:
-            learners = session.query(Learner).filter(and_(Learner.algorithm.in_(codes), Learner.is_error == 0, Learner.datarun_id.in_(dataset_ids))).limit(n).all()
+            learners = session.query(Learner).filter(and_(Learner.algorithm.in_(function_ids), Learner.is_error == 0,
+                                                          Learner.datarun_id.in_(dataset_ids))).limit(n).all()
 
     except:
-        print "Error in get_classifiers:" % traceback.format_exc()
+        print "Error in get_classifier_ids:" % traceback.format_exc()
     finally:
         if session:
             session.close()
@@ -120,17 +159,19 @@ def get_classifiers(n=None, dataset_ids=None, codes=None):
 
     return classifier_id_list
 
+
 def get_classifier_details(classifier_ids=None):
     classifier_structs = []
 
-    if(type(classifier_ids) == list):
+    if (type(classifier_ids) == list):
         for classifier_id in classifier_ids:
             classifier_structs.append(get_classifier_struct(classifier_id))
 
-    if(type(classifier_ids) == int):
+    if (type(classifier_ids) == int):
         classifier_structs = get_classifier_struct(classifier_ids)
 
     return classifier_structs
+
 
 def get_classifier_struct(classifier_id):
     learner = GetLearner(classifier_id)
@@ -144,7 +185,7 @@ def get_classifier_struct(classifier_id):
 
     struct.classifier_id = classifier_id
     struct.dataset_id = learner.datarun_id
-    struct.algorithm_code = learner.algorithm
+    struct.function_id = learner.algorithm
     struct.train_accuracy = learner.cv
     struct.train_std = learner.stdev
     struct.test_accuracy = learner.test
