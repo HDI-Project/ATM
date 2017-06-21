@@ -110,8 +110,8 @@ class StartPage(tk.Frame):
         return list
 
     def get_best_human_perf(self, dataset_name):
-        openml_filename_to_id_file = '/Users/tss/Dropbox (Personal)/MITvisit/OpenMLIDandFilenames.csv'
-        human_perf_file = '/Users/tss/Dropbox (Personal)/MITvisit/FilesFromWeilian/openml_best_runs.csv'
+        openml_filename_to_id_file = '/Users/tss/Dropbox/MITvisit/OpenMLIDandFilenames.csv'
+        human_perf_file = '/Users/tss/Dropbox/MITvisit/FilesFromWeilian/openml_best_runs.csv'
 
         f2imap = pd.read_csv(openml_filename_to_id_file)
         entry = f2imap.loc[f2imap['filename'] == ''.join((dataset_name,'.csv'))]
