@@ -80,7 +80,18 @@ def VectorBackToParams(vector, optimizables, frozens, constants):
 	
 	# add the optimizables
 	for i, elt in enumerate(vector):
-		params[optimizables[i][0]] = elt
+		if getattr(optimizables[i][1], 'type') == 'INT':
+			params[optimizables[i][0]] = int(elt)
+		elif getattr(optimizables[i][1], 'type') == 'INT_EXP':
+			params[optimizables[i][0]] = int(elt)
+		elif getattr(optimizables[i][1], 'type') == 'FLOAT':
+			params[optimizables[i][0]] = float(elt)
+		elif getattr(optimizables[i][1], 'type') == 'FLOAT_EXP':
+			params[optimizables[i][0]] = float(elt)
+		elif getattr(optimizables[i][1], 'type') == 'BOOL':
+			params[optimizables[i][0]] = bool(elt)
+		else:
+			raise ValueError('Unknown data type: {}'.format(getattr(optimizables[i][1], 'type')))
 		
 	#print "After optimizables: %s" % params
 	

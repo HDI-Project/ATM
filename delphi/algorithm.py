@@ -4,14 +4,12 @@
 
 """
 
-from sklearn.cross_validation import train_test_split, cross_val_score
+from sklearn.model_selection import cross_val_score
 from sklearn.pipeline import Pipeline
-from sklearn.externals import joblib
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn import decomposition
 from sklearn.metrics import confusion_matrix
 from gdbn.activationFunctions import Softmax, Sigmoid, Linear
-from delphi.config import Config
 import numpy as np
 import time
 
