@@ -69,7 +69,7 @@ class EnumeratorBNB(ClassifierEnumerator):
     DEFAULT_RANGES = {
         "alpha" : (0.0, 1.0),
         "binarize" : (0.0, 1.0),
-        "fit_prior" : (1, 0),
+        "fit_prior" : (0, 1),
         "class_prior" : (None, None),
         "_scale" : (True, True),
     }
