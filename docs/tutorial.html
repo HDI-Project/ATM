@@ -1,56 +1,175 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Tutorial &#8212; delphi 0.9 documentation</title>
-    
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.9',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="delphi 0.9 documentation" href="index.html" />
-    <link rel="next" title="delphi" href="code.html" />
-    <link rel="prev" title="Setup" href="setup.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="code.html" title="delphi"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="setup.html" title="Setup"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">delphi 0.9 documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tutorial &mdash; delphi 0.9 documentation</title>
+  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="delphi 0.9 documentation" href="index.html"/>
+        <link rel="next" title="delphi" href="code.html"/>
+        <link rel="prev" title="Setup" href="setup.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> delphi
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.9
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-format">Data Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-a-datarun-in-datahub">Creating a DataRun in DataHub</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-file">Configuration File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#datarun-creation">DataRun Creation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#workers">Workers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#on-a-local-machine">On a Local Machine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#on-amazon-web-services">On Amazon Web Services</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">delphi</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">delphi</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Tutorial</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/tutorial.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="tutorial">
 <h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
@@ -58,11 +177,11 @@
 <h2>Data Format<a class="headerlink" href="#data-format" title="Permalink to this headline">¶</a></h2>
 <p>Delphi takes data in CSV format where each CSV file needs to:</p>
 <ul class="simple">
-<li>Have the first line of the file be headers with strings as the feature names, and the class column named &#8220;class&#8221;. If the features aren&#8217;t named (ie, image or SVD or PCA data), then anything will do (but see below for a small script to generate nice feature names).</li>
+<li>Have the first line of the file be headers with strings as the feature names, and the class column named “class”. If the features aren’t named (ie, image or SVD or PCA data), then anything will do (but see below for a small script to generate nice feature names).</li>
 <li>Should have N + 1 rows (1 header + N examples)</li>
 <li>Should have D + 1 features (1 class label + D features per example)</li>
 </ul>
-<p>Here&#8217;s a handy Python script to create a CSV header line for data that doesn&#8217;t have feature names:</p>
+<p>Here’s a handy Python script to create a CSV header line for data that doesn’t have feature names:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">CreateCSVHeader</span><span class="p">(</span><span class="n">n_features</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">class_label_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a CSV header like:</span>
@@ -86,7 +205,7 @@
 <h3>Configuration File<a class="headerlink" href="#configuration-file" title="Permalink to this headline">¶</a></h3>
 <p>To run Delphi, you must create a configuration file.
 A configuration file template is included in <code class="docutils literal"><span class="pre">config/delphi.cnf.template</span></code> (and shown below).
-Since the configuration file contains passwords, it&#8217;s best to rename it to <code class="docutils literal"><span class="pre">delphi.cnf</span></code> so that it will be ignored by git.
+Since the configuration file contains passwords, it’s best to rename it to <code class="docutils literal"><span class="pre">delphi.cnf</span></code> so that it will be ignored by git.
 This is especially true if you plan to make changes to Delphi and upload them to the repository.
 The git repository is setup to ignore all files in the <code class="docutils literal"><span class="pre">config</span></code> folder except <code class="docutils literal"><span class="pre">delphi.cnf.template</span></code>.</p>
 <p>The name of the file must also be a environmental variable called <code class="docutils literal"><span class="pre">DELPHI_CONFIG_FILE</span></code>.
@@ -116,7 +235,7 @@ Once the configuration file is filled out, we can enter it in DataHub with:</p>
 </pre></div>
 </div>
 <p>This command can b executed several times to create many workers that operate independently in parallel.
-How many to run depends of your judgement of your computer&#8217;s capabilities.</p>
+How many to run depends of your judgement of your computer’s capabilities.</p>
 </div>
 <div class="section" id="on-amazon-web-services">
 <h3>On Amazon Web Services<a class="headerlink" href="#on-amazon-web-services" title="Permalink to this headline">¶</a></h3>
@@ -142,74 +261,76 @@ Currently, the instances have to be terminated from the AWS Management Console.<
 </div>
 
 
+           </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Tutorial</a><ul>
-<li><a class="reference internal" href="#data-format">Data Format</a></li>
-<li><a class="reference internal" href="#creating-a-datarun-in-datahub">Creating a DataRun in DataHub</a><ul>
-<li><a class="reference internal" href="#configuration-file">Configuration File</a></li>
-<li><a class="reference internal" href="#datarun-creation">DataRun Creation</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#workers">Workers</a><ul>
-<li><a class="reference internal" href="#on-a-local-machine">On a Local Machine</a></li>
-<li><a class="reference internal" href="#on-amazon-web-services">On Amazon Web Services</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="code.html" class="btn btn-neutral float-right" title="delphi" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="setup.html" class="btn btn-neutral" title="Setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="setup.html"
-                        title="previous chapter">Setup</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="code.html"
-                        title="next chapter">delphi</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/tutorial.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright MIT Data to AI Lab.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="code.html" title="delphi"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="setup.html" title="Setup"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">delphi 0.9 documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright MIT Data to AI Lab.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.9',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>
