@@ -9,3 +9,4 @@ config/*
 !config/delphi.cnf.template
 .DS_Store
 .idea/*
+delphi-env/*
