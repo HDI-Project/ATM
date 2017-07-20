@@ -131,10 +131,6 @@ class Wrapper(object):
         if "n_estimators" in learner_params:
             learner_params["n_estimators"] = int(learner_params["n_estimators"])
 
-        ### DT ###
-        if "max_features" in learner_params:
-            learner_params["max_features"] = int(float(learner_params["max_features"] * self.testX.shape[1]))
-
         ### PCA ###
         if "_pca" in learner_params:
             del learner_params["_pca"]
