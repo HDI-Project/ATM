@@ -9,6 +9,7 @@ class EnumeratorDBN(ClassifierEnumerator):
     DEFAULT_RANGES = {
         "inlayer_size" : (-1, -1),
         "outlayer_size" : (-1, -1),
+        "minibatch_size": (30, -30),
         "num_hidden_layers" : (1, 2, 3),
         "hidden_size_layer1" : (2, 300),
         "hidden_size_layer2" : (2, 300),
@@ -25,6 +26,7 @@ class EnumeratorDBN(ClassifierEnumerator):
         # KeyStruct(range, key_type, is_categorical)
         "inlayer_size" : KeyStruct(DEFAULT_RANGES["inlayer_size"], Key.TYPE_INT, True),
         "outlayer_size" : KeyStruct(DEFAULT_RANGES["outlayer_size"], Key.TYPE_INT, True),
+        "minibatch_size": KeyStruct(DEFAULT_RANGES["minibatch_size"], Key.TYPE_INT, True),
         "num_hidden_layers" : KeyStruct(DEFAULT_RANGES["num_hidden_layers"], Key.TYPE_INT, True),
         "hidden_size_layer1" : KeyStruct(DEFAULT_RANGES["hidden_size_layer1"], Key.TYPE_INT, False),
         "hidden_size_layer2" : KeyStruct(DEFAULT_RANGES["hidden_size_layer2"], Key.TYPE_INT, False),
@@ -48,6 +50,7 @@ class EnumeratorDBN(ClassifierEnumerator):
         scale = Choice("_scale", self.ranges["_scale"])
         inlayer_size = Choice("inlayer_size", self.ranges["inlayer_size"])
         outlayer_size = Choice("outlayer_size", self.ranges["outlayer_size"])
+        minibatch_size = Choice("minibatch_size", self.ranges["minibatch_size"])
         num_hidden_layers = Choice("num_hidden_layers", self.ranges["num_hidden_layers"])
         hidden_size_layer1 = Choice("hidden_size_layer1", self.ranges["hidden_size_layer1"])
         hidden_size_layer2 = Choice("hidden_size_layer2", self.ranges["hidden_size_layer2"])
@@ -67,7 +70,7 @@ class EnumeratorDBN(ClassifierEnumerator):
         num_hidden_layers.add_condition(2, [two_layers])
         num_hidden_layers.add_condition(3, [three_layers])
 
-        dbn = Combination([inlayer_size, outlayer_size, num_hidden_layers, 
+        dbn = Combination([inlayer_size, outlayer_size, minibatch_size, num_hidden_layers,
                             learn_rates, learn_rate_decays, learn_rates_pretrain, 
                             output_act_funct, epochs, scale])
         dbnroot = Choice("function", [ClassifierEnumerator.DBN])
