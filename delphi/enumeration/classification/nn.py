@@ -9,7 +9,7 @@ class EnumeratorDBN(ClassifierEnumerator):
     DEFAULT_RANGES = {
         "inlayer_size" : (-1, -1),
         "outlayer_size" : (-1, -1),
-        "minibatch_size": (30, -30),
+        "minibatch_size": (30, 30),
         "num_hidden_layers" : (1, 2, 3),
         "hidden_size_layer1" : (2, 300),
         "hidden_size_layer2" : (2, 300),
