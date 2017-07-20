@@ -80,7 +80,7 @@ for item in frozen_set.frozens:
     params[item[0]] = item[1]
 
 
-datarun = GetDatarun(datarun_id=learner.datarun_id)
+datarun = GetDatarun(datarun_id=learner.datarun_id, ignore_completed=False)
 
 wrapper = CreateWrapper(params)
 trainX, testX, trainY, testY = LoadData(datarun)

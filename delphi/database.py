@@ -161,7 +161,7 @@ def GetAllDataruns():
         if session:
             session.close()
 
-def GetDatarun(datarun_id=None):
+def GetDatarun(datarun_id=None, ignore_completed=True):
     """
     Among the incomplete dataruns with maximal priority,
     returns one at random.
@@ -172,8 +172,10 @@ def GetDatarun(datarun_id=None):
     try:
         session = GetConnection()
 
-        query = session.query(Datarun).\
-            filter(Datarun.completed == None)
+        if ignore_completed:
+            query = session.query(Datarun).filter(Datarun.completed == None)
+        else:
+            query = session.query(Datarun)
 
         if datarun_id:
             query = query.filter(Datarun.id == datarun_id)
