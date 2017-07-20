@@ -204,9 +204,8 @@ while (datetime.datetime.now() - start_time).total_seconds() < 10800: #10800 sec
         started = time.strftime('%Y-%m-%d %H:%M:%S')
         datarun = GetDatarun(datarun_id=args.datarunid)
         if not datarun:
-            _log("No datarun present in database, will wait and try again...")
-            time.sleep(10)
-            continue
+            _log("No datarun present in database, exiting...")
+            sys.exit()
 
         # choose frozen set
         _log("Datarun: %s" % datarun)
