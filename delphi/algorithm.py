@@ -9,7 +9,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn import decomposition
 from sklearn.metrics import confusion_matrix
-from gdbn.activationFunctions import Softmax, Sigmoid, Linear
+from gdbn.activationFunctions import Softmax, Sigmoid, Linear, Tanh
 import numpy as np
 import time
 
@@ -136,51 +136,81 @@ class Wrapper(object):
             del learner_params["_pca"]
             del learner_params["_pca_dimensions"]
 
-        ### DBN ###
-        if learner_params["function"] == "classify_dbn":
+        ### MLP ###
+        if learner_params["function"] == "classify_mlp":
 
-            #print "AddING stuff for DBNs! %s" % learner_params
-
-            learner_params["layer_sizes"] = [learner_params["inlayer_size"]]
+            learner_params["hidden_layer_sizes"] = []
 
             # set layer topology
             if int(learner_params["num_hidden_layers"]) == 1:
-                learner_params["layer_sizes"].append(learner_params["hidden_size_layer1"])
+                learner_params["hidden_layer_sizes"].append(learner_params["hidden_size_layer1"])
                 del learner_params["hidden_size_layer1"]
 
             elif int(learner_params["num_hidden_layers"]) == 2:
-                learner_params["layer_sizes"].append(learner_params["hidden_size_layer1"])
-                learner_params["layer_sizes"].append(learner_params["hidden_size_layer2"])
+                learner_params["hidden_layer_sizes"].append(learner_params["hidden_size_layer1"])
+                learner_params["hidden_layer_sizes"].append(learner_params["hidden_size_layer2"])
                 del learner_params["hidden_size_layer1"]
                 del learner_params["hidden_size_layer2"]
 
             elif int(learner_params["num_hidden_layers"]) == 3:
-                learner_params["layer_sizes"].append(learner_params["hidden_size_layer1"])
-                learner_params["layer_sizes"].append(learner_params["hidden_size_layer2"])
-                learner_params["layer_sizes"].append(learner_params["hidden_size_layer3"])
+                learner_params["hidden_layer_sizes"].append(learner_params["hidden_size_layer1"])
+                learner_params["hidden_layer_sizes"].append(learner_params["hidden_size_layer2"])
+                learner_params["hidden_layer_sizes"].append(learner_params["hidden_size_layer3"])
                 del learner_params["hidden_size_layer1"]
                 del learner_params["hidden_size_layer2"]
                 del learner_params["hidden_size_layer3"]
 
-            learner_params["layer_sizes"].append(learner_params["outlayer_size"])
-            learner_params["layer_sizes"] = [int(x) for x in learner_params["layer_sizes"]] # convert to ints
-
-            # set activation function
-            if learner_params["output_act_funct"] == "Linear":
-                learner_params["output_act_funct"] = Linear()
-            elif learner_params["output_act_funct"] == "Sigmoid":
-                learner_params["output_act_funct"] = Sigmoid()
-            elif learner_params["output_act_funct"] == "Softmax":
-                learner_params["output_act_funct"] = Softmax()
-
-            learner_params["epochs"] = int(learner_params["epochs"])
+            learner_params["hidden_layer_sizes"] = [int(x) for x in learner_params["hidden_layer_sizes"]] # convert to ints
 
             # delete our fabricated keys
             del learner_params["num_hidden_layers"]
-            del learner_params["inlayer_size"]
-            del learner_params["outlayer_size"]
 
-            #print "Added stuff for DBNs! %s" % learner_params
+        #print "Added stuff for DBNs! %s" % learner_params
+        ### DBN ###
+        if learner_params["function"] == "classify_dbn":
+
+                # print "AddING stuff for DBNs! %s" % learner_params
+
+                learner_params["layer_sizes"] = [learner_params["inlayer_size"]]
+
+                # set layer topology
+                if int(learner_params["num_hidden_layers"]) == 1:
+                    learner_params["layer_sizes"].append(learner_params["hidden_size_layer1"])
+                    del learner_params["hidden_size_layer1"]
+
+                elif int(learner_params["num_hidden_layers"]) == 2:
+                    learner_params["layer_sizes"].append(learner_params["hidden_size_layer1"])
+                    learner_params["layer_sizes"].append(learner_params["hidden_size_layer2"])
+                    del learner_params["hidden_size_layer1"]
+                    del learner_params["hidden_size_layer2"]
+
+                elif int(learner_params["num_hidden_layers"]) == 3:
+                    learner_params["layer_sizes"].append(learner_params["hidden_size_layer1"])
+                    learner_params["layer_sizes"].append(learner_params["hidden_size_layer2"])
+                    learner_params["layer_sizes"].append(learner_params["hidden_size_layer3"])
+                    del learner_params["hidden_size_layer1"]
+                    del learner_params["hidden_size_layer2"]
+                    del learner_params["hidden_size_layer3"]
+
+                learner_params["layer_sizes"].append(learner_params["outlayer_size"])
+                learner_params["layer_sizes"] = [int(x) for x in learner_params["layer_sizes"]]  # convert to ints
+
+                # set activation function
+                if learner_params["output_act_funct"] == "Linear":
+                    learner_params["output_act_funct"] = Linear()
+                elif learner_params["output_act_funct"] == "Sigmoid":
+                    learner_params["output_act_funct"] = Sigmoid()
+                elif learner_params["output_act_funct"] == "Softmax":
+                    learner_params["output_act_funct"] = Softmax()
+                elif learner_params["output_act_funct"] == "tanh":
+                    learner_params["output_act_funct"] = Tanh()
+
+                learner_params["epochs"] = int(learner_params["epochs"])
+
+                # delete our fabricated keys
+                del learner_params["num_hidden_layers"]
+                del learner_params["inlayer_size"]
+                del learner_params["outlayer_size"]
 
         # remove function key and return
         del learner_params["function"]

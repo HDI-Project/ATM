@@ -14,6 +14,7 @@ class ClassifierEnumerator(Enumerator):
     DECISION_TREE = "classify_dt"
     RANDOM_FOREST = "classify_rf"
     DBN = "classify_dbn"
+    MLP = "classify_mlp"
     EXTRA_TREES = "classify_et"
     PASSIVE_AGGRESSIVE = "classify_pa"
     LRC = "classify_logreg"

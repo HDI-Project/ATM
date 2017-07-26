@@ -77,3 +77,80 @@ class EnumeratorDBN(ClassifierEnumerator):
         dbnroot.add_condition(ClassifierEnumerator.DBN, [dbn])
 
         self.root = dbnroot
+
+
+class EnumeratorMLP(ClassifierEnumerator):
+    DEFAULT_RANGES = {
+        "batch_size": ('auto','auto'),
+        "solver": ('lbfgs', 'sgd', 'adam'),
+        "alpha": (0.0001, 0.009),
+        "num_hidden_layers": (1, 2, 3),
+        "hidden_size_layer1": (2, 300),
+        "hidden_size_layer2": (2, 300),
+        "hidden_size_layer3": (2, 300),
+        "learning_rate_init": (0.001, 0.99),
+        "beta_1": (0.8, 0.9999),
+        "beta_2": (0.8, 0.9999),
+        "learning_rate": ('constant', 'invscaling', 'adaptive'),
+        "activation": ("relu", "logistic", "identity", "tanh"),
+        "_scale": (True, True),
+    }
+
+    DEFAULT_KEYS = {
+        # KeyStruct(range, key_type, is_categorical)
+        "batch_size": KeyStruct(DEFAULT_RANGES["batch_size"], Key.TYPE_STRING, True),
+        "solver": KeyStruct(DEFAULT_RANGES["solver"], Key.TYPE_STRING, True),
+        "alpha": KeyStruct(DEFAULT_RANGES["alpha"], Key.TYPE_FLOAT, False),
+        "num_hidden_layers": KeyStruct(DEFAULT_RANGES["num_hidden_layers"], Key.TYPE_INT, True),
+        "hidden_size_layer1": KeyStruct(DEFAULT_RANGES["hidden_size_layer1"], Key.TYPE_INT, False),
+        "hidden_size_layer2": KeyStruct(DEFAULT_RANGES["hidden_size_layer2"], Key.TYPE_INT, False),
+        "hidden_size_layer3": KeyStruct(DEFAULT_RANGES["hidden_size_layer3"], Key.TYPE_INT, False),
+        "learning_rate_init": KeyStruct(DEFAULT_RANGES["learning_rate_init"], Key.TYPE_FLOAT, False),
+        "beta_1": KeyStruct(DEFAULT_RANGES["beta_1"], Key.TYPE_FLOAT, False),
+        "beta_2": KeyStruct(DEFAULT_RANGES["beta_2"], Key.TYPE_FLOAT, False),
+        "learning_rate": KeyStruct(DEFAULT_RANGES["learning_rate"], Key.TYPE_STRING, True),
+        "activation": KeyStruct(DEFAULT_RANGES["activation"], Key.TYPE_STRING, True),
+        "_scale": KeyStruct(DEFAULT_RANGES["_scale"], Key.TYPE_BOOL, True),
+    }
+
+    def __init__(self, ranges=None, keys=None):
+        super(EnumeratorMLP, self).__init__(
+            ranges or EnumeratorMLP.DEFAULT_RANGES, keys or EnumeratorMLP.DEFAULT_KEYS)
+        self.code = ClassifierEnumerator.MLP
+        self.create_cpt()
+
+    def create_cpt(self):
+        batch_size = Choice("batch_size", self.ranges["batch_size"])
+        solver = Choice("solver", self.ranges["solver"])
+        alpha = Choice("alpha", self.ranges["alpha"])
+        num_hidden_layers = Choice("num_hidden_layers", self.ranges["num_hidden_layers"])
+        hidden_size_layer1 = Choice("hidden_size_layer1", self.ranges["hidden_size_layer1"])
+        hidden_size_layer2 = Choice("hidden_size_layer2", self.ranges["hidden_size_layer2"])
+        hidden_size_layer3 = Choice("hidden_size_layer3", self.ranges["hidden_size_layer3"])
+        learning_rate_init = Choice("learning_rate_init", self.ranges["learning_rate_init"])
+        beta_1 = Choice("beta_1", self.ranges["beta_1"])
+        beta_2 = Choice("beta_1", self.ranges["beta_1"])
+        learning_rate = Choice("learning_rate", self.ranges["learning_rate"])
+        activation = Choice("activation", self.ranges["activation"])
+        scale = Choice("_scale", self.ranges["_scale"])
+
+        # variable number of layers and layer size
+        one_layer = Combination([hidden_size_layer1])
+        two_layers = Combination([hidden_size_layer1, hidden_size_layer2])
+        three_layers = Combination([hidden_size_layer1, hidden_size_layer2, hidden_size_layer3])
+
+        num_hidden_layers.add_condition(1, [one_layer])
+        num_hidden_layers.add_condition(2, [two_layers])
+        num_hidden_layers.add_condition(3, [three_layers])
+
+        sgd_params = Combination([learning_rate_init, learning_rate])
+        solver.add_condition('sgd', [sgd_params])
+
+        adam_param = Combination([learning_rate_init, beta_1, beta_2])
+        solver.add_condition('adam', [adam_param])
+
+        mlp = Combination([batch_size, solver, alpha, activation, num_hidden_layers, scale])
+        mlproot = Choice("function", [ClassifierEnumerator.MLP])
+        mlproot.add_condition(ClassifierEnumerator.MLP, [mlp])
+
+        self.root = mlproot

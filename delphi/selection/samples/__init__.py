@@ -168,7 +168,7 @@ def DrawRandomValuesGRID(n, struct):
         return 10.0 ** vals[pick]
 
     elif struct.type == Key.TYPE_FLOAT:
-        vals = np.linspace(struct.range[0], math.log10(struct.range[1]), num_vals)
+        vals = np.linspace(struct.range[0], struct.range[1], num_vals)
         return vals[pick]
 
 
