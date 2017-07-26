@@ -7,7 +7,7 @@ from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 from nolearn.dbn import DBN
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import SGDRegressor, LogisticRegression
-from sklearn.gaussian_process import GaussianProcess
+from sklearn.gaussian_process import GaussianProcessClassifier
 
 from delphi.enumeration import Enumerator
 from delphi.enumeration.classification import ClassifierEnumerator
@@ -18,6 +18,7 @@ from delphi.enumeration.classification.logistic import EnumeratorLRC
 from delphi.enumeration.classification.nn import EnumeratorDBN, EnumeratorMLP
 from delphi.enumeration.classification.knn import EnumeratorKNN
 from delphi.enumeration.classification.gd import EnumeratorSGDC, EnumeratorPAC
+from delphi.enumeration.classification.gp import EnumeratorGPC
 
 from delphi.algorithm import Wrapper
 
@@ -49,6 +50,7 @@ class Mapping:
         ClassifierEnumerator.RANDOM_FOREST : RandomForestClassifier,
         ClassifierEnumerator.DBN : DBN,
         ClassifierEnumerator.MLP : MLPClassifier,
+        ClassifierEnumerator.GPC : GaussianProcessClassifier,
         ClassifierEnumerator.EXTRA_TREES : ExtraTreesClassifier,
         ClassifierEnumerator.PASSIVE_AGGRESSIVE : PassiveAggressiveClassifier,
         ClassifierEnumerator.LRC : LogisticRegression}
@@ -64,6 +66,7 @@ class Mapping:
         ClassifierEnumerator.RANDOM_FOREST : EnumeratorRFC,
         ClassifierEnumerator.DBN : EnumeratorDBN,
         ClassifierEnumerator.MLP: EnumeratorMLP,
+        ClassifierEnumerator.GPC: EnumeratorGPC,
         ClassifierEnumerator.EXTRA_TREES : EnumeratorETC,
         ClassifierEnumerator.PASSIVE_AGGRESSIVE : EnumeratorPAC,
         ClassifierEnumerator.LRC : EnumeratorLRC}

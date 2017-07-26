@@ -18,6 +18,7 @@ class ClassifierEnumerator(Enumerator):
     EXTRA_TREES = "classify_et"
     PASSIVE_AGGRESSIVE = "classify_pa"
     LRC = "classify_logreg"
+    GPC = "classify_gp"
     
     def __init__(self, hypers, categoricals):
         super(ClassifierEnumerator, self).__init__(hypers, categoricals)

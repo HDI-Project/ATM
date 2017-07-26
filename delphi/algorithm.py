@@ -10,6 +10,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn import decomposition
 from sklearn.metrics import confusion_matrix
 from gdbn.activationFunctions import Softmax, Sigmoid, Linear, Tanh
+from sklearn.gaussian_process.kernels import ConstantKernel, RBF, Matern, ExpSineSquared, RationalQuadratic
 import numpy as np
 import time
 
@@ -135,6 +136,25 @@ class Wrapper(object):
         if "_pca" in learner_params:
             del learner_params["_pca"]
             del learner_params["_pca_dimensions"]
+
+        ### GPC ###
+        if learner_params["function"] == "classify_gp":
+            if learner_params["kernel"] == "constant":
+                learner_params["kernel"] = ConstantKernel()
+            elif learner_params["kernel"] == "rbf":
+                learner_params["kernel"] = RBF()
+            elif learner_params["kernel"] == "matern":
+                learner_params["kernel"] = Matern(nu=learner_params["nu"])
+                del learner_params["nu"]
+            elif learner_params["kernel"] == "rational_quadratic":
+                learner_params["kernel"] = RationalQuadratic(length_scale=learner_params["length_scale"], alpha=learner_params["alpha"])
+                del learner_params["length_scale"]
+                del learner_params["alpha"]
+            elif learner_params["kernel"] == "exp_sine_squared":
+                learner_params["kernel"] = ExpSineSquared(length_scale=learner_params["length_scale"], periodicity=learner_params["periodicity"])
+                del learner_params["length_scale"]
+                del learner_params["periodicity"]
+
 
         ### MLP ###
         if learner_params["function"] == "classify_mlp":

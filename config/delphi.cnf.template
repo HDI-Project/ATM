@@ -54,7 +54,9 @@ query:
 #     crappy set of parameters on a powerful algo like this.
 #   - SGDs (classify_sgd) can sometimes fail on certain parameter settings as 
 #     well. Don't worry, they train SUPER fast, and the worker.py will simply 
-#     log the error and continue. 
+#     log the error and continue.
+#
+# Algorithm Options: classify_svm, classify_et, classify_pa, classify_sgd, classify_rf, classify_mnb, classify_bnb, classify_dbn, classify_logreg, classify_gnb, classify_dt, classify_knn, classify_mlp, classify_gp
 algorithms: 
 # directory to store trained models
 models-dir: 

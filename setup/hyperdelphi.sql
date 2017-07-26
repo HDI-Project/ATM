@@ -50,7 +50,8 @@ VALUES
 	(10,'classify_gnb','Gaussian Naive Bayes', 1),
 	(11,'classify_dt','Decision Tree', 1),
   (11,'classify_knn','K Nearest Neighbors', 1),
-	(13,'classify_mlp','Multi-Layer Perceptron', 1);
+	(13,'classify_mlp','Multi-Layer Perceptron', 1),
+  (13,'classify_gp','Gaussian Process', 1);
 
 /*!40000 ALTER TABLE `algorithms` ENABLE KEYS */;
 UNLOCK TABLES;
