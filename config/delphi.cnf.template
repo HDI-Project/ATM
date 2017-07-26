@@ -3,14 +3,17 @@
 #################################
 
 [data]
-# Path to CSV file that contains all data (train & test)
+# Path to a file with a list of datafiles. All will be uploaded to the ModelHub using the parameters specified below.
+data-filelist:
+# Path to CSV file that contains all data (train & test) (ignored if data-filelist non-blank)
 alldatapath: 
 # Path to CSV file that contains the train data (ignored if alldatapath non-blank)
 trainpath: 
 # Path to CSV file that contains the test data (ignored if alldatapath non-blank)
 testpath: 
 # Description of the data and classification task (limit 1000 characters)
-data-description: 
+data-description:
+
 
 
 

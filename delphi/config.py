@@ -20,6 +20,7 @@ class Config(ConfigParser):
     DATA_TRAINPATH = "trainpath"
     DATA_TESTPATH = "testpath"
     DATA_DESCRIPTION = "data-description"
+    DATA_FILELIST = "data-filelist"
 
     # subheading: mode
     MODE_RUNMODE = "run-mode"

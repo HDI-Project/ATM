@@ -10,7 +10,7 @@ config = Config(configpath)
 from delphi.run import Run
 
 
-
+data_filelist = config.get(Config.DATA, Config.DATA_FILELIST)
 alldatapath = config.get(Config.DATA, Config.DATA_ALLDATAPATH)
 trainpath = config.get(Config.DATA, Config.DATA_TRAINPATH)
 testpath = config.get(Config.DATA, Config.DATA_TESTPATH)
@@ -47,5 +47,15 @@ description =  "__".join([sample_selection, frozen_selection])
 
 if(bool(dataset_description) and (len(dataset_description[0]) > 1000)):
     raise ValueError('Dataset description is more than 1000 characters.')
-    
-Run(runname, description, metric, sample_selection, frozen_selection, budget_type, priority, k_window, r_min, algorithm_codes, learner_budget, walltime_budget, alldatapath, dataset_description, trainpath, testpath, configpath)
+
+if data_filelist:
+    with open(data_filelist, 'r') as f:
+        for line in f:
+            alldatapath = line.strip()
+            runname = os.path.basename(alldatapath).replace(".csv", "")
+
+            Run(runname, description, metric, sample_selection, frozen_selection, budget_type, priority, k_window,
+                r_min, algorithm_codes, learner_budget, walltime_budget, alldatapath, dataset_description, trainpath,
+                testpath, configpath)
+else:
+    Run(runname, description, metric, sample_selection, frozen_selection, budget_type, priority, k_window, r_min, algorithm_codes, learner_budget, walltime_budget, alldatapath, dataset_description, trainpath, testpath, configpath)
