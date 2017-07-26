@@ -18,7 +18,7 @@ class EnumeratorDBN(ClassifierEnumerator):
         "learn_rate_decays" : (0.001, 0.99),
         "learn_rates_pretrain" : (0.001, 0.99),
         "epochs" : (5, 100),
-        "output_act_funct" : ("Softmax", "Sigmoid", "Linear"),
+        "output_act_funct" : ("Softmax", "Sigmoid", "Linear", "tanh"),
         "_scale" : (True, True),
     }
 
