@@ -169,10 +169,14 @@
 <h1>delphi<a class="headerlink" href="#delphi" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="adding-a-classifier">
 <h2>Adding a classifier<a class="headerlink" href="#adding-a-classifier" title="Permalink to this headline">¶</a></h2>
-<p>Decide name for classifier (e.g., KNeighborsClassifier) and emuerator (e.g., EnumeratorKNN).
-Enter these names in the <code class="docutils literal"><span class="pre">LEARNER_CODE_CLASS_MAP</span></code> and <code class="docutils literal"><span class="pre">ENUMERATOR_CODE_CLASS_MAP</span></code> variables in <code class="docutils literal"><span class="pre">delphi/mapping.py</span></code>.
-Decide a code  for the classifier (e.g., classify_knn) and enter this in the <code class="docutils literal"><span class="pre">__init__.py</span></code> file in <code class="docutils literal"><span class="pre">delphi/enumeration/classification</span></code>.</p>
-<p>Create Enumerator for class in the <code class="docutils literal"><span class="pre">delphi/enumeration/classification</span></code> folder.
+<p>The classifier must be a python class that has the following functions:</p>
+<ol class="arabic simple">
+<li><code class="docutils literal"><span class="pre">fit</span></code>: given training data and labels, learns the model</li>
+<li><code class="docutils literal"><span class="pre">predict</span></code>: given data sample(s), predicts the label(s)</li>
+</ol>
+<p>In <code class="docutils literal"><span class="pre">delphi/mapping.py</span></code>, enter the function in the <code class="docutils literal"><span class="pre">LEARNER_CODE_CLASS_MAP</span></code> variable and the classifier enumerator (see below) in the <code class="docutils literal"><span class="pre">ENUMERATOR_CODE_CLASS_MAP</span></code> variable.
+Decide a code for the classifier (e.g., classify_knn) and enter this in the <code class="docutils literal"><span class="pre">__init__.py</span></code> file in <code class="docutils literal"><span class="pre">delphi/enumeration/classification</span></code>.</p>
+<p>Create an Enumerator for the classifier in the <code class="docutils literal"><span class="pre">delphi/enumeration/classification</span></code> folder.
 In this file:</p>
 <ol class="loweralpha simple">
 <li>define the ranges of the parameters in a variable called <code class="docutils literal"><span class="pre">DEFAULT_RANGES</span></code></li>
@@ -211,15 +215,17 @@ In this file:</p>
         <span class="n">param_categorical</span> <span class="o">=</span> <span class="n">Choice</span><span class="p">(</span><span class="s2">&quot;param_categorical&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">[</span><span class="s2">&quot;param_categorical&quot;</span><span class="p">])</span>
         <span class="n">param_float</span> <span class="o">=</span> <span class="n">Choice</span><span class="p">(</span><span class="s2">&quot;param_float&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">[</span><span class="s2">&quot;param_float&quot;</span><span class="p">])</span>
 
-        <span class="n">example</span> <span class="o">=</span> <span class="n">Combination</span><span class="p">([</span><span class="n">param_int</span><span class="p">,</span> <span class="n">param_categorical</span><span class="p">,</span> <span class="n">param_float</span><span class="p">])</span>
-        <span class="n">exampleroot</span> <span class="o">=</span> <span class="n">Choice</span><span class="p">(</span><span class="s2">&quot;function&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;classify_example&quot;</span><span class="p">])</span>
-        <span class="n">exampleroot</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s2">&quot;classify_knn&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">example</span><span class="p">])</span>
+        <span class="c1"># if param_categorical==A, then param_float is active</span>
+        <span class="n">param_categorical</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">param_float</span><span class="p">])</span>
+
+        <span class="n">example</span> <span class="o">=</span> <span class="n">Combination</span><span class="p">([</span><span class="n">param_int</span><span class="p">,</span> <span class="n">param_categorical</span><span class="p">])</span>
+        <span class="n">exampleroot</span> <span class="o">=</span> <span class="n">Choice</span><span class="p">(</span><span class="s2">&quot;function&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;classify_code&quot;</span><span class="p">])</span>
+        <span class="n">exampleroot</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s2">&quot;classify_code&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">example</span><span class="p">])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">exampleroot</span>
 </pre></div>
 </div>
-<p>Currently, the delphi system uses classifiers in the <code class="docutils literal"><span class="pre">sklearn</span></code> package, so only the name of the classifier is needed.
-Since sklearn uses consistent framework across classifiers (fit, predict, etc.), delphi creates an object using the name of classifier and uses the sklearn standard framework to learn the classifier and make predictions.</p>
+<p>Since sklearn uses consistent framework across classifiers (fit, predict, etc.), delphi creates a pipeline with the classifier and uses the sklearn standard framework to learn the classifier and make predictions.</p>
 </div>
 <div class="section" id="adding-a-parameter-selector">
 <h2>Adding a Parameter Selector<a class="headerlink" href="#adding-a-parameter-selector" title="Permalink to this headline">¶</a></h2>

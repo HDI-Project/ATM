@@ -4,12 +4,16 @@ delphi
 Adding a classifier
 -------------------
 
+The classifier must be a python class that has the following functions:
 
-Decide name for classifier (e.g., KNeighborsClassifier) and emuerator (e.g., EnumeratorKNN).
-Enter these names in the ``LEARNER_CODE_CLASS_MAP`` and ``ENUMERATOR_CODE_CLASS_MAP`` variables in ``delphi/mapping.py``.
-Decide a code  for the classifier (e.g., classify_knn) and enter this in the ``__init__.py`` file in ``delphi/enumeration/classification``.
+1) ``fit``: given training data and labels, learns the model
+2) ``predict``: given data sample(s), predicts the label(s)
 
-Create Enumerator for class in the ``delphi/enumeration/classification`` folder.
+
+In ``delphi/mapping.py``, enter the function in the ``LEARNER_CODE_CLASS_MAP`` variable and the classifier enumerator (see below) in the ``ENUMERATOR_CODE_CLASS_MAP`` variable.
+Decide a code for the classifier (e.g., classify_knn) and enter this in the ``__init__.py`` file in ``delphi/enumeration/classification``.
+
+Create an Enumerator for the classifier in the ``delphi/enumeration/classification`` folder.
 In this file:
 
 a) define the ranges of the parameters in a variable called ``DEFAULT_RANGES``
@@ -50,14 +54,16 @@ c) define the Conditional Parameter Tree (CPT) in a function called ``create_cpt
           param_categorical = Choice("param_categorical", self.ranges["param_categorical"])
           param_float = Choice("param_float", self.ranges["param_float"])
 
-          example = Combination([param_int, param_categorical, param_float])
-          exampleroot = Choice("function", ["classify_example"])
-          exampleroot.add_condition("classify_knn", [example])
+          # if param_categorical==A, then param_float is active
+          param_categorical.add_condition('A', [param_float])
+
+          example = Combination([param_int, param_categorical])
+          exampleroot = Choice("function", ["classify_code"])
+          exampleroot.add_condition("classify_code", [example])
 
           self.root = exampleroot
 
-Currently, the delphi system uses classifiers in the ``sklearn`` package, so only the name of the classifier is needed.
-Since sklearn uses consistent framework across classifiers (fit, predict, etc.), delphi creates an object using the name of classifier and uses the sklearn standard framework to learn the classifier and make predictions.
+Since sklearn uses consistent framework across classifiers (fit, predict, etc.), delphi creates a pipeline with the classifier and uses the sklearn standard framework to learn the classifier and make predictions.
 
 
 
