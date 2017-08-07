@@ -179,8 +179,6 @@ def get_classifier_struct(classifier_id):
     if learner.is_error:
         return None
 
-    frozen = GetFrozenSet(classifier_id, increment=False)
-
     struct = ClassifierInfo()
 
     struct.classifier_id = classifier_id
