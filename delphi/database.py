@@ -3,7 +3,7 @@
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import func
+from sqlalchemy import func, and_
 
 import traceback
 import random, sys
@@ -161,7 +161,7 @@ def GetAllDataruns():
         if session:
             session.close()
 
-def GetDatarun(datarun_id=None, ignore_completed=True):
+def GetDatarun(datarun_id=None, ignore_completed=True, ignore_grid_complete=False):
     """
     Among the incomplete dataruns with maximal priority,
     returns one at random.
@@ -172,8 +172,12 @@ def GetDatarun(datarun_id=None, ignore_completed=True):
     try:
         session = GetConnection()
 
-        if ignore_completed:
+        if ignore_completed and ignore_grid_complete: # this is ignored if ignore_completed is true
+            query = session.query(Datarun).filter(and_(Datarun.completed == None, Datarun.is_gridding_done == 0))
+        elif ignore_completed:
             query = session.query(Datarun).filter(Datarun.completed == None)
+        elif ignore_grid_complete: # this is ignored if ignore_completed is true
+            query = session.query(Datarun).filter(Datarun.is_gridding_done == 0)
         else:
             query = session.query(Datarun)
 
@@ -207,6 +211,7 @@ def GetDatarun(datarun_id=None, ignore_completed=True):
         if session:
             session.close()
 
+
 def GetFrozenSet(frozen_set_id, increment=False):
     session = None
     frozen_set = None
@@ -228,6 +233,38 @@ def GetFrozenSet(frozen_set_id, increment=False):
 
     return frozen_set
 
+def MarkFrozenSetGriddingDone(frozen_set_id):
+    session = None
+    try:
+        session = GetConnection()
+        frozen_set = session.query(FrozenSet).filter(FrozenSet.id == frozen_set_id).one()
+        frozen_set.is_gridding_done = 1
+        session.commit()
+        session.expunge_all() # so we can use outside the session
+
+    except Exception:
+        print "Error in GetFrozenSet():", traceback.format_exc()
+
+    finally:
+        if session:
+            session.close()
+
+def MarkDatarunGriddingDone(datarun_id):
+    session = None
+    try:
+        session = GetConnection()
+        datarun = session.query(Datarun).filter(Datarun.id == datarun_id).one()
+        datarun.is_gridding_done = 1
+        session.commit()
+        session.expunge_all() # so we can use outside the session
+
+    except Exception:
+        print "Error in GetFrozenSet():", traceback.format_exc()
+
+    finally:
+        if session:
+            session.close()
+
 def GetFrozenSets(datarun_id):
     """
     Returns all the frozen sets in a given datarun by id.
@@ -238,6 +275,48 @@ def GetFrozenSets(datarun_id):
         session = GetConnection()
         frozen_sets = session.query(FrozenSet).\
             filter(FrozenSet.datarun_id == datarun_id).all()
+
+    except Exception:
+        print "Error in GetFrozenSets():", traceback.format_exc()
+
+    finally:
+        if session:
+            session.close()
+
+    return frozen_sets
+
+def IsGriddingDoneForDatarun(datarun_id):
+    """
+    Returns all the frozen sets in a given datarun by id.
+    """
+    session = None
+    is_done = True
+    try:
+        session = GetConnection()
+        frozen_sets = session.query(FrozenSet).filter(FrozenSet.datarun_id == datarun_id).all()
+        for frozen_set in frozen_sets:
+            if frozen_set.is_gridding_done == 0:
+                is_done = False
+
+    except Exception:
+        print "Error in GetFrozenSets():", traceback.format_exc()
+
+    finally:
+        if session:
+            session.close()
+
+    return is_done
+
+def GetUncompletedFrozenSets(datarun_id):
+    """
+    Returns all the frozen sets in a given datarun by id.
+    """
+    session = None
+    frozen_sets = []
+    try:
+        session = GetConnection()
+        frozen_sets = session.query(FrozenSet).\
+            filter(and_(FrozenSet.datarun_id == datarun_id, FrozenSet.is_gridding_done == 0)).all()
 
     except Exception:
         print "Error in GetFrozenSets():", traceback.format_exc()

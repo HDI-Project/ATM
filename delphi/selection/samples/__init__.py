@@ -10,6 +10,7 @@ SELECTION_SAMPLES_GP = "gp"
 SELECTION_SAMPLES_GP_EI = "gp_ei"
 SELECTION_SAMPLES_GP_EI_TIME = "gp_eitime"
 SELECTION_SAMPLES_GP_EI_VEL = "gp_eivel"
+SELECTION_SAMPLES_GRID = "grid"
 
 
 class SamplesSelector(Selector):
@@ -40,7 +41,34 @@ def GenerateRandomVectors(n, optimizables):
     i = 0
     for k, struct in optimizables:
         # print "For column %d, and key %s for type %s" % (i, k, struct.type)
-        vectors[:, i] = DrawRandomValuesGRID(n, struct)
+        vectors[:, i] = DrawRandomValues(n, struct)
+        i += 1
+
+    if n == 1:
+        return vectors[0]
+    return vectors
+
+
+def GenerateRandomVectorsGRID(n, optimizables, num_vals_per_var=3):
+    """
+    Given a set of optimizable key => key struct mappings,
+    randomly generates N vectors but with deterministic ordering
+    of corresponding keys in the vector given the set of keys (by sorting).
+
+    Optimizables will look like this:
+    [
+        ('C', 		KeyStruct(range=(1e-05, 100000), 	type='FLOAT_EXP', 	is_categorical=False)),
+        ('degree', 	KeyStruct(range=(2, 4), 			type='INT', 		is_categorical=False)),
+        ('coef0', 	KeyStruct(range=(0, 1), 		    type='INT', 		is_categorical=False)),
+        ('gamma', 	KeyStruct(range=(1e-05, 100000),	type='FLOAT_EXP', 	is_categorical=False))
+    ]
+    """
+    optimizables.sort(key=operator.itemgetter(0))
+    vectors = np.zeros((n, len(optimizables)))
+    i = 0
+    for k, struct in optimizables:
+        # print "For column %d, and key %s for type %s" % (i, k, struct.type)
+        vectors[:, i] = DrawRandomValuesGRID(n, struct, num_vals_per_var)
         i += 1
 
     if n == 1:
@@ -140,36 +168,31 @@ def ParamsToVectors(params, optimizables):
             vectors[i, j] = p[k]
     return vectors
 
-def DrawRandomValuesGRID(n, struct):
+def DrawRandomValuesGRID(n, struct, num_vals_per_var):
     """
     Notes np.random.random_integers(lo, hi, size=n) generates
     n ints in range [lo, hi] INCLUSIVE.
     """
-    if n != 1:
-        raise ValueError('n must be 1 for GRID')
 
-    print 'Using GRID function'
-
-    num_vals = 3
-    pick = np.random.random_integers(low=0, high=num_vals-1, size=n)
     if struct.type == Key.TYPE_FLOAT_EXP:
-        vals = np.linspace(struct.range[0], math.log10(struct.range[1]), num_vals)
+        vals = np.linspace(struct.range[0], math.log10(struct.range[1]), num_vals_per_var)
 
-        random_powers = 10.0 ** vals[pick]
+        random_powers = np.random.choice(vals, size=n)
         random_floats = np.random.rand(n)
         return np.multiply(random_powers, random_floats)
 
     elif struct.type == Key.TYPE_INT:
-        vals = np.linspace(struct.range[0], struct.range[1], num_vals)
-        return vals[pick]
+        vals = np.linspace(struct.range[0], struct.range[1], num_vals_per_var)
+
+        return np.random.choice(vals, size=n)
 
     elif struct.type == Key.TYPE_INT_EXP:
-        vals = np.linspace(math.log10(struct.range[0]), math.log10(struct.range[1]), num_vals)
-        return 10.0 ** vals[pick]
+        vals = np.linspace(math.log10(struct.range[0]), math.log10(struct.range[1]), num_vals_per_var)
+        return 10.0 ** np.random.choice(vals, size=n)
 
     elif struct.type == Key.TYPE_FLOAT:
-        vals = np.linspace(struct.range[0], struct.range[1], num_vals)
-        return vals[pick]
+        vals = np.linspace(struct.range[0], struct.range[1], num_vals_per_var)
+        return np.random.choice(vals, size=n)
 
 
 def DrawRandomValues(n, struct):

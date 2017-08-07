@@ -78,7 +78,7 @@ CREATE TABLE `dataruns` (
   `d` int(11) unsigned NOT NULL,
   `majority` decimal(10,9) NOT NULL,
   `size_kb` int(11) unsigned NOT NULL,
-  `sample_selection` enum('uniform','gp', 'gp_ei', 'gp_eitime', 'gp_eivel') NOT NULL DEFAULT 'uniform',
+  `sample_selection` enum('uniform','gp', 'gp_ei', 'gp_eitime', 'gp_eivel', 'grid') NOT NULL DEFAULT 'uniform',
   `frozen_selection` enum('uniform','ucb1', 'bestk', 'bestkvel', 'recentk', 'recentkvel', 'hieralg', 'hierrand', 'purebestkvel') NOT NULL DEFAULT 'uniform',
   `priority` smallint(10) DEFAULT '5',
   `started` datetime DEFAULT NULL,
@@ -90,6 +90,7 @@ CREATE TABLE `dataruns` (
   `metric` enum('cv','test') DEFAULT NULL,
   `k_window` int(11) DEFAULT NULL,
   `r_min` int(11) DEFAULT NULL,
+  `is_gridding_done` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `name_desc_unq` (`name`,`description`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -107,6 +108,7 @@ CREATE TABLE `frozen_sets` (
   `algorithm` varchar(15) NOT NULL DEFAULT '',
   `trained` int(11) unsigned DEFAULT '0',
   `rewards` decimal(20,10) unsigned DEFAULT '0.0000000000',
+  `is_gridding_done` tinyint(1) NOT NULL DEFAULT '0',
   `optimizables64` longtext,
   `constants64` longtext,
   `frozens64` longtext,

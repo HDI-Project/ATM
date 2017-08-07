@@ -1,4 +1,4 @@
-from delphi.selection.samples import SELECTION_SAMPLES_UNIFORM, SELECTION_SAMPLES_GP
+from delphi.selection.samples import SELECTION_SAMPLES_UNIFORM, SELECTION_SAMPLES_GP, SELECTION_SAMPLES_GRID
 from delphi.selection.samples import SELECTION_SAMPLES_GP_EI, SELECTION_SAMPLES_GP_EI_TIME, SELECTION_SAMPLES_GP_EI_VEL
 from delphi.selection.frozens import SELECTION_FROZENS_UNIFORM, SELECTION_FROZENS_UCB1
 from delphi.config import Config
@@ -200,15 +200,21 @@ while True:
         # choose datarun to work on
         _log("=" * 25)
         started = time.strftime('%Y-%m-%d %H:%M:%S')
-        datarun = GetDatarun(datarun_id=args.datarunid)
+        datarun = GetDatarun(datarun_id=args.datarunid, ignore_grid_complete=False)
         if not datarun:
             _log("No datarun present in database, will wait and try again...")
             time.sleep(10)
             continue
 
-        # choose frozen set
+        # choose frozen ses
         _log("Datarun: %s" % datarun)
-        frozen_sets = GetFrozenSets(datarun.id)
+        frozen_sets = GetUncompletedFrozenSets(datarun.id)
+        if not frozen_sets:
+            if IsGriddingDoneForDatarun(datarun_id=datarun.id):
+                MarkDatarunGriddingDone(datarun_id=datarun.id)
+            _log("No incomplete frozen sets for datarun present in database, will wait and try again...")
+            time.sleep(10)
+            continue
         ncompleted = sum([f.trained for f in frozen_sets])
 
         # check if we've exceeded datarun limits
@@ -257,6 +263,13 @@ while True:
         ### UNIFORM SAMPLE SELECTION ###
         if datarun.sample_selection == SELECTION_SAMPLES_UNIFORM:
             sampler = Sampler(frozen_set=frozen_set)
+
+        ### GRID SAMPLE SELECTION ###
+        elif datarun.sample_selection == SELECTION_SAMPLES_GRID:
+            learners = GetLearnersInFrozen(frozen_set_id)
+            learners = [x.completed == None for x in learners]  # only completed learners
+
+            sampler = Sampler(frozen_set=frozen_set, learners=learners, metric=datarun.metric)
 
         ### BASIC GP SAMPLE SELECTION ###
         elif datarun.sample_selection == SELECTION_SAMPLES_GP:
@@ -317,20 +330,24 @@ while True:
 
         # select the parameters based on the sampler
         params = sampler.select()
-        _log("Params chosen: %s" % params)
+        if params:
+            _log("Params chosen: %s" % params)
 
-        # train learner
-        params["function"] = frozen_set.algorithm
-        wrapper = CreateWrapper(params)
-        trainX, testX, trainY, testY = LoadData(datarun)
-        wrapper.load_data_from_objects(trainX, testX, trainY, testY)
-        performance = wrapper.start()
-        print "Performance: %s" % performance
-        model = Model(wrapper, datarun.wrapper)
+            # train learner
+            params["function"] = frozen_set.algorithm
+            wrapper = CreateWrapper(params)
+            trainX, testX, trainY, testY = LoadData(datarun)
+            wrapper.load_data_from_objects(trainX, testX, trainY, testY)
+            performance = wrapper.start()
+            print "Performance: %s" % performance
+            model = Model(wrapper, datarun.wrapper)
 
-        # insert learner into the database
-        InsertLearner(datarun, frozen_set, performance, params, model, started, config)
+            # insert learner into the database
+            InsertLearner(datarun, frozen_set, performance, params, model, started, config)
+
+
         datarun, frozen_set = None, None  # reset state
+
 
     except Exception as e:
         msg = traceback.format_exc()
