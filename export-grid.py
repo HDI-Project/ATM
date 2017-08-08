@@ -80,6 +80,47 @@ def save_grid():
     with open('grid.pickle', 'wb') as handle:
         pickle.dump(grid, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+def export_csv_grid():
+    with open('grid.pickle', 'rb') as handle:
+        grid = pickle.load(handle)
+
+    np.savetxt('grid.csv', grid, delimiter=',')
+
+    with open('ordered_classifier_dict.pickle', 'rb') as handle:
+        classifier_dict = pickle.load(handle)
+
+    with open('classifier_definitions.tsv', 'w') as f:
+        line = 'column_number\tdefinition\n'
+        f.write(line)
+
+
+        counter = 0
+        for key in classifier_dict.keys():
+            line = '{}\t{}\n'.format(counter, key)
+
+            f.write(line)
+
+            counter += 1
+
+    with open('datarun_definitions.tsv', 'w') as f:
+        line = 'row_number\tdataset_id\tdataset_name\n'
+        f.write(line)
+
+        counter = 0
+        for datarun_id in range(1, 421):
+            datarun = GetDatarun(datarun_id=datarun_id, ignore_completed=False)
+
+            line = '{}\t{}\t{}\n'.format(counter, datarun_id, datarun.name)
+            f.write(line)
+
+            counter += 1
+
+
+
+
+
+
 
 save_classifier_dict()
 save_grid()
+export_csv_grid()
