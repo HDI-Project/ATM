@@ -28,6 +28,7 @@ os.environ["GNUMPY_IMPLICIT_CONVERSION"] = "allow"
 parser = argparse.ArgumentParser(description='Add more learners to database')
 parser.add_argument('-d', '--datarunid', help='Only train on datasets with this id', default=None, required=False)
 parser.add_argument('-c', '--configpath', help='Location of config file', default='config/delphi.cnf', required=False)
+parser.add_argument('-t', '--time', help='Number of seconds to run worker', default=None, required=False)
 args = parser.parse_args()
 
 # setup
@@ -202,8 +203,9 @@ def LoadData(datarun):
     return trainX, testX, trainY, testY
 
 
+start_time = datetime.datetime.now()
 # main loop
-while True:
+while (args.time == None) or ((datetime.datetime.now() - start_time).total_seconds() < int(args.time)):
     datarun, frozen_set, params = None, None, None
     try:
         # choose datarun to work on
