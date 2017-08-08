@@ -119,6 +119,78 @@ class Learner(Base):
     def confusion(self, value):
         self.confusion64 = value # This attribute was removed to save space in DataHub
 
+    @property
+    def cv_f1_scores(self):
+        return Base64ToObject(self.cv_f1_scores64)
+
+    @cv_f1_scores.setter
+    def cv_f1_scores(self, value):
+        self.cv_f1_scores64 = ObjectToBase64(value)
+
+    @property
+    def cv_pr_curve_aucs(self):
+        return Base64ToObject(self.cv_pr_curve_aucs64)
+
+    @cv_pr_curve_aucs.setter
+    def cv_pr_curve_aucs(self, value):
+        self.cv_pr_curve_aucs64 = ObjectToBase64(value)
+
+    @property
+    def cv_roc_curve_aucs(self):
+        return Base64ToObject(self.cv_roc_curve_aucs64)
+
+    @cv_roc_curve_aucs.setter
+    def cv_roc_curve_aucs(self, value):
+        self.cv_roc_curve_aucs64 = ObjectToBase64(value)
+
+    @property
+    def cv_pr_curve_precisions(self):
+        return Base64ToObject(self.cv_pr_curve_precisions64)
+
+    @cv_pr_curve_precisions.setter
+    def cv_pr_curve_precisions(self, value):
+        self.cv_pr_curve_precisions64 = ObjectToBase64(value)
+
+    @property
+    def cv_pr_curve_recalls(self):
+        return Base64ToObject(self.cv_pr_curve_recalls64)
+
+    @cv_pr_curve_recalls.setter
+    def cv_pr_curve_recalls(self, value):
+        self.cv_pr_curve_recalls64 = ObjectToBase64(value)
+
+    @property
+    def cv_pr_curve_thresholds(self):
+        return Base64ToObject(self.cv_pr_curve_thresholds64)
+
+    @cv_pr_curve_thresholds.setter
+    def cv_pr_curve_thresholds(self, value):
+        self.cv_pr_curve_thresholds64 = ObjectToBase64(value)
+
+    @property
+    def cv_roc_curve_fprs(self):
+        return Base64ToObject(self.cv_roc_curve_fprs64)
+
+    @cv_roc_curve_fprs.setter
+    def cv_roc_curve_fprs(self, value):
+        self.cv_roc_curve_fprs64 = ObjectToBase64(value)
+
+    @property
+    def cv_roc_curve_tprs(self):
+        return Base64ToObject(self.cv_roc_curve_tprs64)
+
+    @cv_roc_curve_tprs.setter
+    def cv_roc_curve_tprs(self, value):
+        self.cv_roc_curve_tprs64 = ObjectToBase64(value)
+
+    @property
+    def cv_roc_curve_thresholds(self):
+        return Base64ToObject(self.cv_roc_curve_thresholds64)
+
+    @cv_roc_curve_thresholds.setter
+    def cv_roc_curve_thresholds(self, value):
+        self.cv_roc_curve_thresholds64 = ObjectToBase64(value)
+
     def __repr__(self):
         return "<%s>" % self.algorithm
 

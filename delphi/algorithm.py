@@ -4,7 +4,8 @@
 
 """
 
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+from sklearn.metrics import f1_score, precision_recall_curve, auc, roc_curve, accuracy_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn import decomposition
@@ -13,6 +14,58 @@ from gdbn.activationFunctions import Softmax, Sigmoid, Linear, Tanh
 from sklearn.gaussian_process.kernels import ConstantKernel, RBF, Matern, ExpSineSquared, RationalQuadratic
 import numpy as np
 import time
+
+def delphi_cross_val_binary(pipeline, X, y, cv=10):
+    skf = StratifiedKFold(n_splits=cv)
+    skf.get_n_splits(X, y)
+
+    accuracies = np.zeros(cv)
+    f1_scores = np.zeros(cv)
+    pr_curve_aucs = np.zeros(cv)
+    roc_curve_aucs = np.zeros(cv)
+    pr_curve_precisions = []
+    pr_curve_recalls = []
+    pr_curve_thresholds = []
+    roc_curve_fprs = []
+    roc_curve_tprs = []
+    roc_curve_thresholds = []
+
+    idx = 0
+    for train_index, test_index in skf.split(X, y):
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+
+        pipeline.fit(X_train, y_train)
+        y_pred = pipeline.predict(X_test)
+        y_pred_probs = pipeline.predict_proba(X_test)
+        y_pred_probs = y_pred_probs[:,1] #get probabilites for positive class (1)
+
+        accuracies[idx] = accuracy_score(y_test, y_pred)
+        f1_scores[idx] = f1_score(y_test, y_pred)
+        precision, recall, thresholds = precision_recall_curve(y_test, y_pred_probs, pos_label=1)
+        fpr, tpr, thresholds = roc_curve(y_test, y_pred_probs, pos_label=1)
+
+        pr_curve_aucs[idx] = auc(recall, precision)
+        roc_curve_aucs[idx] = auc(fpr,tpr)
+
+        pr_curve_precisions.append(precision)
+        pr_curve_recalls.append(recall)
+        pr_curve_thresholds.append(thresholds)
+
+        roc_curve_fprs.append(fpr)
+        roc_curve_tprs.append(tpr)
+        roc_curve_thresholds.append(thresholds)
+
+        idx += 1
+
+    cv_results = dict(accuracies=accuracies, f1_scores=f1_scores, pr_curve_aucs=pr_curve_aucs,
+                      roc_curve_aucs=roc_curve_aucs, pr_curve_precisions=pr_curve_precisions,
+                      pr_curve_recalls=pr_curve_recalls, pr_curve_thresholds=pr_curve_thresholds,
+                      roc_curve_fprs=roc_curve_fprs, roc_curve_tprs=roc_curve_tprs,
+                      roc_curve_thresholds=roc_curve_thresholds)
+
+    return cv_results
+
 
 class Wrapper(object):
 
@@ -63,9 +116,18 @@ class Wrapper(object):
             "testing_acc" : self.test_score, # backward compatibility :(
             "test" : self.test_score, # backward compatibility
             "avg_prediction_time" : self.avg_prediction_time,
-            "cv_acc" : np.mean(self.scores), # backward compatibility
-            "cv" : np.mean(self.scores), # backward compatibility
-            "stdev" : np.std(self.scores),
+            "cv_acc" : np.mean(self.scores['accuracies']), # backward compatibility
+            "cv" : np.mean(self.scores['accuracies']), # backward compatibility
+            "stdev" : np.std(self.scores['accuracies']),
+            "cv_f1_scores" : self.scores['f1_scores'],
+            "cv_pr_curve_aucs" : self.scores['pr_curve_aucs'],
+            "cv_roc_curve_aucs" : self.scores['roc_curve_aucs'],
+            "cv_pr_curve_precisions" : self.scores['pr_curve_precisions'],
+            "cv_pr_curve_recalls" : self.scores['pr_curve_recalls'],
+            "cv_pr_curve_thresholds" : self.scores['pr_curve_thresholds'],
+            "cv_roc_curve_fprs" : self.scores['roc_curve_fprs'],
+            "cv_roc_curve_tprs" : self.scores['roc_curve_tprs'],
+            "cv_roc_curve_thresholds" : self.scores['roc_curve_thresholds'],
             "n_folds" : 10,
             "trainable_params": self.trainable_params,
             "testing_confusion" : self.testing_confusion}
@@ -78,7 +140,7 @@ class Wrapper(object):
         self.trainY = trainY
 
     def cross_validate(self):
-        self.scores = cross_val_score(self.pipeline, self.trainX, self.trainY, cv=10)
+        self.scores = delphi_cross_val_binary(self.pipeline, self.trainX, self.trainY, cv=10)
 
     def train_final_model(self):
         self.pipeline.fit(self.trainX, self.trainY)
