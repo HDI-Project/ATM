@@ -56,7 +56,7 @@ A datarun consists of all the parameters for a single experiment run, including 
 The datarun ID in the database also ties together the `hyperpartitions` (frozen sets) which delineate how Delphi can explore different subtypes of classifiers to maximize their performance.
 Once the configuration file is filled out, we can enter it in DataHub with::
 
-    (delphi-env) $ python run_fromfile.py
+    (delphi-env) $ python enter_data.py
 
 Workers
 -------
@@ -68,7 +68,7 @@ On a Local Machine
 
 In local mode, this is simple::
 
-    (delphi-env) $ python run_fromfile.py
+    (delphi-env) $ python worker.py
 
 This command can b executed several times to create many workers that operate independently in parallel.
 How many to run depends of your judgement of your computer's capabilities.

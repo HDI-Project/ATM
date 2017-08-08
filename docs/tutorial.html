@@ -220,7 +220,7 @@ For example if the configuration file is called <code class="docutils literal"><
 A datarun consists of all the parameters for a single experiment run, including where the find the data, what the budget is for number of learners to train, the majoirty class benchmark, and other things.
 The datarun ID in the database also ties together the <cite>hyperpartitions</cite> (frozen sets) which delineate how Delphi can explore different subtypes of classifiers to maximize their performance.
 Once the configuration file is filled out, we can enter it in DataHub with:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>(delphi-env) $ python run_fromfile.py
+<div class="highlight-default"><div class="highlight"><pre><span></span>(delphi-env) $ python enter_data.py
 </pre></div>
 </div>
 </div>
@@ -231,7 +231,7 @@ Once the configuration file is filled out, we can enter it in DataHub with:</p>
 <div class="section" id="on-a-local-machine">
 <h3>On a Local Machine<a class="headerlink" href="#on-a-local-machine" title="Permalink to this headline">¶</a></h3>
 <p>In local mode, this is simple:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>(delphi-env) $ python run_fromfile.py
+<div class="highlight-default"><div class="highlight"><pre><span></span>(delphi-env) $ python worker.py
 </pre></div>
 </div>
 <p>This command can b executed several times to create many workers that operate independently in parallel.
