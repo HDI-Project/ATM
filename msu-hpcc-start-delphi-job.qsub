@@ -13,4 +13,4 @@ cd ${PBS_O_WORKDIR}
 
 source delphi-env/bin/activate
 
-python worker_msu_hpcc.py
+python worker.py -t 10800 # 10800 seconds = 3 hours
