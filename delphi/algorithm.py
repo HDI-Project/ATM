@@ -44,19 +44,19 @@ def delphi_cross_val_binary(pipeline, X, y, cv=10):
 
         accuracies[idx] = accuracy_score(y_test, y_pred)
         f1_scores[idx] = f1_score(y_test, y_pred)
-        precision, recall, thresholds = precision_recall_curve(y_test, y_pred_probs, pos_label=1)
-        fpr, tpr, thresholds = roc_curve(y_test, y_pred_probs, pos_label=1)
+        precision, recall, pr_thresholds = precision_recall_curve(y_test, y_pred_probs, pos_label=1)
+        fpr, tpr, roc_thresholds = roc_curve(y_test, y_pred_probs, pos_label=1)
 
         pr_curve_aucs[idx] = auc(recall, precision)
         roc_curve_aucs[idx] = auc(fpr, tpr)
 
         pr_curve_precisions.append(precision)
         pr_curve_recalls.append(recall)
-        pr_curve_thresholds.append(thresholds)
+        pr_curve_thresholds.append(pr_thresholds)
 
         roc_curve_fprs.append(fpr)
         roc_curve_tprs.append(tpr)
-        roc_curve_thresholds.append(thresholds)
+        roc_curve_thresholds.append(roc_thresholds)
 
         idx += 1
 
@@ -289,6 +289,16 @@ class Wrapper(object):
             "cv_roc_curve_tprs": self.scores['roc_curve_tprs'],
             "cv_roc_curve_thresholds": self.scores['roc_curve_thresholds'],
             "cv_rank_accuracies": self.scores['rank_accuracies'],
+            "test_f1_scores": self.test_f1_scores,
+            "test_pr_curve_aucs": self.test_pr_curve_aucs,
+            "test_roc_curve_aucs": self.test_roc_curve_aucs,
+            "test_pr_curve_precisions": self.test_pr_curve_precisions,
+            "test_pr_curve_recalls": self.test_pr_curve_recalls,
+            "test_pr_curve_thresholds": self.test_pr_curve_thresholds,
+            "test_roc_curve_fprs": self.test_roc_curve_fprs,
+            "test_roc_curve_tprs": self.test_roc_curve_tprs,
+            "test_roc_curve_thresholds": self.test_roc_curve_thresholds,
+            "test_rank_accuracies": self.test_rank_accuracies,
             "n_folds": 10,
             "trainable_params": self.trainable_params,
             "testing_confusion": self.testing_confusion}
@@ -317,6 +327,96 @@ class Wrapper(object):
 
         # make confusion matrix
         self.testing_confusion = confusion_matrix(self.testY, predictions)
+
+        num_classes = len(np.unique(self.testY))
+
+        self.test_f1_scores = None
+        self.test_pr_curve_aucs = None
+        self.test_roc_curve_aucs = None
+        self.test_pr_curve_precisions = None
+        self.test_pr_curve_recalls = None
+        self.test_pr_curve_thresholds = None
+        self.test_roc_curve_fprs = None
+        self.test_roc_curve_tprs = None
+        self.test_roc_curve_thresholds = None
+        self.test_rank_accuracies = None
+
+
+        if num_classes == 2:
+            y_pred_probs = self.pipeline.predict_proba(self.testX)
+            y_pred_probs = y_pred_probs[:, 1]  # get probabilites for positive class (1)
+
+            self.test_f1_scores = f1_score(self.testY, predictions)
+
+            self.test_precision, self.test_recall, self.test_pr_thresholds = precision_recall_curve(self.testY,
+                                                                                                    y_pred_probs,
+                                                                                                    pos_label=1)
+            self.test_fpr, self.test_tpr, self.test_roc_thresholds = roc_curve(self.testY, y_pred_probs, pos_label=1)
+
+            self.test_pr_curve_aucs = auc(self.test_recall, self.test_precision)
+            self.test_roc_curve_aucs = auc(self.test_fpr, self.test_tpr)
+
+        elif (num_classes >= 3) and (num_classes <= 5):
+            self.test_f1_scores = []
+            self.test_pr_curve_aucs = []
+            self.test_roc_curve_aucs = []
+            self.test_pr_curve_precisions = []
+            self.test_pr_curve_recalls = []
+            self.test_pr_curve_thresholds = []
+            self.test_roc_curve_fprs = []
+            self.test_roc_curve_tprs = []
+            self.test_roc_curve_thresholds = []
+
+            y_pred_probs = self.pipeline.predict_proba(self.testX)
+
+            # for each pair, generate roc curve (positive class is the larger class in the pair, i.e., pair[1])
+            for pair in itertools.combinations(self.testY, 2):
+                fpr, tpr, roc_thresholds = roc_curve(y_true=self.testY, y_score=y_pred_probs[:, int(pair[1])],
+                                                     pos_label=pair[1])
+                roc_auc = auc(fpr, tpr)
+
+                self.test_roc_curve_fprs.append((pair, fpr))
+                self.test_roc_curve_tprs.append((pair, tpr))
+                self.test_roc_curve_thresholds.append((pair, roc_thresholds))
+                self.test_roc_curve_aucs.append((pair, roc_auc))
+
+            # for each label, generate F1 and precision-recall curve
+            counter = 0
+            for label in np.nditer(np.unique(self.testY)):
+                y_true_temp = (self.testY == label).astype(int)
+                y_pred_temp = (predictions == label).astype(int)
+                f1_score_val = f1_score(y_true=y_true_temp, y_pred=y_pred_temp, pos_label=1)
+                precision, recall, pr_thresholds = precision_recall_curve(y_true=self.testY,
+                                                                          probas_pred=y_pred_probs[:, int(label)],
+                                                                          pos_label=1)
+                pr_auc = auc(recall, precision)
+
+                self.test_f1_scores.append((label, f1_score_val))
+                self.test_pr_curve_precisions.append((label, precision))
+                self.test_pr_curve_recalls.append((label, recall))
+                self.test_pr_curve_thresholds.append((label, pr_thresholds))
+                self.test_pr_curve_aucs.append((label, pr_auc))
+
+                counter += 1
+
+        else:
+            y_pred_probs = self.pipeline.predict_proba(self.testX)
+
+            self.test_f1_scores = []
+
+            # for each label, generate F1 and precision-recall curve
+            counter = 0
+            for label in np.nditer(np.unique(self.testY)):
+                y_true_temp = (self.testY == label).astype(int)
+                y_pred_temp = (self.testY == label).astype(int)
+                f1_score_val = f1_score(y_true=y_true_temp, y_pred=y_pred_temp, pos_label=1)
+
+                self.test_f1_scores.append((label, f1_score_val))
+
+                counter += 1
+
+            self.test_rank_accuracies = rank_n_accuracy(y_true=self.testY, y_prob_mat=y_pred_probs)
+
 
     def predict(self, examples, probability=False):
         """
