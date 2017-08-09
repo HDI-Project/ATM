@@ -191,6 +191,14 @@ class Learner(Base):
     def cv_roc_curve_thresholds(self, value):
         self.cv_roc_curve_thresholds64 = ObjectToBase64(value)
 
+    @property
+    def cv_rank_accuracies(self):
+        return Base64ToObject(self.cv_rank_accuracies64)
+
+    @cv_rank_accuracies.setter
+    def cv_rank_accuracies(self, value):
+        self.cv_rank_accuracies64 = ObjectToBase64(value)
+
     def __repr__(self):
         return "<%s>" % self.algorithm
 

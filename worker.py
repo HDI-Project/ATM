@@ -101,6 +101,7 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started, conf
                               cv_roc_curve_fprs = performance['cv_roc_curve_fprs'],
                               cv_roc_curve_tprs = performance['cv_roc_curve_tprs'],
                               cv_roc_curve_thresholds = performance['cv_roc_curve_thresholds'],
+                              cv_rank_accuracies = performance['cv_rank_accuracies'],
                               confusion='[THIS COLUMN REMOVED TO SAVE SPACE]', started=started,
                               completed=datetime.datetime.now(), host=GetPublicIP(),
                               dimensions=model.algorithm.dimensions, frozen_hash=frozen_set.frozen_hash,

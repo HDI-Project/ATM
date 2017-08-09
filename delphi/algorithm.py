@@ -14,6 +14,8 @@ from gdbn.activationFunctions import Softmax, Sigmoid, Linear, Tanh
 from sklearn.gaussian_process.kernels import ConstantKernel, RBF, Matern, ExpSineSquared, RationalQuadratic
 import numpy as np
 import time
+import itertools
+
 
 def delphi_cross_val_binary(pipeline, X, y, cv=10):
     skf = StratifiedKFold(n_splits=cv)
@@ -38,7 +40,7 @@ def delphi_cross_val_binary(pipeline, X, y, cv=10):
         pipeline.fit(X_train, y_train)
         y_pred = pipeline.predict(X_test)
         y_pred_probs = pipeline.predict_proba(X_test)
-        y_pred_probs = y_pred_probs[:,1] #get probabilites for positive class (1)
+        y_pred_probs = y_pred_probs[:, 1]  # get probabilites for positive class (1)
 
         accuracies[idx] = accuracy_score(y_test, y_pred)
         f1_scores[idx] = f1_score(y_test, y_pred)
@@ -46,7 +48,7 @@ def delphi_cross_val_binary(pipeline, X, y, cv=10):
         fpr, tpr, thresholds = roc_curve(y_test, y_pred_probs, pos_label=1)
 
         pr_curve_aucs[idx] = auc(recall, precision)
-        roc_curve_aucs[idx] = auc(fpr,tpr)
+        roc_curve_aucs[idx] = auc(fpr, tpr)
 
         pr_curve_precisions.append(precision)
         pr_curve_recalls.append(recall)
@@ -62,13 +64,171 @@ def delphi_cross_val_binary(pipeline, X, y, cv=10):
                       roc_curve_aucs=roc_curve_aucs, pr_curve_precisions=pr_curve_precisions,
                       pr_curve_recalls=pr_curve_recalls, pr_curve_thresholds=pr_curve_thresholds,
                       roc_curve_fprs=roc_curve_fprs, roc_curve_tprs=roc_curve_tprs,
-                      roc_curve_thresholds=roc_curve_thresholds)
+                      roc_curve_thresholds=roc_curve_thresholds, rank_accuracies=None)
 
     return cv_results
 
 
-class Wrapper(object):
+def delphi_cross_val_small_multiclass(pipeline, X, y, cv=10):
+    skf = StratifiedKFold(n_splits=cv)
+    skf.get_n_splits(X, y)
 
+    f1_scores = []
+    pr_curve_aucs = []
+    roc_curve_aucs = []
+    pr_curve_precisions = []
+    pr_curve_recalls = []
+    pr_curve_thresholds = []
+    roc_curve_fprs = []
+    roc_curve_tprs = []
+    roc_curve_thresholds = []
+    accuracies = np.zeros(cv)
+
+    idx = 0
+    for train_index, test_index in skf.split(X, y):
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+
+        pipeline.fit(X_train, y_train)
+        y_pred = pipeline.predict(X_test)
+        y_pred_probs = pipeline.predict_proba(X_test)
+
+        pair_level_roc_curve_fprs = []
+        pair_level_roc_curve_tprs = []
+        pair_level_roc_curve_thresholds = []
+        pair_level_roc_curve_aucs = []
+
+        # for each pair, generate roc curve (positive class is the larger class in the pair, i.e., pair[1])
+        for pair in itertools.combinations(y_test, 2):
+            fpr, tpr, roc_thresholds = roc_curve(y_true=y_test, y_score=y_pred_probs[:, int(pair[1])],
+                                                 pos_label=pair[1])
+            roc_auc = auc(fpr, tpr)
+
+            pair_level_roc_curve_fprs.append((pair, fpr))
+            pair_level_roc_curve_tprs.append((pair, tpr))
+            pair_level_roc_curve_thresholds.append((pair, roc_thresholds))
+            pair_level_roc_curve_aucs.append((pair, roc_auc))
+
+        roc_curve_fprs.append((idx, pair_level_roc_curve_fprs))
+        roc_curve_tprs.append((idx, pair_level_roc_curve_tprs))
+        roc_curve_thresholds.append((idx, pair_level_roc_curve_thresholds))
+        roc_curve_aucs.append((idx, pair_level_roc_curve_aucs))
+
+        label_level_f1_scores = []
+        label_level_pr_curve_aucs = []
+        label_level_pr_curve_precisions = []
+        label_level_pr_curve_recalls = []
+        label_level_pr_curve_thresholds = []
+        f1_scores_vec = np.zeros(len(np.unique(y_test)))
+
+        # for each label, generate F1 and precision-recall curve
+        counter = 0
+        for label in np.nditer(np.unique(y_test)):
+            y_true_temp = (y_test == label).astype(int)
+            y_pred_temp = (y_pred == label).astype(int)
+            f1_score_val = f1_score(y_true=y_true_temp, y_pred=y_pred_temp, pos_label=1)
+            precision, recall, pr_thresholds = precision_recall_curve(y_true=y_test,
+                                                                      probas_pred=y_pred_probs[:, int(label)],
+                                                                      pos_label=1)
+            pr_auc = auc(recall, precision)
+
+            f1_scores_vec[counter] = f1_score_val
+            label_level_f1_scores.append((label, f1_score_val))
+            label_level_pr_curve_precisions.append((label, precision))
+            label_level_pr_curve_recalls.append((label, recall))
+            label_level_pr_curve_thresholds.append((label, pr_thresholds))
+            label_level_pr_curve_aucs.append((label, pr_auc))
+
+            counter += 1
+
+        f1_scores.append((idx, label_level_f1_scores))
+        pr_curve_precisions.append((idx, label_level_pr_curve_precisions))
+        pr_curve_recalls.append((idx, label_level_pr_curve_recalls))
+        pr_curve_thresholds.append((idx, label_level_pr_curve_thresholds))
+        pr_curve_aucs.append((idx, label_level_pr_curve_aucs))
+        accuracies[idx] = np.mean(f1_scores_vec) - np.std(f1_scores_vec)
+
+        idx += 1
+
+    cv_results = dict(accuracies=accuracies, f1_scores=f1_scores, pr_curve_aucs=pr_curve_aucs,
+                      roc_curve_aucs=roc_curve_aucs, pr_curve_precisions=pr_curve_precisions,
+                      pr_curve_recalls=pr_curve_recalls, pr_curve_thresholds=pr_curve_thresholds,
+                      roc_curve_fprs=roc_curve_fprs, roc_curve_tprs=roc_curve_tprs,
+                      roc_curve_thresholds=roc_curve_thresholds, rank_accuracies=None)
+
+    return cv_results
+
+
+def rank_n_accuracy(y_true, y_prob_mat, rank=5):
+    rankings = np.argsort(-y_prob_mat) # negative because we want highest value first
+    rankings = rankings[:, 0:rank-1]
+
+    num_samples = len(y_true)
+    correct_sample_count = 0.0
+
+    for i in range(num_samples):
+        if y_true[i] in rankings[i, :]:
+            correct_sample_count += 1.0
+
+    return correct_sample_count/num_samples
+
+
+def delphi_cross_val_big_multiclass(pipeline, X, y, cv=10, rank=5):
+    skf = StratifiedKFold(n_splits=cv)
+    skf.get_n_splits(X, y)
+
+    f1_scores = []
+    rank_accuracies = np.zeros(cv)
+    accuracies = np.zeros(cv)
+
+    idx = 0
+    for train_index, test_index in skf.split(X, y):
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+
+        pipeline.fit(X_train, y_train)
+        y_pred = pipeline.predict(X_test)
+        y_pred_probs = pipeline.predict_proba(X_test)
+
+        label_level_f1_scores = []
+        f1_scores_vec = np.zeros(len(np.unique(y_test)))
+
+        # for each label, generate F1 and precision-recall curve
+        counter = 0
+        for label in np.nditer(np.unique(y_test)):
+            y_true_temp = (y_test == label).astype(int)
+            y_pred_temp = (y_pred == label).astype(int)
+            f1_score_val = f1_score(y_true=y_true_temp, y_pred=y_pred_temp, pos_label=1)
+
+            f1_scores_vec[counter] = f1_score_val
+            label_level_f1_scores.append((label, f1_score_val))
+
+            counter += 1
+
+        f1_scores.append((idx, label_level_f1_scores))
+        accuracies[idx] = np.mean(f1_scores_vec) - np.std(f1_scores_vec)
+        rank_accuracies[idx] = rank_n_accuracy(y_true=y_test, y_prob_mat=y_pred_probs, rank=rank)
+
+        idx += 1
+
+    cv_results = dict(accuracies=rank_accuracies, f1_scores=f1_scores, pr_curve_aucs=None, roc_curve_aucs=None,
+                      pr_curve_precisions=None, pr_curve_recalls=None, pr_curve_thresholds=None, roc_curve_fprs=None,
+                      roc_curve_tprs=None, roc_curve_thresholds=None, rank_accuracies=rank_accuracies)
+
+    return cv_results
+
+def delphi_cross_val(pipeline, X, y, cv=10):
+    num_classes = len(np.unique(y))
+
+    if num_classes == 2:
+        return delphi_cross_val_binary(pipeline=pipeline, X=X, y=y, cv=cv)
+    elif (num_classes >= 3) and (num_classes <= 5):
+        return delphi_cross_val_small_multiclass(pipeline=pipeline, X=X, y=y, cv=cv)
+    else:
+        return delphi_cross_val_big_multiclass(pipeline=pipeline, X=X, y=y, cv=cv)
+
+
+class Wrapper(object):
     # these are special keys that are used for general purpose
     # things like scaling, normalization, PCA, etc
     FUNCTION = "function"
@@ -113,24 +273,25 @@ class Wrapper(object):
 
     def performance(self):
         self.perf = {
-            "testing_acc" : self.test_score, # backward compatibility :(
-            "test" : self.test_score, # backward compatibility
-            "avg_prediction_time" : self.avg_prediction_time,
-            "cv_acc" : np.mean(self.scores['accuracies']), # backward compatibility
-            "cv" : np.mean(self.scores['accuracies']), # backward compatibility
-            "stdev" : np.std(self.scores['accuracies']),
-            "cv_f1_scores" : self.scores['f1_scores'],
-            "cv_pr_curve_aucs" : self.scores['pr_curve_aucs'],
-            "cv_roc_curve_aucs" : self.scores['roc_curve_aucs'],
-            "cv_pr_curve_precisions" : self.scores['pr_curve_precisions'],
-            "cv_pr_curve_recalls" : self.scores['pr_curve_recalls'],
-            "cv_pr_curve_thresholds" : self.scores['pr_curve_thresholds'],
-            "cv_roc_curve_fprs" : self.scores['roc_curve_fprs'],
-            "cv_roc_curve_tprs" : self.scores['roc_curve_tprs'],
-            "cv_roc_curve_thresholds" : self.scores['roc_curve_thresholds'],
-            "n_folds" : 10,
+            "testing_acc": self.test_score,  # backward compatibility :(
+            "test": self.test_score,  # backward compatibility
+            "avg_prediction_time": self.avg_prediction_time,
+            "cv_acc": np.mean(self.scores['accuracies']),  # backward compatibility
+            "cv": np.mean(self.scores['accuracies']),  # backward compatibility
+            "stdev": np.std(self.scores['accuracies']),
+            "cv_f1_scores": self.scores['f1_scores'],
+            "cv_pr_curve_aucs": self.scores['pr_curve_aucs'],
+            "cv_roc_curve_aucs": self.scores['roc_curve_aucs'],
+            "cv_pr_curve_precisions": self.scores['pr_curve_precisions'],
+            "cv_pr_curve_recalls": self.scores['pr_curve_recalls'],
+            "cv_pr_curve_thresholds": self.scores['pr_curve_thresholds'],
+            "cv_roc_curve_fprs": self.scores['roc_curve_fprs'],
+            "cv_roc_curve_tprs": self.scores['roc_curve_tprs'],
+            "cv_roc_curve_thresholds": self.scores['roc_curve_thresholds'],
+            "cv_rank_accuracies": self.scores['rank_accuracies'],
+            "n_folds": 10,
             "trainable_params": self.trainable_params,
-            "testing_confusion" : self.testing_confusion}
+            "testing_confusion": self.testing_confusion}
         return self.perf
 
     def load_data_from_objects(self, trainX, testX, trainY, testY):
@@ -140,7 +301,7 @@ class Wrapper(object):
         self.trainY = trainY
 
     def cross_validate(self):
-        self.scores = delphi_cross_val_binary(self.pipeline, self.trainX, self.trainY, cv=10)
+        self.scores = delphi_cross_val(self.pipeline, self.trainX, self.trainY, cv=10)
 
     def train_final_model(self):
         self.pipeline.fit(self.trainX, self.trainY)
@@ -209,14 +370,15 @@ class Wrapper(object):
                 learner_params["kernel"] = Matern(nu=learner_params["nu"])
                 del learner_params["nu"]
             elif learner_params["kernel"] == "rational_quadratic":
-                learner_params["kernel"] = RationalQuadratic(length_scale=learner_params["length_scale"], alpha=learner_params["alpha"])
+                learner_params["kernel"] = RationalQuadratic(length_scale=learner_params["length_scale"],
+                                                             alpha=learner_params["alpha"])
                 del learner_params["length_scale"]
                 del learner_params["alpha"]
             elif learner_params["kernel"] == "exp_sine_squared":
-                learner_params["kernel"] = ExpSineSquared(length_scale=learner_params["length_scale"], periodicity=learner_params["periodicity"])
+                learner_params["kernel"] = ExpSineSquared(length_scale=learner_params["length_scale"],
+                                                          periodicity=learner_params["periodicity"])
                 del learner_params["length_scale"]
                 del learner_params["periodicity"]
-
 
         ### MLP ###
         if learner_params["function"] == "classify_mlp":
@@ -242,57 +404,58 @@ class Wrapper(object):
                 del learner_params["hidden_size_layer2"]
                 del learner_params["hidden_size_layer3"]
 
-            learner_params["hidden_layer_sizes"] = [int(x) for x in learner_params["hidden_layer_sizes"]] # convert to ints
+            learner_params["hidden_layer_sizes"] = [int(x) for x in
+                                                    learner_params["hidden_layer_sizes"]]  # convert to ints
 
             # delete our fabricated keys
             del learner_params["num_hidden_layers"]
 
-        #print "Added stuff for DBNs! %s" % learner_params
+        # print "Added stuff for DBNs! %s" % learner_params
         ### DBN ###
         if learner_params["function"] == "classify_dbn":
 
-                # print "AddING stuff for DBNs! %s" % learner_params
+            # print "AddING stuff for DBNs! %s" % learner_params
 
-                learner_params["layer_sizes"] = [learner_params["inlayer_size"]]
+            learner_params["layer_sizes"] = [learner_params["inlayer_size"]]
 
-                # set layer topology
-                if int(learner_params["num_hidden_layers"]) == 1:
-                    learner_params["layer_sizes"].append(learner_params["hidden_size_layer1"])
-                    del learner_params["hidden_size_layer1"]
+            # set layer topology
+            if int(learner_params["num_hidden_layers"]) == 1:
+                learner_params["layer_sizes"].append(learner_params["hidden_size_layer1"])
+                del learner_params["hidden_size_layer1"]
 
-                elif int(learner_params["num_hidden_layers"]) == 2:
-                    learner_params["layer_sizes"].append(learner_params["hidden_size_layer1"])
-                    learner_params["layer_sizes"].append(learner_params["hidden_size_layer2"])
-                    del learner_params["hidden_size_layer1"]
-                    del learner_params["hidden_size_layer2"]
+            elif int(learner_params["num_hidden_layers"]) == 2:
+                learner_params["layer_sizes"].append(learner_params["hidden_size_layer1"])
+                learner_params["layer_sizes"].append(learner_params["hidden_size_layer2"])
+                del learner_params["hidden_size_layer1"]
+                del learner_params["hidden_size_layer2"]
 
-                elif int(learner_params["num_hidden_layers"]) == 3:
-                    learner_params["layer_sizes"].append(learner_params["hidden_size_layer1"])
-                    learner_params["layer_sizes"].append(learner_params["hidden_size_layer2"])
-                    learner_params["layer_sizes"].append(learner_params["hidden_size_layer3"])
-                    del learner_params["hidden_size_layer1"]
-                    del learner_params["hidden_size_layer2"]
-                    del learner_params["hidden_size_layer3"]
+            elif int(learner_params["num_hidden_layers"]) == 3:
+                learner_params["layer_sizes"].append(learner_params["hidden_size_layer1"])
+                learner_params["layer_sizes"].append(learner_params["hidden_size_layer2"])
+                learner_params["layer_sizes"].append(learner_params["hidden_size_layer3"])
+                del learner_params["hidden_size_layer1"]
+                del learner_params["hidden_size_layer2"]
+                del learner_params["hidden_size_layer3"]
 
-                learner_params["layer_sizes"].append(learner_params["outlayer_size"])
-                learner_params["layer_sizes"] = [int(x) for x in learner_params["layer_sizes"]]  # convert to ints
+            learner_params["layer_sizes"].append(learner_params["outlayer_size"])
+            learner_params["layer_sizes"] = [int(x) for x in learner_params["layer_sizes"]]  # convert to ints
 
-                # set activation function
-                if learner_params["output_act_funct"] == "Linear":
-                    learner_params["output_act_funct"] = Linear()
-                elif learner_params["output_act_funct"] == "Sigmoid":
-                    learner_params["output_act_funct"] = Sigmoid()
-                elif learner_params["output_act_funct"] == "Softmax":
-                    learner_params["output_act_funct"] = Softmax()
-                elif learner_params["output_act_funct"] == "tanh":
-                    learner_params["output_act_funct"] = Tanh()
+            # set activation function
+            if learner_params["output_act_funct"] == "Linear":
+                learner_params["output_act_funct"] = Linear()
+            elif learner_params["output_act_funct"] == "Sigmoid":
+                learner_params["output_act_funct"] = Sigmoid()
+            elif learner_params["output_act_funct"] == "Softmax":
+                learner_params["output_act_funct"] = Softmax()
+            elif learner_params["output_act_funct"] == "tanh":
+                learner_params["output_act_funct"] = Tanh()
 
-                learner_params["epochs"] = int(learner_params["epochs"])
+            learner_params["epochs"] = int(learner_params["epochs"])
 
-                # delete our fabricated keys
-                del learner_params["num_hidden_layers"]
-                del learner_params["inlayer_size"]
-                del learner_params["outlayer_size"]
+            # delete our fabricated keys
+            del learner_params["num_hidden_layers"]
+            del learner_params["inlayer_size"]
+            del learner_params["outlayer_size"]
 
         # remove function key and return
         del learner_params["function"]
@@ -307,7 +470,7 @@ class Wrapper(object):
         steps = []
 
         # create a learner with
-        learner_params = {k:v for k,v in self.params.iteritems() if k not in Wrapper.DELPHI_KEYS}
+        learner_params = {k: v for k, v in self.params.iteritems() if k not in Wrapper.DELPHI_KEYS}
 
         # do special converstions
         learner_params = self.special_conversions(learner_params)
@@ -322,7 +485,7 @@ class Wrapper(object):
                 whiten = True
             # PCA dimension in our self.params is a float reprsenting percentages of features to use
             percentage_dimensions = float(self.params[Wrapper.PCA_DIMS])
-            if percentage_dimensions < 0.99: # if close enough keep all features
+            if percentage_dimensions < 0.99:  # if close enough keep all features
                 dimensions = int(percentage_dimensions * float(self.testX.shape[1]))
                 print "*** Will PCA the data down from %d dimensions to %d" % (self.testX.shape[1], dimensions)
                 pca = decomposition.PCA(n_components=dimensions, whiten=whiten)
