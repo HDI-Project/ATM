@@ -84,7 +84,7 @@ def delphi_cross_val_small_multiclass(pipeline, X, y, cv=10):
     roc_curve_thresholds = []
     accuracies = np.zeros(cv)
 
-    idx = 0
+    split_id = 0
     for train_index, test_index in skf.split(X, y):
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
@@ -109,10 +109,10 @@ def delphi_cross_val_small_multiclass(pipeline, X, y, cv=10):
             pair_level_roc_curve_thresholds.append((pair, roc_thresholds))
             pair_level_roc_curve_aucs.append((pair, roc_auc))
 
-        roc_curve_fprs.append((idx, pair_level_roc_curve_fprs))
-        roc_curve_tprs.append((idx, pair_level_roc_curve_tprs))
-        roc_curve_thresholds.append((idx, pair_level_roc_curve_thresholds))
-        roc_curve_aucs.append((idx, pair_level_roc_curve_aucs))
+        roc_curve_fprs.append((split_id, pair_level_roc_curve_fprs))
+        roc_curve_tprs.append((split_id, pair_level_roc_curve_tprs))
+        roc_curve_thresholds.append((split_id, pair_level_roc_curve_thresholds))
+        roc_curve_aucs.append((split_id, pair_level_roc_curve_aucs))
 
         label_level_f1_scores = []
         label_level_pr_curve_aucs = []
@@ -124,6 +124,7 @@ def delphi_cross_val_small_multiclass(pipeline, X, y, cv=10):
         # for each label, generate F1 and precision-recall curve
         counter = 0
         for label in np.nditer(np.unique(y_test)):
+            # set label as positive class, and all other classes as negative class
             y_true_temp = (y_test == label).astype(int)
             y_pred_temp = (y_pred == label).astype(int)
             f1_score_val = f1_score(y_true=y_true_temp, y_pred=y_pred_temp, pos_label=1)
@@ -141,14 +142,14 @@ def delphi_cross_val_small_multiclass(pipeline, X, y, cv=10):
 
             counter += 1
 
-        f1_scores.append((idx, label_level_f1_scores))
-        pr_curve_precisions.append((idx, label_level_pr_curve_precisions))
-        pr_curve_recalls.append((idx, label_level_pr_curve_recalls))
-        pr_curve_thresholds.append((idx, label_level_pr_curve_thresholds))
-        pr_curve_aucs.append((idx, label_level_pr_curve_aucs))
-        accuracies[idx] = np.mean(f1_scores_vec) - np.std(f1_scores_vec)
+        f1_scores.append((split_id, label_level_f1_scores))
+        pr_curve_precisions.append((split_id, label_level_pr_curve_precisions))
+        pr_curve_recalls.append((split_id, label_level_pr_curve_recalls))
+        pr_curve_thresholds.append((split_id, label_level_pr_curve_thresholds))
+        pr_curve_aucs.append((split_id, label_level_pr_curve_aucs))
+        accuracies[split_id] = np.mean(f1_scores_vec) - np.std(f1_scores_vec)
 
-        idx += 1
+        split_id += 1
 
     cv_results = dict(accuracies=accuracies, f1_scores=f1_scores, pr_curve_aucs=pr_curve_aucs,
                       roc_curve_aucs=roc_curve_aucs, pr_curve_precisions=pr_curve_precisions,
@@ -181,7 +182,7 @@ def delphi_cross_val_big_multiclass(pipeline, X, y, cv=10, rank=5):
     rank_accuracies = np.zeros(cv)
     accuracies = np.zeros(cv)
 
-    idx = 0
+    split_id = 0
     for train_index, test_index in skf.split(X, y):
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
@@ -205,11 +206,11 @@ def delphi_cross_val_big_multiclass(pipeline, X, y, cv=10, rank=5):
 
             counter += 1
 
-        f1_scores.append((idx, label_level_f1_scores))
-        accuracies[idx] = np.mean(f1_scores_vec) - np.std(f1_scores_vec)
-        rank_accuracies[idx] = rank_n_accuracy(y_true=y_test, y_prob_mat=y_pred_probs, rank=rank)
+        f1_scores.append((split_id, label_level_f1_scores))
+        accuracies[split_id] = np.mean(f1_scores_vec) - np.std(f1_scores_vec)
+        rank_accuracies[split_id] = rank_n_accuracy(y_true=y_test, y_prob_mat=y_pred_probs, rank=rank)
 
-        idx += 1
+        split_id += 1
 
     cv_results = dict(accuracies=rank_accuracies, f1_scores=f1_scores, pr_curve_aucs=None, roc_curve_aucs=None,
                       pr_curve_precisions=None, pr_curve_recalls=None, pr_curve_thresholds=None, roc_curve_fprs=None,
@@ -273,12 +274,10 @@ class Wrapper(object):
 
     def performance(self):
         self.perf = {
-            "testing_acc": self.test_score,  # backward compatibility :(
-            "test": self.test_score,  # backward compatibility
+            "test_judgement_metric": self.test_score,
             "avg_prediction_time": self.avg_prediction_time,
-            "cv_acc": np.mean(self.scores['accuracies']),  # backward compatibility
-            "cv": np.mean(self.scores['accuracies']),  # backward compatibility
-            "stdev": np.std(self.scores['accuracies']),
+            "cv_judgement_metric": np.mean(self.scores['accuracies']),
+            "cv_judgement_metric_stdev": np.std(self.scores['accuracies']),
             "cv_f1_scores": self.scores['f1_scores'],
             "cv_pr_curve_aucs": self.scores['pr_curve_aucs'],
             "cv_roc_curve_aucs": self.scores['roc_curve_aucs'],
