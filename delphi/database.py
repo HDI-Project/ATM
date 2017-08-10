@@ -112,12 +112,20 @@ class Learner(Base):
         self.trainable_params64 = ObjectToBase64(value)
 
     @property
-    def confusion(self):
-        return Base64ToObject(self.confusion64)
+    def cv_accuracies(self):
+        return Base64ToObject(self.cv_accuracies64)
 
-    @confusion.setter
-    def confusion(self, value):
-        self.confusion64 = value # This attribute was removed to save space in DataHub
+    @cv_accuracies.setter
+    def cv_accuracies(self, value):
+        self.cv_accuracies64 = ObjectToBase64(value)
+
+    @property
+    def cv_cohen_kappas(self):
+        return Base64ToObject(self.cv_cohen_kappas64)
+
+    @cv_cohen_kappas.setter
+    def cv_cohen_kappas(self, value):
+        self.cv_cohen_kappas64 = ObjectToBase64(value)
 
     @property
     def cv_f1_scores(self):
@@ -128,12 +136,28 @@ class Learner(Base):
         self.cv_f1_scores64 = ObjectToBase64(value)
 
     @property
-    def cv_pr_curve_aucs(self):
-        return Base64ToObject(self.cv_pr_curve_aucs64)
+    def cv_roc_curve_fprs(self):
+        return Base64ToObject(self.cv_roc_curve_fprs64)
 
-    @cv_pr_curve_aucs.setter
-    def cv_pr_curve_aucs(self, value):
-        self.cv_pr_curve_aucs64 = ObjectToBase64(value)
+    @cv_roc_curve_fprs.setter
+    def cv_roc_curve_fprs(self, value):
+        self.cv_roc_curve_fprs64 = ObjectToBase64(value)
+
+    @property
+    def cv_roc_curve_tprs(self):
+        return Base64ToObject(self.cv_roc_curve_tprs64)
+
+    @cv_roc_curve_tprs.setter
+    def cv_roc_curve_tprs(self, value):
+        self.cv_roc_curve_tprs64 = ObjectToBase64(value)
+
+    @property
+    def cv_roc_curve_thresholds(self):
+        return Base64ToObject(self.cv_roc_curve_thresholds64)
+
+    @cv_roc_curve_thresholds.setter
+    def cv_roc_curve_thresholds(self, value):
+        self.cv_roc_curve_thresholds64 = ObjectToBase64(value)
 
     @property
     def cv_roc_curve_aucs(self):
@@ -168,28 +192,12 @@ class Learner(Base):
         self.cv_pr_curve_thresholds64 = ObjectToBase64(value)
 
     @property
-    def cv_roc_curve_fprs(self):
-        return Base64ToObject(self.cv_roc_curve_fprs64)
+    def cv_pr_curve_aucs(self):
+        return Base64ToObject(self.cv_pr_curve_aucs64)
 
-    @cv_roc_curve_fprs.setter
-    def cv_roc_curve_fprs(self, value):
-        self.cv_roc_curve_fprs64 = ObjectToBase64(value)
-
-    @property
-    def cv_roc_curve_tprs(self):
-        return Base64ToObject(self.cv_roc_curve_tprs64)
-
-    @cv_roc_curve_tprs.setter
-    def cv_roc_curve_tprs(self, value):
-        self.cv_roc_curve_tprs64 = ObjectToBase64(value)
-
-    @property
-    def cv_roc_curve_thresholds(self):
-        return Base64ToObject(self.cv_roc_curve_thresholds64)
-
-    @cv_roc_curve_thresholds.setter
-    def cv_roc_curve_thresholds(self, value):
-        self.cv_roc_curve_thresholds64 = ObjectToBase64(value)
+    @cv_pr_curve_aucs.setter
+    def cv_pr_curve_aucs(self, value):
+        self.cv_pr_curve_aucs64 = ObjectToBase64(value)
 
     @property
     def cv_rank_accuracies(self):
@@ -200,6 +208,30 @@ class Learner(Base):
         self.cv_rank_accuracies64 = ObjectToBase64(value)
 
     @property
+    def cv_mu_sigmas(self):
+        return Base64ToObject(self.cv_mu_sigmas64)
+
+    @cv_mu_sigmas.setter
+    def cv_mu_sigmas(self, value):
+        self.cv_mu_sigmas64 = ObjectToBase64(value)
+
+    @property
+    def test_accuracies(self):
+        return Base64ToObject(self.test_accuracies64)
+
+    @test_accuracies.setter
+    def test_accuracies(self, value):
+        self.test_accuracies64 = ObjectToBase64(value)
+
+    @property
+    def test_cohen_kappas(self):
+        return Base64ToObject(self.test_cohen_kappas64)
+
+    @test_cohen_kappas.setter
+    def test_cohen_kappas(self, value):
+        self.test_cohen_kappas64 = ObjectToBase64(value)
+
+    @property
     def test_f1_scores(self):
         return Base64ToObject(self.test_f1_scores64)
 
@@ -208,12 +240,28 @@ class Learner(Base):
         self.test_f1_scores64 = ObjectToBase64(value)
 
     @property
-    def test_pr_curve_aucs(self):
-        return Base64ToObject(self.test_pr_curve_aucs64)
+    def test_roc_curve_fprs(self):
+        return Base64ToObject(self.test_roc_curve_fprs64)
 
-    @test_pr_curve_aucs.setter
-    def test_pr_curve_aucs(self, value):
-        self.test_pr_curve_aucs64 = ObjectToBase64(value)
+    @test_roc_curve_fprs.setter
+    def test_roc_curve_fprs(self, value):
+        self.test_roc_curve_fprs64 = ObjectToBase64(value)
+
+    @property
+    def test_roc_curve_tprs(self):
+        return Base64ToObject(self.test_roc_curve_tprs64)
+
+    @test_roc_curve_tprs.setter
+    def test_roc_curve_tprs(self, value):
+        self.test_roc_curve_tprs64 = ObjectToBase64(value)
+
+    @property
+    def test_roc_curve_thresholds(self):
+        return Base64ToObject(self.test_roc_curve_thresholds64)
+
+    @test_roc_curve_thresholds.setter
+    def test_roc_curve_thresholds(self, value):
+        self.test_roc_curve_thresholds64 = ObjectToBase64(value)
 
     @property
     def test_roc_curve_aucs(self):
@@ -248,28 +296,12 @@ class Learner(Base):
         self.test_pr_curve_thresholds64 = ObjectToBase64(value)
 
     @property
-    def test_roc_curve_fprs(self):
-        return Base64ToObject(self.test_roc_curve_fprs64)
+    def test_pr_curve_aucs(self):
+        return Base64ToObject(self.test_pr_curve_aucs64)
 
-    @test_roc_curve_fprs.setter
-    def test_roc_curve_fprs(self, value):
-        self.test_roc_curve_fprs64 = ObjectToBase64(value)
-
-    @property
-    def test_roc_curve_tprs(self):
-        return Base64ToObject(self.test_roc_curve_tprs64)
-
-    @test_roc_curve_tprs.setter
-    def test_roc_curve_tprs(self, value):
-        self.test_roc_curve_tprs64 = ObjectToBase64(value)
-
-    @property
-    def test_roc_curve_thresholds(self):
-        return Base64ToObject(self.test_roc_curve_thresholds64)
-
-    @test_roc_curve_thresholds.setter
-    def test_roc_curve_thresholds(self, value):
-        self.test_roc_curve_thresholds64 = ObjectToBase64(value)
+    @test_pr_curve_aucs.setter
+    def test_pr_curve_aucs(self, value):
+        self.test_pr_curve_aucs64 = ObjectToBase64(value)
 
     @property
     def test_rank_accuracies(self):
@@ -278,6 +310,22 @@ class Learner(Base):
     @test_rank_accuracies.setter
     def test_rank_accuracies(self, value):
         self.test_rank_accuracies64 = ObjectToBase64(value)
+
+    @property
+    def test_mu_sigmas(self):
+        return Base64ToObject(self.test_mu_sigmas64)
+
+    @test_mu_sigmas.setter
+    def test_mu_sigmas(self, value):
+        self.test_mu_sigmas64 = ObjectToBase64(value)
+
+    @property
+    def cv_judgment_metric(self):
+        return Base64ToObject(self.cv_judgment_metric64)
+
+    @cv_judgment_metric.setter
+    def cv_judgment_metric(self, value):
+        self.cv_judgment_metric64 = ObjectToBase64(value)
 
     def __repr__(self):
         return "<%s>" % self.algorithm

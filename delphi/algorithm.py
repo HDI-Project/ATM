@@ -5,11 +5,10 @@
 """
 
 from sklearn.model_selection import cross_val_score, StratifiedKFold
-from sklearn.metrics import f1_score, precision_recall_curve, auc, roc_curve, accuracy_score
+from sklearn.metrics import f1_score, precision_recall_curve, auc, roc_curve, accuracy_score, cohen_kappa_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn import decomposition
-from sklearn.metrics import confusion_matrix
 from gdbn.activationFunctions import Softmax, Sigmoid, Linear, Tanh
 from sklearn.gaussian_process.kernels import ConstantKernel, RBF, Matern, ExpSineSquared, RationalQuadratic
 import numpy as np
@@ -17,72 +16,135 @@ import time
 import itertools
 
 
+def get_metrics_binary(y_true, y_pred, y_pred_probs):
+    y_pred_prob = y_pred_probs[:, 1]  # get probabilites for positive class (1)
+
+    accuracy = accuracy_score(y_true, y_pred)
+    cohen_kappa = cohen_kappa_score(y_true, y_pred)
+
+    _f1_score = f1_score(y_true, y_pred) # _ in front of name to differentiate it from f1_score() function
+
+    pr_precisions, pr_recalls, pr_thresholds = precision_recall_curve(y_true, y_pred_prob, pos_label=1)
+    roc_fprs, roc_tprs, roc_thresholds = roc_curve(y_true, y_pred_prob, pos_label=1)
+
+    pr_curve_auc = auc(pr_recalls, pr_precisions)
+    roc_curve_auc = auc(roc_fprs, roc_tprs)
+
+    results = dict(accuracy=accuracy, cohen_kappa=cohen_kappa, f1_score=_f1_score, pr_curve_precisions=pr_precisions,
+                   pr_curve_recalls=pr_recalls, pr_curve_thresholds=pr_thresholds, pr_curve_auc=pr_curve_auc,
+                   roc_curve_fprs=roc_fprs, roc_curve_tprs=roc_tprs, roc_curve_thresholds=roc_thresholds,
+                   roc_curve_auc=roc_curve_auc)
+
+    return results
+
+def get_metrics_small_multiclass(y_true, y_pred, y_pred_probs):
+    accuracy = accuracy_score(y_true, y_pred)
+    cohen_kappa = cohen_kappa_score(y_true, y_pred)
+
+    pair_level_roc_curve_fprs = []
+    pair_level_roc_curve_tprs = []
+    pair_level_roc_curve_thresholds = []
+    pair_level_roc_curve_aucs = []
+
+    # for each pair, generate roc curve (positive class is the larger class in the pair, i.e., pair[1])
+    for pair in itertools.combinations(y_true, 2):
+        fpr, tpr, roc_thresholds = roc_curve(y_true=y_true, y_score=y_pred_probs[:, int(pair[1])],
+                                             pos_label=pair[1])
+        roc_auc = auc(fpr, tpr)
+
+        pair_level_roc_curve_fprs.append((pair, fpr))
+        pair_level_roc_curve_tprs.append((pair, tpr))
+        pair_level_roc_curve_thresholds.append((pair, roc_thresholds))
+        pair_level_roc_curve_aucs.append((pair, roc_auc))
+
+    label_level_f1_scores = []
+    label_level_pr_curve_precisions = []
+    label_level_pr_curve_recalls = []
+    label_level_pr_curve_thresholds = []
+    label_level_pr_curve_aucs = []
+    f1_scores_vec = np.zeros(len(np.unique(y_true)))
+
+    # for each label, generate F1 and precision-recall curve
+    counter = 0
+    for label in np.nditer(np.unique(y_true)):
+        # set label as positive class, and all other classes as negative class
+        y_true_temp = (y_true == label).astype(int)
+        y_pred_temp = (y_pred == label).astype(int)
+        f1_score_val = f1_score(y_true=y_true_temp, y_pred=y_pred_temp, pos_label=1)
+        precision, recall, pr_thresholds = precision_recall_curve(y_true=y_true,
+                                                                  probas_pred=y_pred_probs[:, int(label)],
+                                                                  pos_label=1)
+        pr_auc = auc(recall, precision)
+
+        f1_scores_vec[counter] = f1_score_val
+        label_level_f1_scores.append((label, f1_score_val))
+        label_level_pr_curve_precisions.append((label, precision))
+        label_level_pr_curve_recalls.append((label, recall))
+        label_level_pr_curve_thresholds.append((label, pr_thresholds))
+        label_level_pr_curve_aucs.append((label, pr_auc))
+
+        counter += 1
+
+    mu_sigma = np.mean(f1_scores_vec) - np.std(f1_scores_vec)
+
+    results = dict(accuracy=accuracy, cohen_kappa=cohen_kappa, label_level_f1_scores=label_level_f1_scores,
+                   pair_level_roc_curve_fprs=pair_level_roc_curve_fprs,
+                   pair_level_roc_curve_tprs=pair_level_roc_curve_tprs,
+                   pair_level_roc_curve_thresholds=pair_level_roc_curve_thresholds,
+                   pair_level_roc_curve_aucs=pair_level_roc_curve_aucs,
+                   label_level_pr_curve_precisions=label_level_pr_curve_precisions,
+                   label_level_pr_curve_recalls=label_level_pr_curve_recalls,
+                   label_level_pr_curve_thresholds=label_level_pr_curve_thresholds,
+                   label_level_pr_curve_aucs=label_level_pr_curve_aucs, mu_sigma=mu_sigma)
+
+    return results
+
+def get_metrics_large_multiclass(y_true, y_pred, y_pred_probs, rank):
+    label_level_f1_scores = []
+    f1_scores_vec = np.zeros(len(np.unique(y_true)))
+
+    # for each label, generate F1 and precision-recall curve
+    counter = 0
+    for label in np.nditer(np.unique(y_true)):
+        y_true_temp = (y_true == label).astype(int)
+        y_pred_temp = (y_pred == label).astype(int)
+        f1_score_val = f1_score(y_true=y_true_temp, y_pred=y_pred_temp, pos_label=1)
+
+        f1_scores_vec[counter] = f1_score_val
+        label_level_f1_scores.append((label, f1_score_val))
+
+        counter += 1
+
+    mu_sigma = np.mean(f1_scores_vec) - np.std(f1_scores_vec)
+
+    accuracy = accuracy_score(y_true=y_true, y_pred=y_pred)
+    cohen_kappa = cohen_kappa_score(y_true, y_pred)
+
+    rank_accuracy = rank_n_accuracy(y_true=y_true, y_prob_mat=y_pred_probs, rank=rank)
+
+    results = dict(accuracy=accuracy, cohen_kappa=cohen_kappa, label_level_f1_scores=label_level_f1_scores,
+                   mu_sigma=mu_sigma, rank_accuracy=rank_accuracy)
+
+    return results
+
 def delphi_cross_val_binary(pipeline, X, y, cv=10):
     skf = StratifiedKFold(n_splits=cv)
     skf.get_n_splits(X, y)
 
     accuracies = np.zeros(cv)
+    cohen_kappas = np.zeros(cv)
     f1_scores = np.zeros(cv)
-    pr_curve_aucs = np.zeros(cv)
+    roc_curve_fprs = []
+    roc_curve_tprs = []
+    roc_curve_thresholds = []
     roc_curve_aucs = np.zeros(cv)
     pr_curve_precisions = []
     pr_curve_recalls = []
     pr_curve_thresholds = []
-    roc_curve_fprs = []
-    roc_curve_tprs = []
-    roc_curve_thresholds = []
+    pr_curve_aucs = np.zeros(cv)
+    rank_accuracies = None
+    mu_sigmas = None
 
-    idx = 0
-    for train_index, test_index in skf.split(X, y):
-        X_train, X_test = X[train_index], X[test_index]
-        y_train, y_test = y[train_index], y[test_index]
-
-        pipeline.fit(X_train, y_train)
-        y_pred = pipeline.predict(X_test)
-        y_pred_probs = pipeline.predict_proba(X_test)
-        y_pred_probs = y_pred_probs[:, 1]  # get probabilites for positive class (1)
-
-        accuracies[idx] = accuracy_score(y_test, y_pred)
-        f1_scores[idx] = f1_score(y_test, y_pred)
-        precision, recall, pr_thresholds = precision_recall_curve(y_test, y_pred_probs, pos_label=1)
-        fpr, tpr, roc_thresholds = roc_curve(y_test, y_pred_probs, pos_label=1)
-
-        pr_curve_aucs[idx] = auc(recall, precision)
-        roc_curve_aucs[idx] = auc(fpr, tpr)
-
-        pr_curve_precisions.append(precision)
-        pr_curve_recalls.append(recall)
-        pr_curve_thresholds.append(pr_thresholds)
-
-        roc_curve_fprs.append(fpr)
-        roc_curve_tprs.append(tpr)
-        roc_curve_thresholds.append(roc_thresholds)
-
-        idx += 1
-
-    cv_results = dict(accuracies=accuracies, f1_scores=f1_scores, pr_curve_aucs=pr_curve_aucs,
-                      roc_curve_aucs=roc_curve_aucs, pr_curve_precisions=pr_curve_precisions,
-                      pr_curve_recalls=pr_curve_recalls, pr_curve_thresholds=pr_curve_thresholds,
-                      roc_curve_fprs=roc_curve_fprs, roc_curve_tprs=roc_curve_tprs,
-                      roc_curve_thresholds=roc_curve_thresholds, rank_accuracies=None)
-
-    return cv_results
-
-
-def delphi_cross_val_small_multiclass(pipeline, X, y, cv=10):
-    skf = StratifiedKFold(n_splits=cv)
-    skf.get_n_splits(X, y)
-
-    f1_scores = []
-    pr_curve_aucs = []
-    roc_curve_aucs = []
-    pr_curve_precisions = []
-    pr_curve_recalls = []
-    pr_curve_thresholds = []
-    roc_curve_fprs = []
-    roc_curve_tprs = []
-    roc_curve_thresholds = []
-    accuracies = np.zeros(cv)
 
     split_id = 0
     for train_index, test_index in skf.split(X, y):
@@ -93,69 +155,86 @@ def delphi_cross_val_small_multiclass(pipeline, X, y, cv=10):
         y_pred = pipeline.predict(X_test)
         y_pred_probs = pipeline.predict_proba(X_test)
 
-        pair_level_roc_curve_fprs = []
-        pair_level_roc_curve_tprs = []
-        pair_level_roc_curve_thresholds = []
-        pair_level_roc_curve_aucs = []
+        results = get_metrics_binary(y_pred=y_pred, y_true=y_test, y_pred_probs=y_pred_probs)
 
-        # for each pair, generate roc curve (positive class is the larger class in the pair, i.e., pair[1])
-        for pair in itertools.combinations(y_test, 2):
-            fpr, tpr, roc_thresholds = roc_curve(y_true=y_test, y_score=y_pred_probs[:, int(pair[1])],
-                                                 pos_label=pair[1])
-            roc_auc = auc(fpr, tpr)
+        accuracies[split_id] = results['accuracy']
+        cohen_kappas[split_id] = results['cohen_kappa']
 
-            pair_level_roc_curve_fprs.append((pair, fpr))
-            pair_level_roc_curve_tprs.append((pair, tpr))
-            pair_level_roc_curve_thresholds.append((pair, roc_thresholds))
-            pair_level_roc_curve_aucs.append((pair, roc_auc))
+        f1_scores[split_id] = results['f1_score']
 
-        roc_curve_fprs.append((split_id, pair_level_roc_curve_fprs))
-        roc_curve_tprs.append((split_id, pair_level_roc_curve_tprs))
-        roc_curve_thresholds.append((split_id, pair_level_roc_curve_thresholds))
-        roc_curve_aucs.append((split_id, pair_level_roc_curve_aucs))
+        pr_curve_precisions.append(results['pr_curve_precisions'])
+        pr_curve_recalls.append(results['pr_curve_recalls'])
+        pr_curve_thresholds.append(results['pr_curve_thresholds'])
+        pr_curve_aucs[split_id] = results['pr_curve_auc']
 
-        label_level_f1_scores = []
-        label_level_pr_curve_aucs = []
-        label_level_pr_curve_precisions = []
-        label_level_pr_curve_recalls = []
-        label_level_pr_curve_thresholds = []
-        f1_scores_vec = np.zeros(len(np.unique(y_test)))
-
-        # for each label, generate F1 and precision-recall curve
-        counter = 0
-        for label in np.nditer(np.unique(y_test)):
-            # set label as positive class, and all other classes as negative class
-            y_true_temp = (y_test == label).astype(int)
-            y_pred_temp = (y_pred == label).astype(int)
-            f1_score_val = f1_score(y_true=y_true_temp, y_pred=y_pred_temp, pos_label=1)
-            precision, recall, pr_thresholds = precision_recall_curve(y_true=y_test,
-                                                                      probas_pred=y_pred_probs[:, int(label)],
-                                                                      pos_label=1)
-            pr_auc = auc(recall, precision)
-
-            f1_scores_vec[counter] = f1_score_val
-            label_level_f1_scores.append((label, f1_score_val))
-            label_level_pr_curve_precisions.append((label, precision))
-            label_level_pr_curve_recalls.append((label, recall))
-            label_level_pr_curve_thresholds.append((label, pr_thresholds))
-            label_level_pr_curve_aucs.append((label, pr_auc))
-
-            counter += 1
-
-        f1_scores.append((split_id, label_level_f1_scores))
-        pr_curve_precisions.append((split_id, label_level_pr_curve_precisions))
-        pr_curve_recalls.append((split_id, label_level_pr_curve_recalls))
-        pr_curve_thresholds.append((split_id, label_level_pr_curve_thresholds))
-        pr_curve_aucs.append((split_id, label_level_pr_curve_aucs))
-        accuracies[split_id] = np.mean(f1_scores_vec) - np.std(f1_scores_vec)
+        roc_curve_fprs.append(results['roc_curve_fprs'])
+        roc_curve_tprs.append(results['roc_curve_tprs'])
+        roc_curve_thresholds.append(results['roc_curve_thresholds'])
+        roc_curve_aucs[split_id] = results['roc_curve_auc']
 
         split_id += 1
 
     cv_results = dict(accuracies=accuracies, f1_scores=f1_scores, pr_curve_aucs=pr_curve_aucs,
-                      roc_curve_aucs=roc_curve_aucs, pr_curve_precisions=pr_curve_precisions,
+                      cohen_kappas=cohen_kappas, roc_curve_aucs=roc_curve_aucs, pr_curve_precisions=pr_curve_precisions,
                       pr_curve_recalls=pr_curve_recalls, pr_curve_thresholds=pr_curve_thresholds,
                       roc_curve_fprs=roc_curve_fprs, roc_curve_tprs=roc_curve_tprs,
-                      roc_curve_thresholds=roc_curve_thresholds, rank_accuracies=None)
+                      roc_curve_thresholds=roc_curve_thresholds, rank_accuracies=rank_accuracies, mu_sigmas=mu_sigmas,
+                      judgement_metric=np.mean(f1_scores), judgement_metric_std=np.std(f1_scores))
+
+    return cv_results
+
+
+def delphi_cross_val_small_multiclass(pipeline, X, y, cv=10):
+    skf = StratifiedKFold(n_splits=cv)
+    skf.get_n_splits(X, y)
+
+    accuracies = np.zeros(cv)
+    cohen_kappas = np.zeros(cv)
+    f1_scores = []
+    roc_curve_fprs = []
+    roc_curve_tprs = []
+    roc_curve_thresholds = []
+    roc_curve_aucs = []
+    pr_curve_precisions = []
+    pr_curve_recalls = []
+    pr_curve_thresholds = []
+    pr_curve_aucs = []
+    rank_accuracies = None
+    mu_sigmas = np.zeros(cv)
+
+    split_id = 0
+    for train_index, test_index in skf.split(X, y):
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+
+        pipeline.fit(X_train, y_train)
+        y_pred = pipeline.predict(X_test)
+        y_pred_probs = pipeline.predict_proba(X_test)
+
+        results = get_metrics_small_multiclass(y_true=y_test, y_pred=y_pred, y_pred_probs=y_pred_probs)
+
+        roc_curve_fprs.append((split_id, results['pair_level_roc_curve_fprs']))
+        roc_curve_tprs.append((split_id, results['pair_level_roc_curve_tprs']))
+        roc_curve_thresholds.append((split_id, results['pair_level_roc_curve_thresholds']))
+        roc_curve_aucs.append((split_id, results['pair_level_roc_curve_aucs']))
+
+        f1_scores.append((split_id, results['label_level_f1_scores']))
+        pr_curve_precisions.append((split_id, results['label_level_pr_curve_precisions']))
+        pr_curve_recalls.append((split_id, results['label_level_pr_curve_recalls']))
+        pr_curve_thresholds.append((split_id, results['label_level_pr_curve_thresholds']))
+        pr_curve_aucs.append((split_id, results['label_level_pr_curve_aucs']))
+        accuracies[split_id] = results['accuracy']
+        cohen_kappas[split_id] = results['cohen_kappa']
+        mu_sigmas[split_id] = results['mu_sigma']
+
+        split_id += 1
+
+    cv_results = dict(accuracies=accuracies, f1_scores=f1_scores, pr_curve_aucs=pr_curve_aucs,
+                      cohen_kappas=cohen_kappas, roc_curve_aucs=roc_curve_aucs, pr_curve_precisions=pr_curve_precisions,
+                      pr_curve_recalls=pr_curve_recalls, pr_curve_thresholds=pr_curve_thresholds,
+                      roc_curve_fprs=roc_curve_fprs, roc_curve_tprs=roc_curve_tprs,
+                      roc_curve_thresholds=roc_curve_thresholds, rank_accuracies=rank_accuracies, mu_sigmas=mu_sigmas,
+                      judgement_metric=np.mean(mu_sigmas), judgement_metric_std=np.std(mu_sigmas))
 
     return cv_results
 
@@ -174,13 +253,28 @@ def rank_n_accuracy(y_true, y_prob_mat, rank=5):
     return correct_sample_count/num_samples
 
 
-def delphi_cross_val_big_multiclass(pipeline, X, y, cv=10, rank=5):
+def delphi_cross_val_large_multiclass(pipeline, X, y, cv=10, rank=5):
     skf = StratifiedKFold(n_splits=cv)
     skf.get_n_splits(X, y)
 
-    f1_scores = []
-    rank_accuracies = np.zeros(cv)
+    # f1_scores = []
+    # rank_accuracies = np.zeros(cv)
+    # accuracies = np.zeros(cv)
+    # mu_sigma = np.zeros(cv)
+
     accuracies = np.zeros(cv)
+    cohen_kappas = np.zeros(cv)
+    f1_scores = []
+    roc_curve_fprs = None
+    roc_curve_tprs = None
+    roc_curve_thresholds = None
+    roc_curve_aucs = None
+    pr_curve_precisions = None
+    pr_curve_recalls = None
+    pr_curve_thresholds = None
+    pr_curve_aucs = None
+    rank_accuracies = np.zeros(cv)
+    mu_sigmas = np.zeros(cv)
 
     split_id = 0
     for train_index, test_index in skf.split(X, y):
@@ -191,30 +285,21 @@ def delphi_cross_val_big_multiclass(pipeline, X, y, cv=10, rank=5):
         y_pred = pipeline.predict(X_test)
         y_pred_probs = pipeline.predict_proba(X_test)
 
-        label_level_f1_scores = []
-        f1_scores_vec = np.zeros(len(np.unique(y_test)))
+        results = get_metrics_large_multiclass(y_true=y_test, y_pred=y_pred, y_pred_probs=y_pred_probs, rank=rank)
 
-        # for each label, generate F1 and precision-recall curve
-        counter = 0
-        for label in np.nditer(np.unique(y_test)):
-            y_true_temp = (y_test == label).astype(int)
-            y_pred_temp = (y_pred == label).astype(int)
-            f1_score_val = f1_score(y_true=y_true_temp, y_pred=y_pred_temp, pos_label=1)
-
-            f1_scores_vec[counter] = f1_score_val
-            label_level_f1_scores.append((label, f1_score_val))
-
-            counter += 1
-
-        f1_scores.append((split_id, label_level_f1_scores))
-        accuracies[split_id] = np.mean(f1_scores_vec) - np.std(f1_scores_vec)
-        rank_accuracies[split_id] = rank_n_accuracy(y_true=y_test, y_prob_mat=y_pred_probs, rank=rank)
+        f1_scores.append((split_id, results['label_level_f1_scores']))
+        mu_sigmas[split_id] =results['mu_sigma']
+        accuracies[split_id] = results['accuracy']
+        rank_accuracies[split_id] = results['rank_accuracy']
 
         split_id += 1
 
-    cv_results = dict(accuracies=rank_accuracies, f1_scores=f1_scores, pr_curve_aucs=None, roc_curve_aucs=None,
-                      pr_curve_precisions=None, pr_curve_recalls=None, pr_curve_thresholds=None, roc_curve_fprs=None,
-                      roc_curve_tprs=None, roc_curve_thresholds=None, rank_accuracies=rank_accuracies)
+    cv_results = dict(accuracies=accuracies, f1_scores=f1_scores, pr_curve_aucs=pr_curve_aucs,
+                      cohen_kappas=cohen_kappas, roc_curve_aucs=roc_curve_aucs, pr_curve_precisions=pr_curve_precisions,
+                      pr_curve_recalls=pr_curve_recalls, pr_curve_thresholds=pr_curve_thresholds,
+                      roc_curve_fprs=roc_curve_fprs, roc_curve_tprs=roc_curve_tprs,
+                      roc_curve_thresholds=roc_curve_thresholds, rank_accuracies=rank_accuracies, mu_sigmas=mu_sigmas,
+                      judgement_metric=np.mean(mu_sigmas), judgement_metric_std=np.std(mu_sigmas))
 
     return cv_results
 
@@ -226,7 +311,7 @@ def delphi_cross_val(pipeline, X, y, cv=10):
     elif (num_classes >= 3) and (num_classes <= 5):
         return delphi_cross_val_small_multiclass(pipeline=pipeline, X=X, y=y, cv=cv)
     else:
-        return delphi_cross_val_big_multiclass(pipeline=pipeline, X=X, y=y, cv=cv)
+        return delphi_cross_val_large_multiclass(pipeline=pipeline, X=X, y=y, cv=cv)
 
 
 class Wrapper(object):
@@ -274,33 +359,44 @@ class Wrapper(object):
 
     def performance(self):
         self.perf = {
-            "test_judgement_metric": self.test_score,
-            "avg_prediction_time": self.avg_prediction_time,
-            "cv_judgement_metric": np.mean(self.scores['accuracies']),
-            "cv_judgement_metric_stdev": np.std(self.scores['accuracies']),
-            "cv_f1_scores": self.scores['f1_scores'],
-            "cv_pr_curve_aucs": self.scores['pr_curve_aucs'],
-            "cv_roc_curve_aucs": self.scores['roc_curve_aucs'],
-            "cv_pr_curve_precisions": self.scores['pr_curve_precisions'],
-            "cv_pr_curve_recalls": self.scores['pr_curve_recalls'],
-            "cv_pr_curve_thresholds": self.scores['pr_curve_thresholds'],
-            "cv_roc_curve_fprs": self.scores['roc_curve_fprs'],
-            "cv_roc_curve_tprs": self.scores['roc_curve_tprs'],
-            "cv_roc_curve_thresholds": self.scores['roc_curve_thresholds'],
-            "cv_rank_accuracies": self.scores['rank_accuracies'],
-            "test_f1_scores": self.test_f1_scores,
-            "test_pr_curve_aucs": self.test_pr_curve_aucs,
-            "test_roc_curve_aucs": self.test_roc_curve_aucs,
-            "test_pr_curve_precisions": self.test_pr_curve_precisions,
-            "test_pr_curve_recalls": self.test_pr_curve_recalls,
-            "test_pr_curve_thresholds": self.test_pr_curve_thresholds,
-            "test_roc_curve_fprs": self.test_roc_curve_fprs,
-            "test_roc_curve_tprs": self.test_roc_curve_tprs,
-            "test_roc_curve_thresholds": self.test_roc_curve_thresholds,
-            "test_rank_accuracies": self.test_rank_accuracies,
-            "n_folds": 10,
-            "trainable_params": self.trainable_params,
-            "testing_confusion": self.testing_confusion}
+            #judgment metrics (what GP uses to decide next parameter values)
+            "cv_judgement_metric":          self.cv_scores['judgement_metric'],
+            "cv_judgement_metric_stdev":    self.cv_scores['judgement_metric_std'],
+            "test_judgement_metric":        self.test_scores['judgement_metric'],
+            # Cross Validation Metrics (split train data with CV and test on each fold)
+            "cv_accuracies":                self.cv_scores['accuracies'],
+            "cv_cohen_kappas":              self.cv_scores['cohen_kappas'],
+            "cv_f1_scores":                 self.cv_scores['f1_scores'],
+            "cv_roc_curve_fprs":            self.cv_scores['roc_curve_fprs'],
+            "cv_roc_curve_tprs":            self.cv_scores['roc_curve_tprs'],
+            "cv_roc_curve_thresholds":      self.cv_scores['roc_curve_thresholds'],
+            "cv_roc_curve_aucs":            self.cv_scores['roc_curve_aucs'],
+            "cv_pr_curve_precisions":       self.cv_scores['pr_curve_precisions'],
+            "cv_pr_curve_recalls":          self.cv_scores['pr_curve_recalls'],
+            "cv_pr_curve_thresholds":       self.cv_scores['pr_curve_thresholds'],
+            "cv_pr_curve_aucs":             self.cv_scores['pr_curve_aucs'],
+            "cv_rank_accuracies":           self.cv_scores['rank_accuracies'],
+            "cv_mu_sigmas":                 self.cv_scores['mu_sigmas'],
+            # Test Metrics (train on all train data, test on test data)
+            "test_accuracies":                self.test_scores['accuracies'],
+            "test_cohen_kappas":            self.test_scores['cohen_kappas'],
+            "test_f1_scores":               self.test_scores['f1_scores'],
+            "test_roc_curve_fprs":          self.test_scores['roc_curve_fprs'],
+            "test_roc_curve_tprs":          self.test_scores['roc_curve_tprs'],
+            "test_roc_curve_thresholds":    self.test_scores['roc_curve_thresholds'],
+            "test_roc_curve_aucs":          self.test_scores['roc_curve_aucs'],
+            "test_pr_curve_precisions":     self.test_scores['pr_curve_precisions'],
+            "test_pr_curve_recalls":        self.test_scores['pr_curve_recalls'],
+            "test_pr_curve_thresholds":     self.test_scores['pr_curve_thresholds'],
+            "test_pr_curve_aucs":           self.test_scores['pr_curve_aucs'],
+            "test_rank_accuracies":         self.test_scores['rank_accuracies'],
+            "test_mu_sigmas":               self.test_scores['mu_sigmas'],
+            # other info
+            "avg_prediction_time":          self.avg_prediction_time,
+            "n_folds":                      10,
+            "trainable_params":             self.trainable_params
+        }
+
         return self.perf
 
     def load_data_from_objects(self, trainX, testX, trainY, testY):
@@ -310,111 +406,60 @@ class Wrapper(object):
         self.trainY = trainY
 
     def cross_validate(self):
-        self.scores = delphi_cross_val(self.pipeline, self.trainX, self.trainY, cv=10)
+        self.cv_scores = delphi_cross_val(self.pipeline, self.trainX, self.trainY, cv=10)
 
     def train_final_model(self):
         self.pipeline.fit(self.trainX, self.trainY)
 
-        # time the training average
-        self.test_score = self.pipeline.score(self.testX, self.testY)
-
         # time the prediction
         starttime = time.time()
-        predictions = self.pipeline.predict(self.testX)
+        y_preds = self.pipeline.predict(self.testX)
         total = time.time() - starttime
         self.avg_prediction_time = total / float(len(self.testY))
 
-        # make confusion matrix
-        self.testing_confusion = confusion_matrix(self.testY, predictions)
+        y_pred_probs = self.pipeline.predict_proba(self.testX)
 
         num_classes = len(np.unique(self.testY))
 
-        self.test_f1_scores = None
-        self.test_pr_curve_aucs = None
-        self.test_roc_curve_aucs = None
-        self.test_pr_curve_precisions = None
-        self.test_pr_curve_recalls = None
-        self.test_pr_curve_thresholds = None
-        self.test_roc_curve_fprs = None
-        self.test_roc_curve_tprs = None
-        self.test_roc_curve_thresholds = None
-        self.test_rank_accuracies = None
-
-
         if num_classes == 2:
-            y_pred_probs = self.pipeline.predict_proba(self.testX)
-            y_pred_probs = y_pred_probs[:, 1]  # get probabilites for positive class (1)
+            results = get_metrics_binary(y_true=self.testY, y_pred=y_preds, y_pred_probs=y_pred_probs)
 
-            self.test_f1_scores = f1_score(self.testY, predictions)
-
-            self.test_precision, self.test_recall, self.test_pr_thresholds = precision_recall_curve(self.testY,
-                                                                                                    y_pred_probs,
-                                                                                                    pos_label=1)
-            self.test_fpr, self.test_tpr, self.test_roc_thresholds = roc_curve(self.testY, y_pred_probs, pos_label=1)
-
-            self.test_pr_curve_aucs = auc(self.test_recall, self.test_precision)
-            self.test_roc_curve_aucs = auc(self.test_fpr, self.test_tpr)
+            self.test_scores = dict(accuracies=results['accuracy'], cohen_kappas=results['cohen_kappa'],
+                                    f1_scores=results['f1_score'], roc_curve_fprs=results['roc_curve_fprs'],
+                                    roc_curve_tprs=results['roc_curve_tprs'],
+                                    roc_curve_thresholds=results['roc_curve_thresholds'],
+                                    roc_curve_aucs=results['roc_curve_auc'],
+                                    pr_curve_precisions=results['pr_curve_precisions'],
+                                    pr_curve_recalls=results['pr_curve_recalls'],
+                                    pr_curve_thresholds=results['pr_curve_thresholds'],
+                                    pr_curve_aucs=results['pr_curve_auc'],
+                                    rank_accuracies=None, mu_sigmas=None, judgement_metric=results['f1_score'])
 
         elif (num_classes >= 3) and (num_classes <= 5):
-            self.test_f1_scores = []
-            self.test_pr_curve_aucs = []
-            self.test_roc_curve_aucs = []
-            self.test_pr_curve_precisions = []
-            self.test_pr_curve_recalls = []
-            self.test_pr_curve_thresholds = []
-            self.test_roc_curve_fprs = []
-            self.test_roc_curve_tprs = []
-            self.test_roc_curve_thresholds = []
+            results = get_metrics_small_multiclass(y_true=self.testY, y_pred=y_preds, y_pred_probs=y_pred_probs)
 
-            y_pred_probs = self.pipeline.predict_proba(self.testX)
-
-            # for each pair, generate roc curve (positive class is the larger class in the pair, i.e., pair[1])
-            for pair in itertools.combinations(self.testY, 2):
-                fpr, tpr, roc_thresholds = roc_curve(y_true=self.testY, y_score=y_pred_probs[:, int(pair[1])],
-                                                     pos_label=pair[1])
-                roc_auc = auc(fpr, tpr)
-
-                self.test_roc_curve_fprs.append((pair, fpr))
-                self.test_roc_curve_tprs.append((pair, tpr))
-                self.test_roc_curve_thresholds.append((pair, roc_thresholds))
-                self.test_roc_curve_aucs.append((pair, roc_auc))
-
-            # for each label, generate F1 and precision-recall curve
-            counter = 0
-            for label in np.nditer(np.unique(self.testY)):
-                y_true_temp = (self.testY == label).astype(int)
-                y_pred_temp = (predictions == label).astype(int)
-                f1_score_val = f1_score(y_true=y_true_temp, y_pred=y_pred_temp, pos_label=1)
-                precision, recall, pr_thresholds = precision_recall_curve(y_true=self.testY,
-                                                                          probas_pred=y_pred_probs[:, int(label)],
-                                                                          pos_label=1)
-                pr_auc = auc(recall, precision)
-
-                self.test_f1_scores.append((label, f1_score_val))
-                self.test_pr_curve_precisions.append((label, precision))
-                self.test_pr_curve_recalls.append((label, recall))
-                self.test_pr_curve_thresholds.append((label, pr_thresholds))
-                self.test_pr_curve_aucs.append((label, pr_auc))
-
-                counter += 1
+            self.test_scores = dict(accuracies=results['accuracy'], cohen_kappas=results['cohen_kappa'],
+                                    f1_scores=results['label_level_f1_scores'],
+                                    roc_curve_fprs=results['pair_level_roc_curve_fprs'],
+                                    roc_curve_tprs=results['pair_level_roc_curve_tprs'],
+                                    roc_curve_thresholds=results['pair_level_roc_curve_thresholds'],
+                                    roc_curve_aucs=results['pair_level_roc_curve_aucs'],
+                                    pr_curve_precisions=results['label_level_pr_curve_precisions'],
+                                    pr_curve_recalls=results['label_level_pr_curve_recalls'],
+                                    pr_curve_thresholds=results['label_level_pr_curve_thresholds'],
+                                    pr_curve_aucs=results['label_level_pr_curve_aucs'],
+                                    rank_accuracies=None, mu_sigmas=results['mu_sigma'],
+                                    judgement_metric=results['mu_sigma'])
 
         else:
-            y_pred_probs = self.pipeline.predict_proba(self.testX)
+            results = get_metrics_large_multiclass(y_true=self.testY, y_pred=y_preds, y_pred_probs=y_pred_probs, rank=5)
 
-            self.test_f1_scores = []
-
-            # for each label, generate F1 and precision-recall curve
-            counter = 0
-            for label in np.nditer(np.unique(self.testY)):
-                y_true_temp = (self.testY == label).astype(int)
-                y_pred_temp = (self.testY == label).astype(int)
-                f1_score_val = f1_score(y_true=y_true_temp, y_pred=y_pred_temp, pos_label=1)
-
-                self.test_f1_scores.append((label, f1_score_val))
-
-                counter += 1
-
-            self.test_rank_accuracies = rank_n_accuracy(y_true=self.testY, y_prob_mat=y_pred_probs)
+            self.test_scores = dict(accuracies=results['accuracy'], cohen_kappas=results['cohen_kappa'],
+                                    f1_scores=results['label_level_f1_scores'], roc_curve_fprs=None,
+                                    roc_curve_tprs=None, roc_curve_thresholds=None, roc_curve_aucs=None,
+                                    pr_curve_precisions=None, pr_curve_recalls=None, pr_curve_thresholds=None,
+                                    pr_curve_aucs=None, rank_accuracies=results['rank_accuracy'],
+                                    mu_sigmas=results['mu_sigma'], judgement_metric=results['mu_sigma'])
 
 
     def predict(self, examples, probability=False):
