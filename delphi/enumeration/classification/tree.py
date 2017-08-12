@@ -8,7 +8,7 @@ class EnumeratorDTC(ClassifierEnumerator):
     
     DEFAULT_RANGES = {
         "criterion" : ("entropy", "gini"),
-        "max_features" : (0.0, 1.0),
+        "max_features" : (0.1, 1.0),
         "max_depth" : (2, 10), 
         "min_samples_split" : (2, 4), 
         "min_samples_leaf" : (1, 3),
@@ -46,7 +46,7 @@ class EnumeratorRFC(ClassifierEnumerator):
     
     DEFAULT_RANGES = {
         "criterion" : ("entropy", "gini"),
-        "max_features" : (0.0, 1.0),
+        "max_features" : (0.1, 1.0),
         "max_depth" : (2, 5, 10), 
         "min_samples_split" : (2, 3),
         "min_samples_leaf" : (1, 2),
@@ -94,7 +94,7 @@ class EnumeratorETC(ClassifierEnumerator):
     
     DEFAULT_RANGES = {
         "criterion" : ("entropy", "gini"),
-        "max_features" : (0.0, 1.0),
+        "max_features" : (0.1, 1.0),
         "max_depth" : (2, 5, 10), 
         "min_samples_split" : (2, 3),
         "min_samples_leaf" : (1, 2),
