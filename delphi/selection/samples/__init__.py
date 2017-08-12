@@ -182,11 +182,11 @@ def DrawRandomValuesGRID(n, struct, num_vals_per_var):
     elif struct.type == Key.TYPE_INT:
         vals = np.linspace(struct.range[0], struct.range[1], num_vals_per_var)
 
-        return np.random.choice(vals, size=n)
+        return np.round(np.random.choice(vals, size=n))
 
     elif struct.type == Key.TYPE_INT_EXP:
         vals = np.linspace(math.log10(struct.range[0]), math.log10(struct.range[1]), num_vals_per_var)
-        return 10.0 ** np.random.choice(vals, size=n)
+        return np.round(10.0 ** np.random.choice(vals, size=n))
 
     elif struct.type == Key.TYPE_FLOAT:
         vals = np.round(np.linspace(struct.range[0], struct.range[1], num_vals_per_var), decimals=5)
