@@ -1,7 +1,7 @@
 #!/bin/bash -login
 
 #PBS -l walltime=03:59:00
-#PBS -l nodes=1:ppn=1,mem=8gb
+#PBS -l nodes=1:ppn=1,mem=64gb
 #PBS -m abe
 #PBS -N Delphi
 
@@ -13,4 +13,4 @@ cd ${PBS_O_WORKDIR}
 
 source delphi-env/bin/activate
 
-python worker.py -t 10800 # 10800 seconds = 3 hours
+python worker.py -t 10800 -l # 10800 seconds = 3 hours
