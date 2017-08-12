@@ -24,11 +24,21 @@ def get_metrics_binary(y_true, y_pred, y_pred_probs):
 
     _f1_score = f1_score(y_true, y_pred) # _ in front of name to differentiate it from f1_score() function
 
-    pr_precisions, pr_recalls, pr_thresholds = precision_recall_curve(y_true, y_pred_prob, pos_label=1)
-    roc_fprs, roc_tprs, roc_thresholds = roc_curve(y_true, y_pred_prob, pos_label=1)
+    if np.any(np.isnan(y_pred_probs)):
+        pr_precisions = 'nan probabilities, cannot compute pr curve'
+        pr_recalls = 'nan probabilities, cannot compute pr curve'
+        pr_thresholds = 'nan probabilities, cannot compute pr curve'
+        roc_fprs = 'nan probabilities, cannot compute roc curve'
+        roc_tprs = 'nan probabilities, cannot compute roc curve'
+        roc_thresholds = 'nan probabilities, cannot compute roc curve'
+        pr_curve_auc = 'nan probabilities, cannot compute pr curve'
+        roc_curve_auc = 'nan probabilities, cannot compute roc curve'
+    else:
+        pr_precisions, pr_recalls, pr_thresholds = precision_recall_curve(y_true, y_pred_prob, pos_label=1)
+        roc_fprs, roc_tprs, roc_thresholds = roc_curve(y_true, y_pred_prob, pos_label=1)
 
-    pr_curve_auc = auc(pr_recalls, pr_precisions)
-    roc_curve_auc = auc(roc_fprs, roc_tprs)
+        pr_curve_auc = auc(pr_recalls, pr_precisions)
+        roc_curve_auc = auc(roc_fprs, roc_tprs)
 
     results = dict(accuracy=accuracy, cohen_kappa=cohen_kappa, f1_score=_f1_score, pr_curve_precisions=pr_precisions,
                    pr_curve_recalls=pr_recalls, pr_curve_thresholds=pr_thresholds, pr_curve_auc=pr_curve_auc,
@@ -46,11 +56,18 @@ def get_metrics_small_multiclass(y_true, y_pred, y_pred_probs):
     pair_level_roc_curve_thresholds = []
     pair_level_roc_curve_aucs = []
 
+
     # for each pair, generate roc curve (positive class is the larger class in the pair, i.e., pair[1])
     for pair in itertools.combinations(y_true, 2):
-        fpr, tpr, roc_thresholds = roc_curve(y_true=y_true, y_score=y_pred_probs[:, int(pair[1])],
-                                             pos_label=pair[1])
-        roc_auc = auc(fpr, tpr)
+        if np.any(np.isnan(y_pred_probs[:, int(pair[1])])):
+            fpr = 'nan probabilities, cannot compute roc curve'
+            tpr = 'nan probabilities, cannot compute roc curve'
+            roc_thresholds = 'nan probabilities, cannot compute roc curve'
+            roc_auc = 'nan probabilities, cannot compute roc curve'
+        else:
+            fpr, tpr, roc_thresholds = roc_curve(y_true=y_true, y_score=y_pred_probs[:, int(pair[1])],
+                                                 pos_label=pair[1])
+            roc_auc = auc(fpr, tpr)
 
         pair_level_roc_curve_fprs.append((pair, fpr))
         pair_level_roc_curve_tprs.append((pair, tpr))
@@ -71,10 +88,17 @@ def get_metrics_small_multiclass(y_true, y_pred, y_pred_probs):
         y_true_temp = (y_true == label).astype(int)
         y_pred_temp = (y_pred == label).astype(int)
         f1_score_val = f1_score(y_true=y_true_temp, y_pred=y_pred_temp, pos_label=1)
-        precision, recall, pr_thresholds = precision_recall_curve(y_true=y_true,
-                                                                  probas_pred=y_pred_probs[:, int(label)],
-                                                                  pos_label=1)
-        pr_auc = auc(recall, precision)
+
+        if np.any(np.isnan(y_pred_probs[:, int(pair[1])])):
+            precision = 'nan probabilities, cannot compute pr curve'
+            recall = 'nan probabilities, cannot compute pr curve'
+            pr_thresholds = 'nan probabilities, cannot compute pr curve'
+            pr_auc = 'nan probabilities, cannot compute pr curve'
+        else:
+            precision, recall, pr_thresholds = precision_recall_curve(y_true=y_true,
+                                                                      probas_pred=y_pred_probs[:, int(label)],
+                                                                      pos_label=1)
+            pr_auc = auc(recall, precision)
 
         f1_scores_vec[counter] = f1_score_val
         label_level_f1_scores.append((label, f1_score_val))
@@ -103,7 +127,7 @@ def get_metrics_large_multiclass(y_true, y_pred, y_pred_probs, rank):
     label_level_f1_scores = []
     f1_scores_vec = np.zeros(len(np.unique(y_true)))
 
-    # for each label, generate F1 and precision-recall curve
+    # for each label, generate F1
     counter = 0
     for label in np.nditer(np.unique(y_true)):
         y_true_temp = (y_true == label).astype(int)
@@ -175,12 +199,20 @@ def delphi_cross_val_binary(pipeline, X, y, cv=10):
         pr_curve_precisions.append(results['pr_curve_precisions'])
         pr_curve_recalls.append(results['pr_curve_recalls'])
         pr_curve_thresholds.append(results['pr_curve_thresholds'])
-        pr_curve_aucs[split_id] = results['pr_curve_auc']
+
+        if results['pr_curve_auc'] == 'nan probabilities, cannot compute pr curve':
+            pr_curve_aucs[split_id] = np.nan
+        else:
+            pr_curve_aucs[split_id] = results['pr_curve_auc']
 
         roc_curve_fprs.append(results['roc_curve_fprs'])
         roc_curve_tprs.append(results['roc_curve_tprs'])
         roc_curve_thresholds.append(results['roc_curve_thresholds'])
-        roc_curve_aucs[split_id] = results['roc_curve_auc']
+
+        if results['roc_curve_auc'] == 'nan probabilities, cannot compute roc curve':
+            roc_curve_aucs[split_id] = np.nan
+        else:
+            roc_curve_aucs[split_id] = results['roc_curve_auc']
 
         split_id += 1
 
