@@ -369,7 +369,7 @@ def GetAllDataruns():
         if session:
             session.close()
 
-def GetDatarun(datarun_id=None, ignore_completed=True, ignore_grid_complete=False):
+def GetDatarun(datarun_id=None, ignore_completed=True, ignore_grid_complete=False, chose_randomly=True):
     """
     Among the incomplete dataruns with maximal priority,
     returns one at random.
@@ -406,10 +406,15 @@ def GetDatarun(datarun_id=None, ignore_completed=True, ignore_grid_complete=Fals
                 candidates.append(run)
 
         # choose one if there is at least one
-        if candidates:
+        if candidates and chose_randomly:
             chosen = candidates[random.randint(0, len(candidates) - 1)]
             if chosen:
                 return chosen
+        elif candidates and not chose_randomly:
+            chosen = candidates[0]
+            if chosen:
+                return chosen
+
         return []
 
     except Exception:
@@ -493,7 +498,7 @@ def GetFrozenSets(datarun_id):
 
     return frozen_sets
 
-def IsGriddingDoneForDatarun(datarun_id):
+def IsGriddingDoneForDatarun(datarun_id, min_num_errors_to_exclude=0):
     """
     Returns all the frozen sets in a given datarun by id.
     """
@@ -504,7 +509,10 @@ def IsGriddingDoneForDatarun(datarun_id):
         frozen_sets = session.query(FrozenSet).filter(FrozenSet.datarun_id == datarun_id).all()
         for frozen_set in frozen_sets:
             if frozen_set.is_gridding_done == 0:
-                is_done = False
+                if((min_num_errors_to_exclude > 0) and (GetNumberOfFrozenSetErrors(frozen_set_id=frozen_set.id) < min_num_errors_to_exclude)):
+                    is_done = False
+                elif min_num_errors_to_exclude == 0:
+                    is_done = False
 
     except Exception:
         print "Error in GetFrozenSets():", traceback.format_exc()
@@ -515,7 +523,7 @@ def IsGriddingDoneForDatarun(datarun_id):
 
     return is_done
 
-def GetUncompletedFrozenSets(datarun_id):
+def GetIncompletedFrozenSets(datarun_id, min_num_errors_to_exclude=0):
     """
     Returns all the frozen sets in a given datarun by id.
     """
@@ -526,6 +534,15 @@ def GetUncompletedFrozenSets(datarun_id):
         frozen_sets = session.query(FrozenSet).\
             filter(and_(FrozenSet.datarun_id == datarun_id, FrozenSet.is_gridding_done == 0)).all()
 
+        if min_num_errors_to_exclude > 0:
+            old_list = frozen_sets
+            frozen_sets = []
+
+            for frozen_set in old_list:
+                if GetNumberOfFrozenSetErrors(frozen_set_id=frozen_set.id) < min_num_errors_to_exclude:
+                    frozen_sets.append(frozen_set)
+
+
     except Exception:
         print "Error in GetFrozenSets():", traceback.format_exc()
 
@@ -534,6 +551,20 @@ def GetUncompletedFrozenSets(datarun_id):
             session.close()
 
     return frozen_sets
+
+def GetNumberOfFrozenSetErrors(frozen_set_id):
+    session = None
+    learners = []
+    try:
+        session = GetConnection()
+        learners = session.query(Learner). \
+            filter(and_(Learner.frozen_set_id == frozen_set_id, Learner.is_error == 1)).all()
+    except:
+        print "Error in GetLearnersInFrozen(%d):" % frozen_set_id, traceback.format_exc()
+    finally:
+        if session:
+            session.close()
+    return len(learners)
 
 
 def MarkDatarunDone(datarun_id):

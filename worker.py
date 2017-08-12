@@ -29,6 +29,8 @@ parser = argparse.ArgumentParser(description='Add more learners to database')
 parser.add_argument('-d', '--datarunid', help='Only train on datasets with this id', default=None, required=False)
 parser.add_argument('-c', '--configpath', help='Location of config file', default='config/delphi.cnf', required=False)
 parser.add_argument('-t', '--time', help='Number of seconds to run worker', default=None, required=False)
+parser.add_argument('-l', '--seqorder', help='work on datasets in sequential order starting with smallest id number, but still max priority (default = random)',
+                    dest='choose_randomly', default=True, action='store_const', const=False)
 args = parser.parse_args()
 
 # setup
@@ -229,7 +231,7 @@ while (args.time == None) or ((datetime.datetime.now() - start_time).total_secon
         # choose datarun to work on
         _log("=" * 25)
         started = time.strftime('%Y-%m-%d %H:%M:%S')
-        datarun = GetDatarun(datarun_id=args.datarunid, ignore_grid_complete=False)
+        datarun = GetDatarun(datarun_id=args.datarunid, ignore_grid_complete=True, chose_randomly=args.choose_randomly)
         if not datarun:
             _log("No datarun present in database, will wait and try again...")
             time.sleep(10)
@@ -237,9 +239,9 @@ while (args.time == None) or ((datetime.datetime.now() - start_time).total_secon
 
         # choose frozen ses
         _log("Datarun: %s" % datarun)
-        frozen_sets = GetUncompletedFrozenSets(datarun.id)
+        frozen_sets = GetIncompletedFrozenSets(datarun.id, min_num_errors_to_exclude=20)
         if not frozen_sets:
-            if IsGriddingDoneForDatarun(datarun_id=datarun.id):
+            if IsGriddingDoneForDatarun(datarun_id=datarun.id, min_num_errors_to_exclude=20):
                 MarkDatarunGriddingDone(datarun_id=datarun.id)
             _log("No incomplete frozen sets for datarun present in database, will wait and try again...")
             time.sleep(10)
