@@ -153,7 +153,17 @@ def delphi_cross_val_binary(pipeline, X, y, cv=10):
 
         pipeline.fit(X_train, y_train)
         y_pred = pipeline.predict(X_test)
-        y_pred_probs = pipeline.predict_proba(X_test)
+
+        last_step = pipeline.steps[-1]
+        if last_step[0] == 'classify_sgd' or last_step[0] == 'classify_pa':
+            class_1_distance = pipeline.decision_function(X_test)
+            class_0_distance = -class_1_distance
+
+            # this isn't a probability
+            y_pred_probs = np.column_stack((class_0_distance, class_1_distance))
+
+        else:
+            y_pred_probs = pipeline.predict_proba(X_test)
 
         results = get_metrics_binary(y_pred=y_pred, y_true=y_test, y_pred_probs=y_pred_probs)
 
@@ -209,7 +219,15 @@ def delphi_cross_val_small_multiclass(pipeline, X, y, cv=10):
 
         pipeline.fit(X_train, y_train)
         y_pred = pipeline.predict(X_test)
-        y_pred_probs = pipeline.predict_proba(X_test)
+
+        last_step = pipeline.steps[-1]
+        if last_step[0] == 'classify_sgd' or last_step[0] == 'classify_pa':
+            # this isn't a probability
+            y_pred_probs = pipeline.decision_function(X_test)
+
+        else:
+            y_pred_probs = pipeline.predict_proba(X_test)
+
 
         results = get_metrics_small_multiclass(y_true=y_test, y_pred=y_pred, y_pred_probs=y_pred_probs)
 
@@ -283,7 +301,14 @@ def delphi_cross_val_large_multiclass(pipeline, X, y, cv=10, rank=5):
 
         pipeline.fit(X_train, y_train)
         y_pred = pipeline.predict(X_test)
-        y_pred_probs = pipeline.predict_proba(X_test)
+
+        last_step = pipeline.steps[-1]
+        if last_step[0] == 'classify_sgd' or last_step[0] == 'classify_pa':
+            # this isn't a probability
+            y_pred_probs = pipeline.decision_function(X_test)
+
+        else:
+            y_pred_probs = pipeline.predict_proba(X_test)
 
         results = get_metrics_large_multiclass(y_true=y_test, y_pred=y_pred, y_pred_probs=y_pred_probs, rank=rank)
 
@@ -417,11 +442,21 @@ class Wrapper(object):
         total = time.time() - starttime
         self.avg_prediction_time = total / float(len(self.testY))
 
-        y_pred_probs = self.pipeline.predict_proba(self.testX)
 
         num_classes = len(np.unique(self.testY))
 
         if num_classes == 2:
+            last_step = self.pipeline.steps[-1]
+            if last_step[0] == 'classify_sgd' or last_step[0] == 'classify_pa':
+                class_1_distance = self.pipeline.decision_function(self.testX)
+                class_0_distance = -class_1_distance
+
+                # this isn't a probability
+                y_pred_probs = np.column_stack((class_0_distance, class_1_distance))
+
+            else:
+                y_pred_probs = self.pipeline.predict_proba(self.testX)
+
             results = get_metrics_binary(y_true=self.testY, y_pred=y_preds, y_pred_probs=y_pred_probs)
 
             self.test_scores = dict(accuracies=results['accuracy'], cohen_kappas=results['cohen_kappa'],
@@ -436,6 +471,15 @@ class Wrapper(object):
                                     rank_accuracies=None, mu_sigmas=None, judgement_metric=results['f1_score'])
 
         elif (num_classes >= 3) and (num_classes <= 5):
+            last_step = self.pipeline.steps[-1]
+            if last_step[0] == 'classify_sgd' or last_step[0] == 'classify_pa':
+                # this isn't a probability
+                y_pred_probs = self.pipeline.decision_function(self.testX)
+
+            else:
+                y_pred_probs = self.pipeline.predict_proba(self.testX)
+
+
             results = get_metrics_small_multiclass(y_true=self.testY, y_pred=y_preds, y_pred_probs=y_pred_probs)
 
             self.test_scores = dict(accuracies=results['accuracy'], cohen_kappas=results['cohen_kappa'],
@@ -452,6 +496,14 @@ class Wrapper(object):
                                     judgement_metric=results['mu_sigma'])
 
         else:
+            last_step = self.pipeline.steps[-1]
+            if last_step[0] == 'classify_sgd' or last_step[0] == 'classify_pa':
+                # this isn't a probability
+                y_pred_probs = self.pipeline.decision_function(self.testX)
+
+            else:
+                y_pred_probs = self.pipeline.predict_proba(self.testX)
+
             results = get_metrics_large_multiclass(y_true=self.testY, y_pred=y_preds, y_pred_probs=y_pred_probs, rank=5)
 
             self.test_scores = dict(accuracies=results['accuracy'], cohen_kappas=results['cohen_kappa'],
