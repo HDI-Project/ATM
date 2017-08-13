@@ -4,6 +4,7 @@
 logs/*
 data/*
 models/*
+metrics/*
 # ignore configuration files except the template
 config/*
 !config/delphi.cnf.template

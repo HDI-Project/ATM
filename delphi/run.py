@@ -40,12 +40,12 @@ def Run(runname, description, metric, sample_selection, frozen_selection, budget
         raise Exception("No valid training or testing files!")
 
     # wrap the data and save it to disk
-    training_path, testing_path = dw.wrap()
+    local_training_path, local_testing_path = dw.wrap()
     stats = dw.get_statistics()
-    print "Training data: %s" % training_path
-    print "Testing data: %s" % testing_path
-    training_http = PREFIX + os.path.basename(training_path)
-    testing_http = PREFIX + os.path.basename(testing_path)
+    print "Training data: %s" % local_training_path
+    print "Testing data: %s" % local_testing_path
+    training_http = PREFIX + os.path.basename(local_training_path)
+    testing_http = PREFIX + os.path.basename(local_testing_path)
 
     # create all combinations necessary
     config = Config(configpath)
@@ -56,8 +56,8 @@ def Run(runname, description, metric, sample_selection, frozen_selection, budget
         "name": runname,
         "trainpath": training_http,
         "testpath": testing_http,
-        "local_trainpath": training_path,
-        "local_testpath": testing_path,
+        "local_trainpath": local_training_path,
+        "local_testpath": local_testing_path,
         "labelcol": stats["label_col"],
         "metric": metric,
         "description": description,
@@ -144,11 +144,17 @@ def Run(runname, description, metric, sample_selection, frozen_selection, budget
         s3_bucket = config.get(Config.AWS, Config.AWS_S3_BUCKET)
         bucket = conn.get_bucket(s3_bucket)
         ktrain = Key(bucket)
-        ktrain.key = training_path
-        ktrain.set_contents_from_filename(training_path)
+        if config.get(Config.AWS, Config.AWS_S3_FOLDER) and not config.get(Config.AWS, Config.AWS_S3_FOLDER).isspace():
+            aws_training_path = os.path.join(config.get(Config.AWS, Config.AWS_S3_FOLDER), local_training_path)
+            aws_testing_path = os.path.join(config.get(Config.AWS, Config.AWS_S3_FOLDER), local_testing_path)
+        else:
+            aws_training_path = local_training_path
+            aws_testing_path = local_testing_path
+        ktrain.key = aws_training_path
+        ktrain.set_contents_from_filename(local_training_path)
         ktest = Key(bucket)
-        ktest.key = testing_path
-        ktest.set_contents_from_filename(testing_path)
+        ktest.key = aws_testing_path
+        ktest.set_contents_from_filename(local_testing_path)
         print 'CLOUD MODE: Train and test files uploaded to AWS S3 Bucket {}'.format(s3_bucket)
     else:
         print 'LOCAL MODE: Train and test files only on local drive'

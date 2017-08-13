@@ -62,22 +62,44 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started, conf
             # save model
             phash = HashDict(params)
             rhash = HashString(datarun.name)
-            model_path = MakeModelPath("models", phash, rhash, datarun.description)
-            model.save(model_path)
-            _log("Saving model in: %s" % model_path)
+            local_model_path = MakeModelPath("models", phash, rhash, datarun.description)
+            model.save(local_model_path)
+            _log("Saving model in: %s" % local_model_path)
+
+            local_metric_path = MakeMetricPath("metrics", phash, rhash, datarun.description)
+            SaveMetric(local_metric_path, object=performance['cv_object'])
+            _log("Saving metric in: %s" % local_model_path)
+
             if mode == 'cloud':
                 aws_key = config.get(Config.AWS, Config.AWS_ACCESS_KEY)
                 aws_secret = config.get(Config.AWS, Config.AWS_SECRET_KEY)
                 conn = S3Connection(aws_key, aws_secret)
                 s3_bucket = config.get(Config.AWS, Config.AWS_S3_BUCKET)
                 bucket = conn.get_bucket(s3_bucket)
+
+
+                if config.get(Config.AWS, Config.AWS_S3_FOLDER) and not config.get(Config.AWS, Config.AWS_S3_FOLDER).isspace():
+                    aws_model_path = os.path.join(config.get(Config.AWS, Config.AWS_S3_FOLDER), local_model_path)
+                    aws_metric_path = os.path.join(config.get(Config.AWS, Config.AWS_S3_FOLDER), local_metric_path)
+                else:
+                    aws_model_path = local_model_path
+                    aws_metric_path = local_metric_path
+
                 kmodel = Key(bucket)
-                kmodel.key = model_path
-                kmodel.set_contents_from_filename(model_path)
-                _log('Uploading model to S3 bucket {} in {}'.format(s3_bucket, model_path))
-                # delete the local copy of the model so that it doesn't fill up the worker instance's hard drive
-                os.remove(model_path)
-                _log('Deleting local copy of {}'.format(model_path))
+                kmodel.key = aws_model_path
+                kmodel.set_contents_from_filename(local_model_path)
+                _log('Uploading model to S3 bucket {} in {}'.format(s3_bucket, local_model_path))
+
+                kmodel = Key(bucket)
+                kmodel.key = aws_metric_path
+                kmodel.set_contents_from_filename(local_metric_path)
+                _log('Uploading metric to S3 bucket {} in {}'.format(s3_bucket, local_metric_path))
+
+                # delete the local copy of the model & metric so that it doesn't fill up the worker instance's hard drive
+                os.remove(local_model_path)
+                _log('Deleting local copy of {}'.format(local_model_path))
+                os.remove(local_metric_path)
+                _log('Deleting local copy of {}'.format(local_metric_path))
 
 
             # compile fields
@@ -91,24 +113,11 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started, conf
             session = GetConnection()
             learner = Learner(datarun_id=datarun.id, frozen_set_id=frozen_set.id, dataname=datarun.name,
                               algorithm=frozen_set.algorithm, trainpath=datarun.trainpath,
-                              testpath=datarun.testpath, modelpath=model_path, params_hash=phash,
-                              params=params, trainable_params=trainables,
+                              testpath=datarun.testpath, modelpath=local_model_path, params_hash=phash,
+                              params=params, trainable_params=trainables, metricpath=local_metric_path,
                               cv_judgement_metric=performance['cv_judgement_metric'],
                               cv_judgement_metric_stdev=performance['cv_judgement_metric_stdev'],
                               test_judgement_metric=performance['test_judgement_metric'],
-                              cv_accuracies=performance['cv_accuracies'],
-                              cv_cohen_kappas=performance['cv_cohen_kappas'],
-                              cv_f1_scores=performance['cv_f1_scores'],
-                              cv_pr_curve_aucs=performance['cv_pr_curve_aucs'],
-                              cv_roc_curve_aucs=performance['cv_roc_curve_aucs'],
-                              cv_pr_curve_precisions=performance['cv_pr_curve_precisions'],
-                              cv_pr_curve_recalls=performance['cv_pr_curve_recalls'],
-                              cv_pr_curve_thresholds=performance['cv_pr_curve_thresholds'],
-                              cv_roc_curve_fprs=performance['cv_roc_curve_fprs'],
-                              cv_roc_curve_tprs=performance['cv_roc_curve_tprs'],
-                              cv_roc_curve_thresholds=performance['cv_roc_curve_thresholds'],
-                              cv_rank_accuracies=performance['cv_rank_accuracies'],
-                              cv_mu_sigmas=performance['cv_mu_sigmas'],
                               test_accuracies=performance['test_accuracies'],
                               test_cohen_kappas=performance['test_cohen_kappas'],
                               test_f1_scores=performance['test_f1_scores'],

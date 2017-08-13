@@ -129,7 +129,9 @@ num_instances:
 # Number of Delphi workers per instances
 num_workers_per_instance: 
 # AWS S3 bucket to store data
-s3_bucket: 
+s3_bucket:
+# Folder in AWS S3 bucket in which to store data
+s3_folder:
 # Region to start instances in
 ec2_region: 
 # Name of Delphi AMI
