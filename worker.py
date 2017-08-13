@@ -233,6 +233,7 @@ def LoadData(datarun):
 
 
 start_time = datetime.datetime.now()
+num_no_dataruns = 0
 # main loop
 while (args.time == None) or ((datetime.datetime.now() - start_time).total_seconds() < int(args.time)):
     datarun, frozen_set, params = None, None, None
@@ -242,7 +243,10 @@ while (args.time == None) or ((datetime.datetime.now() - start_time).total_secon
         started = time.strftime('%Y-%m-%d %H:%M:%S')
         datarun = GetDatarun(datarun_id=args.datarunid, ignore_grid_complete=True, chose_randomly=args.choose_randomly)
         if not datarun:
+            if num_no_dataruns > 10:
+                sys.exit()
             _log("No datarun present in database, will wait and try again...")
+            num_no_dataruns += 1
             time.sleep(10)
             continue
 
