@@ -173,8 +173,14 @@ def DownloadFileS3(config, keyname):
     s3_bucket = config.get(Config.AWS, Config.AWS_S3_BUCKET)
     bucket = conn.get_bucket(s3_bucket)
 
+    if config.get(Config.AWS, Config.AWS_S3_FOLDER) and not config.get(Config.AWS, Config.AWS_S3_FOLDER).isspace():
+        aws_keyname = os.path.join(config.get(Config.AWS, Config.AWS_S3_FOLDER), keyname)
+    else:
+        aws_keyname = keyname
+
+
     s3key = Key(bucket)
-    s3key.key = keyname
+    s3key.key = aws_keyname
 
     s3key.get_contents_to_filename(keyname)
 
