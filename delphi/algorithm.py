@@ -423,19 +423,7 @@ class Wrapper(object):
             # Cross Validation Metrics (split train data with CV and test on each fold)
             "cv_object":                    self.cv_scores,
             # Test Metrics (train on all train data, test on test data)
-            "test_accuracies":              self.test_scores['accuracies'],
-            "test_cohen_kappas":            self.test_scores['cohen_kappas'],
-            "test_f1_scores":               self.test_scores['f1_scores'],
-            "test_roc_curve_fprs":          self.test_scores['roc_curve_fprs'],
-            "test_roc_curve_tprs":          self.test_scores['roc_curve_tprs'],
-            "test_roc_curve_thresholds":    self.test_scores['roc_curve_thresholds'],
-            "test_roc_curve_aucs":          self.test_scores['roc_curve_aucs'],
-            "test_pr_curve_precisions":     self.test_scores['pr_curve_precisions'],
-            "test_pr_curve_recalls":        self.test_scores['pr_curve_recalls'],
-            "test_pr_curve_thresholds":     self.test_scores['pr_curve_thresholds'],
-            "test_pr_curve_aucs":           self.test_scores['pr_curve_aucs'],
-            "test_rank_accuracies":         self.test_scores['rank_accuracies'],
-            "test_mu_sigmas":               self.test_scores['mu_sigmas'],
+            "test_object":                    self.test_scores,
             # other info
             "avg_prediction_time":          self.avg_prediction_time,
             "n_folds":                      10,

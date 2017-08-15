@@ -36,6 +36,7 @@ args = parser.parse_args()
 # setup
 config = Config(args.configpath)
 EnsureDirectory("models")
+EnsureDirectory("metrics")
 EnsureDirectory("logs")
 hostname = GetPublicIP() or random.randint(1, 1e12)
 logfile = "logs/%s.txt" % hostname
@@ -67,7 +68,8 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started, conf
             _log("Saving model in: %s" % local_model_path)
 
             local_metric_path = MakeMetricPath("metrics", phash, rhash, datarun.description)
-            SaveMetric(local_metric_path, object=performance['cv_object'])
+            metric_obj = dict(cv=performance['cv_object'], test=performance['test_object'])
+            SaveMetric(local_metric_path, object=metric_obj)
             _log("Saving metric in: %s" % local_model_path)
 
             if mode == 'cloud':
@@ -112,28 +114,14 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started, conf
             # connect and insert, update
             session = GetConnection()
             learner = Learner(datarun_id=datarun.id, frozen_set_id=frozen_set.id, dataname=datarun.name,
-                              algorithm=frozen_set.algorithm, trainpath=datarun.trainpath,
-                              testpath=datarun.testpath, modelpath=local_model_path, params_hash=phash,
-                              params=params, trainable_params=trainables, metricpath=local_metric_path,
+                              algorithm=frozen_set.algorithm, trainpath=datarun.trainpath, testpath=datarun.testpath,
+                              modelpath=local_model_path, params_hash=phash, params=params, trainable_params=trainables,
                               cv_judgement_metric=performance['cv_judgement_metric'],
                               cv_judgement_metric_stdev=performance['cv_judgement_metric_stdev'],
                               test_judgement_metric=performance['test_judgement_metric'],
-                              test_accuracies=performance['test_accuracies'],
-                              test_cohen_kappas=performance['test_cohen_kappas'],
-                              test_f1_scores=performance['test_f1_scores'],
-                              test_pr_curve_aucs=performance['test_pr_curve_aucs'],
-                              test_roc_curve_aucs=performance['test_roc_curve_aucs'],
-                              test_pr_curve_precisions=performance['test_pr_curve_precisions'],
-                              test_pr_curve_recalls=performance['test_pr_curve_recalls'],
-                              test_pr_curve_thresholds=performance['test_pr_curve_thresholds'],
-                              test_roc_curve_fprs=performance['test_roc_curve_fprs'],
-                              test_roc_curve_tprs=performance['test_roc_curve_tprs'],
-                              test_roc_curve_thresholds=performance['test_roc_curve_thresholds'],
-                              test_rank_accuracies=performance['test_rank_accuracies'],
-                              test_mu_sigmas=performance['test_mu_sigmas'], started=started,
-                              completed=datetime.datetime.now(), host=GetPublicIP(),
-                              dimensions=model.algorithm.dimensions, frozen_hash=frozen_set.frozen_hash,
-                              seconds=seconds, description=datarun.description)
+                              metricpath=local_metric_path, started=started, completed=datetime.datetime.now(),
+                              host=GetPublicIP(), dimensions=model.algorithm.dimensions,
+                              frozen_hash=frozen_set.frozen_hash, seconds=seconds, description=datarun.description)
             session.add(learner)
             frozen_set = session.query(FrozenSet).filter(FrozenSet.id == frozen_set.id).one()
             # frozen_set.trained += 1 # we mark before now
@@ -241,7 +229,7 @@ while (args.time == None) or ((datetime.datetime.now() - start_time).total_secon
         # choose datarun to work on
         _log("=" * 25)
         started = time.strftime('%Y-%m-%d %H:%M:%S')
-        datarun = GetDatarun(datarun_id=args.datarunid, ignore_grid_complete=True, chose_randomly=args.choose_randomly)
+        datarun = GetDatarun(datarun_id=args.datarunid, ignore_grid_complete=False, chose_randomly=args.choose_randomly)
         if not datarun:
             if num_no_dataruns > 10:
                 sys.exit()
