@@ -679,7 +679,7 @@ class Wrapper(object):
         # do special converstions
         learner_params = self.special_conversions(learner_params)
         self.trainable_params = learner_params
-        print "Training: %s" % learner_params
+        #print "Training: %s" % learner_params
         learner = self.learner_class(**learner_params)
 
         dimensions = None
