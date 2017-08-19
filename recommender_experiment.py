@@ -163,8 +163,9 @@ parser.add_argument('-g', '--gridpath', help='path to grid pickle file', default
 parser.add_argument('-c', '--classpath', help='path to classifier dict pickle file', default=None, required=True)
 parser.add_argument('-d', '--datapath', help='path to data tsv file', default=None, required=True)
 parser.add_argument('-p', '--probedatasetid', help='id of probe dataset id', type=int, default=None, required=True)
-parser.add_argument('-n', '--numiter', help='number of iterations', default=3, type=int, required=False)
+parser.add_argument('-n', '--numiter', help='number of iterations', default=2, type=int, required=False)
 parser.add_argument('-s', '--galsize', help='number of gallery classifiers', default=10000, type=int, required=False)
+parser.add_argument('-r', '--numruns', help='number of runs', default=2, type=int, required=False)
 
 args = parser.parse_args()
 
@@ -187,48 +188,51 @@ grid = grid[:, :args.galsize]
 probe_dataset_id = args.probedatasetid
 num_iters = args.numiter
 
-# get probe dataset details
-probe_dataset_info = dataset_info[dataset_info['dataset_id'] == probe_dataset_id]
-probe_row_number = int(probe_dataset_info['row_number'])
+for run_id in range(args.numruns):
+    print 'starting run {}'.format(run_id)
+    with open('results/dataset_{}__run_{}.csv'.format(args.probedatasetid, run_id), 'w') as f:
+        # get probe dataset details
+        probe_dataset_info = dataset_info[dataset_info['dataset_id'] == probe_dataset_id]
+        probe_row_number = int(probe_dataset_info['row_number'])
 
-datarun = GetDatarun(datarun_id=probe_dataset_id, ignore_completed=False)
+        datarun = GetDatarun(datarun_id=probe_dataset_id, ignore_completed=False)
 
-# split grid into probe and gallery datasets
-probe_performances = grid[probe_row_number, :]
-gallery_performances = np.delete(grid, probe_row_number, 0)
+        # split grid into probe and gallery datasets
+        probe_performances = grid[probe_row_number, :]
+        gallery_performances = np.delete(grid, probe_row_number, 0)
 
-# sample probe performances
-sampled_probe_performance = sample_row(probe_performances, num_non_nan_entries=5)
+        # sample probe performances
+        sampled_probe_performance = sample_row(probe_performances, num_non_nan_entries=5)
 
-best_so_far = np.nanmax(sampled_probe_performance)
+        best_so_far = np.nanmax(sampled_probe_performance)
 
-print 'Iter ID: Best Performance So Far'
-print '{}: {}'.format(0, best_so_far)
-for iter_id in range(num_iters):
-    suggestions = suggest_classifiers(gallery_performances=gallery_performances, probe_performances=sampled_probe_performance)
+        f.write('Iter ID,Best Performance So Far\n')
+        f.write('{},{}\n'.format(0, best_so_far))
+        for iter_id in range(num_iters):
+            suggestions = suggest_classifiers(gallery_performances=gallery_performances, probe_performances=sampled_probe_performance)
 
-    for col_id in suggestions:
-        if not np.isnan(probe_performances[col_id]):
-            param_str = classifier_dict.keys()[col_id]
-            params = read_params(param_str=param_str)
+            for col_id in suggestions:
+                if not np.isnan(probe_performances[col_id]):
+                    param_str = classifier_dict.keys()[col_id]
+                    params = read_params(param_str=param_str)
 
-            wrapper = CreateWrapper(params)
-            trainX, testX, trainY, testY = LoadData(datarun)
-            wrapper.load_data_from_objects(trainX, testX, trainY, testY)
+                    wrapper = CreateWrapper(params)
+                    trainX, testX, trainY, testY = LoadData(datarun)
+                    wrapper.load_data_from_objects(trainX, testX, trainY, testY)
 
-            performance = wrapper.start()
+                    performance = wrapper.start()
 
-            result = performance['cv_judgement_metric']
-        else:
-            result = probe_performances[col_id]
+                    result = performance['cv_judgement_metric']
+                else:
+                    result = probe_performances[col_id]
 
-        sampled_probe_performance[col_id] = result
+                sampled_probe_performance[col_id] = result
 
-    cur_max = np.nanmax(sampled_probe_performance)
+            cur_max = np.nanmax(sampled_probe_performance)
 
-    if cur_max > best_so_far:
-        best_so_far = cur_max
+            if cur_max > best_so_far:
+                best_so_far = cur_max
 
-    print '{}: {}'.format(iter_id + 1, best_so_far)
+            f.write('{},{}\n'.format(iter_id + 1, best_so_far))
 
-print 'Best Performance From Delphi: {}'.format(np.nanmax(probe_performances))
+        f.write('Best Performance From Delphi,{}\n'.format(np.nanmax(probe_performances)))
