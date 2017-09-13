@@ -7,7 +7,7 @@ models/*
 metrics/*
 # ignore configuration files except the template
 config/*
-!config/delphi.cnf.template
+!config/atm.cnf.template
 .DS_Store
 .idea/*
 delphi-env/*

@@ -6,6 +6,7 @@ from delphi.database import *
 from delphi.utilities import *
 from delphi.mapping import Mapping, CreateWrapper
 from delphi.model import Model
+
 import datetime
 import pandas as pd
 from decimal import Decimal
@@ -17,6 +18,8 @@ import ast
 import argparse
 import os
 
+from boto.s3.connection import S3Connection, Key as S3Key
+
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -26,14 +29,16 @@ os.environ["GNUMPY_IMPLICIT_CONVERSION"] = "allow"
 
 # grab the command line arguments
 parser = argparse.ArgumentParser(description='Add more learners to database')
-parser.add_argument('-d', '--datarunid', help='Only train on datasets with this id', default=None, required=False)
-parser.add_argument('-c', '--configpath', help='Location of config file', default='config/delphi.cnf', required=False)
+parser.add_argument('-d', '--datarun', help='Only train on datasets with this id', default=None, required=False)
+parser.add_argument('-c', '--configpath', help='Location of config file', default=os.getenv('DELPHI_CONFIG_FILE', 'config/atm.cnf'), required=False)
 parser.add_argument('-t', '--time', help='Number of seconds to run worker', default=None, required=False)
+
+# TODO: a little confusingly named
 parser.add_argument('-l', '--seqorder', help='work on datasets in sequential order starting with smallest id number, but still max priority (default = random)',
                     dest='choose_randomly', default=True, action='store_const', const=False)
 args = parser.parse_args()
 
-# setup
+# TODO: config should only be loaded once (also in database.py and enter_data.py)
 config = Config(args.configpath)
 EnsureDirectory("models")
 EnsureDirectory("metrics")
@@ -53,14 +58,19 @@ def _log(msg):
 def InsertLearner(datarun, frozen_set, performance, params, model, started, config):
     """
     Inserts a learner and also updates the frozen_sets table.
+
+    datarun: datarun object for the learner
+    frozen_set:
     """
+    # mode: cloud or local?
+    mode = config.get(Config.MODE, Config.MODE_RUNMODE)
     session = None
     total = 5
     tries = total
-    mode = config.get(Config.MODE, Config.MODE_RUNMODE)
+
     while tries:
         try:
-            # save model
+            # save model to local filesystem
             phash = HashDict(params)
             rhash = HashString(datarun.name)
             local_model_path = MakeModelPath("models", phash, rhash, datarun.description)
@@ -72,6 +82,7 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started, conf
             SaveMetric(local_metric_path, object=metric_obj)
             _log("Saving metric in: %s" % local_model_path)
 
+            # save model to Amazon S3 bucket
             if mode == 'cloud':
                 aws_key = config.get(Config.AWS, Config.AWS_ACCESS_KEY)
                 aws_secret = config.get(Config.AWS, Config.AWS_SECRET_KEY)
@@ -87,12 +98,12 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started, conf
                     aws_model_path = local_model_path
                     aws_metric_path = local_metric_path
 
-                kmodel = Key(bucket)
+                kmodel = S3Key(bucket)
                 kmodel.key = aws_model_path
                 kmodel.set_contents_from_filename(local_model_path)
                 _log('Uploading model to S3 bucket {} in {}'.format(s3_bucket, local_model_path))
 
-                kmodel = Key(bucket)
+                kmodel = S3Key(bucket)
                 kmodel.key = aws_metric_path
                 kmodel.set_contents_from_filename(local_metric_path)
                 _log('Uploading metric to S3 bucket {} in {}'.format(s3_bucket, local_metric_path))
@@ -222,6 +233,7 @@ def LoadData(datarun):
 
 start_time = datetime.datetime.now()
 num_no_dataruns = 0
+
 # main loop
 while (args.time == None) or ((datetime.datetime.now() - start_time).total_seconds() < int(args.time)):
     datarun, frozen_set, params = None, None, None
@@ -229,7 +241,7 @@ while (args.time == None) or ((datetime.datetime.now() - start_time).total_secon
         # choose datarun to work on
         _log("=" * 25)
         started = time.strftime('%Y-%m-%d %H:%M:%S')
-        datarun = GetDatarun(datarun_id=args.datarunid, ignore_grid_complete=False, chose_randomly=args.choose_randomly)
+        datarun = GetDatarun(datarun_id=args.datarun, ignore_grid_complete=False, chose_randomly=args.choose_randomly)
         if not datarun:
             if num_no_dataruns > 10:
                 sys.exit()
@@ -252,11 +264,13 @@ while (args.time == None) or ((datetime.datetime.now() - start_time).total_secon
         # check if we've exceeded datarun limits
         budget_type = datarun.budget
         endrun = False
+
         if budget_type == "learner" and ncompleted >= datarun.learner_budget:
             # this run is done
             MarkDatarunDone(datarun.id)
             endrun = True
             _log("Learner budget has run out!")
+
         elif budget_type == "walltime":
             deadline = datarun.deadline
             if datetime.datetime.now() > deadline:
@@ -280,6 +294,7 @@ while (args.time == None) or ((datetime.datetime.now() - start_time).total_secon
         frozen_set_id = fselector.select()
         if not frozen_set_id > 0:
             _log("Invalid frozen set id! %d" % frozen_set_id)
+
         frozen_set = GetFrozenSet(frozen_set_id, increment=True)
         if not frozen_set:
             _log("Invalid frozen set! %s" % frozen_set)

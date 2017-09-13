@@ -6,7 +6,7 @@ from sklearn import preprocessing
 from delphi.utilities import *
 from sklearn.pipeline import Pipeline
 from sklearn.externals import joblib
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
 from sklearn_pandas import DataFrameMapper
 
 class DataWrapper(object):

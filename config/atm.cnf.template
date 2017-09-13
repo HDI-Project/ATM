@@ -74,7 +74,7 @@ priority:
 budget-type: 
 # If budget-type is learner, how many learners to try?
 learner-budget: 
-# If budget-type is walltime, how long to search (in seconds)?
+# If budget-type is walltime, how long to search (in minutes)?
 walltime-budget:
 
 

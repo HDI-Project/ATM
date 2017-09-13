@@ -6,7 +6,7 @@ import hashlib
 import numpy as np
 import os, random
 import base64
-from boto.s3.connection import S3Connection, Key
+from boto.s3.connection import S3Connection, Key as S3Key
 
 PUBLIC_IP_URL = "http://ifconfig.me/ip"  # "http://ipecho.net/plain"
 
@@ -131,7 +131,7 @@ def GetPublicIP():
 def GetInfo():
     """
         Returns dictionary about information of this
-        computer for statistics. 
+        computer for statistics.
     """
     # how much free memory do we have?
     memory = GetMemory()
@@ -147,7 +147,7 @@ def GetInfo():
 
 def ObjectToBase64(obj):
     """
-        Takes object in memory, then pickles and 
+        Takes object in memory, then pickles and
         base64 encodes it.
     """
     pickled = pickle.dumps(obj)
@@ -157,7 +157,7 @@ def ObjectToBase64(obj):
 def Base64ToObject(b64str):
     """
         Inverse of ObjectToBase64.
-        
+
         Decodes base64 encoded string and
         then de-pickles it.
     """
@@ -179,7 +179,7 @@ def DownloadFileS3(config, keyname):
         aws_keyname = keyname
 
 
-    s3key = Key(bucket)
+    s3key = S3Key(bucket)
     s3key.key = aws_keyname
 
     s3key.get_contents_to_filename(keyname)
@@ -221,7 +221,7 @@ def DelphiToScikit(learner_params):
     """
         TODO: Make this logic into subclasses
 
-        ORRRR, should make each enumerator handle it in a static function 
+        ORRRR, should make each enumerator handle it in a static function
         something like:
 
         @staticmethod
