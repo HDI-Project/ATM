@@ -30,7 +30,7 @@ os.environ["GNUMPY_IMPLICIT_CONVERSION"] = "allow"
 # grab the command line arguments
 parser = argparse.ArgumentParser(description='Add more learners to database')
 parser.add_argument('-d', '--datarun', help='Only train on datasets with this id', default=None, required=False)
-parser.add_argument('-c', '--configpath', help='Location of config file', default=os.getenv('DELPHI_CONFIG_FILE', 'config/atm.cnf'), required=False)
+parser.add_argument('-c', '--configpath', help='Location of config file', default=os.getenv('ATM_CONFIG_FILE', 'config/atm.cnf'), required=False)
 parser.add_argument('-t', '--time', help='Number of seconds to run worker', default=None, required=False)
 
 # TODO: a little confusingly named

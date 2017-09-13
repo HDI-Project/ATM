@@ -14,7 +14,7 @@ from datetime import datetime
 import warnings
 
 # TODO: config should only be loaded once
-configpath = os.getenv('DELPHI_CONFIG_FILE')
+configpath = os.getenv('ATM_CONFIG_FILE')
 if configpath == None:
     warnings.warn('No config file environmental variable, using default config/atm.cnf')
     configpath = 'config/atm.cnf'

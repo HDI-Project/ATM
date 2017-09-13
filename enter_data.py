@@ -3,7 +3,7 @@ from delphi.config import Config
 
 # this has to go above Run import to get databases info loaded first
 # TODO: config should only be loaded in one place
-configpath = os.getenv('DELPHI_CONFIG_FILE', 'config/atm.cnf')
+configpath = os.getenv('ATM_CONFIG_FILE', 'config/atm.cnf')
 global config
 config = Config(configpath)
 
