@@ -13,10 +13,11 @@ import os
 from datetime import datetime
 import warnings
 
+# TODO: config should only be loaded once
 configpath = os.getenv('DELPHI_CONFIG_FILE')
 if configpath == None:
-    warnings.warn('No config file environmental variable, using default config/delphi.cnf')
-    configpath = 'config/delphi.cnf'
+    warnings.warn('No config file environmental variable, using default config/atm.cnf')
+    configpath = 'config/atm.cnf'
 assert os.path.isfile(configpath), 'Configuration file not found. ({})'.format(configpath)
 config = Config(configpath)
 

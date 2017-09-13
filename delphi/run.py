@@ -11,11 +11,13 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
+# TODO: get rid of these hard-coded values
 OUTPUT_FOLDER = "data/processed"
 LABEL_COLUMN = 'class'
 PREFIX = "http://people.csail.mit.edu/drevo/datasets-v2/"
 PREFIX = "http://people.csail.mit.edu/bcollazo/datasets/"  # Added by bcollazo
 PREFIX = "http://web.mit.edu/swearin3/www/"  # Added by swearin3
+PREFIX = ""     # added by bcyphers
 
 
 def Run(runname, description, metric, sample_selection, frozen_selection, budget_type, priority,

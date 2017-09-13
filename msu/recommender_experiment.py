@@ -195,6 +195,7 @@ for run_id in range(args.numruns):
         probe_dataset_info = dataset_info[dataset_info['dataset_id'] == probe_dataset_id]
         probe_row_number = int(probe_dataset_info['row_number'])
 
+        # load DataRun from the database
         datarun = GetDatarun(datarun_id=probe_dataset_id, ignore_completed=False)
 
         # split grid into probe and gallery datasets

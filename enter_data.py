@@ -2,7 +2,8 @@ import os
 from delphi.config import Config
 
 # this has to go above Run import to get databases info loaded first
-configpath = 'config/delphi.cnf'
+# TODO: config should only be loaded in one place
+configpath = os.getenv('DELPHI_CONFIG_FILE', 'config/atm.cnf')
 global config
 config = Config(configpath)
 
@@ -45,7 +46,7 @@ frozen_selection = config.get(Config.STRATEGY, Config.STRATEGY_FROZENS)
 
 description =  "__".join([sample_selection, frozen_selection])
 
-if(bool(dataset_description) and (len(dataset_description[0]) > 1000)):
+if (bool(dataset_description) and (len(dataset_description[0]) > 1000)):
     raise ValueError('Dataset description is more than 1000 characters.')
 
 if data_filelist:
