@@ -3,7 +3,7 @@ from fabric.colors import green as _green, yellow as _yellow
 import boto
 import boto.ec2
 import time
-from delphi.config import Config
+from atm.config import Config
 
 def check_instances_pending(instances):
     isPending = False
@@ -64,7 +64,7 @@ def create_instances():
 
 #@parallel
 def deploy():
-    code_dir = '/home/ubuntu/delphi'
+    code_dir = '/home/ubuntu/atm'
     WORKERS_PER_MACHINE = int(config.get(Config.AWS, Config.AWS_NUM_WORKERS_PER_INSTACNCES))
     with settings(warn_only=True):
         if run("test -d %s" % code_dir).failed:

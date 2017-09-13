@@ -1,5 +1,5 @@
 import os
-from delphi.config import Config
+from atm.config import Config
 
 # this has to go above Run import to get databases info loaded first
 # TODO: config should only be loaded in one place
@@ -8,7 +8,7 @@ global config
 config = Config(configpath)
 
 
-from delphi.run import Run
+from atm.run import Run
 
 
 data_filelist = config.get(Config.DATA, Config.DATA_FILELIST)

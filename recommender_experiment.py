@@ -1,26 +1,26 @@
-from delphi.database import *
-from delphi.mapping import CreateWrapper, Mapping
-from delphi.key import Key
+from atm.database import *
+from atm.mapping import CreateWrapper, Mapping
+from atm.key import Key
 import numpy as np
 import pandas as pd
 from fancyimpute import SoftImpute
 import argparse
 
-def get_delphi_csv_num_lines(filepath):
+def get_atm_csv_num_lines(filepath):
     with open(filepath) as f:
         for i, _ in enumerate(f):
             pass
     return i + 1
 
-def get_delphi_csv_num_cols(filepath):
+def get_atm_csv_num_cols(filepath):
     line = open(filepath).readline()
     return len(line.split(','))
 
-# this works from the assumption the data has been preprocessed by delphi:
+# this works from the assumption the data has been preprocessed by atm:
 # no headers, numerical data only
-def read_delphi_csv(filepath):
-    num_rows = get_delphi_csv_num_lines(filepath)
-    num_cols = get_delphi_csv_num_cols(filepath)
+def read_atm_csv(filepath):
+    num_rows = get_atm_csv_num_lines(filepath)
+    num_cols = get_atm_csv_num_cols(filepath)
 
     data = np.zeros((num_rows, num_cols))
 
@@ -46,7 +46,7 @@ def LoadData(datarun):
             raise Exception("Something about train dataset caching is wrong...")
 
     # load the data into matrix format
-    trainX = read_delphi_csv(datarun.local_trainpath)
+    trainX = read_atm_csv(datarun.local_trainpath)
     labelcol = datarun.labelcol
     trainY = trainX[:, labelcol]
     trainX = np.delete(trainX, labelcol, axis=1)
@@ -58,7 +58,7 @@ def LoadData(datarun):
             raise Exception("Something about test dataset caching is wrong...")
 
     # load the data into matrix format
-    testX = read_delphi_csv(datarun.local_testpath)
+    testX = read_atm_csv(datarun.local_testpath)
     labelcol = datarun.labelcol
     testY = testX[:, labelcol]
     testX = np.delete(testX, labelcol, axis=1)
@@ -68,12 +68,12 @@ def LoadData(datarun):
 
 def LoadDataFromFile(train_path, test_path, labelcol):
     # load the data into matrix format
-    trainX = read_delphi_csv(train_path)
+    trainX = read_atm_csv(train_path)
     trainY = trainX[:, labelcol]
     trainX = np.delete(trainX, labelcol, axis=1)
 
     # load the data into matrix format
-    testX = read_delphi_csv(test_path)
+    testX = read_atm_csv(test_path)
     testY = testX[:, labelcol]
     testX = np.delete(testX, labelcol, axis=1)
 
@@ -236,4 +236,4 @@ for run_id in range(args.numruns):
 
             f.write('{},{}\n'.format(iter_id + 1, best_so_far))
 
-        f.write('Best Performance From Delphi,{}\n'.format(np.nanmax(probe_performances)))
+        f.write('Best Performance From ATM,{}\n'.format(np.nanmax(probe_performances)))

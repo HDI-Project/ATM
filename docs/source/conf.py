@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# delphi documentation build configuration file, created by
+# atm documentation build configuration file, created by
 # sphinx-quickstart on Fri Jan  6 13:06:48 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -58,7 +58,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'delphi'
+project = u'atm'
 copyright = u'MIT Data to AI Lab'
 author = u'Thomas Swearingen, Kalyan Veeramachaneni'
 
@@ -147,7 +147,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = u'delphi v0.9'
+# html_title = u'atm v0.9'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -247,7 +247,7 @@ html_static_path = ['_static']
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'delphidoc'
+htmlhelp_basename = 'atmdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -273,7 +273,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'delphi.tex', u'delphi Documentation',
+    (master_doc, 'atm.tex', u'atm Documentation',
      u'Thomas Swearingen', 'manual'),
 ]
 
@@ -315,7 +315,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'delphi', u'delphi Documentation',
+    (master_doc, 'atm', u'atm Documentation',
      [author], 1)
 ]
 
@@ -330,8 +330,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'delphi', u'delphi Documentation',
-     author, 'delphi', 'One line description of project.',
+    (master_doc, 'atm', u'atm Documentation',
+     author, 'atm', 'One line description of project.',
      'Miscellaneous'),
 ]
 

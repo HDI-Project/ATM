@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>delphi &mdash; delphi 0.9 documentation</title>
+  <title>atm &mdash; atm 0.9 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="delphi 0.9 documentation" href="index.html"/>
+    <link rel="top" title="atm 0.9 documentation" href="index.html"/>
         <link rel="prev" title="Tutorial" href="tutorial.html"/> 
 
   
@@ -55,7 +55,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> delphi
+            <a href="index.html" class="icon icon-home"> atm
           
 
           
@@ -93,7 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">delphi</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">atm</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#adding-a-classifier">Adding a classifier</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#adding-a-parameter-selector">Adding a Parameter Selector</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#changing-the-acquisition-function">Changing the Acquisition Function</a></li>
@@ -116,7 +116,7 @@
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">delphi</a>
+          <a href="index.html">atm</a>
         
       </nav>
 
@@ -146,7 +146,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>delphi</li>
+      <li>atm</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,8 +165,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="delphi">
-<h1>delphi<a class="headerlink" href="#delphi" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="atm">
+<h1>atm<a class="headerlink" href="#atm" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="adding-a-classifier">
 <h2>Adding a classifier<a class="headerlink" href="#adding-a-classifier" title="Permalink to this headline">¶</a></h2>
 <p>The classifier must be a python class that has the following functions:</p>
@@ -174,19 +174,19 @@
 <li><code class="docutils literal"><span class="pre">fit</span></code>: given training data and labels, learns the model</li>
 <li><code class="docutils literal"><span class="pre">predict</span></code>: given data sample(s), predicts the label(s)</li>
 </ol>
-<p>In <code class="docutils literal"><span class="pre">delphi/mapping.py</span></code>, enter the function in the <code class="docutils literal"><span class="pre">LEARNER_CODE_CLASS_MAP</span></code> variable and the classifier enumerator (see below) in the <code class="docutils literal"><span class="pre">ENUMERATOR_CODE_CLASS_MAP</span></code> variable.
-Decide a code for the classifier (e.g., classify_knn) and enter this in the <code class="docutils literal"><span class="pre">__init__.py</span></code> file in <code class="docutils literal"><span class="pre">delphi/enumeration/classification</span></code>.</p>
-<p>Create an Enumerator for the classifier in the <code class="docutils literal"><span class="pre">delphi/enumeration/classification</span></code> folder.
+<p>In <code class="docutils literal"><span class="pre">atm/mapping.py</span></code>, enter the function in the <code class="docutils literal"><span class="pre">LEARNER_CODE_CLASS_MAP</span></code> variable and the classifier enumerator (see below) in the <code class="docutils literal"><span class="pre">ENUMERATOR_CODE_CLASS_MAP</span></code> variable.
+Decide a code for the classifier (e.g., classify_knn) and enter this in the <code class="docutils literal"><span class="pre">__init__.py</span></code> file in <code class="docutils literal"><span class="pre">atm/enumeration/classification</span></code>.</p>
+<p>Create an Enumerator for the classifier in the <code class="docutils literal"><span class="pre">atm/enumeration/classification</span></code> folder.
 In this file:</p>
 <ol class="loweralpha simple">
 <li>define the ranges of the parameters in a variable called <code class="docutils literal"><span class="pre">DEFAULT_RANGES</span></code></li>
 <li>define the parameter types (int, float, etc.) in a variable called <code class="docutils literal"><span class="pre">DEFAULT_KEYS</span></code></li>
 <li>define the Conditional Parameter Tree (CPT) in a function called <code class="docutils literal"><span class="pre">create_cpt</span></code></li>
 </ol>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">delphi.cpt</span> <span class="k">import</span> <span class="n">Choice</span><span class="p">,</span> <span class="n">Combination</span>
-<span class="kn">from</span> <span class="nn">delphi.enumeration</span> <span class="k">import</span> <span class="n">Enumerator</span>
-<span class="kn">from</span> <span class="nn">delphi.enumeration.classification</span> <span class="k">import</span> <span class="n">ClassifierEnumerator</span>
-<span class="kn">from</span> <span class="nn">delphi.key</span> <span class="k">import</span> <span class="n">Key</span><span class="p">,</span> <span class="n">KeyStruct</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">atm.cpt</span> <span class="k">import</span> <span class="n">Choice</span><span class="p">,</span> <span class="n">Combination</span>
+<span class="kn">from</span> <span class="nn">atm.enumeration</span> <span class="k">import</span> <span class="n">Enumerator</span>
+<span class="kn">from</span> <span class="nn">atm.enumeration.classification</span> <span class="k">import</span> <span class="n">ClassifierEnumerator</span>
+<span class="kn">from</span> <span class="nn">atm.key</span> <span class="k">import</span> <span class="n">Key</span><span class="p">,</span> <span class="n">KeyStruct</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="k">class</span> <span class="nc">EnumeratorExample</span><span class="p">(</span><span class="n">ClassifierEnumerator</span><span class="p">):</span>
@@ -225,7 +225,7 @@ In this file:</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">exampleroot</span>
 </pre></div>
 </div>
-<p>Since sklearn uses consistent framework across classifiers (fit, predict, etc.), delphi creates a pipeline with the classifier and uses the sklearn standard framework to learn the classifier and make predictions.</p>
+<p>Since sklearn uses consistent framework across classifiers (fit, predict, etc.), atm creates a pipeline with the classifier and uses the sklearn standard framework to learn the classifier and make predictions.</p>
 </div>
 <div class="section" id="adding-a-parameter-selector">
 <h2>Adding a Parameter Selector<a class="headerlink" href="#adding-a-parameter-selector" title="Permalink to this headline">¶</a></h2>
@@ -233,15 +233,15 @@ In this file:</p>
 The class must have a <code class="docutils literal"><span class="pre">select</span></code> function which returns the chose parameters.
 A few examples which use a Gaussian Process to choose parameters is shown below.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
-<span class="kn">from</span> <span class="nn">delphi.selection.samples</span> <span class="k">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">delphi.utilities</span> <span class="k">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">delphi.database</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">atm.selection.samples</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">atm.utilities</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">atm.database</span> <span class="k">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">sklearn.gaussian_process</span> <span class="k">import</span> <span class="n">GaussianProcess</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">traceback</span>
 
-<span class="kn">from</span> <span class="nn">delphi.selection.acquisition</span> <span class="k">import</span> <span class="n">expected_improvement</span>
-<span class="kn">from</span> <span class="nn">delphi.selection.samples.uniform</span> <span class="k">import</span> <span class="n">UniformSampler</span>
+<span class="kn">from</span> <span class="nn">atm.selection.acquisition</span> <span class="k">import</span> <span class="n">expected_improvement</span>
+<span class="kn">from</span> <span class="nn">atm.selection.samples.uniform</span> <span class="k">import</span> <span class="n">UniformSampler</span>
 
 <span class="k">class</span> <span class="nc">GPEi</span><span class="p">(</span><span class="n">SamplesSelector</span><span class="p">):</span>
     
@@ -437,7 +437,7 @@ A few examples which use a Gaussian Process to choose parameters is shown below.
 <h3>Changing the Acquisition Function<a class="headerlink" href="#changing-the-acquisition-function" title="Permalink to this headline">¶</a></h3>
 <p>The Gaussian Process Expected Improvement selection scheme makes use of an acquisition function to decide which parameter set will offer the best performance improvement.
 The current acquisition function (seen below) makes use of the predicted performance and the confidence of the performance to create a new metric for deciding which parameter set will likely offer the best performance.
-This metric can be altered depending on the needs of a particular problem in the <code class="docutils literal"><span class="pre">acquisition.py</span></code> file in the <code class="docutils literal"><span class="pre">delphi/selection</span></code> folder.</p>
+This metric can be altered depending on the needs of a particular problem in the <code class="docutils literal"><span class="pre">acquisition.py</span></code> file in the <code class="docutils literal"><span class="pre">atm/selection</span></code> folder.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="k">import</span> <span class="n">norm</span>
@@ -465,8 +465,8 @@ This metric can be altered depending on the needs of a particular problem in the
 <p>A parameter selector can be created by creating a class which inherits the <code class="docutils literal"><span class="pre">FrozenSelector</span></code> class.
 The class must have a <code class="docutils literal"><span class="pre">select</span></code> function which returns the chose parameters.
 An example which uses the UCB1 algorithm to choose the hyperpartition is shown below.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">delphi.selection.frozens</span> <span class="k">import</span> <span class="n">FrozenSelector</span>
-<span class="kn">from</span> <span class="nn">delphi.selection.bandit</span> <span class="k">import</span> <span class="n">UCB1Bandit</span><span class="p">,</span> <span class="n">FrozenArm</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">atm.selection.frozens</span> <span class="k">import</span> <span class="n">FrozenSelector</span>
+<span class="kn">from</span> <span class="nn">atm.selection.bandit</span> <span class="k">import</span> <span class="n">UCB1Bandit</span><span class="p">,</span> <span class="n">FrozenArm</span>
 <span class="kn">import</span> <span class="nn">math</span><span class="o">,</span> <span class="nn">random</span>
 
 <span class="k">class</span> <span class="nc">UCB1</span><span class="p">(</span><span class="n">FrozenSelector</span><span class="p">):</span>

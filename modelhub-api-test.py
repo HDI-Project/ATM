@@ -1,6 +1,6 @@
 import modelhub_api.queries as mh
 
-print 'These are the functions available in Delphi:'
+print 'These are the functions available in ATM:'
 
 funcs = mh.get_functions()
 print '\t|{}|'.format('-'*47)
