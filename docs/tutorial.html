@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Tutorial &mdash; delphi 0.9 documentation</title>
+  <title>Tutorial &mdash; atm 0.9 documentation</title>
   
 
   
@@ -35,8 +35,8 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="delphi 0.9 documentation" href="index.html"/>
-        <link rel="next" title="delphi" href="code.html"/>
+    <link rel="top" title="atm 0.9 documentation" href="index.html"/>
+        <link rel="next" title="atm" href="code.html"/>
         <link rel="prev" title="Setup" href="setup.html"/> 
 
   
@@ -56,7 +56,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> delphi
+            <a href="index.html" class="icon icon-home"> atm
           
 
           
@@ -107,7 +107,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">delphi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">atm</a></li>
 </ul>
 
             
@@ -122,7 +122,7 @@
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">delphi</a>
+          <a href="index.html">atm</a>
         
       </nav>
 
@@ -175,7 +175,7 @@
 <h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="data-format">
 <h2>Data Format<a class="headerlink" href="#data-format" title="Permalink to this headline">¶</a></h2>
-<p>Delphi takes data in CSV format where each CSV file needs to:</p>
+<p>ATM takes data in CSV format where each CSV file needs to:</p>
 <ul class="simple">
 <li>Have the first line of the file be headers with strings as the feature names, and the class column named “class”. If the features aren’t named (ie, image or SVD or PCA data), then anything will do (but see below for a small script to generate nice feature names).</li>
 <li>Should have N + 1 rows (1 header + N examples)</li>
@@ -203,14 +203,14 @@
 <p>Once your data in the proper format, you can upload it to the DataHub for processing.</p>
 <div class="section" id="configuration-file">
 <h3>Configuration File<a class="headerlink" href="#configuration-file" title="Permalink to this headline">¶</a></h3>
-<p>To run Delphi, you must create a configuration file.
-A configuration file template is included in <code class="docutils literal"><span class="pre">config/delphi.cnf.template</span></code> (and shown below).
-Since the configuration file contains passwords, it’s best to rename it to <code class="docutils literal"><span class="pre">delphi.cnf</span></code> so that it will be ignored by git.
-This is especially true if you plan to make changes to Delphi and upload them to the repository.
-The git repository is setup to ignore all files in the <code class="docutils literal"><span class="pre">config</span></code> folder except <code class="docutils literal"><span class="pre">delphi.cnf.template</span></code>.</p>
-<p>The name of the file must also be a environmental variable called <code class="docutils literal"><span class="pre">DELPHI_CONFIG_FILE</span></code>.
-For example if the configuration file is called <code class="docutils literal"><span class="pre">delphi.cnf</span></code> in the <code class="docutils literal"><span class="pre">config</span></code> directory of the root delphi directory, then an environmental variable would created with the command:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>(delphi-env) $ export DELPHI_CONFIG_FILE=/path_to_delphi_root/config/delphi.cnf
+<p>To run ATM, you must create a configuration file.
+A configuration file template is included in <code class="docutils literal"><span class="pre">config/atm.cnf.template</span></code> (and shown below).
+Since the configuration file contains passwords, it’s best to rename it to <code class="docutils literal"><span class="pre">atm.cnf</span></code> so that it will be ignored by git.
+This is especially true if you plan to make changes to ATM and upload them to the repository.
+The git repository is setup to ignore all files in the <code class="docutils literal"><span class="pre">config</span></code> folder except <code class="docutils literal"><span class="pre">atm.cnf.template</span></code>.</p>
+<p>The name of the file must also be a environmental variable called <code class="docutils literal"><span class="pre">ATM_CONFIG_FILE</span></code>.
+For example if the configuration file is called <code class="docutils literal"><span class="pre">atm.cnf</span></code> in the <code class="docutils literal"><span class="pre">config</span></code> directory of the root atm directory, then an environmental variable would created with the command:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>(atm-env) $ export ATM_CONFIG_FILE=/path_to_atm_root/config/atm.cnf
 </pre></div>
 </div>
 </div>
@@ -218,9 +218,9 @@ For example if the configuration file is called <code class="docutils literal"><
 <h3>DataRun Creation<a class="headerlink" href="#datarun-creation" title="Permalink to this headline">¶</a></h3>
 <p>Now we need to add the <cite>datarun</cite> to the DataHub (database).
 A datarun consists of all the parameters for a single experiment run, including where the find the data, what the budget is for number of learners to train, the majoirty class benchmark, and other things.
-The datarun ID in the database also ties together the <cite>hyperpartitions</cite> (frozen sets) which delineate how Delphi can explore different subtypes of classifiers to maximize their performance.
+The datarun ID in the database also ties together the <cite>hyperpartitions</cite> (frozen sets) which delineate how ATM can explore different subtypes of classifiers to maximize their performance.
 Once the configuration file is filled out, we can enter it in DataHub with:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>(delphi-env) $ python enter_data.py
+<div class="highlight-default"><div class="highlight"><pre><span></span>(atm-env) $ python enter_data.py
 </pre></div>
 </div>
 </div>
@@ -231,7 +231,7 @@ Once the configuration file is filled out, we can enter it in DataHub with:</p>
 <div class="section" id="on-a-local-machine">
 <h3>On a Local Machine<a class="headerlink" href="#on-a-local-machine" title="Permalink to this headline">¶</a></h3>
 <p>In local mode, this is simple:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>(delphi-env) $ python worker.py
+<div class="highlight-default"><div class="highlight"><pre><span></span>(atm-env) $ python worker.py
 </pre></div>
 </div>
 <p>This command can b executed several times to create many workers that operate independently in parallel.
@@ -241,17 +241,17 @@ How many to run depends of your judgement of your computer’s capabilities.</p>
 <h3>On Amazon Web Services<a class="headerlink" href="#on-amazon-web-services" title="Permalink to this headline">¶</a></h3>
 <p>In cloud mode, the <a class="reference external" href="https://www.fabfile.org">fabric</a> package is used to deploy workers on AWS.
 First, you must create instance(s) by executing the following command on your local machine:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>(delphi-env) $ fab create_instances
+<div class="highlight-default"><div class="highlight"><pre><span></span>(atm-env) $ fab create_instances
 </pre></div>
 </div>
 <p>The number of instances will be the number specified in the <em>aws</em> section of the configuration file.
-Second, you must start Delphi worker processes on the instance(s) by executing the following command on your local machine:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>(delphi-env) $ fab deploy
+Second, you must start ATM worker processes on the instance(s) by executing the following command on your local machine:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>(atm-env) $ fab deploy
 </pre></div>
 </div>
 <p>The number of worker processes on each EC2 instance is specified in the configuration file.
 Once the workers are done, the worker processes can be killed by executing the following command on your local machine:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>(delphi-env) $ fab killworkers
+<div class="highlight-default"><div class="highlight"><pre><span></span>(atm-env) $ fab killworkers
 </pre></div>
 </div>
 <p><strong>This does NOT terminate the instances</strong>.
@@ -270,7 +270,7 @@ Currently, the instances have to be terminated from the AWS Management Console.<
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="code.html" class="btn btn-neutral float-right" title="delphi" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="code.html" class="btn btn-neutral float-right" title="atm" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="setup.html" class="btn btn-neutral" title="Setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

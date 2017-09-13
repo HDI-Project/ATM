@@ -10,6 +10,6 @@ config/*
 !config/atm.cnf.template
 .DS_Store
 .idea/*
-delphi-env/*
+atm-env/*
 *.pickle
 *.tsv

@@ -1,11 +1,11 @@
-from delphi.selection.samples import SELECTION_SAMPLES_UNIFORM, SELECTION_SAMPLES_GP, SELECTION_SAMPLES_GRID
-from delphi.selection.samples import SELECTION_SAMPLES_GP_EI, SELECTION_SAMPLES_GP_EI_TIME, SELECTION_SAMPLES_GP_EI_VEL
-from delphi.selection.frozens import SELECTION_FROZENS_UNIFORM, SELECTION_FROZENS_UCB1
-from delphi.config import Config
-from delphi.database import *
-from delphi.utilities import *
-from delphi.mapping import Mapping, CreateWrapper
-from delphi.model import Model
+from atm.selection.samples import SELECTION_SAMPLES_UNIFORM, SELECTION_SAMPLES_GP, SELECTION_SAMPLES_GRID
+from atm.selection.samples import SELECTION_SAMPLES_GP_EI, SELECTION_SAMPLES_GP_EI_TIME, SELECTION_SAMPLES_GP_EI_VEL
+from atm.selection.frozens import SELECTION_FROZENS_UNIFORM, SELECTION_FROZENS_UCB1
+from atm.config import Config
+from atm.database import *
+from atm.utilities import *
+from atm.mapping import Mapping, CreateWrapper
+from atm.model import Model
 
 import datetime
 import pandas as pd
@@ -172,21 +172,21 @@ def InsertError(datarun_id, frozen_set_id, params, error_msg):
         if session:
             session.close()
 
-def get_delphi_csv_num_lines(filepath):
+def get_atm_csv_num_lines(filepath):
     with open(filepath) as f:
         for i, _ in enumerate(f):
             pass
     return i + 1
 
-def get_delphi_csv_num_cols(filepath):
+def get_atm_csv_num_cols(filepath):
     line = open(filepath).readline()
     return len(line.split(','))
 
-# this works from the assumption the data has been preprocessed by delphi:
+# this works from the assumption the data has been preprocessed by atm:
 # no headers, numerical data only
-def read_delphi_csv(filepath):
-    num_rows = get_delphi_csv_num_lines(filepath)
-    num_cols = get_delphi_csv_num_cols(filepath)
+def read_atm_csv(filepath):
+    num_rows = get_atm_csv_num_lines(filepath)
+    num_cols = get_atm_csv_num_cols(filepath)
 
     data = np.zeros((num_rows, num_cols))
 
@@ -211,7 +211,7 @@ def LoadData(datarun):
             raise Exception("Something about train dataset caching is wrong...")
 
     # load the data into matrix format
-    trainX = read_delphi_csv(datarun.local_trainpath)
+    trainX = read_atm_csv(datarun.local_trainpath)
     labelcol = datarun.labelcol
     trainY = trainX[:, labelcol]
     trainX = np.delete(trainX, labelcol, axis=1)
@@ -223,7 +223,7 @@ def LoadData(datarun):
             raise Exception("Something about test dataset caching is wrong...")
 
     # load the data into matrix format
-    testX = read_delphi_csv(datarun.local_testpath)
+    testX = read_atm_csv(datarun.local_testpath)
     labelcol = datarun.labelcol
     testY = testX[:, labelcol]
     testX = np.delete(testX, labelcol, axis=1)

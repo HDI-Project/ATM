@@ -97,9 +97,9 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/delphi.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/atm.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/delphi.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/atm.qhc"
 
 .PHONY: applehelp
 applehelp:
@@ -116,8 +116,8 @@ devhelp:
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/delphi"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/delphi"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/atm"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/atm"
 	@echo "# devhelp"
 
 .PHONY: epub
