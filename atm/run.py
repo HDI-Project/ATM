@@ -18,9 +18,11 @@ OUTPUT_FOLDER = "data/processed"
 LABEL_COLUMN = "class"
 
 
-def Run(config, runname, description, metric, sample_selection, frozen_selection, budget_type, priority,
-        k_window, r_min, algorithm_codes, learner_budget=None, walltime_budget=None, alldatapath=None,
-        dataset_description=None, trainpath=None, testpath=None, verbose=True, frozens_separately=False):
+def Run(config, runname, description, metric, score_target, sample_selection,
+        frozen_selection, budget_type, priority, k_window, r_min,
+        algorithm_codes, learner_budget=None, walltime_budget=None,
+        alldatapath=None, dataset_description=None, trainpath=None,
+        testpath=None, verbose=True, frozens_separately=False):
     EnsureDirectory("models")
     EnsureDirectory("logs")
 
@@ -57,6 +59,7 @@ def Run(config, runname, description, metric, sample_selection, frozen_selection
         "local_testpath": local_testing_path,
         "labelcol": stats["label_col"],
         "metric": metric,
+        "score_target": score_target,
         "description": description,
         "wrapper": dw,
         "n": int(stats["n_examples"]),
@@ -65,7 +68,8 @@ def Run(config, runname, description, metric, sample_selection, frozen_selection
         "majority": float(stats["majority"]),
         "size_kb": int(stats["datasize_bytes"]),
         "k_window": k_window,
-        "r_min": r_min, }
+        "r_min": r_min,
+    }
 
     ### dataset description ###
     if dataset_description:
@@ -80,7 +84,6 @@ def Run(config, runname, description, metric, sample_selection, frozen_selection
 
     if learner_budget:
         values["learner_budget"] = learner_budget
-
     elif walltime_budget:
         minutes = walltime_budget
         values["walltime_budget_minutes"] = walltime_budget

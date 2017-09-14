@@ -10,7 +10,6 @@ from sklearn.model_selection import train_test_split
 from sklearn_pandas import DataFrameMapper
 
 class DataWrapper(object):
-
     def __init__(self, dataname, outfolder, labelcol, testing_ratio=0.3, traintestfile=None, trainfile=None, testfile=None,
                 dropvals=None, sep=None):
         self.dataname = dataname

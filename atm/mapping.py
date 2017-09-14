@@ -93,9 +93,9 @@ class Mapping:
         SELECTION_FROZENS_PURE_BEST_K_VEL: PureBestKVelocity, }
 
 
-def CreateWrapper(params):
+def CreateWrapper(params, judgment_metric):
     learner_class = Mapping.LEARNER_CODE_CLASS_MAP[params["function"]]
-    return Wrapper(params["function"], params, learner_class)
+    return Wrapper(params["function"], judgment_metric, params, learner_class)
 
 
 def FrozenSetsFromAlgorithmCodes(codes, verbose=False):
@@ -123,7 +123,7 @@ def FrozenSetsFromAlgorithmCodes(codes, verbose=False):
     frozen_sets = {}
     for algorithm in algorithms:
 
-        # for each algorithm, get all the unique settings of 
+        # for each algorithm, get all the unique settings of
         # categorical variables as a tuple of tuples
         categoricals = algorithm.get_categorical_keys()
         optimizable = algorithm.get_optimizable_keys()
@@ -134,7 +134,7 @@ def FrozenSetsFromAlgorithmCodes(codes, verbose=False):
 
         for params in algorithm.combinations():
 
-            # only get the k,v pairs which are from 
+            # only get the k,v pairs which are from
             # categorical keys
             categorical_set = []
             optimizable_set = []

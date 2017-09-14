@@ -34,6 +34,7 @@ def enter_data(config):
     r_min = int(config.get(Config.STRATEGY, Config.STRATEGY_R))
     k_window = int(config.get(Config.STRATEGY, Config.STRATEGY_K))
     metric = config.get(Config.STRATEGY, Config.STRATEGY_METRIC)
+    score_target = config.get(Config.STRATEGY, Config.STRATEGY_SCORE_TARGET)
 
     sample_selection = config.get(Config.STRATEGY, Config.STRATEGY_SELECTION)
     frozen_selection = config.get(Config.STRATEGY, Config.STRATEGY_FROZENS)
