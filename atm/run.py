@@ -5,7 +5,7 @@ from atm.utilities import *
 from atm.mapping import FrozenSetsFromAlgorithmCodes
 import atm.database as db
 
-from boto.s3.connection import S3Connection, Key
+from boto.s3.connection import S3Connection, Key as S3Key
 import datetime
 import pdb
 
@@ -16,7 +16,6 @@ warnings.filterwarnings("ignore")
 # TODO: get rid of these hard-coded values
 OUTPUT_FOLDER = "data/processed"
 LABEL_COLUMN = "class"
-PREFIX = ""     # TODO: this is pretty much unnecessary
 
 
 def Run(config, runname, description, metric, sample_selection, frozen_selection, budget_type, priority,
@@ -47,8 +46,6 @@ def Run(config, runname, description, metric, sample_selection, frozen_selection
     stats = dw.get_statistics()
     print "Training data: %s" % local_training_path
     print "Testing data: %s" % local_testing_path
-    training_http = PREFIX + os.path.basename(local_training_path)
-    testing_http = PREFIX + os.path.basename(local_testing_path)
 
     # create all combinations necessary
     frozen_sets = FrozenSetsFromAlgorithmCodes(algorithm_codes, verbose=verbose)
@@ -56,8 +53,6 @@ def Run(config, runname, description, metric, sample_selection, frozen_selection
     ### create datarun ###
     values = {
         "name": runname,
-        "trainpath": training_http,
-        "testpath": testing_http,
         "local_trainpath": local_training_path,
         "local_testpath": local_testing_path,
         "labelcol": stats["label_col"],
@@ -139,22 +134,26 @@ def Run(config, runname, description, metric, sample_selection, frozen_selection
     session.close()
 
     run_mode = config.get(Config.MODE, Config.MODE_RUNMODE)
-    if (run_mode == 'cloud'):
+    if run_mode == 'cloud':
         aws_key = config.get(Config.AWS, Config.AWS_ACCESS_KEY)
         aws_secret = config.get(Config.AWS, Config.AWS_SECRET_KEY)
         conn = S3Connection(aws_key, aws_secret)
         s3_bucket = config.get(Config.AWS, Config.AWS_S3_BUCKET)
         bucket = conn.get_bucket(s3_bucket)
-        ktrain = Key(bucket)
-        if config.get(Config.AWS, Config.AWS_S3_FOLDER) and not config.get(Config.AWS, Config.AWS_S3_FOLDER).isspace():
-            aws_training_path = os.path.join(config.get(Config.AWS, Config.AWS_S3_FOLDER), local_training_path)
-            aws_testing_path = os.path.join(config.get(Config.AWS, Config.AWS_S3_FOLDER), local_testing_path)
+        ktrain = S3Key(bucket)
+
+        if config.get(Config.AWS, Config.AWS_S3_FOLDER).strip():
+            aws_training_path = os.path.join(config.get(Config.AWS, Config.AWS_S3_FOLDER),
+                                             local_training_path)
+            aws_testing_path = os.path.join(config.get(Config.AWS, Config.AWS_S3_FOLDER),
+                                            local_testing_path)
         else:
             aws_training_path = local_training_path
             aws_testing_path = local_testing_path
+
         ktrain.key = aws_training_path
         ktrain.set_contents_from_filename(local_training_path)
-        ktest = Key(bucket)
+        ktest = S3Key(bucket)
         ktest.key = aws_testing_path
         ktest.set_contents_from_filename(local_testing_path)
         print 'CLOUD MODE: Train and test files uploaded to AWS S3 Bucket {}'.format(s3_bucket)

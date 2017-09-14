@@ -223,7 +223,7 @@ for run_id in range(args.numruns):
 
                     performance = wrapper.start()
 
-                    result = performance['cv_judgement_metric']
+                    result = performance['cv_judgment_metric']
                 else:
                     result = probe_performances[col_id]
 

@@ -71,7 +71,7 @@ In local mode, this is simple::
     (atm-env) $ python run_fromfile.py
 
 This command can b executed several times to create many workers that operate independently in parallel.
-How many to run depends of your judgement of your computer's capabilities.
+How many to run depends of your judgment of your computer's capabilities.
 
 On Amazon Web Services
 ^^^^^^^^^^^^^^^^^^^^^^
