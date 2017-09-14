@@ -124,9 +124,9 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started, conf
             learner = db.Learner(datarun_id=datarun.id, frozen_set_id=frozen_set.id, dataname=datarun.name,
                                  algorithm=frozen_set.algorithm, trainpath=datarun.trainpath, testpath=datarun.testpath,
                                  modelpath=local_model_path, params_hash=phash, params=params, trainable_params=trainables,
-                                 cv_judgement_metric=performance['cv_judgement_metric'],
-                                 cv_judgement_metric_stdev=performance['cv_judgement_metric_stdev'],
-                                 test_judgement_metric=performance['test_judgement_metric'],
+                                 cv_judgment_metric=performance['cv_judgment_metric'],
+                                 cv_judgment_metric_stdev=performance['cv_judgment_metric_stdev'],
+                                 test_judgment_metric=performance['test_judgment_metric'],
                                  metricpath=local_metric_path, started=started, completed=datetime.datetime.now(),
                                  host=GetPublicIP(), dimensions=model.algorithm.dimensions,
                                  frozen_hash=frozen_set.frozen_hash, seconds=seconds, description=datarun.description)
@@ -230,7 +230,7 @@ def LoadData(datarun, config):
     return trainX, testX, trainY, testY
 
 
-def work(config, datarun_id, total_time=None, choose_randomly=True):
+def work(config, datarun_id=None, total_time=None, choose_randomly=True):
     start_time = datetime.datetime.now()
     num_no_dataruns = 0
 
@@ -401,15 +401,15 @@ def work(config, datarun_id, total_time=None, choose_randomly=True):
 
                 print
                 _log("Judgement metric (%s): %.3f +- %.3f" %
-                     (wrapper.judgement_metric,
-                      performance["cv_judgement_metric"],
-                      2 * performance["cv_judgement_metric_stdev"]))
+                     (wrapper.judgment_metric,
+                      performance["cv_judgment_metric"],
+                      2 * performance["cv_judgment_metric_stdev"]))
 
-                if ((performance["cv_judgement_metric"] -
-                     performance["cv_judgement_metric_stdev"] * 2) >
+                if ((performance["cv_judgment_metric"] -
+                     performance["cv_judgment_metric_stdev"] * 2) >
                         best_perf - best_err):
-                    best_perf = performance["cv_judgement_metric"]
-                    best_err = performance["cv_judgement_metric_stdev"] * 2
+                    best_perf = performance["cv_judgment_metric"]
+                    best_err = performance["cv_judgment_metric_stdev"] * 2
 
                 _log("Best so far: %.3f +- %.3f" %
                      (best_perf, best_err))
@@ -446,8 +446,6 @@ if __name__ == '__main__':
     parser.add_argument('-l', '--seqorder', help='work on datasets in sequential order starting with smallest id number, but still max priority (default = random)',
                         dest='choose_randomly', default=True, action='store_const', const=False)
     args = parser.parse_args()
-
-    # TODO: config should only be loaded once (also in database.py and enter_data.py)
     config = Config(args.configpath)
 
     # les go

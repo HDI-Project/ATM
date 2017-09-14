@@ -40,9 +40,16 @@ def get_metrics_binary(y_true, y_pred, y_pred_probs):
         pr_curve_auc = auc(pr_recalls, pr_precisions)
         roc_curve_auc = auc(roc_fprs, roc_tprs)
 
-    results = dict(accuracy=accuracy, cohen_kappa=cohen_kappa, f1_score=_f1_score, pr_curve_precisions=pr_precisions,
-                   pr_curve_recalls=pr_recalls, pr_curve_thresholds=pr_thresholds, pr_curve_auc=pr_curve_auc,
-                   roc_curve_fprs=roc_fprs, roc_curve_tprs=roc_tprs, roc_curve_thresholds=roc_thresholds,
+    results = dict(accuracy=accuracy,
+                   cohen_kappa=cohen_kappa,
+                   f1_score=_f1_score,
+                   pr_curve_precisions=pr_precisions,
+                   pr_curve_recalls=pr_recalls,
+                   pr_curve_thresholds=pr_thresholds,
+                   pr_curve_auc=pr_curve_auc,
+                   roc_curve_fprs=roc_fprs,
+                   roc_curve_tprs=roc_tprs,
+                   roc_curve_thresholds=roc_thresholds,
                    roc_curve_auc=roc_curve_auc)
 
     return results
@@ -151,7 +158,7 @@ def get_metrics_large_multiclass(y_true, y_pred, y_pred_probs, rank):
 
     return results
 
-def atm_cross_val_binary(pipeline, X, y, cv=10):
+def atm_cross_val_binary(pipeline, X, y, judment_metric, cv=10):
     skf = StratifiedKFold(n_splits=cv)
     skf.get_n_splits(X, y)
 
@@ -228,14 +235,15 @@ def atm_cross_val_binary(pipeline, X, y, cv=10):
                       roc_curve_tprs=roc_curve_tprs,
                       roc_curve_thresholds=roc_curve_thresholds,
                       rank_accuracies=rank_accuracies,
-                      mu_sigmas=mu_sigmas,
-                      judgement_metric=np.mean(f1_scores),
-                      judgement_metric_std=np.std(f1_scores))
+                      mu_sigmas=mu_sigmas)
+
+    cv_results['judgment_metric'] = np.mean(cv_results[judgment_metric])
+    cv_results['judgment_metric_std'] = np.std(cv_results[judgment_metric])
 
     return cv_results
 
 
-def atm_cross_val_small_multiclass(pipeline, X, y, cv=10):
+def atm_cross_val_small_multiclass(pipeline, X, y, judment_metric, cv=10):
     skf = StratifiedKFold(n_splits=cv)
     skf.get_n_splits(X, y)
 
@@ -300,9 +308,10 @@ def atm_cross_val_small_multiclass(pipeline, X, y, cv=10):
                       roc_curve_tprs=roc_curve_tprs,
                       roc_curve_thresholds=roc_curve_thresholds,
                       rank_accuracies=rank_accuracies,
-                      mu_sigmas=mu_sigmas,
-                      judgement_metric=np.mean(mu_sigmas),
-                      judgement_metric_std=np.std(mu_sigmas))
+                      mu_sigmas=mu_sigmas)
+
+    cv_results['judgment_metric'] = np.mean(cv_results[judgment_metric])
+    cv_results['judgment_metric_std'] = np.std(cv_results[judgment_metric])
 
     return cv_results
 
@@ -321,7 +330,7 @@ def rank_n_accuracy(y_true, y_prob_mat, rank=5):
     return correct_sample_count/num_samples
 
 
-def atm_cross_val_large_multiclass(pipeline, X, y, cv=10, rank=5):
+def atm_cross_val_large_multiclass(pipeline, X, y, judment_metric, cv=10, rank=5):
     skf = StratifiedKFold(n_splits=cv)
     skf.get_n_splits(X, y)
 
@@ -381,21 +390,20 @@ def atm_cross_val_large_multiclass(pipeline, X, y, cv=10, rank=5):
                       roc_curve_tprs=roc_curve_tprs,
                       roc_curve_thresholds=roc_curve_thresholds,
                       rank_accuracies=rank_accuracies,
-                      mu_sigmas=mu_sigmas,
-                      judgement_metric=np.mean(mu_sigmas),
-                      judgement_metric_std=np.std(mu_sigmas))
+                      mu_sigmas=mu_sigmas)
+
+    cv_results['judgment_metric'] = np.mean(cv_results[judgment_metric])
+    cv_results['judgment_metric_std'] = np.std(cv_results[judgment_metric])
 
     return cv_results
 
-def atm_cross_val(pipeline, X, y, cv=10):
-    num_classes = len(np.unique(y))
-
+def atm_cross_val(pipeline, X, y, num_classes, judgment_metric, cv=10):
     if num_classes == 2:
-        return atm_cross_val_binary(pipeline=pipeline, X=X, y=y, cv=cv)
+        return atm_cross_val_binary(pipeline, X, y, judgment_metric, cv=cv)
     elif (num_classes >= 3) and (num_classes <= 5):
-        return atm_cross_val_small_multiclass(pipeline=pipeline, X=X, y=y, cv=cv)
+        return atm_cross_val_small_multiclass(pipeline, X, y, judgment_metric, cv=cv)
     else:
-        return atm_cross_val_large_multiclass(pipeline=pipeline, X=X, y=y, cv=cv)
+        return atm_cross_val_large_multiclass(pipeline, X, y, judgment_metric, cv=cv)
 
 
 class Wrapper(object):
@@ -412,12 +420,15 @@ class Wrapper(object):
     ATM_KEYS = [
         SCALE, PCA, WHITEN, MINMAX, PCA_DIMS]
 
-    def __init__(self, code, params, learner_class):
+    # number of folds for cross-validation (arbitrary, for speed)
+    CV_COUNT = 5
 
+    def __init__(self, code, params, learner_class, judgment_metric=None):
         # configuration & database
         self.code = code
         self.params = params
         self.learner_class = learner_class
+        self.judgment_metric = judgment_metric
 
         # data related
         self.datapath = None
@@ -443,17 +454,17 @@ class Wrapper(object):
 
     def performance(self):
         self.perf = {
-            #judgment metrics (what GP uses to decide next parameter values)
-            "cv_judgement_metric":          self.cv_scores['judgement_metric'],
-            "cv_judgement_metric_stdev":    self.cv_scores['judgement_metric_std'],
-            "test_judgement_metric":        self.test_scores['judgement_metric'],
+            # judgment metrics (what GP uses to decide next parameter values)
+            "cv_judgment_metric":           self.cv_scores['judgment_metric'],
+            "cv_judgment_metric_stdev":     self.cv_scores['judgment_metric_std'],
+            "test_judgment_metric":         self.test_scores['judgment_metric'],
             # Cross Validation Metrics (split train data with CV and test on each fold)
             "cv_object":                    self.cv_scores,
             # Test Metrics (train on all train data, test on test data)
             "test_object":                  self.test_scores,
             # other info
             "avg_prediction_time":          self.avg_prediction_time,
-            "n_folds":                      10,
+            "n_folds":                      self.CV_COUNT,
             "trainable_params":             self.trainable_params
         }
 
@@ -464,9 +475,20 @@ class Wrapper(object):
         self.testY = testY
         self.trainX = trainX
         self.trainY = trainY
+        self.num_classes = len(np.unique(self.trainY))
+        assert self.num_classes > 1
+
+        # default judgment metric is f1 for binary and mu sigma for multiclass.
+        if self.judgment_metric is None:
+            if self.num_classes == 2:
+                self.judgment_metric = 'f1_scores'
+            else:
+                self.judgment_metric = 'mu_sigmas'
 
     def cross_validate(self):
-        self.cv_scores = atm_cross_val(self.pipeline, self.trainX, self.trainY, cv=10)
+        self.cv_scores = atm_cross_val(self.pipeline, self.trainX, self.trainY,
+                                       self.num_classes, self.judgment_metric,
+                                       cv=self.CV_COUNT)
 
     def train_final_model(self):
         self.pipeline.fit(self.trainX, self.trainY)
@@ -477,9 +499,7 @@ class Wrapper(object):
         total = time.time() - starttime
         self.avg_prediction_time = total / float(len(self.testY))
 
-        num_classes = len(np.unique(self.testY))
-
-        if num_classes == 2:
+        if self.num_classes == 2:
             last_step = self.pipeline.steps[-1]
             if last_step[0] == 'classify_sgd' or last_step[0] == 'classify_pa':
                 class_1_distance = self.pipeline.decision_function(self.testX)
@@ -491,9 +511,9 @@ class Wrapper(object):
             else:
                 y_pred_probs = self.pipeline.predict_proba(self.testX)
 
-            results = get_metrics_binary(y_true=self.testY, y_pred=y_preds, y_pred_probs=y_pred_probs)
+            results = get_metrics_binary(y_true=self.testY, y_pred=y_preds,
+                                         y_pred_probs=y_pred_probs)
 
-            self.judgement_metric = 'f1_score'
             self.test_scores = dict(accuracies=results['accuracy'],
                                     cohen_kappas=results['cohen_kappa'],
                                     f1_scores=results['f1_score'],
@@ -506,10 +526,10 @@ class Wrapper(object):
                                     pr_curve_thresholds=results['pr_curve_thresholds'],
                                     pr_curve_aucs=results['pr_curve_auc'],
                                     rank_accuracies=None,
-                                    mu_sigmas=None,
-                                    judgement_metric=results['f1_score'])
+                                    mu_sigmas=None)
+            self.test_scores['judgment_metric'] = self.test_scores[self.judgment_metric]
 
-        elif (num_classes >= 3) and (num_classes <= 5):
+        elif self.num_classes <= 5:
             last_step = self.pipeline.steps[-1]
             if last_step[0] == 'classify_sgd' or last_step[0] == 'classify_pa':
                 # this isn't a probability
@@ -519,9 +539,10 @@ class Wrapper(object):
                 y_pred_probs = self.pipeline.predict_proba(self.testX)
 
 
-            results = get_metrics_small_multiclass(y_true=self.testY, y_pred=y_preds, y_pred_probs=y_pred_probs)
+            results = get_metrics_small_multiclass(y_true=self.testY,
+                                                   y_pred=y_preds,
+                                                   y_pred_probs=y_pred_probs)
 
-            self.judgement_metric = 'mu_sigma'
             self.test_scores = dict(accuracies=results['accuracy'],
                                     cohen_kappas=results['cohen_kappa'],
                                     f1_scores=results['label_level_f1_scores'],
@@ -534,8 +555,8 @@ class Wrapper(object):
                                     pr_curve_thresholds=results['label_level_pr_curve_thresholds'],
                                     pr_curve_aucs=results['label_level_pr_curve_aucs'],
                                     rank_accuracies=None,
-                                    mu_sigmas=results['mu_sigma'],
-                                    judgement_metric=results['mu_sigma'])
+                                    mu_sigmas=results['mu_sigma'])
+            self.test_scores['judgment_metric'] = self.test_scores[self.judgment_metric]
 
         else:
             last_step = self.pipeline.steps[-1]
@@ -546,9 +567,11 @@ class Wrapper(object):
             else:
                 y_pred_probs = self.pipeline.predict_proba(self.testX)
 
-            results = get_metrics_large_multiclass(y_true=self.testY, y_pred=y_preds, y_pred_probs=y_pred_probs, rank=5)
+            results = get_metrics_large_multiclass(y_true=self.testY,
+                                                   y_pred=y_preds,
+                                                   y_pred_probs=y_pred_probs,
+                                                   rank=5)
 
-            self.judgement_metric = 'mu_sigma'
             self.test_scores = dict(accuracies=results['accuracy'],
                                     cohen_kappas=results['cohen_kappa'],
                                     f1_scores=results['label_level_f1_scores'],
@@ -560,8 +583,8 @@ class Wrapper(object):
                                     pr_curve_thresholds=None,
                                     pr_curve_aucs=None,
                                     rank_accuracies=results['rank_accuracy'],
-                                    mu_sigmas=results['mu_sigma'],
-                                    judgement_metric=results['mu_sigma'])
+                                    mu_sigmas=results['mu_sigma'])
+            self.test_scores['judgment_metric'] = self.test_scores[self.judgment_metric]
 
 
     def predict(self, examples, probability=False):
@@ -661,7 +684,6 @@ class Wrapper(object):
         if learner_params["function"] == "classify_dbn":
 
             # print "AddING stuff for DBNs! %s" % learner_params
-
             learner_params["layer_sizes"] = [learner_params["inlayer_size"]]
 
             # set layer topology
@@ -715,8 +737,9 @@ class Wrapper(object):
         # create a list of steps
         steps = []
 
-        # create a learner with
-        learner_params = {k: v for k, v in self.params.iteritems() if k not in Wrapper.ATM_KEYS}
+        # create a learner with specified parameters
+        learner_params = {k: v for k, v in self.params.iteritems() if k not in
+                          Wrapper.ATM_KEYS}
 
         # do special converstions
         learner_params = self.special_conversions(learner_params)
