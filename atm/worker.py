@@ -240,6 +240,8 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
     # call database method to define ORM objects in the db module
     define_tables(config)
 
+    judgment_metric = config.get(Config.STRATEGY, Config.STRATEGY_METRIC)
+
     # main loop
     while True:
         datarun, frozen_set, params = None, None, None
@@ -297,6 +299,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
             fclass = Mapping.SELECTION_FROZENS_MAP[datarun.frozen_selection]
             best_y = GetMaximumY(datarun.id, datarun.metric, default=0.0)
             fselector = fclass(frozen_sets=frozen_sets, best_y=best_y, k=datarun.k_window, metric=datarun.metric)
+
             frozen_set_id = fselector.select()
             if not frozen_set_id > 0:
                 _log("Invalid frozen set id! %d" % frozen_set_id)
@@ -345,8 +348,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
 
                 # check if we have enough results to pursue this strategy
                 if len(learners) < N_OPT:
-                    _log(
-                        "Not enough previous results for gp_ei, falling back onto strategy: %s" % SELECTION_SAMPLES_UNIFORM)
+                    _log("Not enough previous results for gp_ei, falling back onto strategy: %s" % SELECTION_SAMPLES_UNIFORM)
                     Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
                     sampler = Sampler(frozen_set=frozen_set)
                 else:
@@ -374,8 +376,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
 
                 # check if we have enough results to pursue this strategy
                 if len(learners) < N_OPT:
-                    _log(
-                        "Not enough previous results for gp_eitime, falling back onto strategy: %s" % SELECTION_SAMPLES_UNIFORM)
+                    _log("Not enough previous results for gp_eitime, falling back onto strategy: %s" % SELECTION_SAMPLES_UNIFORM)
                     Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
                     sampler = Sampler(frozen_set=frozen_set)
                 else:
@@ -394,14 +395,14 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
 
                 # train learner
                 params["function"] = frozen_set.algorithm
-                wrapper = CreateWrapper(params)
+                wrapper = CreateWrapper(params, judgment_metric)
                 trainX, testX, trainY, testY = LoadData(datarun, config)
                 wrapper.load_data_from_objects(trainX, testX, trainY, testY)
                 performance = wrapper.start()
 
                 print
                 _log("Judgement metric (%s): %.3f +- %.3f" %
-                     (wrapper.judgment_metric,
+                     (judgment_metric,
                       performance["cv_judgment_metric"],
                       2 * performance["cv_judgment_metric_stdev"]))
 

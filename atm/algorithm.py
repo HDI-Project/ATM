@@ -16,6 +16,33 @@ import time
 import itertools
 
 
+# these are the strings that are used to index into results dictionaries
+class Metrics:
+    ACCURACY = 'accuracies'
+    F1 = 'f1_scores'
+    F1_MICRO = 'f1_scores_micro'
+    F1_MACRO = 'f1_scores_macro'
+    F1_MU_SIGMA = 'mu_sigmas'           # mean(f1) - std(f1)
+    ROC_AUC = 'roc_curve_aucs'
+    ROC_AUC_MICRO = 'roc_curve_aucs_micro'
+    ROC_AUC_MACRO = 'roc_curve_aucs_macro'
+    PR_AUC = 'pr_curve_aucs'
+    COHEN_KAPPA = 'cohen_kappas'
+    RANK_ACCURACY = 'rank_accuracies'   # for large multiclass problems
+
+
+# these are the human-readable strings used in the config files
+JUDGMENT_METRICS = {
+    'accuracy': Metrics.ACCURACY,
+    'f1': Metrics.F1,
+    'f1_micro': Metrics.F1_MICRO,
+    'f1_macro': Metrics.F1_MACRO,
+    'roc_auc': Metrics.ROC_AUC,
+    'roc_auc_micro': Metrics.ROC_AUC_MICRO,
+    'roc_auc_macro': Metrics.ROC_AUC_MACRO,
+}
+
+
 def get_metrics_binary(y_true, y_pred, y_pred_probs):
     y_pred_prob = y_pred_probs[:, 1]  # get probabilites for positive class (1)
 
@@ -54,6 +81,7 @@ def get_metrics_binary(y_true, y_pred, y_pred_probs):
 
     return results
 
+
 def get_metrics_small_multiclass(y_true, y_pred, y_pred_probs):
     accuracy = accuracy_score(y_true, y_pred)
     cohen_kappa = cohen_kappa_score(y_true, y_pred)
@@ -62,7 +90,6 @@ def get_metrics_small_multiclass(y_true, y_pred, y_pred_probs):
     pair_level_roc_curve_tprs = []
     pair_level_roc_curve_thresholds = []
     pair_level_roc_curve_aucs = []
-
 
     # for each pair, generate roc curve (positive class is the larger class in the pair, i.e., pair[1])
     for pair in itertools.combinations(y_true, 2):
@@ -118,7 +145,9 @@ def get_metrics_small_multiclass(y_true, y_pred, y_pred_probs):
 
     mu_sigma = np.mean(f1_scores_vec) - np.std(f1_scores_vec)
 
-    results = dict(accuracy=accuracy, cohen_kappa=cohen_kappa, label_level_f1_scores=label_level_f1_scores,
+    results = dict(accuracy=accuracy,
+                   cohen_kappa=cohen_kappa,
+                   label_level_f1_scores=label_level_f1_scores,
                    pair_level_roc_curve_fprs=pair_level_roc_curve_fprs,
                    pair_level_roc_curve_tprs=pair_level_roc_curve_tprs,
                    pair_level_roc_curve_thresholds=pair_level_roc_curve_thresholds,
@@ -126,9 +155,11 @@ def get_metrics_small_multiclass(y_true, y_pred, y_pred_probs):
                    label_level_pr_curve_precisions=label_level_pr_curve_precisions,
                    label_level_pr_curve_recalls=label_level_pr_curve_recalls,
                    label_level_pr_curve_thresholds=label_level_pr_curve_thresholds,
-                   label_level_pr_curve_aucs=label_level_pr_curve_aucs, mu_sigma=mu_sigma)
+                   label_level_pr_curve_aucs=label_level_pr_curve_aucs,
+                   mu_sigma=mu_sigma)
 
     return results
+
 
 def get_metrics_large_multiclass(y_true, y_pred, y_pred_probs, rank):
     label_level_f1_scores = []
@@ -153,12 +184,16 @@ def get_metrics_large_multiclass(y_true, y_pred, y_pred_probs, rank):
 
     rank_accuracy = rank_n_accuracy(y_true=y_true, y_prob_mat=y_pred_probs, rank=rank)
 
-    results = dict(accuracy=accuracy, cohen_kappa=cohen_kappa, label_level_f1_scores=label_level_f1_scores,
-                   mu_sigma=mu_sigma, rank_accuracy=rank_accuracy)
+    results = dict(accuracy=accuracy,
+                   cohen_kappa=cohen_kappa,
+                   label_level_f1_scores=label_level_f1_scores,
+                   mu_sigma=mu_sigma,
+                   rank_accuracy=rank_accuracy)
 
     return results
 
-def atm_cross_val_binary(pipeline, X, y, judment_metric, cv=10):
+
+def atm_cross_val_binary(pipeline, X, y, judgment_metric, cv=10):
     skf = StratifiedKFold(n_splits=cv)
     skf.get_n_splits(X, y)
 
@@ -175,7 +210,6 @@ def atm_cross_val_binary(pipeline, X, y, judment_metric, cv=10):
     pr_curve_aucs = np.zeros(cv)
     rank_accuracies = None
     mu_sigmas = None
-
 
     split_id = 0
     for train_index, test_index in skf.split(X, y):
@@ -243,7 +277,7 @@ def atm_cross_val_binary(pipeline, X, y, judment_metric, cv=10):
     return cv_results
 
 
-def atm_cross_val_small_multiclass(pipeline, X, y, judment_metric, cv=10):
+def atm_cross_val_small_multiclass(pipeline, X, y, judgment_metric, cv=10):
     skf = StratifiedKFold(n_splits=cv)
     skf.get_n_splits(X, y)
 
@@ -327,10 +361,10 @@ def rank_n_accuracy(y_true, y_prob_mat, rank=5):
         if y_true[i] in rankings[i, :]:
             correct_sample_count += 1.0
 
-    return correct_sample_count/num_samples
+    return correct_sample_count / num_samples
 
 
-def atm_cross_val_large_multiclass(pipeline, X, y, judment_metric, cv=10, rank=5):
+def atm_cross_val_large_multiclass(pipeline, X, y, judgment_metric, cv=10, rank=5):
     skf = StratifiedKFold(n_splits=cv)
     skf.get_n_splits(X, y)
 
@@ -397,6 +431,7 @@ def atm_cross_val_large_multiclass(pipeline, X, y, judment_metric, cv=10, rank=5
 
     return cv_results
 
+
 def atm_cross_val(pipeline, X, y, num_classes, judgment_metric, cv=10):
     if num_classes == 2:
         return atm_cross_val_binary(pipeline, X, y, judgment_metric, cv=cv)
@@ -423,12 +458,12 @@ class Wrapper(object):
     # number of folds for cross-validation (arbitrary, for speed)
     CV_COUNT = 5
 
-    def __init__(self, code, params, learner_class, judgment_metric=None):
+    def __init__(self, code, judgment_metric, params, learner_class):
         # configuration & database
         self.code = code
+        self.judgment_metric = JUDGMENT_METRICS[judgment_metric]
         self.params = params
         self.learner_class = learner_class
-        self.judgment_metric = judgment_metric
 
         # data related
         self.datapath = None

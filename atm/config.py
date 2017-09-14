@@ -14,7 +14,7 @@ class Config(ConfigParser):
     DATAHUB = "datahub"
     DATA = "data"
     MODE = "mode"
-    
+
     # subheading: data
     DATA_ALLDATAPATH = "alldatapath"
     DATA_TRAINPATH = "trainpath"
@@ -24,13 +24,13 @@ class Config(ConfigParser):
 
     # subheading: mode
     MODE_RUNMODE = "run-mode"
-    
+
     # subheading: images
     IMG_WORKER = "worker-image"
-    
+
     # subheading: types
     TYPE_WORKER = "worker-type"
-    
+
     # subheading: Cloud
     CLOUD_SECURITY = "security-groups"
     CLOUD_USER = "username"
@@ -40,12 +40,12 @@ class Config(ConfigParser):
     CLOUD_AUTH_URL = "auth-url"
     CLOUD_KEY = "key"
     CLOUD_PORT = "port"
-    
+
     # subheading: Git
     GIT_USER = "username"
     GIT_PASS = "password"
     GIT_REPO = "repo"
-    
+
     # subheading: Run
     RUN_ALGORITHMS = "algorithms"
     RUN_ATM = "atm-path"
@@ -54,19 +54,20 @@ class Config(ConfigParser):
     RUN_TEST_RATIO = 'test-ratio'
     RUN_NAME = 'name'
     RUN_PRIORITY = "priority"
-    
+
     # subheading: budget
     BUDGET_TYPE = "budget-type"
     BUDGET_LEARNER = "learner-budget"
     BUDGET_WALLTIME = "walltime-budget"
-    
+
     # subheading: strategy
     STRATEGY_SELECTION = "sample_selection"
     STRATEGY_FROZENS = "frozen_selection"
     STRATEGY_METRIC = "metric"
+    STRATEGY_SCORE_TARGET = "score_target"
     STRATEGY_K = "k_window"
     STRATEGY_R = "r_min"
-    
+
     # subheading: aws
     AWS_ACCESS_KEY = "access_key"
     AWS_SECRET_KEY = "secret_key"
@@ -80,7 +81,7 @@ class Config(ConfigParser):
     AWS_EC2_AMIS = "ec2_amis"
     AWS_EC2_USERNAME = "ec2_username"
     AWS_EC2_KEYFILE = "ec2_keyfile"
-    
+
     # subheading: datahub
     DATAHUB_DIALECT = "dialect"
     DATAHUB_DATABASE = "database"
@@ -89,18 +90,18 @@ class Config(ConfigParser):
     DATAHUB_HOST = "host"
     DATAHUB_PORT = "port"
     DATAHUB_QUERY = "query"
-        
+
     ###########################
     # constants
     CONST_NONE = "none"
     CONST_RANDOM = "random"
     CONST_LEARNER = "learner"
     CONST_WALLTIME = "walltime"
-    
+
     def __init__(self, cfgpath):
         ConfigParser.__init__(self)
         self.configpath = cfgpath
         if self.configpath:
             self.read(self.configpath)
             #self.content = open(cfgpath, "r").read()
-     
+
