@@ -216,12 +216,21 @@ def atm_cross_val_binary(pipeline, X, y, cv=10):
 
         split_id += 1
 
-    cv_results = dict(accuracies=accuracies, f1_scores=f1_scores, pr_curve_aucs=pr_curve_aucs,
-                      cohen_kappas=cohen_kappas, roc_curve_aucs=roc_curve_aucs, pr_curve_precisions=pr_curve_precisions,
-                      pr_curve_recalls=pr_curve_recalls, pr_curve_thresholds=pr_curve_thresholds,
-                      roc_curve_fprs=roc_curve_fprs, roc_curve_tprs=roc_curve_tprs,
-                      roc_curve_thresholds=roc_curve_thresholds, rank_accuracies=rank_accuracies, mu_sigmas=mu_sigmas,
-                      judgement_metric=np.mean(f1_scores), judgement_metric_std=np.std(f1_scores))
+    cv_results = dict(accuracies=accuracies,
+                      f1_scores=f1_scores,
+                      pr_curve_aucs=pr_curve_aucs,
+                      cohen_kappas=cohen_kappas,
+                      roc_curve_aucs=roc_curve_aucs,
+                      pr_curve_precisions=pr_curve_precisions,
+                      pr_curve_recalls=pr_curve_recalls,
+                      pr_curve_thresholds=pr_curve_thresholds,
+                      roc_curve_fprs=roc_curve_fprs,
+                      roc_curve_tprs=roc_curve_tprs,
+                      roc_curve_thresholds=roc_curve_thresholds,
+                      rank_accuracies=rank_accuracies,
+                      mu_sigmas=mu_sigmas,
+                      judgement_metric=np.mean(f1_scores),
+                      judgement_metric_std=np.std(f1_scores))
 
     return cv_results
 
@@ -279,12 +288,21 @@ def atm_cross_val_small_multiclass(pipeline, X, y, cv=10):
 
         split_id += 1
 
-    cv_results = dict(accuracies=accuracies, f1_scores=f1_scores, pr_curve_aucs=pr_curve_aucs,
-                      cohen_kappas=cohen_kappas, roc_curve_aucs=roc_curve_aucs, pr_curve_precisions=pr_curve_precisions,
-                      pr_curve_recalls=pr_curve_recalls, pr_curve_thresholds=pr_curve_thresholds,
-                      roc_curve_fprs=roc_curve_fprs, roc_curve_tprs=roc_curve_tprs,
-                      roc_curve_thresholds=roc_curve_thresholds, rank_accuracies=rank_accuracies, mu_sigmas=mu_sigmas,
-                      judgement_metric=np.mean(mu_sigmas), judgement_metric_std=np.std(mu_sigmas))
+    cv_results = dict(accuracies=accuracies,
+                      f1_scores=f1_scores,
+                      pr_curve_aucs=pr_curve_aucs,
+                      cohen_kappas=cohen_kappas,
+                      roc_curve_aucs=roc_curve_aucs,
+                      pr_curve_precisions=pr_curve_precisions,
+                      pr_curve_recalls=pr_curve_recalls,
+                      pr_curve_thresholds=pr_curve_thresholds,
+                      roc_curve_fprs=roc_curve_fprs,
+                      roc_curve_tprs=roc_curve_tprs,
+                      roc_curve_thresholds=roc_curve_thresholds,
+                      rank_accuracies=rank_accuracies,
+                      mu_sigmas=mu_sigmas,
+                      judgement_metric=np.mean(mu_sigmas),
+                      judgement_metric_std=np.std(mu_sigmas))
 
     return cv_results
 
@@ -351,12 +369,21 @@ def atm_cross_val_large_multiclass(pipeline, X, y, cv=10, rank=5):
 
         split_id += 1
 
-    cv_results = dict(accuracies=accuracies, f1_scores=f1_scores, pr_curve_aucs=pr_curve_aucs,
-                      cohen_kappas=cohen_kappas, roc_curve_aucs=roc_curve_aucs, pr_curve_precisions=pr_curve_precisions,
-                      pr_curve_recalls=pr_curve_recalls, pr_curve_thresholds=pr_curve_thresholds,
-                      roc_curve_fprs=roc_curve_fprs, roc_curve_tprs=roc_curve_tprs,
-                      roc_curve_thresholds=roc_curve_thresholds, rank_accuracies=rank_accuracies, mu_sigmas=mu_sigmas,
-                      judgement_metric=np.mean(mu_sigmas), judgement_metric_std=np.std(mu_sigmas))
+    cv_results = dict(accuracies=accuracies,
+                      f1_scores=f1_scores,
+                      pr_curve_aucs=pr_curve_aucs,
+                      cohen_kappas=cohen_kappas,
+                      roc_curve_aucs=roc_curve_aucs,
+                      pr_curve_precisions=pr_curve_precisions,
+                      pr_curve_recalls=pr_curve_recalls,
+                      pr_curve_thresholds=pr_curve_thresholds,
+                      roc_curve_fprs=roc_curve_fprs,
+                      roc_curve_tprs=roc_curve_tprs,
+                      roc_curve_thresholds=roc_curve_thresholds,
+                      rank_accuracies=rank_accuracies,
+                      mu_sigmas=mu_sigmas,
+                      judgement_metric=np.mean(mu_sigmas),
+                      judgement_metric_std=np.std(mu_sigmas))
 
     return cv_results
 
@@ -423,7 +450,7 @@ class Wrapper(object):
             # Cross Validation Metrics (split train data with CV and test on each fold)
             "cv_object":                    self.cv_scores,
             # Test Metrics (train on all train data, test on test data)
-            "test_object":                    self.test_scores,
+            "test_object":                  self.test_scores,
             # other info
             "avg_prediction_time":          self.avg_prediction_time,
             "n_folds":                      10,
@@ -450,7 +477,6 @@ class Wrapper(object):
         total = time.time() - starttime
         self.avg_prediction_time = total / float(len(self.testY))
 
-
         num_classes = len(np.unique(self.testY))
 
         if num_classes == 2:
@@ -467,8 +493,11 @@ class Wrapper(object):
 
             results = get_metrics_binary(y_true=self.testY, y_pred=y_preds, y_pred_probs=y_pred_probs)
 
-            self.test_scores = dict(accuracies=results['accuracy'], cohen_kappas=results['cohen_kappa'],
-                                    f1_scores=results['f1_score'], roc_curve_fprs=results['roc_curve_fprs'],
+            self.judgement_metric = 'f1_score'
+            self.test_scores = dict(accuracies=results['accuracy'],
+                                    cohen_kappas=results['cohen_kappa'],
+                                    f1_scores=results['f1_score'],
+                                    roc_curve_fprs=results['roc_curve_fprs'],
                                     roc_curve_tprs=results['roc_curve_tprs'],
                                     roc_curve_thresholds=results['roc_curve_thresholds'],
                                     roc_curve_aucs=results['roc_curve_auc'],
@@ -476,7 +505,9 @@ class Wrapper(object):
                                     pr_curve_recalls=results['pr_curve_recalls'],
                                     pr_curve_thresholds=results['pr_curve_thresholds'],
                                     pr_curve_aucs=results['pr_curve_auc'],
-                                    rank_accuracies=None, mu_sigmas=None, judgement_metric=results['f1_score'])
+                                    rank_accuracies=None,
+                                    mu_sigmas=None,
+                                    judgement_metric=results['f1_score'])
 
         elif (num_classes >= 3) and (num_classes <= 5):
             last_step = self.pipeline.steps[-1]
@@ -490,7 +521,9 @@ class Wrapper(object):
 
             results = get_metrics_small_multiclass(y_true=self.testY, y_pred=y_preds, y_pred_probs=y_pred_probs)
 
-            self.test_scores = dict(accuracies=results['accuracy'], cohen_kappas=results['cohen_kappa'],
+            self.judgement_metric = 'mu_sigma'
+            self.test_scores = dict(accuracies=results['accuracy'],
+                                    cohen_kappas=results['cohen_kappa'],
                                     f1_scores=results['label_level_f1_scores'],
                                     roc_curve_fprs=results['pair_level_roc_curve_fprs'],
                                     roc_curve_tprs=results['pair_level_roc_curve_tprs'],
@@ -500,7 +533,8 @@ class Wrapper(object):
                                     pr_curve_recalls=results['label_level_pr_curve_recalls'],
                                     pr_curve_thresholds=results['label_level_pr_curve_thresholds'],
                                     pr_curve_aucs=results['label_level_pr_curve_aucs'],
-                                    rank_accuracies=None, mu_sigmas=results['mu_sigma'],
+                                    rank_accuracies=None,
+                                    mu_sigmas=results['mu_sigma'],
                                     judgement_metric=results['mu_sigma'])
 
         else:
@@ -514,12 +548,20 @@ class Wrapper(object):
 
             results = get_metrics_large_multiclass(y_true=self.testY, y_pred=y_preds, y_pred_probs=y_pred_probs, rank=5)
 
-            self.test_scores = dict(accuracies=results['accuracy'], cohen_kappas=results['cohen_kappa'],
-                                    f1_scores=results['label_level_f1_scores'], roc_curve_fprs=None,
-                                    roc_curve_tprs=None, roc_curve_thresholds=None, roc_curve_aucs=None,
-                                    pr_curve_precisions=None, pr_curve_recalls=None, pr_curve_thresholds=None,
-                                    pr_curve_aucs=None, rank_accuracies=results['rank_accuracy'],
-                                    mu_sigmas=results['mu_sigma'], judgement_metric=results['mu_sigma'])
+            self.judgement_metric = 'mu_sigma'
+            self.test_scores = dict(accuracies=results['accuracy'],
+                                    cohen_kappas=results['cohen_kappa'],
+                                    f1_scores=results['label_level_f1_scores'],
+                                    roc_curve_fprs=None, roc_curve_tprs=None,
+                                    roc_curve_thresholds=None,
+                                    roc_curve_aucs=None,
+                                    pr_curve_precisions=None,
+                                    pr_curve_recalls=None,
+                                    pr_curve_thresholds=None,
+                                    pr_curve_aucs=None,
+                                    rank_accuracies=results['rank_accuracy'],
+                                    mu_sigmas=results['mu_sigma'],
+                                    judgement_metric=results['mu_sigma'])
 
 
     def predict(self, examples, probability=False):

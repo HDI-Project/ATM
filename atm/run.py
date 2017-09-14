@@ -1,8 +1,10 @@
 from atm.datawrapper import DataWrapper
 from atm.config import Config
-from atm.utilities import *
 from atm.database import *
+from atm.utilities import *
 from atm.mapping import FrozenSetsFromAlgorithmCodes
+import atm.database as db
+
 from boto.s3.connection import S3Connection, Key
 import datetime
 import pdb
@@ -13,19 +15,18 @@ warnings.filterwarnings("ignore")
 
 # TODO: get rid of these hard-coded values
 OUTPUT_FOLDER = "data/processed"
-LABEL_COLUMN = 'class'
-PREFIX = "http://people.csail.mit.edu/drevo/datasets-v2/"
-PREFIX = "http://people.csail.mit.edu/bcollazo/datasets/"  # Added by bcollazo
-PREFIX = "http://web.mit.edu/swearin3/www/"  # Added by swearin3
-PREFIX = ""     # added by bcyphers
+LABEL_COLUMN = "class"
+PREFIX = ""     # TODO: this is pretty much unnecessary
 
 
-def Run(runname, description, metric, sample_selection, frozen_selection, budget_type, priority,
+def Run(config, runname, description, metric, sample_selection, frozen_selection, budget_type, priority,
         k_window, r_min, algorithm_codes, learner_budget=None, walltime_budget=None, alldatapath=None,
-        dataset_description=None,
-        trainpath=None, testpath=None, configpath="config/experiments.cnf", verbose=True, frozens_separately=False):
+        dataset_description=None, trainpath=None, testpath=None, verbose=True, frozens_separately=False):
     EnsureDirectory("models")
     EnsureDirectory("logs")
+
+    # call database method to define ORM objects in the db module
+    db.define_tables(config)
 
     print "Dataname: %s, description: %s" % (runname, description)
 
@@ -50,7 +51,6 @@ def Run(runname, description, metric, sample_selection, frozen_selection, budget
     testing_http = PREFIX + os.path.basename(local_testing_path)
 
     # create all combinations necessary
-    config = Config(configpath)
     frozen_sets = FrozenSetsFromAlgorithmCodes(algorithm_codes, verbose=verbose)
 
     ### create datarun ###
@@ -103,7 +103,7 @@ def Run(runname, description, metric, sample_selection, frozen_selection, budget
     datarun = None
     datarun_ids = []
     if not frozens_separately:
-        datarun = Datarun(**values)
+        datarun = db.Datarun(**values)
         print datarun
         session.add(datarun)
         session.commit()
@@ -119,14 +119,14 @@ def Run(runname, description, metric, sample_selection, frozen_selection, budget
             # print fsettings, "=>", optimizables, constants
 
             if frozens_separately:
-                datarun = Datarun(**values)
+                datarun = db.Datarun(**values)
                 session.add(datarun)
                 session.commit()
                 datarun_id = datarun.id
                 datarun_ids.append(datarun_id)
 
             fhash = HashNestedTuple(fsettings)
-            fset = FrozenSet(**{
+            fset = db.FrozenSet(**{
                 "datarun_id": datarun.id,
                 "algorithm": algorithm,
                 "optimizables": optimizables,
