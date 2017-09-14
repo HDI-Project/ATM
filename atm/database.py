@@ -13,219 +13,222 @@ import os
 from datetime import datetime
 import warnings
 
-# TODO: config should only be loaded once
-configpath = os.getenv('ATM_CONFIG_FILE')
-if configpath == None:
-    warnings.warn('No config file environmental variable, using default config/atm.cnf')
-    configpath = 'config/atm.cnf'
-assert os.path.isfile(configpath), 'Configuration file not found. ({})'.format(configpath)
-config = Config(configpath)
 
-DIALECT = config.get(Config.DATAHUB, Config.DATAHUB_DIALECT)
-DATABASE = config.get(Config.DATAHUB, Config.DATAHUB_DATABASE)
-USER = config.get(Config.DATAHUB, Config.DATAHUB_USERNAME)
-PASSWORD = config.get(Config.DATAHUB, Config.DATAHUB_PASSWORD)
-HOST = config.get(Config.DATAHUB, Config.DATAHUB_HOST)
-PORT = int(config.get(Config.DATAHUB, Config.DATAHUB_PORT))
-QUERY = config.get(Config.DATAHUB, Config.DATAHUB_QUERY)
+def define_tables(config):
+    """
+    Accepts a config (for database connection info), and defines SQLAlchemy ORM
+    objects for all the tables in the database.
+    """
+    DIALECT = config.get(Config.DATAHUB, Config.DATAHUB_DIALECT)
+    DATABASE = config.get(Config.DATAHUB, Config.DATAHUB_DATABASE)
+    USER = config.get(Config.DATAHUB, Config.DATAHUB_USERNAME)
+    PASSWORD = config.get(Config.DATAHUB, Config.DATAHUB_PASSWORD)
+    HOST = config.get(Config.DATAHUB, Config.DATAHUB_HOST)
+    PORT = int(config.get(Config.DATAHUB, Config.DATAHUB_PORT))
+    QUERY = config.get(Config.DATAHUB, Config.DATAHUB_QUERY)
 
-Base = declarative_base()
-DB_STRING = '%s://%s:%s@%s:%d/%s?%s' % (
-    DIALECT, USER, PASSWORD, HOST, PORT, DATABASE, QUERY)
-engine = create_engine(DB_STRING)
-metadata = MetaData(bind=engine)
-Session = sessionmaker(bind=engine, expire_on_commit=False)
+    Base = declarative_base()
+    DB_STRING = '%s://%s:%s@%s:%d/%s?%s' % (
+        DIALECT, USER, PASSWORD, HOST, PORT, DATABASE, QUERY)
+    engine = create_engine(DB_STRING)
+    metadata = MetaData(bind=engine)
 
-class Datarun(Base):
-    __table__ = Table('dataruns', metadata, autoload=True)
+    global Session
+    Session = sessionmaker(bind=engine, expire_on_commit=False)
 
-    @property
-    def wrapper(self):
-        return Base64ToObject(self.datawrapper)
+    global Datarun, FrozenSet, Algorithm, Learner
 
-    @wrapper.setter
-    def wrapper(self, value):
-        self.datawrapper = ObjectToBase64(value)
+    class Datarun(Base):
+        __table__ = Table('dataruns', metadata, autoload=True)
 
-    def __repr__(self):
-        base = "<%s:, frozen: %s, sampling: %s, budget: %s, status: %s>"
-        status = ""
-        if self.started == None:
-            status = "pending"
-        elif self.started != None and self.completed == None:
-            status = "running"
-        elif self.started != None and self.completed != None:
-            status = "done"
-        return base % (self.name, self.frozen_selection, self.sample_selection, self.budget, status)
+        @property
+        def wrapper(self):
+            return Base64ToObject(self.datawrapper)
 
-class FrozenSet(Base):
-    __table__ = Table('frozen_sets', metadata, autoload=True)
+        @wrapper.setter
+        def wrapper(self, value):
+            self.datawrapper = ObjectToBase64(value)
 
-    @property
-    def optimizables(self):
-        return Base64ToObject(self.optimizables64)
+        def __repr__(self):
+            base = "<%s:, frozen: %s, sampling: %s, budget: %s, status: %s>"
+            status = ""
+            if self.started == None:
+                status = "pending"
+            elif self.started != None and self.completed == None:
+                status = "running"
+            elif self.started != None and self.completed != None:
+                status = "done"
+            return base % (self.name, self.frozen_selection, self.sample_selection, self.budget, status)
 
-    @optimizables.setter
-    def optimizables(self, value):
-        self.optimizables64 = ObjectToBase64(value)
+    class FrozenSet(Base):
+        __table__ = Table('frozen_sets', metadata, autoload=True)
 
-    @property
-    def frozens(self):
-        return Base64ToObject(self.frozens64)
+        @property
+        def optimizables(self):
+            return Base64ToObject(self.optimizables64)
 
-    @frozens.setter
-    def frozens(self, value):
-        self.frozens64 = ObjectToBase64(value)
+        @optimizables.setter
+        def optimizables(self, value):
+            self.optimizables64 = ObjectToBase64(value)
 
-    @property
-    def constants(self):
-        return Base64ToObject(self.constants64)
+        @property
+        def frozens(self):
+            return Base64ToObject(self.frozens64)
 
-    @constants.setter
-    def constants(self, value):
-        self.constants64 = ObjectToBase64(value)
+        @frozens.setter
+        def frozens(self, value):
+            self.frozens64 = ObjectToBase64(value)
 
-    def __repr__(self):
-        return "<%s: %s>" % (self.algorithm, self.frozen_hash)
+        @property
+        def constants(self):
+            return Base64ToObject(self.constants64)
 
-class Algorithm(Base):
-    __table__ = Table('algorithms', metadata, autoload=True)
-    def __repr__(self):
-        return "<%s>" % self.name
+        @constants.setter
+        def constants(self, value):
+            self.constants64 = ObjectToBase64(value)
 
-class Learner(Base):
-    __table__ = Table('learners', metadata, autoload=True)
+        def __repr__(self):
+            return "<%s: %s>" % (self.algorithm, self.frozen_hash)
 
-    @property
-    def params(self):
-        return Base64ToObject(self.params64)
+    class Algorithm(Base):
+        __table__ = Table('algorithms', metadata, autoload=True)
+        def __repr__(self):
+            return "<%s>" % self.name
 
-    @params.setter
-    def params(self, value):
-        self.params64 = ObjectToBase64(value)
+    class Learner(Base):
+        __table__ = Table('learners', metadata, autoload=True)
 
-    @property
-    def trainable_params(self):
-        return Base64ToObject(self.trainable_params64)
+        @property
+        def params(self):
+            return Base64ToObject(self.params64)
 
-    @trainable_params.setter
-    def trainable_params(self, value):
-        self.trainable_params64 = ObjectToBase64(value)
+        @params.setter
+        def params(self, value):
+            self.params64 = ObjectToBase64(value)
 
-    @property
-    def test_accuracies(self):
-        return Base64ToObject(self.test_accuracies64)
+        @property
+        def trainable_params(self):
+            return Base64ToObject(self.trainable_params64)
 
-    @test_accuracies.setter
-    def test_accuracies(self, value):
-        self.test_accuracies64 = ObjectToBase64(value)
+        @trainable_params.setter
+        def trainable_params(self, value):
+            self.trainable_params64 = ObjectToBase64(value)
 
-    @property
-    def test_cohen_kappas(self):
-        return Base64ToObject(self.test_cohen_kappas64)
+        @property
+        def test_accuracies(self):
+            return Base64ToObject(self.test_accuracies64)
 
-    @test_cohen_kappas.setter
-    def test_cohen_kappas(self, value):
-        self.test_cohen_kappas64 = ObjectToBase64(value)
+        @test_accuracies.setter
+        def test_accuracies(self, value):
+            self.test_accuracies64 = ObjectToBase64(value)
 
-    @property
-    def test_f1_scores(self):
-        return Base64ToObject(self.test_f1_scores64)
+        @property
+        def test_cohen_kappas(self):
+            return Base64ToObject(self.test_cohen_kappas64)
 
-    @test_f1_scores.setter
-    def test_f1_scores(self, value):
-        self.test_f1_scores64 = ObjectToBase64(value)
+        @test_cohen_kappas.setter
+        def test_cohen_kappas(self, value):
+            self.test_cohen_kappas64 = ObjectToBase64(value)
 
-    @property
-    def test_roc_curve_fprs(self):
-        return Base64ToObject(self.test_roc_curve_fprs64)
+        @property
+        def test_f1_scores(self):
+            return Base64ToObject(self.test_f1_scores64)
 
-    @test_roc_curve_fprs.setter
-    def test_roc_curve_fprs(self, value):
-        self.test_roc_curve_fprs64 = ObjectToBase64(value)
+        @test_f1_scores.setter
+        def test_f1_scores(self, value):
+            self.test_f1_scores64 = ObjectToBase64(value)
 
-    @property
-    def test_roc_curve_tprs(self):
-        return Base64ToObject(self.test_roc_curve_tprs64)
+        @property
+        def test_roc_curve_fprs(self):
+            return Base64ToObject(self.test_roc_curve_fprs64)
 
-    @test_roc_curve_tprs.setter
-    def test_roc_curve_tprs(self, value):
-        self.test_roc_curve_tprs64 = ObjectToBase64(value)
+        @test_roc_curve_fprs.setter
+        def test_roc_curve_fprs(self, value):
+            self.test_roc_curve_fprs64 = ObjectToBase64(value)
 
-    @property
-    def test_roc_curve_thresholds(self):
-        return Base64ToObject(self.test_roc_curve_thresholds64)
+        @property
+        def test_roc_curve_tprs(self):
+            return Base64ToObject(self.test_roc_curve_tprs64)
 
-    @test_roc_curve_thresholds.setter
-    def test_roc_curve_thresholds(self, value):
-        self.test_roc_curve_thresholds64 = ObjectToBase64(value)
+        @test_roc_curve_tprs.setter
+        def test_roc_curve_tprs(self, value):
+            self.test_roc_curve_tprs64 = ObjectToBase64(value)
 
-    @property
-    def test_roc_curve_aucs(self):
-        return Base64ToObject(self.test_roc_curve_aucs64)
+        @property
+        def test_roc_curve_thresholds(self):
+            return Base64ToObject(self.test_roc_curve_thresholds64)
 
-    @test_roc_curve_aucs.setter
-    def test_roc_curve_aucs(self, value):
-        self.test_roc_curve_aucs64 = ObjectToBase64(value)
+        @test_roc_curve_thresholds.setter
+        def test_roc_curve_thresholds(self, value):
+            self.test_roc_curve_thresholds64 = ObjectToBase64(value)
 
-    @property
-    def test_pr_curve_precisions(self):
-        return Base64ToObject(self.test_pr_curve_precisions64)
+        @property
+        def test_roc_curve_aucs(self):
+            return Base64ToObject(self.test_roc_curve_aucs64)
 
-    @test_pr_curve_precisions.setter
-    def test_pr_curve_precisions(self, value):
-        self.test_pr_curve_precisions64 = ObjectToBase64(value)
+        @test_roc_curve_aucs.setter
+        def test_roc_curve_aucs(self, value):
+            self.test_roc_curve_aucs64 = ObjectToBase64(value)
 
-    @property
-    def test_pr_curve_recalls(self):
-        return Base64ToObject(self.test_pr_curve_recalls64)
+        @property
+        def test_pr_curve_precisions(self):
+            return Base64ToObject(self.test_pr_curve_precisions64)
 
-    @test_pr_curve_recalls.setter
-    def test_pr_curve_recalls(self, value):
-        self.test_pr_curve_recalls64 = ObjectToBase64(value)
+        @test_pr_curve_precisions.setter
+        def test_pr_curve_precisions(self, value):
+            self.test_pr_curve_precisions64 = ObjectToBase64(value)
 
-    @property
-    def test_pr_curve_thresholds(self):
-        return Base64ToObject(self.test_pr_curve_thresholds64)
+        @property
+        def test_pr_curve_recalls(self):
+            return Base64ToObject(self.test_pr_curve_recalls64)
 
-    @test_pr_curve_thresholds.setter
-    def test_pr_curve_thresholds(self, value):
-        self.test_pr_curve_thresholds64 = ObjectToBase64(value)
+        @test_pr_curve_recalls.setter
+        def test_pr_curve_recalls(self, value):
+            self.test_pr_curve_recalls64 = ObjectToBase64(value)
 
-    @property
-    def test_pr_curve_aucs(self):
-        return Base64ToObject(self.test_pr_curve_aucs64)
+        @property
+        def test_pr_curve_thresholds(self):
+            return Base64ToObject(self.test_pr_curve_thresholds64)
 
-    @test_pr_curve_aucs.setter
-    def test_pr_curve_aucs(self, value):
-        self.test_pr_curve_aucs64 = ObjectToBase64(value)
+        @test_pr_curve_thresholds.setter
+        def test_pr_curve_thresholds(self, value):
+            self.test_pr_curve_thresholds64 = ObjectToBase64(value)
 
-    @property
-    def test_rank_accuracies(self):
-        return Base64ToObject(self.test_rank_accuracies64)
+        @property
+        def test_pr_curve_aucs(self):
+            return Base64ToObject(self.test_pr_curve_aucs64)
 
-    @test_rank_accuracies.setter
-    def test_rank_accuracies(self, value):
-        self.test_rank_accuracies64 = ObjectToBase64(value)
+        @test_pr_curve_aucs.setter
+        def test_pr_curve_aucs(self, value):
+            self.test_pr_curve_aucs64 = ObjectToBase64(value)
 
-    @property
-    def test_mu_sigmas(self):
-        return Base64ToObject(self.test_mu_sigmas64)
+        @property
+        def test_rank_accuracies(self):
+            return Base64ToObject(self.test_rank_accuracies64)
 
-    @test_mu_sigmas.setter
-    def test_mu_sigmas(self, value):
-        self.test_mu_sigmas64 = ObjectToBase64(value)
+        @test_rank_accuracies.setter
+        def test_rank_accuracies(self, value):
+            self.test_rank_accuracies64 = ObjectToBase64(value)
 
-    @property
-    def cv_judgment_metric(self):
-        return Base64ToObject(self.cv_judgment_metric64)
+        @property
+        def test_mu_sigmas(self):
+            return Base64ToObject(self.test_mu_sigmas64)
 
-    @cv_judgment_metric.setter
-    def cv_judgment_metric(self, value):
-        self.cv_judgment_metric64 = ObjectToBase64(value)
+        @test_mu_sigmas.setter
+        def test_mu_sigmas(self, value):
+            self.test_mu_sigmas64 = ObjectToBase64(value)
 
-    def __repr__(self):
-        return "<%s>" % self.algorithm
+        @property
+        def cv_judgment_metric(self):
+            return Base64ToObject(self.cv_judgment_metric64)
+
+        @cv_judgment_metric.setter
+        def cv_judgment_metric(self, value):
+            self.cv_judgment_metric64 = ObjectToBase64(value)
+
+        def __repr__(self):
+            return "<%s>" % self.algorithm
+
 
 def GetConnection():
     """
@@ -237,6 +240,7 @@ def GetConnection():
     >>> connection.close()
     """
     return Session()
+
 
 def GetAllDataruns():
     """
@@ -265,6 +269,7 @@ def GetAllDataruns():
     finally:
         if session:
             session.close()
+
 
 def GetDatarun(datarun_id=None, ignore_completed=True, ignore_grid_complete=False, chose_randomly=True):
     """
@@ -343,6 +348,7 @@ def GetFrozenSet(frozen_set_id, increment=False):
 
     return frozen_set
 
+
 def MarkFrozenSetGriddingDone(frozen_set_id):
     session = None
     try:
@@ -359,6 +365,7 @@ def MarkFrozenSetGriddingDone(frozen_set_id):
         if session:
             session.close()
 
+
 def MarkDatarunGriddingDone(datarun_id):
     session = None
     try:
@@ -374,6 +381,7 @@ def MarkDatarunGriddingDone(datarun_id):
     finally:
         if session:
             session.close()
+
 
 def GetFrozenSets(datarun_id):
     """
@@ -394,6 +402,7 @@ def GetFrozenSets(datarun_id):
             session.close()
 
     return frozen_sets
+
 
 def IsGriddingDoneForDatarun(datarun_id, min_num_errors_to_exclude=0):
     """
@@ -419,6 +428,7 @@ def IsGriddingDoneForDatarun(datarun_id, min_num_errors_to_exclude=0):
             session.close()
 
     return is_done
+
 
 def GetIncompletedFrozenSets(datarun_id, min_num_errors_to_exclude=0):
     """
@@ -448,6 +458,7 @@ def GetIncompletedFrozenSets(datarun_id, min_num_errors_to_exclude=0):
             session.close()
 
     return frozen_sets
+
 
 def GetNumberOfFrozenSetErrors(frozen_set_id):
     session = None
@@ -501,6 +512,7 @@ def GetMaximumY(datarun_id, metric, default=0.0):
         session.close()
     return maximum
 
+
 def GetLearnersInFrozen(frozen_set_id):
     """
     Returns all completed learners in
@@ -517,6 +529,7 @@ def GetLearnersInFrozen(frozen_set_id):
         if session:
             session.close()
     return learners
+
 
 def GetLearners(datarun_id):
     """
