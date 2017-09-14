@@ -234,14 +234,15 @@ def work(config, datarun_id, total_time=None, choose_randomly=True):
     start_time = datetime.datetime.now()
     num_no_dataruns = 0
 
+    # TODO: load these from database
+    best_perf, best_err = 0, 0
+
     # call database method to define ORM objects in the db module
     define_tables(config)
 
     # main loop
     while True:
         datarun, frozen_set, params = None, None, None
-        # TODO: load these from db
-        best_perf, best_err = 0, 0
         try:
             # choose datarun to work on
             _log("=" * 25)
