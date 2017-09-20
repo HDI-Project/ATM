@@ -77,7 +77,7 @@ class Config(ConfigParser):
     AWS_EC2_KEY_PAIR = "ec2_key_pair"
     AWS_EC2_INSTANCE_TYPE = "ec2_instance_type"
     AWS_EC2_REGION = "ec2_region"
-    AWS_EC2_AMIS = "ec2_amis"
+    AWS_EC2_AMI = "ec2_ami"
     AWS_EC2_USERNAME = "ec2_username"
     AWS_EC2_KEYFILE = "ec2_keyfile"
     

@@ -45,14 +45,14 @@ def create_instances():
     ec2_secret = config.get(Config.AWS, Config.AWS_SECRET_KEY)
     conn = boto.ec2.connect_to_region(ec2_region, aws_access_key_id=ec2_key, aws_secret_access_key=ec2_secret)
 
-    ec2_amis = config.get(Config.AWS, Config.AWS_EC2_AMIS)
-    image = conn.get_all_images(ec2_amis)
+    ec2_ami = config.get(Config.AWS, Config.AWS_EC2_AMI)
+    image = conn.get_image(ec2_ami)
 
     ec2_key_pair = config.get(Config.AWS, Config.AWS_EC2_KEY_PAIR)
     ec2_instance_type = config.get(Config.AWS, Config.AWS_EC2_INSTANCE_TYPE)
     num_instances = config.get(Config.AWS, Config.AWS_NUM_INSTANCES)
     # must give num_instances twice because 1 min num and 1 max num
-    reservation = image[0].run(num_instances, num_instances, key_name=ec2_key_pair, instance_type=ec2_instance_type) 
+    reservation = image.run(num_instances, num_instances, key_name=ec2_key_pair, instance_type=ec2_instance_type)
 
     while check_instances_pending(reservation.instances):
         print(_yellow("Instances still pending"))
@@ -64,7 +64,7 @@ def create_instances():
 
 #@parallel
 def deploy():
-    code_dir = '/home/ubuntu/delphi'
+    code_dir = '/home/ubuntu/ATM'
     WORKERS_PER_MACHINE = int(config.get(Config.AWS, Config.AWS_NUM_WORKERS_PER_INSTACNCES))
     with settings(warn_only=True):
         if run("test -d %s" % code_dir).failed:

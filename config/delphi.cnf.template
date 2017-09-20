@@ -114,7 +114,7 @@ metric: cv
 username: 
 # git password
 password:
-# Delphi git location (http)
+# Delphi git web address (no http)
 repo: 
 
 
