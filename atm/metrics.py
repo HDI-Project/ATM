@@ -26,6 +26,7 @@ JUDGMENT_METRICS = {
     'f1': Metrics.F1,
     'f1_micro': Metrics.F1_MICRO,
     'f1_macro': Metrics.F1_MACRO,
+    'f1_mu_sigma': Metrics.F1_MU_SIGMA,
     'roc_auc': Metrics.ROC_AUC,
     'roc_auc_micro': Metrics.ROC_AUC_MICRO,
     'roc_auc_macro': Metrics.ROC_AUC_MACRO,
