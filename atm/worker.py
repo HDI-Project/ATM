@@ -18,6 +18,7 @@ import time
 import ast
 import argparse
 import os
+import pdb
 
 from boto.s3.connection import S3Connection, Key as S3Key
 
@@ -109,7 +110,6 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started, conf
                 os.remove(local_metric_path)
                 _log('Deleting local copy of {}'.format(local_metric_path))
 
-
             # compile fields
             completed = time.strftime('%Y-%m-%d %H:%M:%S')
             trainables = model.algorithm.performance()['trainable_params']
@@ -117,25 +117,35 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started, conf
             fmt_started = datetime.datetime.strptime(started, SQL_DATE_FORMAT)
             seconds = (fmt_completed - fmt_started).total_seconds()
 
-            # connect and insert, update
-            session = GetConnection()
-
             # create learner ORM object, and insert into the database
-            learner = db.Learner(datarun_id=datarun.id, frozen_set_id=frozen_set.id, dataname=datarun.name,
-                                 algorithm=frozen_set.algorithm, trainpath=datarun.trainpath, testpath=datarun.testpath,
-                                 modelpath=local_model_path, params_hash=phash, params=params, trainable_params=trainables,
+            session = GetConnection()
+            learner = db.Learner(datarun_id=datarun.id,
+                                 frozen_set_id=frozen_set.id,
+                                 dataname=datarun.name,
+                                 algorithm=frozen_set.algorithm,
+                                 trainpath=datarun.trainpath,
+                                 testpath=datarun.testpath,
+                                 modelpath=local_model_path,
+                                 params_hash=phash,
+                                 params=params,
+                                 trainable_params=trainables,
                                  cv_judgment_metric=performance['cv_judgment_metric'],
                                  cv_judgment_metric_stdev=performance['cv_judgment_metric_stdev'],
                                  test_judgment_metric=performance['test_judgment_metric'],
-                                 metricpath=local_metric_path, started=started, completed=datetime.datetime.now(),
-                                 host=GetPublicIP(), dimensions=model.algorithm.dimensions,
-                                 frozen_hash=frozen_set.frozen_hash, seconds=seconds, description=datarun.description)
+                                 metricpath=local_metric_path,
+                                 started=started,
+                                 completed=datetime.datetime.now(),
+                                 host=GetPublicIP(),
+                                 dimensions=model.algorithm.dimensions,
+                                 frozen_hash=frozen_set.frozen_hash,
+                                 seconds=seconds,
+                                 description=datarun.description)
             session.add(learner)
 
             # update this session's frozen set entry
             frozen_set = session.query(db.FrozenSet).filter(db.FrozenSet.id == frozen_set.id).one()
             # frozen_set.trained += 1 # we mark before now
-            frozen_set.rewards += Decimal(performance[datarun.metric])
+            frozen_set.rewards += Decimal(performance[datarun.score_target])
             session.commit()
             break
 
@@ -297,8 +307,10 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
             # otherwise select a frozen set from this run
             _log("Frozen Selection: %s" % datarun.frozen_selection)
             fclass = Mapping.SELECTION_FROZENS_MAP[datarun.frozen_selection]
-            best_y = GetMaximumY(datarun.id, datarun.metric, default=0.0)
-            fselector = fclass(frozen_sets=frozen_sets, best_y=best_y, k=datarun.k_window, metric=datarun.metric)
+            print datarun.score_target
+            best_y = GetMaximumY(datarun.id, datarun.score_target, default=0.0)
+            fselector = fclass(frozen_sets=frozen_sets, best_y=best_y,
+                               k=datarun.k_window, metric=datarun.score_target)
 
             frozen_set_id = fselector.select()
             if not frozen_set_id > 0:
@@ -325,7 +337,8 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
                 learners = GetLearnersInFrozen(frozen_set_id)
                 learners = [x.completed == None for x in learners]  # only completed learners
 
-                sampler = Sampler(frozen_set=frozen_set, learners=learners, metric=datarun.metric)
+                sampler = Sampler(frozen_set=frozen_set, learners=learners,
+                                  metric=datarun.score_target)
 
             ### BASIC GP SAMPLE SELECTION ###
             elif datarun.sample_selection == SELECTION_SAMPLES_GP:
@@ -338,13 +351,14 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
                     Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
                     sampler = Sampler(frozen_set=frozen_set)
                 else:
-                    sampler = Sampler(frozen_set=frozen_set, learners=learners, metric=datarun.metric)
+                    sampler = Sampler(frozen_set=frozen_set, learners=learners,
+                                      metric=datarun.score_target)
 
             ### GP EXPECTED IMPROVEMENT SAMPLE SELECTION ###
             elif datarun.sample_selection == SELECTION_SAMPLES_GP_EI:
                 learners = GetLearnersInFrozen(frozen_set.id)
                 learners = [x.completed == None for x in learners]  # only completed learners
-                best_y = GetMaximumY(datarun.id, datarun.metric, default=0.0)
+                best_y = GetMaximumY(datarun.id, datarun.score_target, default=0.0)
 
                 # check if we have enough results to pursue this strategy
                 if len(learners) < N_OPT:
@@ -352,12 +366,13 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
                     Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
                     sampler = Sampler(frozen_set=frozen_set)
                 else:
-                    sampler = Sampler(frozen_set=frozen_set, learners=learners, metric=datarun.metric, best_y=best_y)
+                    sampler = Sampler(frozen_set=frozen_set, learners=learners,
+                                      metric=datarun.score_target, best_y=best_y)
 
             elif datarun.sample_selection == SELECTION_SAMPLES_GP_EI_VEL:
                 learners = GetLearnersInFrozen(frozen_set.id)
                 learners = [x.completed == None for x in learners]  # only completed learners
-                best_y = GetMaximumY(datarun.id, datarun.metric, default=0.0)
+                best_y = GetMaximumY(datarun.id, datarun.score_target, default=0.0)
 
                 # check if we have enough results to pursue this strategy
                 if len(learners) < N_OPT:
@@ -366,13 +381,14 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
                     Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
                     sampler = Sampler(frozen_set=frozen_set)
                 else:
-                    sampler = Sampler(frozen_set=frozen_set, learners=learners, metric=datarun.metric, best_y=best_y)
+                    sampler = Sampler(frozen_set=frozen_set, learners=learners,
+                                      metric=datarun.score_target, best_y=best_y)
 
             ### GP EXPECTED IMPROVEMENT PER TIME SAMPLE SELECTION ###
             elif datarun.sample_selection == SELECTION_SAMPLES_GP_EI_TIME:
                 learners = GetLearnersInFrozen(frozen_set.id)
                 learners = [x.completed == None for x in learners]  # only completed learners
-                best_y = GetMaximumY(datarun.id, datarun.metric, default=0.0)
+                best_y = GetMaximumY(datarun.id, datarun.score_target, default=0.0)
 
                 # check if we have enough results to pursue this strategy
                 if len(learners) < N_OPT:
@@ -380,7 +396,8 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
                     Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
                     sampler = Sampler(frozen_set=frozen_set)
                 else:
-                    sampler = Sampler(frozen_set=frozen_set, learners=learners, metric=datarun.metric, best_y=best_y)
+                    sampler = Sampler(frozen_set=frozen_set, learners=learners,
+                                      metric=datarun.score_target, best_y=best_y)
 
             # select the parameters based on the sampler
             params = sampler.select()

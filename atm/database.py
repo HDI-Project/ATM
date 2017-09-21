@@ -7,11 +7,13 @@ from sqlalchemy import func, and_
 
 import traceback
 import random, sys
-from atm.utilities import *
-from atm.config import Config
 import os
 from datetime import datetime
 import warnings
+import pdb
+
+from atm.utilities import *
+from atm.config import Config
 
 
 def define_tables(config):
@@ -218,13 +220,13 @@ def define_tables(config):
         def test_mu_sigmas(self, value):
             self.test_mu_sigmas64 = ObjectToBase64(value)
 
-        @property
-        def cv_judgment_metric(self):
-            return Base64ToObject(self.cv_judgment_metric64)
+        #@property
+        #def cv_judgment_metric(self):
+            #return Base64ToObject(self.cv_judgment_metric64)
 
-        @cv_judgment_metric.setter
-        def cv_judgment_metric(self, value):
-            self.cv_judgment_metric64 = ObjectToBase64(value)
+        #@cv_judgment_metric.setter
+        #def cv_judgment_metric(self, value):
+            #self.cv_judgment_metric64 = ObjectToBase64(value)
 
         def __repr__(self):
             return "<%s>" % self.algorithm

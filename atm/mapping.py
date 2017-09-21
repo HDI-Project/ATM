@@ -20,7 +20,7 @@ from atm.enumeration.classification.knn import EnumeratorKNN
 from atm.enumeration.classification.gd import EnumeratorSGDC, EnumeratorPAC
 from atm.enumeration.classification.gp import EnumeratorGPC
 
-from atm.algorithm import Wrapper
+from atm.wrapper import Wrapper
 
 # sample selectors
 from atm.selection.samples import *
