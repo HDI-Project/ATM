@@ -88,7 +88,7 @@ CREATE TABLE `dataruns` (
   `walltime_budget_minutes` int(11) unsigned DEFAULT NULL,
   `deadline` datetime DEFAULT NULL,
   `metric` enum('f1', 'f1_micro', 'f1_macro', 'roc_auc', 'roc_auc_micro', 'roc_auc_macro', 'accuracy') DEFAULT NULL,
-  `score_target` enum('cross_validate', 'test') DEFAULT NULL,
+  `score_target` enum('cv_judgment_metric', 'test_judgment_metric') DEFAULT NULL,
   `k_window` int(11) DEFAULT NULL,
   `r_min` int(11) DEFAULT NULL,
   `is_gridding_done` tinyint(1) NOT NULL DEFAULT '0',
@@ -124,6 +124,8 @@ CREATE TABLE `frozen_sets` (
 
 DROP TABLE IF EXISTS `learners`;
 
+/* TODO: make the "judgment_metric" fields consistent with rest of code */
+
 CREATE TABLE `learners` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `frozen_set_id` int(11) unsigned DEFAULT NULL,
@@ -141,9 +143,9 @@ CREATE TABLE `learners` (
   `params64` mediumtext NOT NULL,
   `trainable_params64` longtext,
   `dimensions` int(11) unsigned DEFAULT NULL,
-  `cv_judgement_metric` decimal(20,10) DEFAULT NULL,
-  `cv_judgement_metric_stdev` decimal(20,10) DEFAULT NULL,
-  `test_judgement_metric` decimal(20,10) DEFAULT NULL,
+  `cv_judgment_metric` decimal(20,10) DEFAULT NULL,
+  `cv_judgment_metric_stdev` decimal(20,10) DEFAULT NULL,
+  `test_judgment_metric` decimal(20,10) DEFAULT NULL,
   `started` datetime DEFAULT NULL,
   `completed` datetime DEFAULT NULL,
   `seconds` int(11) unsigned DEFAULT NULL,
