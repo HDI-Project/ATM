@@ -287,8 +287,16 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
             # choose datarun to work on
             _log("=" * 25)
             started = time.strftime('%Y-%m-%d %H:%M:%S')
-            datarun = GetDatarun(datarun_id=datarun_id, ignore_grid_complete=False, chose_randomly=choose_randomly)
+            datarun = GetDatarun(datarun_id=datarun_id,
+                                 ignore_grid_complete=False,
+                                 chose_randomly=choose_randomly)
             if not datarun:
+                # If desired, we can comment this out and wait for a new datarun
+                # to be added
+                _log("No datarun present in database, exiting.")
+                sys.exit()
+
+                # this part gets skipped for now
                 if num_no_dataruns > 10:
                     sys.exit()
                 _log("No datarun present in database, will wait and try again...")
@@ -298,9 +306,11 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
 
             # choose frozen set
             _log("Datarun: %s" % datarun)
-            frozen_sets = GetIncompletedFrozenSets(datarun.id, min_num_errors_to_exclude=20)
+            frozen_sets = GetIncompletedFrozenSets(datarun.id,
+                                                   min_num_errors_to_exclude=20)
             if not frozen_sets:
-                if IsGriddingDoneForDatarun(datarun_id=datarun.id, min_num_errors_to_exclude=20):
+                if IsGriddingDoneForDatarun(datarun_id=datarun.id,
+                                            min_num_errors_to_exclude=20):
                     MarkDatarunGriddingDone(datarun_id=datarun.id)
                 _log("No incomplete frozen sets for datarun present in database, will wait and try again...")
                 time.sleep(10)
@@ -336,7 +346,6 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
             _log("Frozen Selection: %s" % datarun.frozen_selection)
             fclass = Mapping.SELECTION_FROZENS_MAP[datarun.frozen_selection]
             best_y = GetMaximumY(datarun.id, datarun.score_target, default=0.0)
-            print 'best y:', best_y
             fselector = fclass(frozen_sets=frozen_sets, best_y=best_y,
                                k=datarun.k_window, metric=datarun.score_target)
 
@@ -375,7 +384,8 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
 
                 # check if we have enough results to pursue this strategy
                 if len(learners) < N_OPT:
-                    _log("Not enough previous results, falling back onto strategy: %s" % SELECTION_SAMPLES_UNIFORM)
+                    _log("Not enough previous results, falling back onto strategy: %s"
+                         % SELECTION_SAMPLES_UNIFORM)
                     Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
                     sampler = Sampler(frozen_set=frozen_set)
                 else:
@@ -389,7 +399,8 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
 
                 # check if we have enough results to pursue this strategy
                 if len(learners) < N_OPT:
-                    _log("Not enough previous results for gp_ei, falling back onto strategy: %s" % SELECTION_SAMPLES_UNIFORM)
+                    _log("Not enough previous results for gp_ei, falling back onto strategy: %s"
+                         % SELECTION_SAMPLES_UNIFORM)
                     Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
                     sampler = Sampler(frozen_set=frozen_set)
                 else:
@@ -417,7 +428,8 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
 
                 # check if we have enough results to pursue this strategy
                 if len(learners) < N_OPT:
-                    _log("Not enough previous results for gp_eitime, falling back onto strategy: %s" % SELECTION_SAMPLES_UNIFORM)
+                    _log("Not enough previous results for gp_eitime, falling back onto strategy: %s"
+                         % SELECTION_SAMPLES_UNIFORM)
                     Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
                     sampler = Sampler(frozen_set=frozen_set)
                 else:
@@ -485,7 +497,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--datarun-id', help='Only train on datasets with this id', default=None, required=False)
     parser.add_argument('-t', '--time', help='Number of seconds to run worker', default=None, required=False)
 
-    # TODO: a little confusingly named
+    # TODO: a little confusingly named (seqorder populates choose_randomly?)
     parser.add_argument('-l', '--seqorder', help='work on datasets in sequential order starting with smallest id number, but still max priority (default = random)',
                         dest='choose_randomly', default=True, action='store_const', const=False)
     args = parser.parse_args()
