@@ -10,14 +10,14 @@ from atm.selection.acquisition import expected_improvement
 from atm.selection.samples.uniform import UniformSampler
 
 class GPEi(SamplesSelector):
-    
+
     def __init__(self, **kwargs):
         """
         Needs:
         frozen_set, learners, metric, best_y
         """
         super(GPEi, self).__init__(**kwargs)
-        
+
     def select(self):
         """
         Takes in learner objects from database that
@@ -29,22 +29,22 @@ class GPEi(SamplesSelector):
         for learner in learners:
             y = float(getattr(learner, self.metric))
             past_params.append((learner.params, y))
-            
+
         return self.do_selection(past_params)
-            
-        
+
+
     def do_selection(self, past_params):
         """
-        Based on past parameterizations and their performances, 
-        select a best candidate for evaluation by randomly generating 
+        Based on past parameterizations and their performances,
+        select a best candidate for evaluation by randomly generating
         many examples and seeing which has the highest average expected
-        regression value. 
-        
+        regression value.
+
         Example format:
-        
+
             past_params = [
-                ({...}, y1), 
-                ({...}, y2), 
+                ({...}, y1),
+                ({...}, y2),
                 ...
             ]
         """
@@ -52,33 +52,33 @@ class GPEi(SamplesSelector):
         params = [x[0] for x in past_params]
         y = np.array([x[1] for x in past_params])
         X = ParamsToVectors(params, self.frozen_set.optimizables)
-        
+
         # train a GP
         gp = GaussianProcess(theta0=1e-2, thetaL=1e-4, thetaU=1e-1, nugget=np.finfo(np.double).eps * 1000)
-        gp.fit(X, y) 
-        
+        gp.fit(X, y)
+
         # randomly generate many vectors
         candidates = GenerateRandomVectors(1000, self.frozen_set.optimizables)
         ys, stdevs = gp.predict(candidates, eval_MSE=True)
         predictions = zip(ys, stdevs)
         predictions = [expected_improvement(y, self.best_y, stdev) for (y, stdev) in predictions]
-        
+
         #print "PREDICTIONS", np.unique(predictions)
-        
+
         # choose one with highest average, convert, and return
         chosen = candidates[np.argmax(predictions)]
-        
+
         return VectorBackToParams(chosen, self.frozen_set.optimizables, self.frozen_set.frozens, self.frozen_set.constants)
-        
+
 class GPEiTime(SamplesSelector):
-    
+
     def __init__(self, **kwargs):
         """
         Needs:
         frozen_set, metric, best_y
         """
         super(GPEiTime, self).__init__(**kwargs)
-        
+
     def select(self):
         """
         Takes in learner objects from database that
@@ -93,25 +93,25 @@ class GPEiTime(SamplesSelector):
             if elapsed <= 0:
                 elapsed = 1.0
             past_params.append((learner.params, y / elapsed))
-            
+
         return self.do_selection(past_params)
-            
-        
+
+
     def do_selection(self, past_params):
         """
-        Based on past parameterizations and their performances, 
-        select a best candidate for evaluation by randomly generating 
+        Based on past parameterizations and their performances,
+        select a best candidate for evaluation by randomly generating
         many examples and seeing which has the highest average expected
         regression value.
-        
+
         The value to train on is EI divided by time for expected improvement
-        per unit time. 
-        
+        per unit time.
+
         Example format:
-        
+
             past_params = [
-                ({...}, y1), 
-                ({...}, y2), 
+                ({...}, y1),
+                ({...}, y2),
                 ...
             ]
         """
@@ -119,34 +119,34 @@ class GPEiTime(SamplesSelector):
         params = [x[0] for x in past_params]
         y = np.array([x[1] for x in past_params])
         X = ParamsToVectors(params, self.frozen_set.optimizables)
-        
+
         # train a GP
         gp = GaussianProcess(theta0=1e-2, thetaL=1e-4, thetaU=1e-1, nugget=np.finfo(np.double).eps * 1000)
-        gp.fit(X, y) 
-        
+        gp.fit(X, y)
+
         # randomly generate many vectors
         candidates = GenerateRandomVectors(1000, self.frozen_set.optimizables)
         ys, stdevs = gp.predict(candidates, eval_MSE=True)
         predictions = zip(ys, stdevs)
         predictions = [expected_improvement(y, self.best_y, stdev) for (y, stdev) in predictions]
-        
+
         # choose one with highest average, convert, and return
         chosen = candidates[np.argmax(predictions)]
-        
+
         return VectorBackToParams(chosen, self.frozen_set.optimizables, self.frozen_set.frozens, self.frozen_set.constants)
-        
+
 class GPEiVelocity(SamplesSelector):
 
     MULTIPLIER = -100
     LIMIT = 5
-    
+
     def __init__(self, **kwargs):
         """
         Needs:
         frozen_set, learners, metric, best_y, velocity
         """
         super(GPEiVelocity, self).__init__(**kwargs)
-        
+
     def select(self):
         """
         Takes in learner objects from database that
@@ -186,14 +186,14 @@ class GPEiVelocity(SamplesSelector):
         # now select a sample
         sampler = None
         if np.random.random() < probability_of_random:
-            # our forward progress in this frozen set has stalled, let's 
+            # our forward progress in this frozen set has stalled, let's
             # introduce some randomness
             print "Choosing random so as to not stagnate!"
             sampler = UniformSampler(frozen_set=self.frozen_set)
-        
+
         # otherwise continue with ei + time as intended
         else:
             sampler = GPEi(frozen_set=self.frozen_set,
-                    metric=self.metric, best_y=self.best_y)
+                           metric=self.metric, best_y=self.best_y)
 
         return sampler.select()

@@ -51,6 +51,34 @@ def _log(msg, stdout=True):
         print msg
 
 
+def get_best_so_far(datarun_id, metric):
+    maximum = 0
+    best_val, best_std = 0, 0
+    session = GetConnection()
+
+    if metric == 'cv_judgment_metric':
+        result = session.query(db.Learner.cv_judgment_metric,
+                               db.Learner.cv_judgment_metric_stdev)\
+                        .filter(db.Learner.datarun_id == datarun_id)\
+                        .all()
+        for val, std in result:
+            if val is None or std is None:
+                continue
+            if val - std > maximum:
+                best_val, best_std = float(val), float(std)
+                maximum = float(val - std)
+
+    elif metric == 'test_judgment_metric':
+        result = session.query(func.max(db.Learner.test_judgment_metric))\
+                        .filter(db.Learner.datarun_id == datarun_id)\
+                        .one()[0]
+        if result is not None and result > maximum:
+            best_val = float(result)
+            maximum = best_val
+
+    return best_val, best_std
+
+
 def InsertLearner(datarun, frozen_set, performance, params, model, started, config):
     """
     Inserts a learner and also updates the frozen_sets table.
@@ -307,8 +335,8 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
             # otherwise select a frozen set from this run
             _log("Frozen Selection: %s" % datarun.frozen_selection)
             fclass = Mapping.SELECTION_FROZENS_MAP[datarun.frozen_selection]
-            print datarun.score_target
             best_y = GetMaximumY(datarun.id, datarun.score_target, default=0.0)
+            print 'best y:', best_y
             fselector = fclass(frozen_sets=frozen_sets, best_y=best_y,
                                k=datarun.k_window, metric=datarun.score_target)
 
@@ -358,7 +386,6 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
             elif datarun.sample_selection == SELECTION_SAMPLES_GP_EI:
                 learners = GetLearnersInFrozen(frozen_set.id)
                 learners = [x.completed == None for x in learners]  # only completed learners
-                best_y = GetMaximumY(datarun.id, datarun.score_target, default=0.0)
 
                 # check if we have enough results to pursue this strategy
                 if len(learners) < N_OPT:
@@ -372,7 +399,6 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
             elif datarun.sample_selection == SELECTION_SAMPLES_GP_EI_VEL:
                 learners = GetLearnersInFrozen(frozen_set.id)
                 learners = [x.completed == None for x in learners]  # only completed learners
-                best_y = GetMaximumY(datarun.id, datarun.score_target, default=0.0)
 
                 # check if we have enough results to pursue this strategy
                 if len(learners) < N_OPT:
@@ -388,7 +414,6 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
             elif datarun.sample_selection == SELECTION_SAMPLES_GP_EI_TIME:
                 learners = GetLearnersInFrozen(frozen_set.id)
                 learners = [x.completed == None for x in learners]  # only completed learners
-                best_y = GetMaximumY(datarun.id, datarun.score_target, default=0.0)
 
                 # check if we have enough results to pursue this strategy
                 if len(learners) < N_OPT:
@@ -430,7 +455,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
                     best_err = performance["cv_judgment_metric_stdev"] * 2
 
                 _log("Best so far: %.3f +- %.3f" %
-                     (best_perf, best_err))
+                     get_best_so_far(datarun_id, datarun.score_target))
 
                 print
                 model = Model(wrapper, datarun.wrapper)

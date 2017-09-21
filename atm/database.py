@@ -505,7 +505,8 @@ def GetMaximumY(datarun_id, metric, default=0.0):
     session = GetConnection()
     maximum = default
     try:
-        result = session.query(func.max(getattr(Learner, metric))).one()[0]
+        result = session.query(func.max(getattr(Learner, metric)))\
+            .filter(Learner.datarun_id == datarun_id).one()[0]
         if result:
             maximum = float(result)
     except:
