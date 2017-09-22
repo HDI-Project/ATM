@@ -1,9 +1,9 @@
 Introduction
 ============
 
-ATM is an AutoML system designed with ease of use in mind.
+BTB is an AutoML system designed with ease of use in mind.
 Typically a Machine Learning algorithm has parameters that must be tuned.
-ATM, like many other AutoML systems, abstracts this tuning sequence away from the end user.
-ATM takes in data with pre-extracted feature vectors and labels in a simple CSV file format.
-In the end, ATM returns the best classifier with parameters for a particular input feature set.
+BTB, like many other AutoML systems, abstracts this tuning sequence away from the end user.
+BTB takes in data with pre-extracted feature vectors and labels in a simple CSV file format.
+In the end, BTB returns the best classifier with parameters for a particular input feature set.
 There are still some parameters, but they are of a more intuitive nature (*e.g.*, maximum number of classifier runs, metric of performance, *etc.*).

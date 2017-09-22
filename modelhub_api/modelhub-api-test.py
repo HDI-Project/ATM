@@ -1,6 +1,6 @@
 import modelhub_api.queries as mh
 
-print 'These are the functions available in ATM:'
+print 'These are the functions available in BTB:'
 
 funcs = mh.get_functions()
 print '\t|{}|'.format('-'*47)

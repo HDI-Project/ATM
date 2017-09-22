@@ -1,21 +1,21 @@
-from atm.database import *
-from atm.mapping import CreateWrapper
+from btb.database import *
+from btb.mapping import CreateWrapper
 
-def get_atm_csv_num_lines(filepath):
+def get_btb_csv_num_lines(filepath):
     with open(filepath) as f:
         for i, _ in enumerate(f):
             pass
     return i + 1
 
-def get_atm_csv_num_cols(filepath):
+def get_btb_csv_num_cols(filepath):
     line = open(filepath).readline()
     return len(line.split(','))
 
-# this works from the assumption the data has been preprocessed by atm:
+# this works from the assumption the data has been preprocessed by btb:
 # no headers, numerical data only
-def read_atm_csv(filepath):
-    num_rows = get_atm_csv_num_lines(filepath)
-    num_cols = get_atm_csv_num_cols(filepath)
+def read_btb_csv(filepath):
+    num_rows = get_btb_csv_num_lines(filepath)
+    num_cols = get_btb_csv_num_cols(filepath)
 
     data = np.zeros((num_rows, num_cols))
 
@@ -40,7 +40,7 @@ def LoadData(datarun):
             raise Exception("Something about train dataset caching is wrong...")
 
     # load the data into matrix format
-    trainX = read_atm_csv(datarun.local_trainpath)
+    trainX = read_btb_csv(datarun.local_trainpath)
     labelcol = datarun.labelcol
     trainY = trainX[:, labelcol]
     trainX = np.delete(trainX, labelcol, axis=1)
@@ -52,7 +52,7 @@ def LoadData(datarun):
             raise Exception("Something about test dataset caching is wrong...")
 
     # load the data into matrix format
-    testX = read_atm_csv(datarun.local_testpath)
+    testX = read_btb_csv(datarun.local_testpath)
     labelcol = datarun.labelcol
     testY = testX[:, labelcol]
     testX = np.delete(testX, labelcol, axis=1)

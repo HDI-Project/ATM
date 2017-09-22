@@ -3,7 +3,7 @@ from fabric.colors import green as _green, yellow as _yellow
 import boto
 import boto.ec2
 import time
-from atm.config import Config
+from btb.config import Config
 
 def check_instances_pending(instances):
     isPending = False
@@ -64,7 +64,7 @@ def create_instances():
 
 #@parallel
 def deploy():
-    code_dir = '/home/ubuntu/atm'
+    code_dir = '/home/ubuntu/btb'
     WORKERS_PER_MACHINE = int(config.get(Config.AWS, Config.AWS_NUM_WORKERS_PER_INSTACNCES))
     with settings(warn_only=True):
         if run("test -d %s" % code_dir).failed:
@@ -74,7 +74,7 @@ def deploy():
             with cd(code_dir):
                 run("git pull")
                 run("mkdir config")
-                put("config/atm.cnf", "config");
+                put("config/btb.cnf", "config");
                 for i in range(1, WORKERS_PER_MACHINE + 1, 1):
                     run("screen -dm -S worker%d python worker.py; sleep 2" % (i,))
         else:
@@ -90,7 +90,7 @@ def killworkers():
         run("pkill -15 screen")
 
 
-config = Config('config/atm.cnf')
+config = Config('config/btb.cnf')
 
 # fabric env setup
 env.user = config.get(Config.AWS, Config.AWS_EC2_USERNAME)
