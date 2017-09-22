@@ -3,7 +3,7 @@
 #PBS -l walltime=03:59:00
 #PBS -l nodes=1:ppn=1,mem=64gb
 #PBS -m abe
-#PBS -N ATM
+#PBS -N BTB
 
 module load Python
 
@@ -11,6 +11,6 @@ ssh -Ngf -L 3309:mysql-user.cse.msu.edu:3306 swearin3@arctic.cse.msu.edu
 
 cd ${PBS_O_WORKDIR}
 
-source atm-env/bin/activate
+source btb-env/bin/activate
 
 python worker.py -t 10800 -l # 10800 seconds = 3 hours

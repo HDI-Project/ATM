@@ -12,7 +12,7 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 setup(
-    name='Auto Tune Models',
+    name='Bayesian Tuning and Building',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -22,7 +22,7 @@ setup(
     description='A multi user, multi data, model exploration system',
 
     # The project's main homepage.
-    url='https://github.com/HDI-project/ATM',
+    url='https://github.com/HDI-project/BTB',
 
     # Choose your license
     license='MIT',
@@ -54,7 +54,7 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=['atm'],
+    packages=['btb'],
 
     # List run-time dependencies here.  These will be installed by pip when
     # your project is installed. For an analysis of "install_requires" vs pip's
