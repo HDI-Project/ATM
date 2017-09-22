@@ -79,16 +79,16 @@ unchanged, it will compute 20 different learners before stopping. The output
 should show which hyperparameters are being tested and the performance of each
 learner (the "judgment metric"), plus the best overall performance so far.
 
-  Classifier type: classify_logreg
-  Params chosen:
-          C = 8904.06127554
-          _scale = True
-          fit_intercept = False
-          penalty = l2
-          tol = 4.60893080631
-          dual = True
-          class_weight = auto
+    Classifier type: classify_logreg
+    Params chosen:
+            C = 8904.06127554
+            _scale = True
+            fit_intercept = False
+            penalty = l2
+            tol = 4.60893080631
+            dual = True
+            class_weight = auto
 
-  Judgement metric (f1): 0.536 +- 0.067
+    Judgement metric (f1): 0.536 +- 0.067
 
 Note: Any dataset with less than 30 samples will fail for the DBN classifier unless the DBN `minibatch_size` constant is changed to match the number of samples.
