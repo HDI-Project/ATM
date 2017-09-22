@@ -3,6 +3,8 @@ BTB - Bayesian Tuning and Building
 
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://hdi-project.github.io/BTB/)
 
+## Quick start guide
+
 1. Install dependencies:
 ```
 $ sudo apt install mysql-server mysql-client
@@ -91,4 +93,10 @@ learner (the "judgment metric"), plus the best overall performance so far.
 
     Judgement metric (f1): 0.536 +- 0.067
 
-Note: Any dataset with less than 30 samples will fail for the DBN classifier unless the DBN `minibatch_size` constant is changed to match the number of samples.
+And that's it! You can break out of the worker with Ctrl+C and restart it with
+the same command; it will pick up right where it left off. You can also start
+multiple workers at the same time in different terminals to parallelize the
+work. When all 20 learners in your budget have been computed, all workers will
+exit gracefully.
+
+<!--Note: Any dataset with less than 30 samples will fail for the DBN classifier unless the DBN `minibatch_size` constant is changed to match the number of samples.-->
