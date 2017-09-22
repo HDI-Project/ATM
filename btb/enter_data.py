@@ -50,16 +50,20 @@ def enter_data(config):
                 alldatapath = line.strip()
                 runname = os.path.basename(alldatapath).replace(".csv", "")
 
-                Run(config, runname, description, metric, score_target,
-                    sample_selection, frozen_selection, budget_type, priority,
-                    k_window, r_min, algorithm_codes, learner_budget,
-                    walltime_budget, alldatapath, dataset_description,
-                    trainpath, testpath)
+                ids.append(Run(config, runname, description, metric,
+                               score_target, sample_selection, frozen_selection,
+                               budget_type, priority, k_window, r_min,
+                               algorithm_codes, learner_budget, walltime_budget,
+                               alldatapath, dataset_description, trainpath,
+                               testpath)
     else:
-        Run(config, runname, description, metric, score_target,
-            sample_selection, frozen_selection, budget_type, priority, k_window,
-            r_min, algorithm_codes, learner_budget, walltime_budget,
-            alldatapath, dataset_description, trainpath, testpath)
+        ids = [Run(config, runname, description, metric, score_target,
+                   sample_selection, frozen_selection, budget_type, priority,
+                   k_window, r_min, algorithm_codes, learner_budget,
+                   walltime_budget, alldatapath, dataset_description, trainpath,
+                   testpath)]
+
+    return ids
 
 
 if __name__ == '__main__':

@@ -60,7 +60,8 @@ def define_tables(config):
                 status = "running"
             elif self.started != None and self.completed != None:
                 status = "done"
-            return base % (self.name, self.frozen_selection, self.sample_selection, self.budget, status)
+            return base % (self.name, self.frozen_selection,
+                           self.sample_selection, self.budget, status)
 
     class FrozenSet(Base):
         __table__ = Table('frozen_sets', metadata, autoload=True)
@@ -219,14 +220,6 @@ def define_tables(config):
         @test_mu_sigmas.setter
         def test_mu_sigmas(self, value):
             self.test_mu_sigmas64 = ObjectToBase64(value)
-
-        #@property
-        #def cv_judgment_metric(self):
-            #return Base64ToObject(self.cv_judgment_metric64)
-
-        #@cv_judgment_metric.setter
-        #def cv_judgment_metric(self, value):
-            #self.cv_judgment_metric64 = ObjectToBase64(value)
 
         def __repr__(self):
             return "<%s>" % self.algorithm
@@ -496,17 +489,30 @@ def GetLearners(datarun_id):
     """
     Returns all learners in datarun.
     """
-    session = None
-    learners = []
-    try:
-        session = GetConnection()
-        learners = session.query(Learner).filter(Learner.datarun_id == datarun_id).order_by(Learner.started).all()
-    except:
-        print "Error in GetLearners(%d):" % datarun_id, traceback.format_exc()
-    finally:
-        if session:
-            session.close()
+    session = GetConnection()
+    learners = session.query(Learner)\
+        .filter(Learner.datarun_id == datarun_id)\
+        .order_by(Learner.started).all()
+    session.close()
     return learners
+
+
+def GetBestLearner(datarun_id, metric):
+    """
+    Returns best learner in datarun.
+    """
+    session = GetConnection()
+    learners = session.query(Learner)\
+        .filter(Learner.datarun_id == datarun_id)\
+        .order_by(Learner.started).all()
+    session.close()
+
+    for l in learners:
+        if getattr(l, metric) > best_score:
+            best_learner = l
+            best_score = getattr(l, metric)
+
+    return best_learner
 
 
 def GetLearner(learner_id):
