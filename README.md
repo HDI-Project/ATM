@@ -13,7 +13,7 @@ $ pip install -r requirements.txt
 
 2. Set up MySQL (replace 'username' and 'password' with your choices):
 ```
-$ mysql -u root -p            # you'll be prompted for a password
+$ mysql -u root -p            # you'll be prompted for your root password
 > GRANT ALL ON btb.\* TO 'username'@'localhost' IDENTIFIED BY 'password';
 > CREATE DATABASE btb;
 > exit
@@ -30,6 +30,7 @@ $ mysql -u username -p btb
 > show tables;
 ``` 
 You should see something like: 
+
     +---------------+
     | Tables_in_btb |
     +---------------+
@@ -54,6 +55,7 @@ issues later on, it's probably because of your config file.
 $ python btb/enter_data.py --configpath ./config/btb.cnf
 ```
 You should get a lot of output, the end of which looks something like:
+
     ========== Summary ==========
     Algorithm classify_rf had 2 frozen sets
     Algorithm classify_gnb had 1 frozen sets
