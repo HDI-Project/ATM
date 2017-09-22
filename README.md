@@ -14,9 +14,9 @@ $ pip install -r requirements.txt
 2. Set up MySQL (replace 'username' and 'password' with your choices):
 ```
 $ mysql -u root -p            # you'll be prompted for your root password
-> GRANT ALL ON btb.\* TO 'username'@'localhost' IDENTIFIED BY 'password';
-> CREATE DATABASE btb;
-> exit
+mysql> GRANT ALL ON btb.\* TO 'username'@'localhost' IDENTIFIED BY 'password';
+mysql> CREATE DATABASE btb;
+mysql> exit
 Bye
 ```
 
@@ -27,19 +27,17 @@ $ mysql -u username -p btb < setup/hyperbtb.sql
 Check to make sure it worked.
 ```
 $ mysql -u username -p btb
-> show tables;
+mysql> show tables;
++---------------+
+| Tables_in_btb |
++---------------+
+| algorithms    |
+| dataruns      |
+| frozen_sets   |
+| learners      |
++---------------+
+4 rows in set (0.00 sec)
 ``` 
-You should see something like: 
-
-    +---------------+
-    | Tables_in_btb |
-    +---------------+
-    | algorithms    |
-    | dataruns      |
-    | frozen_sets   |
-    | learners      |
-    +---------------+
-    4 rows in set (0.00 sec)
 
 4. Create a copy of the sample config file, and edit it to add your settings:
 ```
