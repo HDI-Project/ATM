@@ -27,15 +27,15 @@ Check to make sure it worked. You should see something like:
 $ mysql -u username -p btb
 > show tables;
 ```
-  +---------------+
-  | Tables_in_btb |
-  +---------------+
-  | algorithms    |
-  | dataruns      |
-  | frozen_sets   |
-  | learners      |
-  +---------------+
-  4 rows in set (0.00 sec)
+    +---------------+
+    | Tables_in_btb |
+    +---------------+
+    | algorithms    |
+    | dataruns      |
+    | frozen_sets   |
+    | learners      |
+    +---------------+
+    4 rows in set (0.00 sec)
 
 4. Create a copy of the sample config file, and edit it to add your settings:
 ```
@@ -49,16 +49,16 @@ issues later on, it's probably because of your config file.
 5. Create a datarun:
 `$ python btb/enter_data.py --configpath ./config/btb.cnf`
 You should get a lot of output, the end of which looks something like:
-  ========== Summary ==========
-  Algorithm classify_rf had 2 frozen sets
-  Algorithm classify_gnb had 1 frozen sets
-  Algorithm classify_dt had 2 frozen sets
-  Algorithm classify_logreg had 6 frozen sets
-  Sample selection: gp_ei
-  Frozen selection: uniform
-  <yourdataset:, frozen: uniform, sampling: gp_ei, budget: learner, status: pending>
-  Datarun ID: 1
-  LOCAL MODE: Train and test files only on local drive
+    ========== Summary ==========
+    Algorithm classify_rf had 2 frozen sets
+    Algorithm classify_gnb had 1 frozen sets
+    Algorithm classify_dt had 2 frozen sets
+    Algorithm classify_logreg had 6 frozen sets
+    Sample selection: gp_ei
+    Frozen selection: uniform
+    <yourdataset:, frozen: uniform, sampling: gp_ei, budget: learner, status: pending>
+    Datarun ID: 1
+    LOCAL MODE: Train and test files only on local drive
 
 The important piece of information is the datarun ID.
 
