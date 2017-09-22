@@ -246,91 +246,49 @@ def GetConnection():
 
 def GetAllDataruns():
     """
-    Among the incomplete dataruns with maximal priority,
-    returns one at random.
+    Return all dataruns in the database regardless of priority or completion
     """
-    # get all incomplete dataruns
-    session = None
-    dataruns = []
-    try:
-        session = GetConnection()
+    session = GetConnection()
+    dataruns = session.query(Datarun).all()
+    session.close()
 
-        query = session.query(Datarun)
-
-        dataruns = query.all()
-        session.close()
-
-        if not dataruns:
-            return []
-
-        return dataruns
-
-    except Exception:
-        print "Error in GetDatarun():", traceback.format_exc()
-
-    finally:
-        if session:
-            session.close()
+    return dataruns or []
 
 
-def GetDatarun(datarun_id=None, ignore_completed=True, ignore_grid_complete=False, chose_randomly=True):
+def GetDatarun(datarun_id=None, ignore_completed=True,
+               ignore_grid_complete=False, choose_randomly=True):
     """
     Among the incomplete dataruns with maximal priority,
     returns one at random.
     """
-    # get all incomplete dataruns
-    session = None
+    pdb.set_trace()
     dataruns = []
-    try:
-        session = GetConnection()
+    session = GetConnection()
+    query = session.query(Datarun)
+    if ignore_completed:
+        query = query.filter(Datarun.completed == None)
+    if ignore_grid_complete:
+        query = query.filter(Datarun.is_gridding_done == 0)
+    if datarun_id:
+        query = query.filter(Datarun.id == datarun_id)
 
-        if ignore_completed and ignore_grid_complete: # this is ignored if ignore_completed is true
-            query = session.query(Datarun).filter(and_(Datarun.completed == None, Datarun.is_gridding_done == 0))
-        elif ignore_completed:
-            query = session.query(Datarun).filter(Datarun.completed == None)
-        elif ignore_grid_complete: # this is ignored if ignore_completed is true
-            query = session.query(Datarun).filter(Datarun.is_gridding_done == 0)
-        else:
-            query = session.query(Datarun)
+    dataruns = query.all()
+    session.close()
 
-        if datarun_id:
-            query = query.filter(Datarun.id == datarun_id)
+    if not dataruns:
+        return None
 
-        dataruns = query.all()
-        session.close()
+    # select only those with max priority
+    max_priority = max([r.priority for r in dataruns])
+    candidates = [r for r in dataruns if r.priority == max_priority]
 
-        if not dataruns:
-            return []
-
-        # select only those with max priority
-        max_priority = max([x.priority for x in dataruns])
-        candidates = []
-        for run in dataruns:
-            if run.priority == max_priority:
-                candidates.append(run)
-
-        # choose one if there is at least one
-        if candidates and chose_randomly:
-            chosen = candidates[random.randint(0, len(candidates) - 1)]
-            if chosen:
-                return chosen
-        elif candidates and not chose_randomly:
-            chosen = candidates[0]
-            if chosen:
-                return chosen
-
-        return []
-
-    except Exception:
-        print "Error in GetDatarun():", traceback.format_exc()
-
-    finally:
-        if session:
-            session.close()
+    # choose a random candidate if necessary
+    if choose_randomly:
+        return candidates[random.randint(0, len(candidates) - 1)]
+    return candidates[0]
 
 
 def GetFrozenSet(frozen_set_id, increment=False):
-    session = None
     frozen_set = None
     try:
         session = GetConnection()

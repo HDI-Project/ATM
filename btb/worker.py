@@ -327,8 +327,8 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
             started = time.strftime('%Y-%m-%d %H:%M:%S')
             datarun = db.GetDatarun(datarun_id=datarun_id,
                                     ignore_grid_complete=False,
-                                    chose_randomly=choose_randomly)
-            if not datarun:
+                                    choose_randomly=choose_randomly)
+            if datarun is None:
                 # If desired, we can sleep here and wait for a new datarun
                 _log("No datarun present in database, exiting.")
                 sys.exit()
