@@ -289,6 +289,10 @@ def get_sampler(datarun, best_y, frozen_set):
     if datarun.sample_selection == SELECTION_SAMPLES_UNIFORM:
         return Sampler(frozen_set=frozen_set)
 
+    # gather learners that haven't been completed yet
+    learners = db.GetLearnersInFrozen(frozen_set.id)
+    learners = [x.completed == None for x in learners]
+
     # Use uniform sample selection if there are not enough results to use
     # another method
     if datarun.sample_selection in need_opt and len(learners) < n_opt:
@@ -296,10 +300,6 @@ def get_sampler(datarun, best_y, frozen_set):
              % SELECTION_SAMPLES_UNIFORM)
         Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
         return Sampler(frozen_set=frozen_set)
-
-    # gather learners that haven't been completed yet
-    learners = db.GetLearnersInFrozen(frozen_set.id)
-    learners = [x.completed == None for x in learners]
 
     # some sample selectors need the best_y field, others don't
     if datarun.sample_selection in need_best_y:
@@ -386,7 +386,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
             _log("Frozen set: %d" % frozen_set_id)
 
             # choose sampler
-            sampler = get_sampler(datarun, best_y)
+            sampler = get_sampler(datarun, best_y, frozen_set)
 
             # select the parameters based on the sampler
             params = sampler.select()
@@ -407,25 +407,21 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
                 performance = wrapper.start()
 
                 print
+
                 _log("Judgement metric (%s): %.3f +- %.3f" %
                      (judgment_metric,
                       performance["cv_judgment_metric"],
                       2 * performance["cv_judgment_metric_stdev"]))
-
-                if ((performance["cv_judgment_metric"] -
-                     performance["cv_judgment_metric_stdev"] * 2) >
-                        best_perf - best_err):
-                    best_perf = performance["cv_judgment_metric"]
-                    best_err = performance["cv_judgment_metric_stdev"] * 2
-
-                _log("Best so far: %.3f +- %.3f" %
-                     get_best_so_far(datarun_id, datarun.score_target))
 
                 print
                 model = Model(wrapper, datarun.wrapper)
 
                 # insert learner into the database
                 InsertLearner(datarun, frozen_set, performance, params, model, started, config)
+
+                print
+                _log("Best so far: %.3f +- %.3f" %
+                     get_best_so_far(datarun_id, datarun.score_target))
 
         except Exception as e:
             msg = traceback.format_exc()
