@@ -280,10 +280,12 @@ def LoadData(datarun, config):
 def get_sampler(datarun, best_y, frozen_set):
     _log("Sample selection: %s" % datarun.sample_selection)
     Sampler = Mapping.SELECTION_SAMPLES_MAP[datarun.sample_selection]
-    need_opt = [SELECTION_SAMPLES_GP, SELECTION_SAMPLES_GP_EI,
+
+    needs_opt = [SELECTION_SAMPLES_GP, SELECTION_SAMPLES_GP_EI,
                 SELECTION_SAMPLES_GP_EI_VEL, SELECTION_SAMPLES_GP_EI_TIME]
-    need_best_y = [SELECTION_SAMPLES_GP_EI, SELECTION_SAMPLES_GP_EI_VEL,
+    needs_best_y = [SELECTION_SAMPLES_GP_EI, SELECTION_SAMPLES_GP_EI_VEL,
                    SELECTION_SAMPLES_GP_EI_TIME]
+
     n_opt = datarun.r_min
 
     if datarun.sample_selection == SELECTION_SAMPLES_UNIFORM:
@@ -295,14 +297,14 @@ def get_sampler(datarun, best_y, frozen_set):
 
     # Use uniform sample selection if there are not enough results to use
     # another method
-    if datarun.sample_selection in need_opt and len(learners) < n_opt:
-        _log("Not enough previous results, falling back onto strategy: %s"
+    if datarun.sample_selection in needs_opt and len(learners) < n_opt:
+        _log("Not enough previous results, falling back to strategy: %s"
              % SELECTION_SAMPLES_UNIFORM)
         Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
         return Sampler(frozen_set=frozen_set)
 
     # some sample selectors need the best_y field, others don't
-    if datarun.sample_selection in need_best_y:
+    if datarun.sample_selection in needs_best_y:
         return Sampler(frozen_set=frozen_set, learners=learners,
                        metric=datarun.score_target, best_y=best_y)
     else:
@@ -407,13 +409,12 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
                 performance = wrapper.start()
 
                 print
-
                 _log("Judgement metric (%s): %.3f +- %.3f" %
                      (judgment_metric,
                       performance["cv_judgment_metric"],
                       2 * performance["cv_judgment_metric_stdev"]))
-
                 print
+
                 model = Model(wrapper, datarun.wrapper)
 
                 # insert learner into the database

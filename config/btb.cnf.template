@@ -1,15 +1,19 @@
 #################################
-#   DELPHI CONFIGURATION FILE   #
+#   BTB CONFIGURATION FILE   #
 #################################
 
 [data]
-# Path to a file with a list of datafiles. All will be uploaded to the ModelHub using the parameters specified below.
+# Path to a file with a list of datafiles. All will be uploaded to the ModelHub
+# using the parameters specified below.
 data-filelist:
-# Path to CSV file that contains all data (train & test) (ignored if data-filelist non-blank)
-alldatapath: 
-# Path to CSV file that contains the train data (ignored if alldatapath non-blank)
+# Path to CSV file that contains all data (train & test). Must be fully
+# qualified; i.e. no tildes. This is ignored if data-filelist non-blank.
+alldatapath: /path/to/all/data
+# Path to CSV file that contains the train data
+# Ignored if data-filelist or alldatapath non-blank
 trainpath: 
-# Path to CSV file that contains the test data (ignored if alldatapath non-blank)
+# Path to CSV file that contains the test data 
+# Ignored if data-filelist or alldatapath non-blank
 testpath: 
 # Description of the data and classification task (limit 1000 characters)
 data-description:
@@ -18,8 +22,8 @@ data-description:
 
 
 [mode]
-# delphi run mode (cloud or local)
-run-mode: 
+# btb run mode (cloud or local)
+run-mode: local
 
 
 
@@ -27,15 +31,15 @@ run-mode:
 # Database dialect
 dialect: mysql
 # Name of the database
-database:
+database: btb
 # Username to gain access to the database
-username: 
+username: your-username
 # Password to gain access to the database
-password: 
+password: your-password
 # Host name of the device hosting the database
-host: 
+host: localhost
 # Port on host listening for database connections
-port: 
+port: 3306
 # Optional field for specifying login details
 query: 
 
@@ -44,7 +48,7 @@ query:
 [run]
 # Add here the algorithm codes you'd like to run and compare. Look these up in 
 # the 'algorithms' tables in the database, or alternatively, in the 
-# config/hyperdelphi.sql file in this repository. You must spell them correctly!
+# config/hyperbtb.sql file in this repository. You must spell them correctly!
 # 
 # Add each algorithm code as a text string separated by a comma.
 # 
@@ -56,35 +60,52 @@ query:
 #     well. Don't worry, they train SUPER fast, and the worker.py will simply 
 #     log the error and continue.
 #
-# Algorithm Options: classify_svm, classify_et, classify_pa, classify_sgd, classify_rf, classify_mnb, classify_bnb, classify_dbn, classify_logreg, classify_gnb, classify_dt, classify_knn, classify_mlp, classify_gp
-algorithms: 
-# directory to store trained models
-models-dir: 
+# Algorithm Options: 
+#   classify_logreg - logistic regression
+#   classify_svm    - support vector machine
+#   classify_sgd    - linear classifier (SVM or logreg) using stochastic
+#                     gradient descent 
+#   classify_dt     - decision tree
+#   classify_et     - extra trees
+#   classify_rf     - random forest
+#   classify_gnb    - gaussian naive bayes
+#   classify_mnb    - multinomial naive bayes
+#   classify_bnb    - bernoulli naive bayes
+#   classify_gp     - gaussian process
+#   classify_pa     - passive aggressive
+#   classify_knn    - K nearest neighbors
+#   classify_dbn    - deep belief network
+#   classify_mlp    - multi-layer perceptron
+algorithms: classify_rf, classify_logreg, classify_dt, classify_gnb
+# directory to store trained models; will be created if it doesn't exist
+models-dir: /path/to/save/models
 # not sure this is used
-drop-values: 
+drop-values:
 # not sure this is used
 test-ratio: 
 # priority (higher number is more important)
-priority: 
+priority: 1
 
 
 
 [budget]
 # Should there be a learner or walltime budget?
-budget-type: 
+budget-type: learner
 # If budget-type is learner, how many learners to try?
-learner-budget: 
+learner-budget: 20
 # If budget-type is walltime, how long to search (in minutes)?
-walltime-budget:
+walltime-budget: 5
 
 
 
 [strategy]
-# How should Delphi sample a hyperpartition (frozen set) that it must explore?
+# How should BTB sample a hyperpartition (frozen set) that it must explore?
 # 	- uniform: pick randomly! (baseline)
 # 	- gp_ei: Gaussian Process expected improvement criterion
 # 	- gp_eitime: Gaussian Process expected improvement criterion per unit time
-sample_selection: 
+# 	- gp_eivel: GPEI criterion per unit velocity
+# 	- grid: grid selection
+sample_selection: gp_ei
 # r_min is the number of random runs performed in each hyperpartition before 
 # allowing bayesian opt to select parameters. Consult the thesis to understand
 # what those mean, but essentially: 
@@ -93,19 +114,24 @@ sample_selection:
 # 		# train using sample criteria 
 # 	else
 # 		# train using uniform (baseline)
-r_min: 
-# How should Delphi select a particular hyperpartition (frozen set) from the 
+r_min: 2
+# How should BTB select a particular hyperpartition (frozen set) from the 
 # set of all hyperpartitions? 
-# 
+# options: uniform, ucb1, best_k, best_k_vel, recent_k, recent_k_vel, hier_alg,
+#          hier_rand, pure_best_k_vel
 # Again, each is a different method, consult the thesis.
-frozen_selection: 
-# k is number that xxx-k methods use. It is similar to r_min, except it is 
-# called k_window and determines how much "history" Delphi considers for certain
+frozen_selection: uniform
+# k is number that xxx_k methods use. It is similar to r_min, except it is 
+# called k_window and determines how much "history" BTB considers for certain
 # frozen selection logics.
-k_window: 
-# Which field to use for judgement of performance
-# cv = Cross-Validated performance on training data
-metric: cv
+k_window: 5
+# Which field to use for judgment of performance
+# options: f1, roc_auc, accuracy
+metric: f1
+# Which data to use for computing judgment score
+# cv_judgment_metric = Cross-Validated performance on training data
+# test_judgment_metric = Performance on test data
+score_target: cv_judgment_metric
 
 
 
@@ -114,7 +140,7 @@ metric: cv
 username: 
 # git password
 password:
-# Delphi git web address (no http)
+# BTB git location (http)
 repo: 
 
 
@@ -126,7 +152,7 @@ access_key:
 secret_key: 
 # Number of AWS instances to start
 num_instances: 
-# Number of Delphi workers per instances
+# Number of BTB workers per instances
 num_workers_per_instance: 
 # AWS S3 bucket to store data
 s3_bucket:
@@ -134,7 +160,7 @@ s3_bucket:
 s3_folder:
 # Region to start instances in
 ec2_region: 
-# Name of Delphi AMI
+# Name of BTB AMI
 ec2_amis: 
 # AWS key pair to use for EC2 instances
 ec2_key_pair: 
