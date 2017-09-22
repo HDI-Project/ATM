@@ -21,12 +21,15 @@ Bye
 ```
 
 3. Set up the BTB database:
-`$ mysql -u username -p btb < setup/hyperbtb.sql`
-Check to make sure it worked. You should see something like: 
+```
+$ mysql -u username -p btb < setup/hyperbtb.sql
+```
+Check to make sure it worked.
 ```
 $ mysql -u username -p btb
 > show tables;
-```
+``` 
+You should see something like: 
     +---------------+
     | Tables_in_btb |
     +---------------+
@@ -47,7 +50,9 @@ MySQL settings under `[datahub]`. This is the trickiest part; if you run into
 issues later on, it's probably because of your config file. 
 
 5. Create a datarun:
-`$ python btb/enter_data.py --configpath ./config/btb.cnf`
+```
+$ python btb/enter_data.py --configpath ./config/btb.cnf
+```
 You should get a lot of output, the end of which looks something like:
     ========== Summary ==========
     Algorithm classify_rf had 2 frozen sets
@@ -64,7 +69,9 @@ The important piece of information is the datarun ID.
 
 6. Start a worker, specifying your config file and the datarun you'd like to
    compute:
-`$ python btb/worker.py --configpath ./config/btb.cnf --datarun 1`
+```
+$ python btb/worker.py --configpath ./config/btb.cnf --datarun 1
+```
 
 This will start a process that computes learners and saves them in the models/
 directory you configured. If you left the budget parameters in the config file
