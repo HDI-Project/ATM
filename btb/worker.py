@@ -409,7 +409,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
                 performance = wrapper.start()
 
                 print
-                _log("Judgement metric (%s): %.3f +- %.3f" %
+                _log("Judgment metric (%s): %.3f +- %.3f" %
                      (judgment_metric,
                       performance["cv_judgment_metric"],
                       2 * performance["cv_judgment_metric_stdev"]))

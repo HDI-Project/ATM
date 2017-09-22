@@ -91,7 +91,7 @@ learner (the "judgment metric"), plus the best overall performance so far.
             dual = True
             class_weight = auto
 
-    Judgement metric (f1): 0.536 +- 0.067
+    Judgment metric (f1): 0.536 +- 0.067
 
 And that's it! You can break out of the worker with Ctrl+C and restart it with
 the same command; it will pick up right where it left off. You can also start
