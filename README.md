@@ -16,7 +16,7 @@ $ pip install -r requirements.txt
 2. Set up MySQL (replace 'username' and 'password' with your choices):
 ```
 $ mysql -u root -p            # you'll be prompted for your root password
-mysql> GRANT ALL ON btb.\* TO 'username'@'localhost' IDENTIFIED BY 'password';
+mysql> GRANT ALL ON btb.* TO 'username'@'localhost' IDENTIFIED BY 'password';
 mysql> CREATE DATABASE btb;
 mysql> exit
 Bye
