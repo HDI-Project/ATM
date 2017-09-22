@@ -121,11 +121,16 @@ def GetMemory():
     return ret
 
 
+public_ip = None
 def GetPublicIP():
-    try:
-        return urllib2.urlopen(PUBLIC_IP_URL).read().strip()
-    except Exception:  # any exception, doesn't matter
-        return None
+    if public_ip is None:
+        try:
+            global public_ip
+            public_ip = urllib2.urlopen(PUBLIC_IP_URL).read().strip()
+        except Exception:  # any exception, doesn't matter
+            public_ip = None
+
+    return public_ip
 
 
 def GetInfo():

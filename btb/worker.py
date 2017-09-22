@@ -1,6 +1,11 @@
-from btb.selection.samples import SELECTION_SAMPLES_UNIFORM, SELECTION_SAMPLES_GP, SELECTION_SAMPLES_GRID
-from btb.selection.samples import SELECTION_SAMPLES_GP_EI, SELECTION_SAMPLES_GP_EI_TIME, SELECTION_SAMPLES_GP_EI_VEL
-from btb.selection.frozens import SELECTION_FROZENS_UNIFORM, SELECTION_FROZENS_UCB1
+from btb.selection.samples import SELECTION_SAMPLES_UNIFORM,\
+                                  SELECTION_SAMPLES_GP,\
+                                  SELECTION_SAMPLES_GRID
+from btb.selection.samples import SELECTION_SAMPLES_GP_EI,\
+                                  SELECTION_SAMPLES_GP_EI_TIME,\
+                                  SELECTION_SAMPLES_GP_EI_VEL
+from btb.selection.frozens import SELECTION_FROZENS_UNIFORM,\
+                                  SELECTION_FROZENS_UCB1
 from btb.config import Config
 from btb.database import *
 from btb.utilities import *
@@ -8,22 +13,23 @@ from btb.mapping import Mapping, CreateWrapper
 from btb.model import Model
 import btb.database as db
 
-import datetime
-import pandas as pd
-from decimal import Decimal
-import traceback
-import random
-import sys
-import time
-import ast
 import argparse
+import ast
+import datetime
 import os
 import pdb
+import random
+import socket
+import sys
+import time
+import traceback
+import warnings
+from decimal import Decimal
 
+import pandas as pd
 from boto.s3.connection import S3Connection, Key as S3Key
 
-import warnings
-
+# ... shhh
 warnings.filterwarnings("ignore")
 
 # for garrays
@@ -35,9 +41,8 @@ EnsureDirectory("models")
 EnsureDirectory("metrics")
 EnsureDirectory("logs")
 
-# open or create our log file. TODO: why the random number?
-hostname = GetPublicIP() or random.randint(1, 1e12)
-logfile = "logs/%s.txt" % hostname
+# name log file after the local hostname
+logfile = "logs/%s.txt" % socket.gethostname()
 
 # misc constant definitions
 loop_wait = 6
@@ -54,7 +59,7 @@ def _log(msg, stdout=True):
 def get_best_so_far(datarun_id, metric):
     maximum = 0
     best_val, best_std = 0, 0
-    session = GetConnection()
+    session = db.GetConnection()
 
     if metric == 'cv_judgment_metric':
         result = session.query(db.Learner.cv_judgment_metric,
@@ -146,7 +151,7 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started, conf
             seconds = (fmt_completed - fmt_started).total_seconds()
 
             # create learner ORM object, and insert into the database
-            session = GetConnection()
+            session = db.GetConnection()
             learner = db.Learner(datarun_id=datarun.id,
                                  frozen_set_id=frozen_set.id,
                                  dataname=datarun.name,
@@ -194,7 +199,7 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started, conf
 def InsertError(datarun_id, frozen_set, params, error_msg):
     session = None
     try:
-        session = GetConnection()
+        session = db.GetConnection()
         session.autoflush = False
         learner = db.Learner(datarun_id=datarun_id, frozen_set_id=frozen_set.id,
                              errored=datetime.datetime.now(), is_error=True, params=params,
@@ -209,15 +214,18 @@ def InsertError(datarun_id, frozen_set, params, error_msg):
         if session:
             session.close()
 
+
 def get_btb_csv_num_lines(filepath):
     with open(filepath) as f:
         for i, _ in enumerate(f):
             pass
     return i + 1
 
+
 def get_btb_csv_num_cols(filepath):
     line = open(filepath).readline()
     return len(line.split(','))
+
 
 # this works from the assumption the data has been preprocessed by btb:
 # no headers, numerical data only
@@ -233,6 +241,7 @@ def read_btb_csv(filepath):
                 data[i, j] = float(cell)
 
     return data
+
 
 def LoadData(datarun, config):
     """
@@ -268,16 +277,43 @@ def LoadData(datarun, config):
     return trainX, testX, trainY, testY
 
 
+def get_sampler(datarun, best_y, frozen_set):
+    _log("Sample selection: %s" % datarun.sample_selection)
+    Sampler = Mapping.SELECTION_SAMPLES_MAP[datarun.sample_selection]
+    need_opt = [SELECTION_SAMPLES_GP, SELECTION_SAMPLES_GP_EI,
+                SELECTION_SAMPLES_GP_EI_VEL, SELECTION_SAMPLES_GP_EI_TIME]
+    need_best_y = [SELECTION_SAMPLES_GP_EI, SELECTION_SAMPLES_GP_EI_VEL,
+                   SELECTION_SAMPLES_GP_EI_TIME]
+    n_opt = datarun.r_min
+
+    if datarun.sample_selection == SELECTION_SAMPLES_UNIFORM:
+        return Sampler(frozen_set=frozen_set)
+
+    # Use uniform sample selection if there are not enough results to use
+    # another method
+    if datarun.sample_selection in need_opt and len(learners) < n_opt:
+        _log("Not enough previous results, falling back onto strategy: %s"
+             % SELECTION_SAMPLES_UNIFORM)
+        Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
+        return Sampler(frozen_set=frozen_set)
+
+    # gather learners that haven't been completed yet
+    learners = db.GetLearnersInFrozen(frozen_set.id)
+    learners = [x.completed == None for x in learners]
+
+    # some sample selectors need the best_y field, others don't
+    if datarun.sample_selection in need_best_y:
+        return Sampler(frozen_set=frozen_set, learners=learners,
+                       metric=datarun.score_target, best_y=best_y)
+    else:
+        return Sampler(frozen_set=frozen_set, learners=learners,
+                       metric=datarun.score_target)
+
+
 def work(config, datarun_id=None, total_time=None, choose_randomly=True):
-    start_time = datetime.datetime.now()
-    num_no_dataruns = 0
-
-    # TODO: load these from database
-    best_perf, best_err = 0, 0
-
     # call database method to define ORM objects in the db module
-    define_tables(config)
-
+    db.define_tables(config)
+    start_time = datetime.datetime.now()
     judgment_metric = config.get(Config.STRATEGY, Config.STRATEGY_METRIC)
 
     # main loop
@@ -287,31 +323,22 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
             # choose datarun to work on
             _log("=" * 25)
             started = time.strftime('%Y-%m-%d %H:%M:%S')
-            datarun = GetDatarun(datarun_id=datarun_id,
-                                 ignore_grid_complete=False,
-                                 chose_randomly=choose_randomly)
+            datarun = db.GetDatarun(datarun_id=datarun_id,
+                                    ignore_grid_complete=False,
+                                    chose_randomly=choose_randomly)
             if not datarun:
-                # If desired, we can comment this out and wait for a new datarun
-                # to be added
+                # If desired, we can sleep here and wait for a new datarun
                 _log("No datarun present in database, exiting.")
                 sys.exit()
 
-                # this part gets skipped for now
-                if num_no_dataruns > 10:
-                    sys.exit()
-                _log("No datarun present in database, will wait and try again...")
-                num_no_dataruns += 1
-                time.sleep(10)
-                continue
-
             # choose frozen set
             _log("Datarun: %s" % datarun)
-            frozen_sets = GetIncompletedFrozenSets(datarun.id,
-                                                   min_num_errors_to_exclude=20)
+            frozen_sets = db.GetIncompletedFrozenSets(datarun.id,
+                                                      min_num_errors_to_exclude=20)
             if not frozen_sets:
-                if IsGriddingDoneForDatarun(datarun_id=datarun.id,
-                                            min_num_errors_to_exclude=20):
-                    MarkDatarunGriddingDone(datarun_id=datarun.id)
+                if db.IsGriddingDoneForDatarun(datarun_id=datarun.id,
+                                               min_num_errors_to_exclude=20):
+                    db.MarkDatarunGriddingDone(datarun_id=datarun.id)
                 _log("No incomplete frozen sets for datarun present in database, will wait and try again...")
                 time.sleep(10)
                 continue
@@ -323,7 +350,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
 
             if budget_type == "learner" and ncompleted >= datarun.learner_budget:
                 # this run is done
-                MarkDatarunDone(datarun.id)
+                db.MarkDatarunDone(datarun.id)
                 endrun = True
                 _log("Learner budget has run out!")
 
@@ -331,7 +358,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
                 deadline = datarun.deadline
                 if datetime.datetime.now() > deadline:
                     # this run is done
-                    MarkDatarunDone(datarun.id)
+                    db.MarkDatarunDone(datarun.id)
                     endrun = True
                     _log("Walltime budget has run out!")
 
@@ -345,7 +372,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
             # otherwise select a frozen set from this run
             _log("Frozen Selection: %s" % datarun.frozen_selection)
             fclass = Mapping.SELECTION_FROZENS_MAP[datarun.frozen_selection]
-            best_y = GetMaximumY(datarun.id, datarun.score_target, default=0.0)
+            best_y = db.GetMaximumY(datarun.id, datarun.score_target, default=0.0)
             fselector = fclass(frozen_sets=frozen_sets, best_y=best_y,
                                k=datarun.k_window, metric=datarun.score_target)
 
@@ -353,88 +380,13 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
             if not frozen_set_id > 0:
                 _log("Invalid frozen set id! %d" % frozen_set_id)
 
-            frozen_set = GetFrozenSet(frozen_set_id, increment=True)
+            frozen_set = db.GetFrozenSet(frozen_set_id, increment=True)
             if not frozen_set:
                 _log("Invalid frozen set! %s" % frozen_set)
-            _log("Frozen set: %d" % frozen_set.id)
+            _log("Frozen set: %d" % frozen_set_id)
 
             # choose sampler
-            _log("Sample selection: %s" % datarun.sample_selection)
-            Sampler = Mapping.SELECTION_SAMPLES_MAP[datarun.sample_selection]
-            sampler = None
-
-            N_OPT = datarun.r_min
-
-            ### UNIFORM SAMPLE SELECTION ###
-            if datarun.sample_selection == SELECTION_SAMPLES_UNIFORM:
-                sampler = Sampler(frozen_set=frozen_set)
-
-            ### GRID SAMPLE SELECTION ###
-            elif datarun.sample_selection == SELECTION_SAMPLES_GRID:
-                learners = GetLearnersInFrozen(frozen_set_id)
-                learners = [x.completed == None for x in learners]  # only completed learners
-
-                sampler = Sampler(frozen_set=frozen_set, learners=learners,
-                                  metric=datarun.score_target)
-
-            ### BASIC GP SAMPLE SELECTION ###
-            elif datarun.sample_selection == SELECTION_SAMPLES_GP:
-                learners = GetLearnersInFrozen(frozen_set_id)
-                learners = [x.completed == None for x in learners]  # only completed learners
-
-                # check if we have enough results to pursue this strategy
-                if len(learners) < N_OPT:
-                    _log("Not enough previous results, falling back onto strategy: %s"
-                         % SELECTION_SAMPLES_UNIFORM)
-                    Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
-                    sampler = Sampler(frozen_set=frozen_set)
-                else:
-                    sampler = Sampler(frozen_set=frozen_set, learners=learners,
-                                      metric=datarun.score_target)
-
-            ### GP EXPECTED IMPROVEMENT SAMPLE SELECTION ###
-            elif datarun.sample_selection == SELECTION_SAMPLES_GP_EI:
-                learners = GetLearnersInFrozen(frozen_set.id)
-                learners = [x.completed == None for x in learners]  # only completed learners
-
-                # check if we have enough results to pursue this strategy
-                if len(learners) < N_OPT:
-                    _log("Not enough previous results for gp_ei, falling back onto strategy: %s"
-                         % SELECTION_SAMPLES_UNIFORM)
-                    Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
-                    sampler = Sampler(frozen_set=frozen_set)
-                else:
-                    sampler = Sampler(frozen_set=frozen_set, learners=learners,
-                                      metric=datarun.score_target, best_y=best_y)
-
-            elif datarun.sample_selection == SELECTION_SAMPLES_GP_EI_VEL:
-                learners = GetLearnersInFrozen(frozen_set.id)
-                learners = [x.completed == None for x in learners]  # only completed learners
-
-                # check if we have enough results to pursue this strategy
-                if len(learners) < N_OPT:
-                    _log("Not enough previous results for gp_eivel, falling back onto strategy: %s (learners %d < %d)" % (
-                        SELECTION_SAMPLES_UNIFORM, len(learners), N_OPT))
-                    Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
-                    sampler = Sampler(frozen_set=frozen_set)
-                else:
-                    sampler = Sampler(frozen_set=frozen_set, learners=learners,
-                                      metric=datarun.score_target, best_y=best_y)
-
-            ### GP EXPECTED IMPROVEMENT PER TIME SAMPLE SELECTION ###
-            elif datarun.sample_selection == SELECTION_SAMPLES_GP_EI_TIME:
-                learners = GetLearnersInFrozen(frozen_set.id)
-                learners = [x.completed == None for x in learners]  # only completed learners
-
-                # check if we have enough results to pursue this strategy
-                if len(learners) < N_OPT:
-                    _log("Not enough previous results for gp_eitime, falling back onto strategy: %s"
-                         % SELECTION_SAMPLES_UNIFORM)
-                    Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
-                    sampler = Sampler(frozen_set=frozen_set)
-                else:
-                    sampler = Sampler(frozen_set=frozen_set, learners=learners,
-                                      metric=datarun.score_target, best_y=best_y)
+            sampler = get_sampler(datarun, best_y)
 
             # select the parameters based on the sampler
             params = sampler.select()
@@ -490,6 +442,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
         if total_time is not None and elapsed_time >= total_time:
             break
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Add more learners to database')
     parser.add_argument('-c', '--configpath', help='Location of config file',
@@ -497,7 +450,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--datarun-id', help='Only train on datasets with this id', default=None, required=False)
     parser.add_argument('-t', '--time', help='Number of seconds to run worker', default=None, required=False)
 
-    # TODO: a little confusingly named (seqorder populates choose_randomly?)
+    # a little confusingly named (seqorder populates choose_randomly?)
     parser.add_argument('-l', '--seqorder', help='work on datasets in sequential order starting with smallest id number, but still max priority (default = random)',
                         dest='choose_randomly', default=True, action='store_const', const=False)
     args = parser.parse_args()
