@@ -5,6 +5,11 @@ from btb.run import Run
 
 
 def enter_data(config):
+    """
+    Given a config, creates a set of dataruns for the config and enters them into
+    the database.
+    Returns the IDs for the created dataruns.
+    """
     data_filelist = config.get(Config.DATA, Config.DATA_FILELIST)
     alldatapath = config.get(Config.DATA, Config.DATA_ALLDATAPATH)
     trainpath = config.get(Config.DATA, Config.DATA_TRAINPATH)
@@ -45,6 +50,7 @@ def enter_data(config):
         raise ValueError('Dataset description is more than 1000 characters.')
 
     if data_filelist:
+        ids = []
         with open(data_filelist, 'r') as f:
             for line in f:
                 alldatapath = line.strip()
@@ -55,7 +61,7 @@ def enter_data(config):
                                budget_type, priority, k_window, r_min,
                                algorithm_codes, learner_budget, walltime_budget,
                                alldatapath, dataset_description, trainpath,
-                               testpath)
+                               testpath))
     else:
         ids = [Run(config, runname, description, metric, score_target,
                    sample_selection, frozen_selection, budget_type, priority,

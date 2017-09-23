@@ -32,14 +32,17 @@ def Run(config, runname, description, metric, score_target, sample_selection,
     print "Dataname: %s, description: %s" % (runname, description)
 
     assert alldatapath or (trainpath and testpath), \
-        "Must have either a single file for data or two paths, one for training and the other for testing!"
+        "Must have either a single file for data or two paths, one for " \
+        "training and the other for testing!"
 
     # parse data and create data wrapper for vectorization and label encoding
     dw = None
     if alldatapath:
-        dw = DataWrapper(runname, OUTPUT_FOLDER, LABEL_COLUMN, traintestfile=alldatapath)
+        dw = DataWrapper(runname, OUTPUT_FOLDER, LABEL_COLUMN,
+                         traintestfile=alldatapath)
     elif trainpath and testpath:
-        dw = DataWrapper(runname, OUTPUT_FOLDER, LABEL_COLUMN, trainfile=trainpath, testfile=testpath)
+        dw = DataWrapper(runname, OUTPUT_FOLDER, LABEL_COLUMN,
+                         trainfile=trainpath, testfile=testpath)
     else:
         raise Exception("No valid training or testing files!")
 

@@ -254,7 +254,6 @@ def GetDatarun(datarun_id=None, ignore_completed=True,
     Among the incomplete dataruns with maximal priority,
     returns one at random.
     """
-    pdb.set_trace()
     dataruns = []
     session = GetConnection()
     query = session.query(Datarun)
@@ -497,7 +496,7 @@ def GetLearners(datarun_id):
     return learners
 
 
-def GetBestLearner(datarun_id, metric):
+def GetBestLearner(datarun_id, metric, default=0):
     """
     Returns best learner in datarun.
     """
@@ -507,6 +506,8 @@ def GetBestLearner(datarun_id, metric):
         .order_by(Learner.started).all()
     session.close()
 
+    best_learner = None
+    best_score = default
     for l in learners:
         if getattr(l, metric) > best_score:
             best_learner = l

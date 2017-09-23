@@ -84,116 +84,120 @@ def get_best_so_far(datarun_id, metric):
     return best_val, best_std
 
 
-def InsertLearner(datarun, frozen_set, performance, params, model, started, config):
+def save_learner_cloud(config, local_model_path, local_metric_path):
+    aws_key = config.get(Config.AWS, Config.AWS_ACCESS_KEY)
+    aws_secret = config.get(Config.AWS, Config.AWS_SECRET_KEY)
+    s3_bucket = config.get(Config.AWS, Config.AWS_S3_BUCKET)
+
+    conn = S3Connection(aws_key, aws_secret)
+    bucket = conn.get_bucket(s3_bucket)
+
+    if config.get(Config.AWS, Config.AWS_S3_FOLDER) and not\
+            config.get(Config.AWS, Config.AWS_S3_FOLDER).isspace():
+        aws_model_path = os.path.join(config.get(Config.AWS,
+                                                 Config.AWS_S3_FOLDER),
+                                      local_model_path)
+        aws_metric_path = os.path.join(config.get(Config.AWS,
+                                                  Config.AWS_S3_FOLDER),
+                                       local_metric_path)
+    else:
+        aws_model_path = local_model_path
+        aws_metric_path = local_metric_path
+
+    kmodel = S3Key(bucket)
+    kmodel.key = aws_model_path
+    kmodel.set_contents_from_filename(local_model_path)
+    _log('Uploading model to S3 bucket {} in {}'.format(s3_bucket,
+                                                        local_model_path))
+
+    kmodel = S3Key(bucket)
+    kmodel.key = aws_metric_path
+    kmodel.set_contents_from_filename(local_metric_path)
+    _log('Uploading metric to S3 bucket {} in {}'.format(s3_bucket,
+                                                         local_metric_path))
+
+    # delete the local copy of the model & metric so that it doesn't
+    # fill up the worker instance's hard drive
+    _log('Deleting local copy of {}'.format(local_model_path))
+    os.remove(local_model_path)
+    _log('Deleting local copy of {}'.format(local_metric_path))
+    os.remove(local_metric_path)
+
+
+
+def InsertLearner(datarun, frozen_set, performance, params, model, started,
+                  config):
     """
     Inserts a learner and also updates the frozen_sets table.
 
     datarun: datarun object for the learner
     frozen_set: frozen set object
     """
+    # save model to local filesystem
+    phash = HashDict(params)
+    rhash = HashString(datarun.name)
+    local_model_path = MakeModelPath("models", phash, rhash,
+                                     datarun.description)
+    model.save(local_model_path)
+    _log("Saving model in: %s" % local_model_path)
+
+    local_metric_path = MakeMetricPath("metrics", phash, rhash,
+                                       datarun.description)
+    metric_obj = dict(cv=performance['cv_object'],
+                      test=performance['test_object'])
+    SaveMetric(local_metric_path, object=metric_obj)
+    _log("Saving metrics in: %s" % local_model_path)
+
     # mode: cloud or local?
     mode = config.get(Config.MODE, Config.MODE_RUNMODE)
-    session = None
-    total = 5
-    tries = total
 
-    while tries:
+    # if necessary, save model and metrics to Amazon S3 bucket
+    if mode == 'cloud':
         try:
-            # save model to local filesystem
-            phash = HashDict(params)
-            rhash = HashString(datarun.name)
-            local_model_path = MakeModelPath("models", phash, rhash, datarun.description)
-            model.save(local_model_path)
-            _log("Saving model in: %s" % local_model_path)
-
-            local_metric_path = MakeMetricPath("metrics", phash, rhash, datarun.description)
-            metric_obj = dict(cv=performance['cv_object'], test=performance['test_object'])
-            SaveMetric(local_metric_path, object=metric_obj)
-            _log("Saving metric in: %s" % local_model_path)
-
-            # save model to Amazon S3 bucket
-            if mode == 'cloud':
-                aws_key = config.get(Config.AWS, Config.AWS_ACCESS_KEY)
-                aws_secret = config.get(Config.AWS, Config.AWS_SECRET_KEY)
-                conn = S3Connection(aws_key, aws_secret)
-                s3_bucket = config.get(Config.AWS, Config.AWS_S3_BUCKET)
-                bucket = conn.get_bucket(s3_bucket)
-
-
-                if config.get(Config.AWS, Config.AWS_S3_FOLDER) and not config.get(Config.AWS, Config.AWS_S3_FOLDER).isspace():
-                    aws_model_path = os.path.join(config.get(Config.AWS, Config.AWS_S3_FOLDER), local_model_path)
-                    aws_metric_path = os.path.join(config.get(Config.AWS, Config.AWS_S3_FOLDER), local_metric_path)
-                else:
-                    aws_model_path = local_model_path
-                    aws_metric_path = local_metric_path
-
-                kmodel = S3Key(bucket)
-                kmodel.key = aws_model_path
-                kmodel.set_contents_from_filename(local_model_path)
-                _log('Uploading model to S3 bucket {} in {}'.format(s3_bucket, local_model_path))
-
-                kmodel = S3Key(bucket)
-                kmodel.key = aws_metric_path
-                kmodel.set_contents_from_filename(local_metric_path)
-                _log('Uploading metric to S3 bucket {} in {}'.format(s3_bucket, local_metric_path))
-
-                # delete the local copy of the model & metric so that it doesn't fill up the worker instance's hard drive
-                os.remove(local_model_path)
-                _log('Deleting local copy of {}'.format(local_model_path))
-                os.remove(local_metric_path)
-                _log('Deleting local copy of {}'.format(local_metric_path))
-
-            # compile fields
-            completed = time.strftime('%Y-%m-%d %H:%M:%S')
-            trainables = model.algorithm.performance()['trainable_params']
-            fmt_completed = datetime.datetime.strptime(completed, SQL_DATE_FORMAT)
-            fmt_started = datetime.datetime.strptime(started, SQL_DATE_FORMAT)
-            seconds = (fmt_completed - fmt_started).total_seconds()
-
-            # create learner ORM object, and insert into the database
-            session = db.GetConnection()
-            learner = db.Learner(datarun_id=datarun.id,
-                                 frozen_set_id=frozen_set.id,
-                                 dataname=datarun.name,
-                                 algorithm=frozen_set.algorithm,
-                                 trainpath=datarun.trainpath,
-                                 testpath=datarun.testpath,
-                                 modelpath=local_model_path,
-                                 params_hash=phash,
-                                 params=params,
-                                 trainable_params=trainables,
-                                 cv_judgment_metric=performance['cv_judgment_metric'],
-                                 cv_judgment_metric_stdev=performance['cv_judgment_metric_stdev'],
-                                 test_judgment_metric=performance['test_judgment_metric'],
-                                 metricpath=local_metric_path,
-                                 started=started,
-                                 completed=datetime.datetime.now(),
-                                 host=GetPublicIP(),
-                                 dimensions=model.algorithm.dimensions,
-                                 frozen_hash=frozen_set.frozen_hash,
-                                 seconds=seconds,
-                                 description=datarun.description)
-            session.add(learner)
-
-            # update this session's frozen set entry
-            frozen_set = session.query(db.FrozenSet).filter(db.FrozenSet.id == frozen_set.id).one()
-            # frozen_set.trained += 1 # we mark before now
-            frozen_set.rewards += Decimal(performance[datarun.score_target])
-            session.commit()
-            break
-
+            save_learner_cloud(config, local_model_path, local_metric_path)
         except Exception:
             msg = traceback.format_exc()
-            _log("Error in InsertLearner():, try=%d" % (total - tries) + msg)
-            if tries:
-                time.sleep((total - tries) ** 2)
-                tries -= 1
-                continue
+            _log("Error in save_learner_cloud()")
             InsertError(datarun.id, frozen_set, params, msg)
 
-        finally:
-            if session:
-                session.close()
+    # compile fields
+    completed = time.strftime('%Y-%m-%d %H:%M:%S')
+    trainables = model.algorithm.performance()['trainable_params']
+    fmt_completed = datetime.datetime.strptime(completed, SQL_DATE_FORMAT)
+    fmt_started = datetime.datetime.strptime(started, SQL_DATE_FORMAT)
+    seconds = (fmt_completed - fmt_started).total_seconds()
+
+    # create learner ORM object, and insert learner into the database
+    session = db.GetConnection()
+    learner = db.Learner(datarun_id=datarun.id,
+                         frozen_set_id=frozen_set.id,
+                         dataname=datarun.name,
+                         algorithm=frozen_set.algorithm,
+                         trainpath=datarun.trainpath,
+                         testpath=datarun.testpath,
+                         modelpath=local_model_path,
+                         params_hash=phash,
+                         params=params,
+                         trainable_params=trainables,
+                         cv_judgment_metric=performance['cv_judgment_metric'],
+                         cv_judgment_metric_stdev=performance['cv_judgment_metric_stdev'],
+                         test_judgment_metric=performance['test_judgment_metric'],
+                         metricpath=local_metric_path,
+                         started=started,
+                         completed=datetime.datetime.now(),
+                         host=GetPublicIP(),
+                         dimensions=model.algorithm.dimensions,
+                         frozen_hash=frozen_set.frozen_hash,
+                         seconds=seconds,
+                         description=datarun.description)
+    session.add(learner)
+
+    # update this session's frozen set entry
+    frozen_set = session.query(db.FrozenSet)\
+        .filter(db.FrozenSet.id == frozen_set.id).one()
+    # frozen_set.trained += 1   # we mark before now
+    frozen_set.rewards += Decimal(performance[datarun.score_target])
+    session.commit()
 
 
 def InsertError(datarun_id, frozen_set, params, error_msg):
@@ -341,7 +345,8 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
                 if db.IsGriddingDoneForDatarun(datarun_id=datarun.id,
                                                min_num_errors_to_exclude=20):
                     db.MarkDatarunGriddingDone(datarun_id=datarun.id)
-                _log("No incomplete frozen sets for datarun present in database, will wait and try again...")
+                _log("No incomplete frozen sets for datarun present in "
+                     "database, will wait and try again...")
                 time.sleep(10)
                 continue
             ncompleted = sum([f.trained for f in frozen_sets])
