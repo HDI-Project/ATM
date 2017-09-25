@@ -246,12 +246,13 @@ class DataWrapper(object):
         newd = d - categorical + dummies
 
         # ensure data integrity
-        # SOOOO here's the issue with this: sklearn one hot encoders will
+        # Here was the issue with this: sklearn one hot encoders will
         # convert a single array of binary variables [0,1,0,0,1] to another
         # single array, [1,0,1,1,0]. But if you give an OHE a binary variable
         # in a two-dimensional array -- e.g. [[0], [1], [0]] -- the very same
         # fit_transform will spit out TWO columns for the binary variable (one
-        # of them completely redundant).
+        # of them completely redundant), e.g. [[1, 0], [0, 1], [1, 0]]. So this
+        # count was off.
         assert newd == data.shape[1], "One hot encoding failed"
         assert np.sum(np.isnan(data)) == 0, \
             "Cannot have NaN values in the cleaned data!"

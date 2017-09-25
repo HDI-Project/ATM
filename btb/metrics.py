@@ -1,5 +1,7 @@
 from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import f1_score, precision_recall_curve, auc, roc_curve, accuracy_score, cohen_kappa_score
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from sklearn.metrics import f1_score, precision_recall_curve, auc, roc_curve,\
+                            accuracy_score, cohen_kappa_score, roc_auc_score
 
 import numpy as np
 import itertools
@@ -136,8 +138,27 @@ def get_metrics_small_multiclass(y_true, y_pred, y_pred_probs):
     mu_sigma = np.mean(f1_scores_vec) - np.std(f1_scores_vec)
     f1_score_micro = f1_score(y_true, y_pred, average='micro')
     f1_score_macro = f1_score(y_true, y_pred, average='macro')
-    roc_curve_auc_micro = roc_auc_score(y_true, y_pred_probs, average='micro')
-    roc_curve_auc_macro = roc_auc_score(y_true, y_pred_probs, average='macro')
+
+    #n_classes = len(np.unique(y_true))
+    #ohe = OneHotEncoder()
+    #y_true_mc = ohe.fit_transform(y_true)
+    #y_pred_mc = ohe.transform(y_pred)
+    #fpr, tpr, roc_auc = {}, {}, {}
+    #for i in range(n_classes):
+		#fpr[i], tpr[i], _ = roc_curve(y_true_mc[:, i], y_pred_mc[:, i])
+		#roc_auc[i] = auc(fpr[i], tpr[i])
+
+    ## Compute micro-average ROC curve and ROC area
+    #fpr_micro, tpr_micro, _ = roc_curve(y_true_mc.ravel(), y_pred_mc.ravel())
+    #roc_curve_auc_micro = auc(fpr_micro, tpr_micro)
+    #all_fpr = np.unique(np.concatenate([fpr[i] for i in range(n_classes)]))
+    #mean_tpr = np.zeros_like(all_fpr)
+    #for i in range(n_classes):
+        #mean_tpr += interp(all_fpr, fpr[i], tpr[i])
+
+    ## Finally average it and compute AUC
+    #mean_tpr /= n_classes
+    #roc_curve_auc_macro = auc(all_fpr, mean_tpr)
 
     results = dict(accuracy=accuracy,
                    cohen_kappa=cohen_kappa,
@@ -150,10 +171,10 @@ def get_metrics_small_multiclass(y_true, y_pred, y_pred_probs):
                    label_level_pr_curve_recalls=label_level_pr_curve_recalls,
                    label_level_pr_curve_thresholds=label_level_pr_curve_thresholds,
                    label_level_pr_curve_aucs=label_level_pr_curve_aucs,
-                   f1_score_micro=f1_score_micro,
-                   f1_score_macro=f1_score_macro,
-                   roc_curve_auc_micro=roc_curve_auc_micro,
-                   roc_curve_auc_macro=roc_curve_auc_macro,
+                   f1_scores_micro=f1_score_micro,
+                   f1_scores_macro=f1_score_macro,
+                   #roc_curve_auc_micro=roc_curve_auc_micro,
+                   #roc_curve_auc_macro=roc_curve_auc_macro,
                    mu_sigma=mu_sigma)
 
     return results
@@ -186,15 +207,34 @@ def get_metrics_large_multiclass(y_true, y_pred, y_pred_probs, rank):
 
     f1_score_micro = f1_score(y_true, y_pred, average='micro')
     f1_score_macro = f1_score(y_true, y_pred, average='macro')
-    roc_curve_auc_micro = roc_auc_score(y_true, y_pred_probs, average='micro')
-    roc_curve_auc_macro = roc_auc_score(y_true, y_pred_probs, average='macro')
+
+    #n_classes = len(np.unique(y_true))
+    #ohe = OneHotEncoder()
+    #y_true_mc = ohe.fit_transform(y_true)
+    #y_pred_mc = ohe.transform(y_pred)
+    #fpr, tpr, roc_auc = {}, {}, {}
+    #for i in range(n_classes):
+		#fpr[i], tpr[i], _ = roc_curve(y_true_mc[:, i], y_pred_mc[:, i])
+		#roc_auc[i] = auc(fpr[i], tpr[i])
+
+    ## Compute micro-average ROC curve and ROC area
+    #fpr_micro, tpr_micro, _ = roc_curve(y_true_mc.ravel(), y_pred_mc.ravel())
+    #roc_curve_auc_micro = auc(fpr_micro, tpr_micro)
+    #all_fpr = np.unique(np.concatenate([fpr[i] for i in range(n_classes)]))
+    #mean_tpr = np.zeros_like(all_fpr)
+    #for i in range(n_classes):
+        #mean_tpr += interp(all_fpr, fpr[i], tpr[i])
+
+    ## Finally average it and compute AUC
+    #mean_tpr /= n_classes
+    #roc_curve_auc_macro = auc(all_fpr, mean_tpr)
 
     results = dict(accuracy=accuracy,
                    cohen_kappa=cohen_kappa,
-                   f1_score_micro=f1_score_micro,
-                   f1_score_macro=f1_score_macro,
-                   roc_curve_auc_micro=roc_curve_auc_micro,
-                   roc_curve_auc_macro=roc_curve_auc_macro,
+                   f1_scores_micro=f1_score_micro,
+                   f1_scores_macro=f1_score_macro,
+                   #roc_curve_auc_micro=roc_curve_auc_micro,
+                   #roc_curve_auc_macro=roc_curve_auc_macro,
                    label_level_f1_scores=label_level_f1_scores,
                    mu_sigma=mu_sigma,
                    rank_accuracy=rank_accuracy)
