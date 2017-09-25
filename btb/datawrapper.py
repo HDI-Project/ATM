@@ -2,16 +2,18 @@ import pandas as pd
 import numpy as np
 import os
 from sklearn.feature_extraction import DictVectorizer
-from sklearn import preprocessing
-from btb.utilities import *
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.pipeline import Pipeline
-from sklearn.externals import joblib
 from sklearn.model_selection import train_test_split
 from sklearn_pandas import DataFrameMapper
 
+from btb.utilities import *
+
+
 class DataWrapper(object):
-    def __init__(self, dataname, outfolder, labelcol, testing_ratio=0.3, traintestfile=None, trainfile=None, testfile=None,
-                dropvals=None, sep=None):
+    def __init__(self, dataname, outfolder, labelcol, testing_ratio=0.3,
+                 traintestfile=None, trainfile=None, testfile=None,
+                 dropvals=None, sep=None):
         self.dataname = dataname
         self.outfolder = outfolder
         self.labelcol = labelcol
@@ -77,15 +79,17 @@ class DataWrapper(object):
                 break
 
         # now load both files and stack together
-        data = pd.read_csv(self.trainfile, skipinitialspace=True, na_values=self.dropvals, sep=self.sep)
+        data = pd.read_csv(self.trainfile, skipinitialspace=True,
+                           na_values=self.dropvals, sep=self.sep)
         data = data.dropna(how='any')
         train_labels = np.array(data[[self.labelcol]]) # gets data frame instead of series
-        self.encoder = preprocessing.LabelEncoder()
+        self.encoder = LabelEncoder()
         training_discretized_labels = self.encoder.fit_transform(train_labels)
         num_train_samples = data.shape[0]
 
         # combine training and testing
-        tempdata = pd.read_csv(self.testfile, skipinitialspace=True, na_values=self.dropvals, sep=self.sep)
+        tempdata = pd.read_csv(self.testfile, skipinitialspace=True,
+                               na_values=self.dropvals, sep=self.sep)
         tempdata = tempdata.dropna(how='any')
         test_labels = np.array(tempdata[[self.labelcol]]) # gets data frame instead of series
         testing_discretized_labels = self.encoder.transform(test_labels)
@@ -119,12 +123,14 @@ class DataWrapper(object):
                 ordinal += 1
 
         for column in self.categoricalcols:
-            le = preprocessing.LabelEncoder()
+            le = LabelEncoder()
             le.fit(data[column])
             data[column] = le.transform(data[column])
             self.categoricalcolsvectorizers.append(le)
 
-        self.vectorizer = preprocessing.OneHotEncoder(categorical_features = self.categoricalcolsidxs,sparse = False) # don't use sparse because then then can't test for NaNs
+        # don't use sparse because then can't test for NaNs
+        self.vectorizer = OneHotEncoder(categorical_features=self.categoricalcolsidxs,
+                                        sparse=False)
         self.vectorizer.fit(data)
         data = self.vectorizer.transform(data)
         newd = d - categorical + dummies
@@ -145,14 +151,18 @@ class DataWrapper(object):
         testing = data[-num_test_samples:,:]
 
         # training
-        self.training_path = os.path.join(self.outfolder, "%s_train.csv" % self.dataname)
-        training_matrix = np.column_stack((np.array(training_discretized_labels), np.array(training)))
+        self.training_path = os.path.join(self.outfolder,
+                                          "%s_train.csv" % self.dataname)
+        training_matrix = np.column_stack((np.array(training_discretized_labels),
+                                           np.array(training)))
         print "training matrix:", training_matrix.shape
         np.savetxt(self.training_path, training_matrix, delimiter=self.sep, fmt="%s")
 
         # testing
-        self.testing_path = os.path.join(self.outfolder, "%s_test.csv" % self.dataname)
-        testing_matrix = np.column_stack((np.array(testing_discretized_labels), np.array(testing)))
+        self.testing_path = os.path.join(self.outfolder,
+                                         "%s_test.csv" % self.dataname)
+        testing_matrix = np.column_stack((np.array(testing_discretized_labels),
+                                          np.array(testing)))
         print "testing matrix: ", testing_matrix.shape
         np.savetxt(self.testing_path, testing_matrix, delimiter=self.sep, fmt="%s")
 
@@ -162,7 +172,11 @@ class DataWrapper(object):
             "n_examples" : n,
             "d_features" : newd,
             "k_classes" : k,
-            "label_col" : 0, # this is 0 because the processed version of the data file store the label class at column 0
+            # this is 0 because the processed version of the data file store the
+            # label class at column 0
+            # TODO do something about there being both label_col and labelcol
+            # and them sometimes but not always meaning the same thing
+            "label_col" : 0,
             "datasize_bytes" : np.array(data).nbytes,
             "categorical" : categorical,
             "ordinal" : ordinal,
@@ -183,12 +197,13 @@ class DataWrapper(object):
                 break
 
         # now load both files and stack together
-        data = pd.read_csv(self.traintestfile, skipinitialspace=True, na_values=self.dropvals, sep=self.sep)
+        data = pd.read_csv(self.traintestfile, skipinitialspace=True,
+                           na_values=self.dropvals, sep=self.sep)
         data = data.dropna(how='any') # drop rows with any NA values
 
         # Get labels and encode into numerical values
         labels = np.array(data[[self.labelcol]]) # gets data frame instead of series
-        self.encoder = preprocessing.LabelEncoder()
+        self.encoder = LabelEncoder()
         discretized_labels = self.encoder.fit_transform(labels)
 
         # remove labels, get majority percentage
@@ -211,7 +226,7 @@ class DataWrapper(object):
                 self.categoricalcols.append(column)
                 self.categoricalcolsidxs.append(data.columns.get_loc(column))
                 nvalues = len(np.unique(data[column]))
-                if nvalues > 2:
+                if nvalues > 2:     # WHY???
                     dummies += nvalues
                 categorical += 1
             else:
@@ -220,12 +235,14 @@ class DataWrapper(object):
         #data = pd.get_dummies( data )
 
         for column in self.categoricalcols:
-            le = preprocessing.LabelEncoder()
+            le = LabelEncoder()
             le.fit(data[column])
             data[column] = le.transform(data[column])
             self.categoricalcolsvectorizers.append(le)
 
-        self.vectorizer = preprocessing.OneHotEncoder(categorical_features = self.categoricalcolsidxs, sparse = False) # don't use sparse because then then can't test for NaNs
+        # don't use sparse because then then can't test for NaNs
+        self.vectorizer = OneHotEncoder(categorical_features=self.categoricalcolsidxs,
+                                        sparse=False)
         self.vectorizer.fit(data)
         data = self.vectorizer.transform(data)
         newd = d - categorical + dummies
@@ -241,12 +258,15 @@ class DataWrapper(object):
         EnsureDirectory(self.outfolder)
 
         # now split the data
-        data_train, data_test, labels_train, labels_test = train_test_split(data, discretized_labels, test_size=self.testing_ratio)
+        data_train, data_test, labels_train, labels_test = \
+            train_test_split(data, discretized_labels,
+                             test_size=self.testing_ratio)
         #training = pd.DataFrame(data_train)
         #testing = pd.DataFrame(data_test)
 
         # training
-        self.training_path = os.path.join(self.outfolder, "%s_train.csv" % self.dataname)
+        self.training_path = os.path.join(self.outfolder,
+                                          "%s_train.csv" % self.dataname)
         training_matrix = np.column_stack((labels_train, data_train))
         print "training matrix:", training_matrix.shape
         np.savetxt(self.training_path, training_matrix, delimiter=self.sep, fmt="%s")
@@ -264,7 +284,9 @@ class DataWrapper(object):
             "n_examples" : n,
             "d_features" : newd,
             "k_classes" : k,
-            "label_col" : 0, # this is 0 because the processed version of the data file store the label class at column 0
+            # this is 0 because the processed version of the data file store the
+            # label class at column 0
+            "label_col" : 0,
             "datasize_bytes" : np.array(data).nbytes,
             "categorical" : categorical,
             "ordinal" : ordinal,
@@ -295,8 +317,8 @@ class DataWrapper(object):
                         arr[i] = float(arr[i])
                     except:
                         continue
-            ziped = dict(zip(self.headings, arr))
-            ready.append(ziped)
+            zipped = dict(zip(self.headings, arr))
+            ready.append(zipped)
 
         return self.vectorizer.transform(ready)
 

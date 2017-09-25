@@ -4,10 +4,10 @@ from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
 from sklearn.linear_model import SGDClassifier, PassiveAggressiveClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
-from nolearn.dbn import DBN
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import SGDRegressor, LogisticRegression
 from sklearn.gaussian_process import GaussianProcessClassifier
+from nolearn.dbn import DBN
 
 from btb.enumeration import Enumerator
 from btb.enumeration.classification import ClassifierEnumerator
@@ -19,7 +19,6 @@ from btb.enumeration.classification.nn import EnumeratorDBN, EnumeratorMLP
 from btb.enumeration.classification.knn import EnumeratorKNN
 from btb.enumeration.classification.gd import EnumeratorSGDC, EnumeratorPAC
 from btb.enumeration.classification.gp import EnumeratorGPC
-
 from btb.wrapper import Wrapper
 
 # sample selectors

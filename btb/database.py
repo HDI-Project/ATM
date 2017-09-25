@@ -284,8 +284,8 @@ def GetFrozenSet(frozen_set_id, increment=False):
     frozen_set = None
     try:
         session = GetConnection()
-        frozen_set = session.query(FrozenSet).\
-            filter(FrozenSet.id == frozen_set_id).one()
+        frozen_set = session.query(FrozenSet)\
+            .filter(FrozenSet.id == frozen_set_id).one()
         if increment:
             frozen_set.trained += 1
         session.commit()
@@ -305,7 +305,8 @@ def MarkFrozenSetGriddingDone(frozen_set_id):
     session = None
     try:
         session = GetConnection()
-        frozen_set = session.query(FrozenSet).filter(FrozenSet.id == frozen_set_id).one()
+        frozen_set = session.query(FrozenSet)\
+            .filter(FrozenSet.id == frozen_set_id).one()
         frozen_set.is_gridding_done = 1
         session.commit()
         session.expunge_all() # so we can use outside the session
@@ -343,8 +344,8 @@ def GetFrozenSets(datarun_id):
     frozen_sets = []
     try:
         session = GetConnection()
-        frozen_sets = session.query(FrozenSet).\
-            filter(FrozenSet.datarun_id == datarun_id).all()
+        frozen_sets = session.query(FrozenSet)\
+            .filter(FrozenSet.datarun_id == datarun_id).all()
 
     except Exception:
         print "Error in GetFrozenSets():", traceback.format_exc()
@@ -364,10 +365,14 @@ def IsGriddingDoneForDatarun(datarun_id, min_num_errors_to_exclude=0):
     is_done = True
     try:
         session = GetConnection()
-        frozen_sets = session.query(FrozenSet).filter(FrozenSet.datarun_id == datarun_id).all()
+        frozen_sets = session.query(FrozenSet)\
+            .filter(FrozenSet.datarun_id == datarun_id).all()
+
         for frozen_set in frozen_sets:
             if frozen_set.is_gridding_done == 0:
-                if((min_num_errors_to_exclude > 0) and (GetNumberOfFrozenSetErrors(frozen_set_id=frozen_set.id) < min_num_errors_to_exclude)):
+                if ((min_num_errors_to_exclude > 0) and
+                       (GetNumberOfFrozenSetErrors(frozen_set_id=frozen_set.id) <
+                        min_num_errors_to_exclude)):
                     is_done = False
                 elif min_num_errors_to_exclude == 0:
                     is_done = False
@@ -390,15 +395,17 @@ def GetIncompletedFrozenSets(datarun_id, min_num_errors_to_exclude=0):
     frozen_sets = []
     try:
         session = GetConnection()
-        frozen_sets = session.query(FrozenSet).\
-            filter(and_(FrozenSet.datarun_id == datarun_id, FrozenSet.is_gridding_done == 0)).all()
+        frozen_sets = session.query(FrozenSet)\
+            .filter(and_(FrozenSet.datarun_id == datarun_id,
+                         FrozenSet.is_gridding_done == 0)).all()
 
         if min_num_errors_to_exclude > 0:
             old_list = frozen_sets
             frozen_sets = []
 
             for frozen_set in old_list:
-                if GetNumberOfFrozenSetErrors(frozen_set_id=frozen_set.id) < min_num_errors_to_exclude:
+                if GetNumberOfFrozenSetErrors(frozen_set_id=frozen_set.id) < \
+                        min_num_errors_to_exclude:
                     frozen_sets.append(frozen_set)
 
 
@@ -417,13 +424,16 @@ def GetNumberOfFrozenSetErrors(frozen_set_id):
     learners = []
     try:
         session = GetConnection()
-        learners = session.query(Learner). \
-            filter(and_(Learner.frozen_set_id == frozen_set_id, Learner.is_error == 1)).all()
+        learners = session.query(Learner)\
+            .filter(and_(Learner.frozen_set_id == frozen_set_id,
+                         Learner.is_error == 1)).all()
     except:
-        print "Error in GetLearnersInFrozen(%d):" % frozen_set_id, traceback.format_exc()
+        print "Error in GetLearnersInFrozen(%d):" % frozen_set_id
+        print traceback.format_exc()
     finally:
         if session:
             session.close()
+
     return len(learners)
 
 
@@ -435,8 +445,8 @@ def MarkDatarunDone(datarun_id):
     session = None
     try:
         session = GetConnection()
-        datarun = session.query(Datarun).\
-            filter(Datarun.id == datarun_id).one()
+        datarun = session.query(Datarun)\
+            .filter(Datarun.id == datarun_id).one()
         datarun.completed = datetime.now()
         session.commit()
 
@@ -460,7 +470,8 @@ def GetMaximumY(datarun_id, metric, default=0.0):
         if result:
             maximum = float(result)
     except:
-        print "Error in GetMaximumY(%d):" % datarun_id, traceback.format_exc()
+        print "Error in GetMaximumY(%d):" % datarun_id
+        print traceback.format_exc()
     finally:
         session.close()
     return maximum
@@ -474,10 +485,11 @@ def GetLearnersInFrozen(frozen_set_id):
     learners = []
     try:
         session = GetConnection()
-        learners = session.query(Learner).\
-            filter(Learner.frozen_set_id == frozen_set_id).all()
+        learners = session.query(Learner)\
+            .filter(Learner.frozen_set_id == frozen_set_id).all()
     except:
-        print "Error in GetLearnersInFrozen(%d):" % frozen_set_id, traceback.format_exc()
+        print "Error in GetLearnersInFrozen(%d):" % frozen_set_id
+        print traceback.format_exc()
     finally:
         if session:
             session.close()
@@ -526,7 +538,8 @@ def GetLearner(learner_id):
         session = GetConnection()
         learner = session.query(Learner).filter(Learner.id == learner_id).all()
     except:
-        print "Error in GetLearnersInFrozen(%d):" % learner_id, traceback.format_exc()
+        print "Error in GetLearnersInFrozen(%d):" % learner_id
+        print traceback.format_exc()
     finally:
         if session:
             session.close()

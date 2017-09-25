@@ -1,13 +1,17 @@
-from __future__ import division
-from btb.selection.samples import *
-from btb.utilities import *
-from btb.database import *
-from sklearn.gaussian_process import GaussianProcess
-import numpy as np
-import time, traceback
+import time
+import traceback
+import pdb
 
+import numpy as np
+# TODO: this is deprecated as of 0.18
+from sklearn.gaussian_process import GaussianProcess
+
+from btb.database import *
 from btb.selection.acquisition import expected_improvement
+from btb.selection.samples import *
 from btb.selection.samples.uniform import UniformSampler
+from btb.utilities import *
+
 
 class GPEi(SamplesSelector):
 
@@ -32,7 +36,6 @@ class GPEi(SamplesSelector):
 
         return self.do_selection(past_params)
 
-
     def do_selection(self, past_params):
         """
         Based on past parameterizations and their performances,
@@ -48,27 +51,35 @@ class GPEi(SamplesSelector):
                 ...
             ]
         """
-        # etract parameters and performances
+        # extract parameters and performances
         params = [x[0] for x in past_params]
         y = np.array([x[1] for x in past_params])
         X = ParamsToVectors(params, self.frozen_set.optimizables)
 
         # train a GP
-        gp = GaussianProcess(theta0=1e-2, thetaL=1e-4, thetaU=1e-1, nugget=np.finfo(np.double).eps * 1000)
-        gp.fit(X, y)
+        gp = GaussianProcess(theta0=1e-2, thetaL=1e-4, thetaU=1e-1,
+                             nugget=np.finfo(np.double).eps * 1000)
+        try:
+            gp.fit(X, y)
+        except Exception:
+            pdb.set_trace()
 
         # randomly generate many vectors
         candidates = GenerateRandomVectors(1000, self.frozen_set.optimizables)
         ys, stdevs = gp.predict(candidates, eval_MSE=True)
         predictions = zip(ys, stdevs)
-        predictions = [expected_improvement(y, self.best_y, stdev) for (y, stdev) in predictions]
+        predictions = [expected_improvement(y, self.best_y, stdev)
+                       for (y, stdev) in predictions]
 
         #print "PREDICTIONS", np.unique(predictions)
 
         # choose one with highest average, convert, and return
         chosen = candidates[np.argmax(predictions)]
 
-        return VectorBackToParams(chosen, self.frozen_set.optimizables, self.frozen_set.frozens, self.frozen_set.constants)
+        return VectorBackToParams(chosen, self.frozen_set.optimizables,
+                                  self.frozen_set.frozens,
+                                  self.frozen_set.constants)
+
 
 class GPEiTime(SamplesSelector):
 
@@ -96,7 +107,6 @@ class GPEiTime(SamplesSelector):
 
         return self.do_selection(past_params)
 
-
     def do_selection(self, past_params):
         """
         Based on past parameterizations and their performances,
@@ -115,25 +125,30 @@ class GPEiTime(SamplesSelector):
                 ...
             ]
         """
-        # etract parameters and performances
+        # extract parameters and performances
         params = [x[0] for x in past_params]
         y = np.array([x[1] for x in past_params])
         X = ParamsToVectors(params, self.frozen_set.optimizables)
 
         # train a GP
-        gp = GaussianProcess(theta0=1e-2, thetaL=1e-4, thetaU=1e-1, nugget=np.finfo(np.double).eps * 1000)
+        gp = GaussianProcess(theta0=1e-2, thetaL=1e-4, thetaU=1e-1,
+                             nugget=np.finfo(np.double).eps * 1000)
         gp.fit(X, y)
 
         # randomly generate many vectors
         candidates = GenerateRandomVectors(1000, self.frozen_set.optimizables)
         ys, stdevs = gp.predict(candidates, eval_MSE=True)
         predictions = zip(ys, stdevs)
-        predictions = [expected_improvement(y, self.best_y, stdev) for (y, stdev) in predictions]
+        predictions = [expected_improvement(y, self.best_y, stdev)
+                       for (y, stdev) in predictions]
 
         # choose one with highest average, convert, and return
         chosen = candidates[np.argmax(predictions)]
 
-        return VectorBackToParams(chosen, self.frozen_set.optimizables, self.frozen_set.frozens, self.frozen_set.constants)
+        return VectorBackToParams(chosen, self.frozen_set.optimizables,
+                                  self.frozen_set.frozens,
+                                  self.frozen_set.constants)
+
 
 class GPEiVelocity(SamplesSelector):
 
@@ -152,7 +167,6 @@ class GPEiVelocity(SamplesSelector):
         Takes in learner objects from database that
         have been completed.
         """
-
         # calculate average velocity over the k window
         session = None
         probability_of_random = 0.1

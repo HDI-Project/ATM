@@ -13,7 +13,7 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-# TODO: get rid of these hard-coded values
+# TODO: get rid of these hard-coded values, add them to config
 OUTPUT_FOLDER = "data/processed"
 LABEL_COLUMN = "class"
 

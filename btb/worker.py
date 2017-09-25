@@ -7,7 +7,6 @@ from btb.selection.samples import SELECTION_SAMPLES_GP_EI,\
 from btb.selection.frozens import SELECTION_FROZENS_UNIFORM,\
                                   SELECTION_FROZENS_UCB1
 from btb.config import Config
-from btb.database import *
 from btb.utilities import *
 from btb.mapping import Mapping, CreateWrapper
 from btb.model import Model
@@ -386,10 +385,12 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
             frozen_set_id = fselector.select()
             if not frozen_set_id > 0:
                 _log("Invalid frozen set id! %d" % frozen_set_id)
+                continue
 
             frozen_set = db.GetFrozenSet(frozen_set_id, increment=True)
             if not frozen_set:
                 _log("Invalid frozen set! %s" % frozen_set)
+                continue
             _log("Frozen set: %d" % frozen_set_id)
 
             # choose sampler
@@ -423,7 +424,8 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
                 model = Model(wrapper, datarun.wrapper)
 
                 # insert learner into the database
-                InsertLearner(datarun, frozen_set, performance, params, model, started, config)
+                InsertLearner(datarun, frozen_set, performance, params, model,
+                              started, config)
 
                 print
                 _log("Best so far: %.3f +- %.3f" %
