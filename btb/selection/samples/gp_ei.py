@@ -62,7 +62,8 @@ class GPEi(SamplesSelector):
         try:
             gp.fit(X, y)
         except Exception:
-            pdb.set_trace()
+            print 'caught GP_EI exception'
+            # TODO
 
         # randomly generate many vectors
         candidates = GenerateRandomVectors(1000, self.frozen_set.optimizables)

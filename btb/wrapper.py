@@ -125,16 +125,16 @@ class Wrapper(object):
                                          y_pred_probs=y_pred_probs)
 
             self.test_scores = dict(accuracies=results['accuracy'],
-                                    cohen_kappas=results['cohen_kappa'],
                                     f1_scores=results['f1_score'],
-                                    roc_curve_fprs=results['roc_curve_fprs'],
-                                    roc_curve_tprs=results['roc_curve_tprs'],
-                                    roc_curve_thresholds=results['roc_curve_thresholds'],
+                                    pr_curve_aucs=results['pr_curve_auc'],
+                                    cohen_kappas=results['cohen_kappa'],
                                     roc_curve_aucs=results['roc_curve_auc'],
                                     pr_curve_precisions=results['pr_curve_precisions'],
                                     pr_curve_recalls=results['pr_curve_recalls'],
                                     pr_curve_thresholds=results['pr_curve_thresholds'],
-                                    pr_curve_aucs=results['pr_curve_auc'],
+                                    roc_curve_fprs=results['roc_curve_fprs'],
+                                    roc_curve_tprs=results['roc_curve_tprs'],
+                                    roc_curve_thresholds=results['roc_curve_thresholds'],
                                     rank_accuracies=None,
                                     mu_sigmas=None)
             self.test_scores['judgment_metric'] = self.test_scores[self.judgment_metric]
@@ -154,16 +154,18 @@ class Wrapper(object):
                                                    y_pred_probs=y_pred_probs)
 
             self.test_scores = dict(accuracies=results['accuracy'],
-                                    cohen_kappas=results['cohen_kappa'],
                                     f1_scores=results['label_level_f1_scores'],
-                                    roc_curve_fprs=results['pair_level_roc_curve_fprs'],
-                                    roc_curve_tprs=results['pair_level_roc_curve_tprs'],
-                                    roc_curve_thresholds=results['pair_level_roc_curve_thresholds'],
+                                    f1_score_micros=results['f1_score_micro'],
+                                    f1_score_macros=results['f1_score_macro'],
+                                    pr_curve_aucs=results['label_level_pr_curve_aucs'],
+                                    cohen_kappas=results['cohen_kappa'],
                                     roc_curve_aucs=results['pair_level_roc_curve_aucs'],
                                     pr_curve_precisions=results['label_level_pr_curve_precisions'],
                                     pr_curve_recalls=results['label_level_pr_curve_recalls'],
                                     pr_curve_thresholds=results['label_level_pr_curve_thresholds'],
-                                    pr_curve_aucs=results['label_level_pr_curve_aucs'],
+                                    roc_curve_fprs=results['pair_level_roc_curve_fprs'],
+                                    roc_curve_tprs=results['pair_level_roc_curve_tprs'],
+                                    roc_curve_thresholds=results['pair_level_roc_curve_thresholds'],
                                     rank_accuracies=None,
                                     mu_sigmas=results['mu_sigma'])
             self.test_scores['judgment_metric'] = self.test_scores[self.judgment_metric]
@@ -183,8 +185,10 @@ class Wrapper(object):
                                                    rank=5)
 
             self.test_scores = dict(accuracies=results['accuracy'],
-                                    cohen_kappas=results['cohen_kappa'],
                                     f1_scores=results['label_level_f1_scores'],
+                                    f1_score_micros=results['f1_score_micro'],
+                                    f1_score_macros=results['f1_score_macro'],
+                                    cohen_kappas=results['cohen_kappa'],
                                     roc_curve_fprs=None, roc_curve_tprs=None,
                                     roc_curve_thresholds=None,
                                     roc_curve_aucs=None,

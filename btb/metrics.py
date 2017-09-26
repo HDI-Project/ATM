@@ -5,18 +5,19 @@ from sklearn.metrics import f1_score, precision_recall_curve, auc, roc_curve,\
 
 import numpy as np
 import itertools
+import pdb
 
 
 # these are the strings that are used to index into results dictionaries
 class Metrics:
     ACCURACY = 'accuracies'
     F1 = 'f1_scores'
-    F1_MICRO = 'f1_scores_micro'
-    F1_MACRO = 'f1_scores_macro'
+    F1_MICRO = 'f1_score_micros'
+    F1_MACRO = 'f1_score_macros'
     F1_MU_SIGMA = 'mu_sigmas'           # mean(f1) - std(f1)
     ROC_AUC = 'roc_curve_aucs'
-    ROC_AUC_MICRO = 'roc_curve_aucs_micro'
-    ROC_AUC_MACRO = 'roc_curve_aucs_macro'
+    ROC_AUC_MICRO = 'roc_curve_auc_micros'
+    ROC_AUC_MACRO = 'roc_curve_auc_macros'
     PR_AUC = 'pr_curve_aucs'
     COHEN_KAPPA = 'cohen_kappas'
     RANK_ACCURACY = 'rank_accuracies'   # for large multiclass problems
@@ -171,8 +172,8 @@ def get_metrics_small_multiclass(y_true, y_pred, y_pred_probs):
                    label_level_pr_curve_recalls=label_level_pr_curve_recalls,
                    label_level_pr_curve_thresholds=label_level_pr_curve_thresholds,
                    label_level_pr_curve_aucs=label_level_pr_curve_aucs,
-                   f1_scores_micro=f1_score_micro,
-                   f1_scores_macro=f1_score_macro,
+                   f1_score_micro=f1_score_micro,
+                   f1_score_macro=f1_score_macro,
                    #roc_curve_auc_micro=roc_curve_auc_micro,
                    #roc_curve_auc_macro=roc_curve_auc_macro,
                    mu_sigma=mu_sigma)
@@ -231,8 +232,8 @@ def get_metrics_large_multiclass(y_true, y_pred, y_pred_probs, rank):
 
     results = dict(accuracy=accuracy,
                    cohen_kappa=cohen_kappa,
-                   f1_scores_micro=f1_score_micro,
-                   f1_scores_macro=f1_score_macro,
+                   f1_score_micro=f1_score_micro,
+                   f1_score_macro=f1_score_macro,
                    #roc_curve_auc_micro=roc_curve_auc_micro,
                    #roc_curve_auc_macro=roc_curve_auc_macro,
                    label_level_f1_scores=label_level_f1_scores,
@@ -335,14 +336,14 @@ def btb_cross_val_small_multiclass(pipeline, X, y, judgment_metric, cv=10):
     accuracies = np.zeros(cv)
     cohen_kappas = np.zeros(cv)
     f1_scores = []
-    f1_score_micros = []
-    f1_score_macros = []
+    f1_score_micros = np.zeros(cv)
+    f1_score_macros = np.zeros(cv)
     roc_curve_fprs = []
     roc_curve_tprs = []
     roc_curve_thresholds = []
     roc_curve_aucs = []
-    roc_curve_auc_micros = []
-    roc_curve_auc_macros = []
+    roc_curve_auc_micros = np.zeros(cv)
+    roc_curve_auc_macros = np.zeros(cv)
     pr_curve_precisions = []
     pr_curve_recalls = []
     pr_curve_thresholds = []
@@ -367,7 +368,8 @@ def btb_cross_val_small_multiclass(pipeline, X, y, judgment_metric, cv=10):
             y_pred_probs = pipeline.predict_proba(X_test)
 
 
-        results = get_metrics_small_multiclass(y_true=y_test, y_pred=y_pred, y_pred_probs=y_pred_probs)
+        results = get_metrics_small_multiclass(y_true=y_test, y_pred=y_pred,
+                                               y_pred_probs=y_pred_probs)
 
         roc_curve_fprs.append((split_id, results['pair_level_roc_curve_fprs']))
         roc_curve_tprs.append((split_id, results['pair_level_roc_curve_tprs']))
@@ -382,10 +384,10 @@ def btb_cross_val_small_multiclass(pipeline, X, y, judgment_metric, cv=10):
         accuracies[split_id] = results['accuracy']
         cohen_kappas[split_id] = results['cohen_kappa']
         mu_sigmas[split_id] = results['mu_sigma']
-        f1_score_micros[split_id] = results['f1_scores_micro']
-        f1_score_macros[split_id] = results['f1_scores_macro']
-        roc_curve_auc_micros[split_id] = results['roc_curve_aucs_micro']
-        roc_curve_auc_macros[split_id] = results['roc_curve_aucs_macro']
+        f1_score_micros[split_id] = results['f1_score_micro']
+        f1_score_macros[split_id] = results['f1_score_macro']
+        #roc_curve_auc_micros[split_id] = results['roc_curve_auc_micro']
+        #roc_curve_auc_macros[split_id] = results['roc_curve_auc_macro']
 
         split_id += 1
 
@@ -396,8 +398,8 @@ def btb_cross_val_small_multiclass(pipeline, X, y, judgment_metric, cv=10):
                       pr_curve_aucs=pr_curve_aucs,
                       cohen_kappas=cohen_kappas,
                       roc_curve_aucs=roc_curve_aucs,
-                      roc_curve_auc_micros=roc_curve_auc_micros,
-                      roc_curve_auc_macros=roc_curve_auc_macros,
+                      #roc_curve_auc_micros=roc_curve_auc_micros,
+                      #roc_curve_auc_macros=roc_curve_auc_macros,
                       pr_curve_precisions=pr_curve_precisions,
                       pr_curve_recalls=pr_curve_recalls,
                       pr_curve_thresholds=pr_curve_thresholds,
@@ -439,14 +441,14 @@ def btb_cross_val_large_multiclass(pipeline, X, y, judgment_metric, cv=10, rank=
     accuracies = np.zeros(cv)
     cohen_kappas = np.zeros(cv)
     f1_scores = []
-    f1_score_micros = []
-    f1_score_macros = []
+    f1_score_micros = np.zeros(cv)
+    f1_score_macros = np.zeros(cv)
     roc_curve_fprs = None
     roc_curve_tprs = None
     roc_curve_thresholds = None
     roc_curve_aucs = None
-    roc_curve_auc_micros = []
-    roc_curve_auc_macros = []
+    roc_curve_auc_micros = np.zeros(cv)
+    roc_curve_auc_macros = np.zeros(cv)
     pr_curve_precisions = None
     pr_curve_recalls = None
     pr_curve_thresholds = None
@@ -470,16 +472,18 @@ def btb_cross_val_large_multiclass(pipeline, X, y, judgment_metric, cv=10, rank=
         else:
             y_pred_probs = pipeline.predict_proba(X_test)
 
-        results = get_metrics_large_multiclass(y_true=y_test, y_pred=y_pred, y_pred_probs=y_pred_probs, rank=rank)
+        results = get_metrics_large_multiclass(y_true=y_test, y_pred=y_pred,
+                                               y_pred_probs=y_pred_probs,
+                                               rank=rank)
 
         f1_scores.append((split_id, results['label_level_f1_scores']))
         mu_sigmas[split_id] =results['mu_sigma']
         accuracies[split_id] = results['accuracy']
         rank_accuracies[split_id] = results['rank_accuracy']
-        f1_score_micros[split_id] = results['f1_scores_micro']
-        f1_score_macros[split_id] = results['f1_scores_macro']
-        roc_curve_auc_micros[split_id] = results['roc_curve_aucs_micro']
-        roc_curve_auc_macros[split_id] = results['roc_curve_aucs_macro']
+        f1_score_micros[split_id] = results['f1_score_micro']
+        f1_score_macros[split_id] = results['f1_score_macro']
+        #roc_curve_auc_micros[split_id] = results['roc_curve_auc_micro']
+        #roc_curve_auc_macros[split_id] = results['roc_curve_auc_macro']
 
         split_id += 1
 
@@ -490,8 +494,8 @@ def btb_cross_val_large_multiclass(pipeline, X, y, judgment_metric, cv=10, rank=
                       pr_curve_aucs=pr_curve_aucs,
                       cohen_kappas=cohen_kappas,
                       roc_curve_aucs=roc_curve_aucs,
-                      roc_curve_auc_micros=roc_curve_auc_micros,
-                      roc_curve_auc_macros=roc_curve_auc_macros,
+                      #roc_curve_auc_micros=roc_curve_auc_micros,
+                      #roc_curve_auc_macros=roc_curve_auc_macros,
                       pr_curve_precisions=pr_curve_precisions,
                       pr_curve_recalls=pr_curve_recalls,
                       pr_curve_thresholds=pr_curve_thresholds,
@@ -501,6 +505,7 @@ def btb_cross_val_large_multiclass(pipeline, X, y, judgment_metric, cv=10, rank=
                       rank_accuracies=rank_accuracies,
                       mu_sigmas=mu_sigmas)
 
+    assert judgment_metric in ['f1_score_micros', 'f1_scores_macros']
     cv_results['judgment_metric'] = np.mean(cv_results[judgment_metric])
     cv_results['judgment_metric_std'] = np.std(cv_results[judgment_metric])
 

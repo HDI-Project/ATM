@@ -5,6 +5,7 @@ class Model(object):
     INPUT_CSV = "csv"
     INPUT_DICT = "dict"
     INPUT_VECT = "vector" # already converted to entirely numerical vectors
+    INPUT_FILE = "file"
 
     OUTPUT_ORIGINAL = "original"
     OUTPUT_INT = "int"
@@ -60,6 +61,21 @@ class Model(object):
 
         elif input_type == Model.INPUT_DICT:
             raise Exception("Input dictionary type not supported yet.")
+
+        elif input_type == Model.INPUT_FILE:
+
+            if probability:
+                vectorized_examples = self.data.vectorize_file(examples)
+                probs = self.algorithm.predict(vectorized_examples,
+                                               probability=probability)
+                return probs
+
+            else:
+                vectorized_examples = self.data.vectorize_file(examples)
+                labels = self.algorithm.predict(vectorized_examples).astype(int)
+                if output_type == Model.OUTPUT_ORIGINAL:
+                    labels = self.data.decode_labels(labels.astype(int))
+                return labels
 
     def save(self, path):
         joblib.dump(self, path, compress=9)

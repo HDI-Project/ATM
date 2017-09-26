@@ -307,6 +307,22 @@ class DataWrapper(object):
     def __repr__(self):
         return "<DataWrapper>"
 
+    def vectorize_file(self, path):
+        data = pd.read_csv(path, skipinitialspace=True,
+                           na_values=self.dropvals, sep=self.sep)
+        data = data.dropna(how='any') # drop rows with any NA values
+
+        for column in data.columns.values:
+            if data[column].dtype == "object":
+                #self.categoricalcols.append(column)
+                #self.categoricalcolsidxs.append(data.columns.get_loc(column))
+
+                # encode feature as an integer in range(nvalues)
+                le = LabelEncoder()
+                data[column] = le.fit_transform(data[column])
+                #self.categoricalcolsvectorizers.append(le)
+        return self.vectorizer.transform(data)
+
     def vectorize_examples(self, examples):
         """
         examples : list of csv strings
