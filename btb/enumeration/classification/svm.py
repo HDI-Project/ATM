@@ -15,7 +15,7 @@ class EnumeratorSVC(ClassifierEnumerator):
         "probability" : (True,),
         "shrinking" : (True,),
         "cache_size" : (15000, 15000),
-        "class_weight" : ("balanced",),
+        "class_weight" : ("auto",),
         "_scale" : (True,),
     }
 

@@ -12,7 +12,7 @@ class EnumeratorLRC(ClassifierEnumerator):
         "penalty" : ('l1', 'l2'),
         "dual" : (True, False),
         "fit_intercept" : (True, False),
-        "class_weight" : ('balanced', 'balanced'),
+        "class_weight" : ('auto', 'auto'),
         "_scale" : (True, True)
     }
 
