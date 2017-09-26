@@ -44,9 +44,9 @@ class EnumeratorDBN(ClassifierEnumerator):
             ranges or EnumeratorDBN.DEFAULT_RANGES, keys or EnumeratorDBN.DEFAULT_KEYS)
         self.code = ClassifierEnumerator.DBN
         self.create_cpt()
-        
+
     def create_cpt(self):
-        
+
         scale = Choice("_scale", self.ranges["_scale"])
         inlayer_size = Choice("inlayer_size", self.ranges["inlayer_size"])
         outlayer_size = Choice("outlayer_size", self.ranges["outlayer_size"])
@@ -71,7 +71,7 @@ class EnumeratorDBN(ClassifierEnumerator):
         num_hidden_layers.add_condition(3, [three_layers])
 
         dbn = Combination([inlayer_size, outlayer_size, minibatch_size, num_hidden_layers,
-                            learn_rates, learn_rate_decays, learn_rates_pretrain, 
+                            learn_rates, learn_rate_decays, learn_rates_pretrain,
                             output_act_funct, epochs, scale])
         dbnroot = Choice("function", [ClassifierEnumerator.DBN])
         dbnroot.add_condition(ClassifierEnumerator.DBN, [dbn])

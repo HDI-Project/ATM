@@ -12,7 +12,7 @@ class EnumeratorLRC(ClassifierEnumerator):
         "penalty" : ('l1', 'l2'),
         "dual" : (True, False),
         "fit_intercept" : (True, False),
-        "class_weight" : ('auto', 'auto'),
+        "class_weight" : ('balanced', 'balanced'),
         "_scale" : (True, True)
     }
 
@@ -32,9 +32,9 @@ class EnumeratorLRC(ClassifierEnumerator):
             ranges or EnumeratorLRC.DEFAULT_RANGES, keys or EnumeratorLRC.DEFAULT_KEYS)
         self.code = ClassifierEnumerator.LRC
         self.create_cpt()
-        
+
     def create_cpt(self):
-        
+
         C = Choice("C", self.ranges["C"])
         tol = Choice("tol", self.ranges["tol"])
         penalty = Choice("penalty", self.ranges["penalty"])
@@ -42,11 +42,11 @@ class EnumeratorLRC(ClassifierEnumerator):
         fit_intercept = Choice("fit_intercept", self.ranges["fit_intercept"])
         class_weight = Choice("class_weight", self.ranges["class_weight"])
         scale = Choice("_scale", self.ranges["_scale"])
-        
+
         penalty.add_condition("l2", [dual])
-        
+
         logreg = Combination([C, tol, penalty, fit_intercept, class_weight, scale])
         logroot = Choice("function", [ClassifierEnumerator.LRC])
         logroot.add_condition(ClassifierEnumerator.LRC, [logreg])
-        
+
         self.root = logroot

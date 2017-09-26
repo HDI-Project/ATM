@@ -59,11 +59,8 @@ class GPEi(SamplesSelector):
         # train a GP
         gp = GaussianProcess(theta0=1e-2, thetaL=1e-4, thetaU=1e-1,
                              nugget=np.finfo(np.double).eps * 1000)
-        try:
-            gp.fit(X, y)
-        except Exception:
-            print 'caught GP_EI exception'
-            # TODO
+        # TODO: This throws an error
+        gp.fit(X, y)
 
         # randomly generate many vectors
         candidates = GenerateRandomVectors(1000, self.frozen_set.optimizables)
