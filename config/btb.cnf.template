@@ -1,6 +1,19 @@
 #################################
 #   BTB CONFIGURATION FILE   #
 #################################
+#
+# In order to use this, you must change the following fields at the very least:
+# [data]
+# - alldatapath
+# [datahub]
+# - username
+# - password
+#
+# The most important values for tuning are:
+# [run]
+# - algorithms
+# [budget]
+# - learner
 
 [data]
 # Path to a file with a list of datafiles. All will be uploaded to the ModelHub
@@ -76,9 +89,9 @@ query:
 #   classify_knn    - K nearest neighbors
 #   classify_dbn    - deep belief network
 #   classify_mlp    - multi-layer perceptron
-algorithms: classify_rf, classify_logreg, classify_dt, classify_gnb
+algorithms: classify_rf, classify_logreg, classify_dt
 # directory to store trained models; will be created if it doesn't exist
-models-dir: /path/to/save/models
+models-dir: ./models
 # not sure this is used
 drop-values:
 # not sure this is used
@@ -105,7 +118,7 @@ walltime-budget: 5
 # 	- gp_eitime: Gaussian Process expected improvement criterion per unit time
 # 	- gp_eivel: GPEI criterion per unit velocity
 # 	- grid: grid selection
-sample_selection: gp_ei
+sample_selection: grid
 # r_min is the number of random runs performed in each hyperpartition before 
 # allowing bayesian opt to select parameters. Consult the thesis to understand
 # what those mean, but essentially: 
