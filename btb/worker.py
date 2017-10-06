@@ -1,9 +1,10 @@
 from btb.selection.samples import SELECTION_SAMPLES_UNIFORM,\
                                   SELECTION_SAMPLES_GP,\
-                                  SELECTION_SAMPLES_GRID
-from btb.selection.samples import SELECTION_SAMPLES_GP_EI,\
+                                  SELECTION_SAMPLES_GRID,\
+                                  SELECTION_SAMPLES_GP_EI,\
                                   SELECTION_SAMPLES_GP_EI_TIME,\
-                                  SELECTION_SAMPLES_GP_EI_VEL
+                                  SELECTION_SAMPLES_GP_EI_VEL,\
+                                  SELECTION_SAMPLES_CUSTOM
 from btb.selection.frozens import SELECTION_FROZENS_UNIFORM,\
                                   SELECTION_FROZENS_UCB1
 from btb.config import Config
@@ -290,10 +291,10 @@ def get_sampler(datarun, best_y, frozen_set):
     _log("Sample selection: %s" % datarun.sample_selection)
     Sampler = Mapping.SELECTION_SAMPLES_MAP[datarun.sample_selection]
 
-    needs_opt = [SELECTION_SAMPLES_GP, SELECTION_SAMPLES_GP_EI,
-                SELECTION_SAMPLES_GP_EI_VEL, SELECTION_SAMPLES_GP_EI_TIME]
+    needs_n_opt = [SELECTION_SAMPLES_GP, SELECTION_SAMPLES_GP_EI,
+                   SELECTION_SAMPLES_GP_EI_VEL, SELECTION_SAMPLES_GP_EI_TIME]
     needs_best_y = [SELECTION_SAMPLES_GP_EI, SELECTION_SAMPLES_GP_EI_VEL,
-                   SELECTION_SAMPLES_GP_EI_TIME]
+                    SELECTION_SAMPLES_GP_EI_TIME]
 
     n_opt = datarun.r_min
 
@@ -306,7 +307,7 @@ def get_sampler(datarun, best_y, frozen_set):
 
     # Use uniform sample selection if there are not enough results to use
     # another method
-    if datarun.sample_selection in needs_opt and len(learners) < n_opt:
+    if datarun.sample_selection in needs_n_opt and len(learners) < n_opt:
         _log("Not enough previous results, falling back to strategy: %s"
              % SELECTION_SAMPLES_UNIFORM)
         Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
@@ -465,10 +466,10 @@ if __name__ == '__main__':
     parser.add_argument('-l', '--seqorder', help='work on datasets in sequential order starting with smallest id number, but still max priority (default = random)',
                         dest='choose_randomly', default=True, action='store_const', const=False)
     parser.add_argument('--no-save', help="don't save models and metrics for later",
-                        dest='save_files', default=true, action='store_const', const=False)
+                        dest='save_files', default=True, action='store_const', const=False)
     args = parser.parse_args()
     config = Config(args.configpath)
 
-    # les go
+    # lets go
     work(config, args.datarun_id, args.time, args.choose_randomly,
          args.save_files)

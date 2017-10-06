@@ -428,7 +428,7 @@ def GetNumberOfFrozenSetErrors(frozen_set_id):
             .filter(and_(Learner.frozen_set_id == frozen_set_id,
                          Learner.is_error == 1)).all()
     except:
-        print "Error in GetLearnersInFrozen(%d):" % frozen_set_id
+        print "Error in GetNumberOfFrozenSetErrors(%d):" % frozen_set_id
         print traceback.format_exc()
     finally:
         if session:
@@ -479,7 +479,7 @@ def GetMaximumY(datarun_id, metric, default=0.0):
 
 def GetLearnersInFrozen(frozen_set_id):
     """
-    Returns all completed learners in
+    Returns all completed learners in this frozen set
     """
     session = None
     learners = []
@@ -538,7 +538,7 @@ def GetLearner(learner_id):
         session = GetConnection()
         learner = session.query(Learner).filter(Learner.id == learner_id).all()
     except:
-        print "Error in GetLearnersInFrozen(%d):" % learner_id
+        print "Error in GetLearner(%d):" % learner_id
         print traceback.format_exc()
     finally:
         if session:

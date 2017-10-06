@@ -22,20 +22,6 @@ class GPEi(SamplesSelector):
         """
         super(GPEi, self).__init__(**kwargs)
 
-    def select(self):
-        """
-        Takes in learner objects from database that
-        have been completed.
-        """
-        past_params = []
-        learners = GetLearnersInFrozen(self.frozen_set.id)
-        learners = [x for x in learners if x.completed]
-        for learner in learners:
-            y = float(getattr(learner, self.metric))
-            past_params.append((learner.params, y))
-
-        return self.do_selection(past_params)
-
     def do_selection(self, past_params):
         """
         Based on past parameterizations and their performances,
@@ -90,8 +76,8 @@ class GPEiTime(SamplesSelector):
 
     def select(self):
         """
-        Takes in learner objects from database that
-        have been completed.
+        Takes in learner objects from database that have been completed.
+        Need to override default to normalize y scores by elapsed time.
         """
         past_params = []
         learners = GetLearnersInFrozen(self.frozen_set.id)
@@ -162,8 +148,9 @@ class GPEiVelocity(SamplesSelector):
 
     def select(self):
         """
-        Takes in learner objects from database that
-        have been completed.
+        Takes in learner objects from database that have been completed.
+        This class handles all select logic in this function, no do_select is
+        necessary.
         """
         # calculate average velocity over the k window
         session = None

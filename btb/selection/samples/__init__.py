@@ -11,6 +11,7 @@ SELECTION_SAMPLES_GP_EI = "gp_ei"
 SELECTION_SAMPLES_GP_EI_TIME = "gp_eitime"
 SELECTION_SAMPLES_GP_EI_VEL = "gp_eivel"
 SELECTION_SAMPLES_GRID = "grid"
+SELECTION_SAMPLES_CUSTOM = "custom"
 
 
 class SamplesSelector(Selector):
@@ -20,6 +21,18 @@ class SamplesSelector(Selector):
         optimizables, frozens, constants
         """
         super(SamplesSelector, self).__init__(**kwargs)
+
+    def select(self):
+        """ Takes in learner objects from database that have been completed.
+        """
+        past_params = []
+        learners = GetLearnersInFrozen(self.frozen_set.id)
+        learners = [x for x in learners if x.completed]
+        for learner in learners:
+            y = float(getattr(learner, self.metric))
+            past_params.append((learner.params, y))
+
+        return self.do_selection(past_params)
 
 
 def GenerateRandomVectors(n, optimizables):

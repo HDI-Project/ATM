@@ -13,24 +13,7 @@ class Grid(SamplesSelector):
         """
         super(Grid, self).__init__(**kwargs)
 
-    def select(self):
-        """
-        Takes in learner objects from database that
-        have been completed.
-        """
-        past_params = []
-        frozen_ids = []
-
-        learners = GetLearnersInFrozen(self.frozen_set.id)
-        learners = [x for x in learners if x.completed]
-        for learner in learners:
-            y = float(getattr(learner, self.metric))
-            past_params.append((learner.params, y))
-            frozen_ids.append(learner.frozen_set_id)
-
-        return self.do_selection(past_params, frozen_ids)
-
-    def do_selection(self, past_params, frozen_ids):
+    def do_selection(self, past_params):
         """
         Example format:
 

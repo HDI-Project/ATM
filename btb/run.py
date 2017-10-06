@@ -15,7 +15,7 @@ warnings.filterwarnings("ignore")
 
 # TODO: get rid of these hard-coded values, add them to config
 OUTPUT_FOLDER = "data/processed"
-LABEL_COLUMN = "btb_class"
+LABEL_COLUMN = "class"
 
 
 def Run(config, runname, description, metric, score_target, sample_selection,

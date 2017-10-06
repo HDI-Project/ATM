@@ -48,7 +48,8 @@ class GP(SamplesSelector):
         X = ParamsToVectors(params, self.frozen_set.optimizables)
 
         # train a GP
-        gp = GaussianProcess(theta0=1e-2, thetaL=1e-4, thetaU=1e-1, nugget=np.finfo(np.double).eps * 1000)
+        gp = GaussianProcess(theta0=1e-2, thetaL=1e-4, thetaU=1e-1,
+                             nugget=np.finfo(np.double).eps * 1000)
         gp.fit(X, y)
 
         # randomly generate many vectors
@@ -57,5 +58,6 @@ class GP(SamplesSelector):
 
         # choose one with highest average, convert, and return
         chosen = candidates[np.argmax(predictions)]
-        return VectorBackToParams(chosen, self.frozen_set.optimizables, self.frozen_set.frozens,
+        return VectorBackToParams(chosen, self.frozen_set.optimizables,
+                                  self.frozen_set.frozens,
                                   self.frozen_set.constants)
