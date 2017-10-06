@@ -28,7 +28,7 @@ from decimal import Decimal
 import pandas as pd
 from boto.s3.connection import S3Connection, Key as S3Key
 
-# ... shhh
+# shhh
 warnings.filterwarnings("ignore")
 
 # for garrays
@@ -125,7 +125,7 @@ def save_learner_cloud(config, local_model_path, local_metric_path):
 
 
 def InsertLearner(datarun, frozen_set, performance, params, model, started,
-                  config):
+                  config, save_files=True):
     """
     Inserts a learner and also updates the frozen_sets table.
 
@@ -135,29 +135,35 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started,
     # save model to local filesystem
     phash = HashDict(params)
     rhash = HashString(datarun.name)
-    local_model_path = MakeModelPath("models", phash, rhash,
-                                     datarun.description)
-    model.save(local_model_path)
-    _log("Saving model in: %s" % local_model_path)
 
-    local_metric_path = MakeMetricPath("metrics", phash, rhash,
-                                       datarun.description)
-    metric_obj = dict(cv=performance['cv_object'],
-                      test=performance['test_object'])
-    SaveMetric(local_metric_path, object=metric_obj)
-    _log("Saving metrics in: %s" % local_model_path)
+    # whether to save things to local filesystem
+    if save_files:
+        local_model_path = MakeModelPath("models", phash, rhash,
+                                         datarun.description)
+        model.save(local_model_path)
+        _log("Saving model in: %s" % local_model_path)
 
-    # mode: cloud or local?
-    mode = config.get(Config.MODE, Config.MODE_RUNMODE)
+        local_metric_path = MakeMetricPath("metrics", phash, rhash,
+                                           datarun.description)
+        metric_obj = dict(cv=performance['cv_object'],
+                          test=performance['test_object'])
+        SaveMetric(local_metric_path, object=metric_obj)
+        _log("Saving metrics in: %s" % local_model_path)
 
-    # if necessary, save model and metrics to Amazon S3 bucket
-    if mode == 'cloud':
-        try:
-            save_learner_cloud(config, local_model_path, local_metric_path)
-        except Exception:
-            msg = traceback.format_exc()
-            _log("Error in save_learner_cloud()")
-            InsertError(datarun.id, frozen_set, params, msg)
+        # mode: cloud or local?
+        mode = config.get(Config.MODE, Config.MODE_RUNMODE)
+
+        # if necessary, save model and metrics to Amazon S3 bucket
+        if mode == 'cloud':
+            try:
+                save_learner_cloud(config, local_model_path, local_metric_path)
+            except Exception:
+                msg = traceback.format_exc()
+                _log("Error in save_learner_cloud()")
+                InsertError(datarun.id, frozen_set, params, msg)
+    else:
+        local_model_path = None
+        local_metric_path = None
 
     # compile fields
     completed = time.strftime('%Y-%m-%d %H:%M:%S')
@@ -315,7 +321,8 @@ def get_sampler(datarun, best_y, frozen_set):
                        metric=datarun.score_target)
 
 
-def work(config, datarun_id=None, total_time=None, choose_randomly=True):
+def work(config, datarun_id=None, total_time=None, choose_randomly=True,
+         save_files=True):
     # call database method to define ORM objects in the db module
     db.define_tables(config)
     start_time = datetime.datetime.now()
@@ -425,7 +432,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True):
 
                 # insert learner into the database
                 InsertLearner(datarun, frozen_set, performance, params, model,
-                              started, config)
+                              started, config, save_files)
 
                 print
                 _log("Best so far: %.3f +- %.3f" %
@@ -457,8 +464,11 @@ if __name__ == '__main__':
     # a little confusingly named (seqorder populates choose_randomly?)
     parser.add_argument('-l', '--seqorder', help='work on datasets in sequential order starting with smallest id number, but still max priority (default = random)',
                         dest='choose_randomly', default=True, action='store_const', const=False)
+    parser.add_argument('--no-save', help="don't save models and metrics for later",
+                        dest='save_files', default=true, action='store_const', const=False)
     args = parser.parse_args()
     config = Config(args.configpath)
 
     # les go
-    work(config, args.datarun_id, args.time, args.choose_randomly)
+    work(config, args.datarun_id, args.time, args.choose_randomly,
+         args.save_files)

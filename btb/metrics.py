@@ -477,7 +477,7 @@ def btb_cross_val_large_multiclass(pipeline, X, y, judgment_metric, cv=10, rank=
                                                rank=rank)
 
         f1_scores.append((split_id, results['label_level_f1_scores']))
-        mu_sigmas[split_id] =results['mu_sigma']
+        mu_sigmas[split_id] = results['mu_sigma']
         accuracies[split_id] = results['accuracy']
         rank_accuracies[split_id] = results['rank_accuracy']
         f1_score_micros[split_id] = results['f1_score_micro']
@@ -505,7 +505,7 @@ def btb_cross_val_large_multiclass(pipeline, X, y, judgment_metric, cv=10, rank=
                       rank_accuracies=rank_accuracies,
                       mu_sigmas=mu_sigmas)
 
-    assert judgment_metric in ['f1_score_micros', 'f1_scores_macros']
+    assert judgment_metric in ['f1_score_micros', 'f1_score_macros', 'mu_sigmas']
     cv_results['judgment_metric'] = np.mean(cv_results[judgment_metric])
     cv_results['judgment_metric_std'] = np.std(cv_results[judgment_metric])
 

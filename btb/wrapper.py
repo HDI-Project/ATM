@@ -33,7 +33,19 @@ class Wrapper(object):
     # number of folds for cross-validation (arbitrary, for speed)
     CV_COUNT = 5
 
-    def __init__(self, code, judgment_metric, params, learner_class):
+    def __init__(self, code, judgment_metric, params, learner_class,
+                 compute_metrics=False):
+        """
+        Arguments
+            code: not sure
+            judgment_metric: string that has a mapping in
+                metrics.JUDGMENT_METRICS and indicates which metric should be
+                optimized for.
+            params: parameters passed to the sklearn classifier constructor
+            learner_class: sklearn classifier class
+            compute_metrics: bool indicating whether all metrics should be
+                computed (True) or just the judgment metric (False)
+        """
         # configuration & database
         self.code = code
         self.judgment_metric = JUDGMENT_METRICS[judgment_metric]
