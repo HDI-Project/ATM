@@ -23,11 +23,9 @@ from btb.wrapper import Wrapper
 
 # sample selectors
 from btb.selection.samples import *
-from btb.selection.samples.uniform import UniformSampler
-from btb.selection.samples.gp import GP
-from btb.selection.samples.gp_ei import GPEi, GPEiTime, GPEiVelocity
-from btb.selection.samples.grid import Grid
-from btb.selection.samples.custom import CustomSampler
+from btb.selection.samples.uniform_selector import UniformSampler
+from btb.selection.samples.gp_selector import GPSelector
+from btb.selection.samples.grid_selector import GridSelector
 
 # frozen selectors
 from btb.selection.frozens import *
@@ -72,14 +70,20 @@ class Mapping:
         ClassifierEnumerator.PASSIVE_AGGRESSIVE: EnumeratorPAC,
         ClassifierEnumerator.LRC: EnumeratorLRC}
 
+    # phasing these out
+    #SELECTION_SAMPLES_MAP = {
+        #SELECTION_SAMPLES_UNIFORM: UniformSampler,
+        #SELECTION_SAMPLES_GP: GP,
+        #SELECTION_SAMPLES_GP_EI: GPEi,
+        #SELECTION_SAMPLES_GP_EI_TIME: GPEiTime,
+        #SELECTION_SAMPLES_GP_EI_VEL: GPEiVelocity,
+        #SELECTION_SAMPLES_GRID: Grid,
+    #}
+
     SELECTION_SAMPLES_MAP = {
-        SELECTION_SAMPLES_UNIFORM: UniformSampler,
-        SELECTION_SAMPLES_GP: GP,
-        SELECTION_SAMPLES_GP_EI: GPEi,
-        SELECTION_SAMPLES_GP_EI_TIME: GPEiTime,
-        SELECTION_SAMPLES_GP_EI_VEL: GPEiVelocity,
-        SELECTION_SAMPLES_GRID: Grid,
-        SELECTION_SAMPLES_CUSTOM: CustomSampler,
+        SELECTION_SAMPLES_UNIFORM: UniformSelector,
+        SELECTION_SAMPLES_GP: GPSelector,
+        SELECTION_SAMPLES_GRID: GridSelector,
     }
 
     SELECTION_FROZENS_MAP = {

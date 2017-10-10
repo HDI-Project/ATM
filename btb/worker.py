@@ -3,8 +3,7 @@ from btb.selection.samples import SELECTION_SAMPLES_UNIFORM,\
                                   SELECTION_SAMPLES_GRID,\
                                   SELECTION_SAMPLES_GP_EI,\
                                   SELECTION_SAMPLES_GP_EI_TIME,\
-                                  SELECTION_SAMPLES_GP_EI_VEL,\
-                                  SELECTION_SAMPLES_CUSTOM
+                                  SELECTION_SAMPLES_GP_EI_VEL
 from btb.selection.frozens import SELECTION_FROZENS_UNIFORM,\
                                   SELECTION_FROZENS_UCB1
 from btb.config import Config
@@ -125,7 +124,7 @@ def save_learner_cloud(config, local_model_path, local_metric_path):
 
 
 
-def InsertLearner(datarun, frozen_set, performance, params, model, started,
+def insert_learner(datarun, frozen_set, performance, params, model, started,
                   config, save_files=True):
     """
     Inserts a learner and also updates the frozen_sets table.
@@ -161,7 +160,7 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started,
             except Exception:
                 msg = traceback.format_exc()
                 _log("Error in save_learner_cloud()")
-                InsertError(datarun.id, frozen_set, params, msg)
+                insert_error(datarun.id, frozen_set, params, msg)
     else:
         local_model_path = None
         local_metric_path = None
@@ -206,7 +205,7 @@ def InsertLearner(datarun, frozen_set, performance, params, model, started,
     session.commit()
 
 
-def InsertError(datarun_id, frozen_set, params, error_msg):
+def insert_error(datarun_id, frozen_set, params, error_msg):
     session = None
     try:
         session = db.GetConnection()
@@ -219,7 +218,7 @@ def InsertError(datarun_id, frozen_set, params, error_msg):
         _log("Successfully reported error")
 
     except Exception:
-        _log("InsertError(): Error marking this learner an error..." + traceback.format_exc())
+        _log("insert_error(): Error marking this learner an error..." + traceback.format_exc())
     finally:
         if session:
             session.close()
@@ -253,7 +252,7 @@ def read_btb_csv(filepath):
     return data
 
 
-def LoadData(datarun, config):
+def load_data(datarun, config):
     """
     Loads the data from HTTP (if necessary) and then from
     disk into memory.
@@ -287,39 +286,98 @@ def LoadData(datarun, config):
     return trainX, testX, trainY, testY
 
 
-def get_sampler(datarun, best_y, frozen_set):
+def select_frozen_set(datarun):
+    # choose frozen set
+    frozen_sets = db.GetIncompletedFrozenSets(datarun.id,
+                                              min_num_errors_to_exclude=20)
+    if not frozen_sets:
+        if db.IsGriddingDoneForDatarun(datarun_id=datarun.id,
+                                       min_num_errors_to_exclude=20):
+            db.MarkDatarunGriddingDone(datarun_id=datarun.id)
+        _log("No incomplete frozen sets for datarun present in "
+             "database, will wait and try again...")
+        return None
+
+    # count the number of frozen sets we've finished training
+    ncompleted = sum([f.trained for f in frozen_sets])
+
+    # load the class for selecting the frozen set
+    _log("Frozen Selection: %s" % datarun.frozen_selection)
+    fclass = Mapping.SELECTION_FROZENS_MAP[datarun.frozen_selection]
+
+    # get the best score on any learner so far
+    best_y = db.GetMaximumY(datarun.id, datarun.score_target, default=0.0)
+
+    # TODO: switch to the new fit-predict style classes
+    fselector = fclass(frozen_sets=frozen_sets, best_y=best_y,
+                       k=datarun.k_window, metric=datarun.score_target)
+
+    frozen_set_id = fselector.select()
+    if not frozen_set_id > 0:
+        _log("Invalid frozen set id! %d" % frozen_set_id)
+        continue
+
+    frozen_set = db.GetFrozenSet(frozen_set_id, increment=True)
+    if not frozen_set:
+        _log("Invalid frozen set! %s" % frozen_set)
+        continue
+    _log("Frozen set: %d" % frozen_set_id)
+
+
+def sample_params(datarun, best_y, frozen_set):
     _log("Sample selection: %s" % datarun.sample_selection)
     Sampler = Mapping.SELECTION_SAMPLES_MAP[datarun.sample_selection]
 
-    needs_n_opt = [SELECTION_SAMPLES_GP, SELECTION_SAMPLES_GP_EI,
+    needs_r_min = [SELECTION_SAMPLES_GP, SELECTION_SAMPLES_GP_EI,
                    SELECTION_SAMPLES_GP_EI_VEL, SELECTION_SAMPLES_GP_EI_TIME]
     needs_best_y = [SELECTION_SAMPLES_GP_EI, SELECTION_SAMPLES_GP_EI_VEL,
                     SELECTION_SAMPLES_GP_EI_TIME]
 
-    n_opt = datarun.r_min
-
+    # Use uniform selection -- simple.
     if datarun.sample_selection == SELECTION_SAMPLES_UNIFORM:
-        return Sampler(frozen_set=frozen_set)
+        sampler = Sampler(frozen_set=frozen_set)
 
-    # gather learners that haven't been completed yet
-    learners = db.GetLearnersInFrozen(frozen_set.id)
-    learners = [x.completed == None for x in learners]
+    # count the number of incomplete learners in this frozen set
+    # TODO I think this is a problem
+    n_complete = len([l for l in db.GetLearnersInFrozen(frozen_set.id)
+                      if l.completed is not None])
 
     # Use uniform sample selection if there are not enough results to use
     # another method
-    if datarun.sample_selection in needs_n_opt and len(learners) < n_opt:
+    if datarun.sample_selection in needs_r_min and n_complete < datarun.r_min:
         _log("Not enough previous results, falling back to strategy: %s"
              % SELECTION_SAMPLES_UNIFORM)
         Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
-        return Sampler(frozen_set=frozen_set)
+        sampler = Sampler(frozen_set=frozen_set)
 
     # some sample selectors need the best_y field, others don't
     if datarun.sample_selection in needs_best_y:
-        return Sampler(frozen_set=frozen_set, learners=learners,
-                       metric=datarun.score_target, best_y=best_y)
+        sampler = Sampler(frozen_set=frozen_set, metric=datarun.score_target,
+                          best_y=best_y)
     else:
-        return Sampler(frozen_set=frozen_set, learners=learners,
-                       metric=datarun.score_target)
+        sampler = Sampler(frozen_set=frozen_set, metric=datarun.score_target)
+
+    # Get parameter metadata for this frozen set
+    params_meta = frozen_set.optimizables
+
+    # Get previously-used parameters
+    learners = GetLearnersInFrozen(self.frozen_set.id)
+    learners = [x for x in learners if x.completed]
+    for learner in learners:
+        y = float(getattr(learner, self.metric))
+        past_params.append((learner.params, y))
+
+    params = [x[0] for x in past_params]
+    X = ParamsToVectors(params, params_meta)
+    y = np.array([x[1] for x in past_params])
+
+    # propose a new set of parameters and convert it into the metadata-rich
+    # format
+    sampler.fit(X, y)
+    vector = sampler.propose()
+    return VectorBackToParams(vector=vector, optimizables=params_meta,
+                              frozens=frozen_set.frozens,
+                              constants=frozen_set.constants)
 
 
 def work(config, datarun_id=None, total_time=None, choose_randomly=True,
@@ -344,19 +402,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True,
                 _log("No datarun present in database, exiting.")
                 sys.exit()
 
-            # choose frozen set
             _log("Datarun: %s" % datarun)
-            frozen_sets = db.GetIncompletedFrozenSets(datarun.id,
-                                                      min_num_errors_to_exclude=20)
-            if not frozen_sets:
-                if db.IsGriddingDoneForDatarun(datarun_id=datarun.id,
-                                               min_num_errors_to_exclude=20):
-                    db.MarkDatarunGriddingDone(datarun_id=datarun.id)
-                _log("No incomplete frozen sets for datarun present in "
-                     "database, will wait and try again...")
-                time.sleep(10)
-                continue
-            ncompleted = sum([f.trained for f in frozen_sets])
 
             # check if we've exceeded datarun limits
             budget_type = datarun.budget
@@ -380,32 +426,21 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True,
             elif endrun == True:
                 # marked the run as done successfully
                 _log("This datarun has ended, let's find another")
-                time.sleep(2)
+                time.sleep(2)   # TODO: why is this needed?
                 continue
 
-            # otherwise select a frozen set from this run
-            _log("Frozen Selection: %s" % datarun.frozen_selection)
-            fclass = Mapping.SELECTION_FROZENS_MAP[datarun.frozen_selection]
-            best_y = db.GetMaximumY(datarun.id, datarun.score_target, default=0.0)
-            fselector = fclass(frozen_sets=frozen_sets, best_y=best_y,
-                               k=datarun.k_window, metric=datarun.score_target)
-
-            frozen_set_id = fselector.select()
-            if not frozen_set_id > 0:
-                _log("Invalid frozen set id! %d" % frozen_set_id)
+            # use the multi-arm bandit to choose which frozen set to use next
+            frozen_set = select_frozen_set(datarun)
+            if frozen_set is None:
+                _log("Sleeping for 10 seconds, then searching for more frozen sets.")
+                time.sleep(10)
                 continue
 
-            frozen_set = db.GetFrozenSet(frozen_set_id, increment=True)
-            if not frozen_set:
-                _log("Invalid frozen set! %s" % frozen_set)
-                continue
-            _log("Frozen set: %d" % frozen_set_id)
-
-            # choose sampler
-            sampler = get_sampler(datarun, best_y, frozen_set)
+            # use the configured sampler to choose a set of parameters within
+            # the frozen set
+            sampler = sample_params(datarun, best_y, frozen_set)
 
             # select the parameters based on the sampler
-            params = sampler.select()
             if params:
                 print
                 _log("Chose frozen set.")
@@ -418,7 +453,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True,
                 # train learner
                 params["function"] = frozen_set.algorithm
                 wrapper = CreateWrapper(params, judgment_metric)
-                trainX, testX, trainY, testY = LoadData(datarun, config)
+                trainX, testX, trainY, testY = load_data(datarun, config)
                 wrapper.load_data_from_objects(trainX, testX, trainY, testY)
                 performance = wrapper.start()
 
@@ -432,7 +467,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True,
                 model = Model(wrapper, datarun.wrapper)
 
                 # insert learner into the database
-                InsertLearner(datarun, frozen_set, performance, params, model,
+                insert_learner(datarun, frozen_set, performance, params, model,
                               started, config, save_files)
 
                 print
@@ -443,7 +478,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True,
             msg = traceback.format_exc()
             if datarun and frozen_set:
                 _log("Error in main work loop: datarun=%s" % str(datarun) + msg)
-                InsertError(datarun.id, frozen_set, params, msg)
+                insert_error(datarun.id, frozen_set, params, msg)
             else:
                 _log("Error in main work loop (no datarun or frozen set):" + msg)
 

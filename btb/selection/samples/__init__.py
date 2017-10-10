@@ -1,5 +1,6 @@
 from btb.key import Key, KeyStruct
 from btb.selection import Selector
+from btb.database import GetLearnersInFrozen
 import operator
 import numpy as np
 import random
@@ -11,15 +12,9 @@ SELECTION_SAMPLES_GP_EI = "gp_ei"
 SELECTION_SAMPLES_GP_EI_TIME = "gp_eitime"
 SELECTION_SAMPLES_GP_EI_VEL = "gp_eivel"
 SELECTION_SAMPLES_GRID = "grid"
-SELECTION_SAMPLES_CUSTOM = "custom"
-
 
 class SamplesSelector(Selector):
     def __init__(self, **kwargs):
-        """
-        Needs:
-        optimizables, frozens, constants
-        """
         super(SamplesSelector, self).__init__(**kwargs)
 
     def select(self):
@@ -180,6 +175,7 @@ def ParamsToVectors(params, optimizables):
         for j, k in enumerate(keys):
             vectors[i, j] = p[k]
     return vectors
+
 
 def DrawRandomValuesGRID(n, struct, num_vals_per_var):
     """

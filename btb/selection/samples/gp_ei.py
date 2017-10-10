@@ -15,12 +15,9 @@ from btb.utilities import *
 
 class GPEi(SamplesSelector):
 
-    def __init__(self, **kwargs):
-        """
-        Needs:
-        frozen_set, learners, metric, best_y
-        """
-        super(GPEi, self).__init__(**kwargs)
+    def __init__(self, frozen_set, metric):
+        self.frozen_set = frozen_set
+        self.metric = metric
 
     def do_selection(self, past_params):
         """
@@ -67,12 +64,10 @@ class GPEi(SamplesSelector):
 
 class GPEiTime(SamplesSelector):
 
-    def __init__(self, **kwargs):
-        """
-        Needs:
-        frozen_set, metric, best_y
-        """
-        super(GPEiTime, self).__init__(**kwargs)
+    def __init__(self, frozen_set, metric, best_y):
+        self.frozen_set = frozen_set
+        self.metric = metric
+        self.best_y = best_y
 
     def select(self):
         """
@@ -139,12 +134,10 @@ class GPEiVelocity(SamplesSelector):
     MULTIPLIER = -100
     LIMIT = 5
 
-    def __init__(self, **kwargs):
-        """
-        Needs:
-        frozen_set, learners, metric, best_y, velocity
-        """
-        super(GPEiVelocity, self).__init__(**kwargs)
+    def __init__(self, frozen_set, metric, best_y):
+        self.frozen_set = frozen_set
+        self.metric = metric
+        self.best_y = best_y
 
     def select(self):
         """

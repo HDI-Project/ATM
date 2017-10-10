@@ -6,12 +6,9 @@ import numpy as np
 
 
 class GP(SamplesSelector):
-    def __init__(self, **kwargs):
-        """
-        Needs:
-        frozen_set, learners, metric
-        """
-        super(GP, self).__init__(**kwargs)
+    def __init__(self, frozen_set, metric):
+        self.frozen_set = frozen_set
+        self.metric = metric
 
     def select(self):
         """
