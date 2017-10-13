@@ -7,6 +7,7 @@ from btb.selection.samples import SELECTION_SAMPLES_UNIFORM,\
 from btb.selection.frozens import SELECTION_FROZENS_UNIFORM,\
                                   SELECTION_FROZENS_UCB1
 from btb.config import Config
+from btb.selection.samples import GridSelector
 from btb.utilities import *
 from btb.mapping import Mapping, CreateWrapper
 from btb.model import Model
@@ -323,7 +324,7 @@ def select_frozen_set(datarun):
     return frozen_set
 
 
-def sample_params(datarun, frozen_set, score_target):
+def select_params(datarun, frozen_set, score_target):
     _log("Sample selection: %s" % datarun.sample_selection)
     Sampler = Mapping.SELECTION_SAMPLES_MAP[datarun.sample_selection]
 
@@ -350,20 +351,27 @@ def sample_params(datarun, frozen_set, score_target):
              % SELECTION_SAMPLES_UNIFORM)
         Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
 
-    past_params = []
-    for learner in learners:
-        y = float(getattr(learner, score_target))
-        past_params.append((learner.params, y))
+    # extract parameters and scores as numpy arrays from learners
+    X = ParamsToVectors([l.params for l in learners], optimizables)
+    y = np.array(float(getattr(l, score_target)) for l in learners)
 
-    params = [x[0] for x in past_params]
-    X = ParamsToVectors(params, optimizables)
-    y = np.array([x[1] for x in past_params])
+    # If there aren't any optimizables, only run this frozen set once
+    # TODO: "Gridding Done" is kind of the wrong term, since it applies to
+    # non-grid samplers as well
+    if not len(optimizables):
+        db.MarkFrozenSetGriddingDone(frozen_set.id)
+        return VectorToParams(vector=[], optimizables=optimizables,
+                              frozens=frozen_set.frozens,
+                              constants=frozen_set.constants)
 
     # propose a new set of parameters and convert them from vectors
-    # TODO: if no optimizables, skip
     sampler = Sampler(optimizables)
     sampler.fit(X, y)
     vector = sampler.propose()
+    if isinstance(sampler, GridSelector):
+        if sampler.finished:
+            db.MarkFrozenSetGriddingDone(frozen_set.id)
+
     return VectorToParams(vector=vector, optimizables=optimizables,
                           frozens=frozen_set.frozens,
                           constants=frozen_set.constants)
@@ -432,7 +440,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True,
 
             # use the configured sampler to choose a set of parameters within
             # the frozen set
-            params = sample_params(datarun, frozen_set, score_target)
+            params = select_params(datarun, frozen_set, score_target)
 
             # select the parameters based on the sampler
             if params:

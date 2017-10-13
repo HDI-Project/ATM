@@ -347,23 +347,23 @@ def VectorToParams(vector, optimizables, frozens, constants):
         ]
 
     """
-    optimizables.sort(key=operator.itemgetter(0))
     params = {}
 
     # add the optimizables
     for i, elt in enumerate(vector):
-        if getattr(optimizables[i][1], 'type') == 'INT':
-            params[optimizables[i][0]] = int(elt)
-        elif getattr(optimizables[i][1], 'type') == 'INT_EXP':
-            params[optimizables[i][0]] = int(elt)
-        elif getattr(optimizables[i][1], 'type') == 'FLOAT':
-            params[optimizables[i][0]] = float(elt)
-        elif getattr(optimizables[i][1], 'type') == 'FLOAT_EXP':
-            params[optimizables[i][0]] = float(elt)
-        elif getattr(optimizables[i][1], 'type') == 'BOOL':
-            params[optimizables[i][0]] = bool(elt)
+        key, struct = optimizables[i]
+        if struct.type == 'INT':
+            params[key] = int(elt)
+        elif struct.type == 'INT_EXP':
+            params[key] = int(elt)
+        elif struct.type == 'FLOAT':
+            params[key] = float(elt)
+        elif struct.type == 'FLOAT_EXP':
+            params[key] = float(elt)
+        elif struct.type == 'BOOL':
+            params[key] = bool(elt)
         else:
-            raise ValueError('Unknown data type: {}'.format(getattr(optimizables[i][1], 'type')))
+            raise ValueError('Unknown data type: {}'.format(struct.type))
 
     # add the frozen categorical settings
     for key, value in frozens:
@@ -378,7 +378,7 @@ def VectorToParams(vector, optimizables, frozens, constants):
 
 def ParamsToVectors(params, optimizables):
     """
-    params is a list of {}
+    params is a list of {'key' -> value}
 
     Example of optimizables below:
 
@@ -391,12 +391,11 @@ def ParamsToVectors(params, optimizables):
 
     Creates vectors ready to be optimized by a Gaussian Process.
     """
+    # make sure params is iterable
     if not isinstance(params, (list, np.ndarray)):
         params = [params]
 
     keys = [k[0] for k in optimizables]
-    keys.sort()
-
     vectors = np.zeros((len(params), len(keys)))
     for i, p in enumerate(params):
         for j, k in enumerate(keys):
