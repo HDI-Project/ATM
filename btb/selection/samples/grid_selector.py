@@ -1,18 +1,20 @@
-from btb.selection.samples import *
-from btb.utilities import *
-from btb.database import *
-from sklearn.gaussian_process import GaussianProcess
+import math
 import numpy as np
 
+from btb.key import Key
+from btb.selection.samples import SampleSelector
+from btb.utilities import *
+from sklearn.gaussian_process import GaussianProcess
 
-class GridSelector(object):
-    def __init__(self, parameters, grid_size=3):
+
+class GridSelector(SampleSelector):
+    def __init__(self, optimizables, grid_size=3):
         """
         Grid space selector.
         grid_size determines how many possible values to try for each variable,
         i.e. how many blocks in the grid
         """
-        super(GridSelector, self).__init__(parameters)
+        super(GridSelector, self).__init__(optimizables)
         self.grid_size = grid_size
         self.finished = False
 
@@ -28,8 +30,8 @@ class GridSelector(object):
         Generate a number of random hyperparameter vectors based on the
         parameter specifications given to the constructor.
         """
-        vectors = np.zeros((n, len(self.parameters)))
-        for i, (k, struct) in enumerate(self.parameters):
+        vectors = np.zeros((n, len(self.optimizables)))
+        for i, (k, struct) in enumerate(self.optimizables):
             if struct.type == Key.TYPE_FLOAT_EXP:
                 vals = np.round(np.linspace(struct.range[0],
                                             math.log10(struct.range[1]),
@@ -65,4 +67,4 @@ class GridSelector(object):
         candidates = self.create_candidates()
         for i in range(candidates.shape[0]):
             if candidates[i, :] not in self.past_params:
-                return chosen
+                return candidates[i, :]

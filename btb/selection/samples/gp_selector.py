@@ -1,6 +1,4 @@
 from btb.selection.samples import SampleSelector
-from btb.utilities import *
-import btb.database as db
 
 import numpy as np
 from scipy import linalg, optimize
@@ -57,13 +55,13 @@ def l1_cross_distances(X):
 
 
 class GPSelector(SampleSelector):
-    def __init__(self, parameters, regr='constant', corr='squared_exponential',
+    def __init__(self, optimizables, regr='constant', corr='squared_exponential',
                  beta0=None, storage_mode='full', verbose=False, theta0=1e-1,
                  thetaL=None, thetaU=None, optimizer='fmin_cobyla',
                  random_start=1, normalize=True, nugget=10. * MACHINE_EPSILON,
-                 random_state=None)):
+                 random_state=None):
 
-        super(GPSelector, self).__init__(parameters)
+        super(GPSelector, self).__init__(optimizables)
 
         self.regr = regr
         self.corr = corr

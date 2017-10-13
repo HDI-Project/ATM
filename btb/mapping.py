@@ -23,9 +23,6 @@ from btb.wrapper import Wrapper
 
 # sample selectors
 from btb.selection.samples import *
-from btb.selection.samples.uniform_selector import UniformSampler
-from btb.selection.samples.gp_selector import GPSelector
-from btb.selection.samples.grid_selector import GridSelector
 
 # frozen selectors
 from btb.selection.frozens import *

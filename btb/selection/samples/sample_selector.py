@@ -1,4 +1,3 @@
-from btb.key import Key, KeyStruct
 from btb.selection import Selector
 from btb.database import GetLearnersInFrozen
 import operator
@@ -8,10 +7,10 @@ import math
 
 
 class SampleSelector(object):
-    def __init__(self, parameters):
+    def __init__(self, optimizables):
         """
         Accepts a list of pamameter metadata structures.
-        parameters will look like this:
+        optimizables will look like this:
         [
             ('C', 		KeyStruct(range=(1e-05, 100000), 	type='FLOAT_EXP', 	is_categorical=False)),
             ('degree', 	KeyStruct(range=(2, 4), 			type='INT', 		is_categorical=False)),
@@ -19,7 +18,7 @@ class SampleSelector(object):
             ('gamma', 	KeyStruct(range=(1e-05, 100000),	type='FLOAT_EXP', 	is_categorical=False))
         ]
         """
-        self.parameters = parameters
+        self.optimizables = optimizables
 
 
     def fit(self, X, y):
@@ -48,8 +47,8 @@ class SampleSelector(object):
         Generate a number of random hyperparameter vectors based on the
         parameter specifications given to the constructor.
         """
-        vectors = np.zeros((n, len(self.parameters)))
-        for i, (k, struct) in enumerate(self.parameters):
+        vectors = np.zeros((n, len(self.optimizables)))
+        for i, (k, struct) in enumerate(self.optimizables):
             if struct.type == Key.TYPE_FLOAT_EXP:
                 random_powers = 10.0 ** np.random.random_integers(
                     math.log10(struct.range[0]), math.log10(struct.range[1]), size=n)

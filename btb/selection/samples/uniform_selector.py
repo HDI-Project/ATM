@@ -1,13 +1,12 @@
-from btb.selection.samples import SamplesSelector, GenerateRandomVectors, VectorBackToParams
+from btb.selection.samples import SampleSelector
 
-
-class UniformSelector(object):
-    def __init__(self, parameters):
+class UniformSelector(SampleSelector):
+    def __init__(self, optimizables):
         """
         Very bare_bones sample selector that returns a random set of parameters
         each time.
         """
-        super(UniformSelector, self).__init__(parameters)
+        super(UniformSelector, self).__init__(optimizables)
 
     def fit(self, X, y):
         return self

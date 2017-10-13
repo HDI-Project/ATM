@@ -44,15 +44,13 @@ class GPEi(SamplesSelector):
                              nugget=np.finfo(np.double).eps * 1000)
         # TODO: This throws an error
         gp.fit(X, y)
+        best_y = max(y)
 
         # randomly generate many vectors
         candidates = GenerateRandomVectors(1000, self.frozen_set.optimizables)
         ys, stdevs = gp.predict(candidates, eval_MSE=True)
-        predictions = zip(ys, stdevs)
-        predictions = [expected_improvement(y, self.best_y, stdev)
-                       for (y, stdev) in predictions]
-
-        #print "PREDICTIONS", np.unique(predictions)
+        predictions = [expected_improvement(y, best_y, stdev)
+                       for (y, stdev) in zip(ys, stdevs)]
 
         # choose one with highest average, convert, and return
         chosen = candidates[np.argmax(predictions)]
@@ -64,10 +62,9 @@ class GPEi(SamplesSelector):
 
 class GPEiTime(SamplesSelector):
 
-    def __init__(self, frozen_set, metric, best_y):
+    def __init__(self, frozen_set, metric):
         self.frozen_set = frozen_set
         self.metric = metric
-        self.best_y = best_y
 
     def select(self):
         """
@@ -118,7 +115,8 @@ class GPEiTime(SamplesSelector):
         candidates = GenerateRandomVectors(1000, self.frozen_set.optimizables)
         ys, stdevs = gp.predict(candidates, eval_MSE=True)
         predictions = zip(ys, stdevs)
-        predictions = [expected_improvement(y, self.best_y, stdev)
+        best_y = max(y)
+        predictions = [expected_improvement(y, best_y, stdev)
                        for (y, stdev) in predictions]
 
         # choose one with highest average, convert, and return
