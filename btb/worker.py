@@ -359,6 +359,7 @@ def select_params(datarun, frozen_set, score_target):
     # TODO: "Gridding Done" is kind of the wrong term, since it applies to
     # non-grid samplers as well
     if not len(optimizables):
+        _log("No optimizables for frozen set %d" % frozen_set.id)
         db.MarkFrozenSetGriddingDone(frozen_set.id)
         return VectorToParams(vector=[], optimizables=optimizables,
                               frozens=frozen_set.frozens,
@@ -370,7 +371,12 @@ def select_params(datarun, frozen_set, score_target):
     vector = sampler.propose()
     if isinstance(sampler, GridSelector):
         if sampler.finished:
+            _log("Gridding done for frozen set %d" % frozen_set.id)
             db.MarkFrozenSetGriddingDone(frozen_set.id)
+
+    if vector is None:
+        _log("No sample selected for frozen set %d" % frozen_set.id)
+        return None
 
     return VectorToParams(vector=vector, optimizables=optimizables,
                           frozens=frozen_set.frozens,
@@ -443,7 +449,7 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True,
             params = select_params(datarun, frozen_set, score_target)
 
             # select the parameters based on the sampler
-            if params:
+            if params is not None:
                 _log("Chose parameters for algorithm %s" % frozen_set.algorithm)
                 _log("Params chosen: %s" % params, False)
                 print "Params chosen:"

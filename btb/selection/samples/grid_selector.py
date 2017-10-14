@@ -74,7 +74,7 @@ class GridSelector(SampleSelector):
         time until it runs out of possibilities.
         """
         # compute the total number of points in the grid
-        total_points = len(self.optimizables) ** self.grid_size
+        total_points = self.grid_size ** len(self.optimizables)
 
         for i in xrange(total_points):
             vector = np.zeros(len(self.optimizables))
@@ -93,6 +93,5 @@ class GridSelector(SampleSelector):
             # if we've reached the end of iteration, set the finished flag
             if (candidate == self._last_candidate()).all():
                 self.finished = True
-                return candidate
             if candidate not in self.past_params:
                 return candidate
