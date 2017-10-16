@@ -1,4 +1,4 @@
-from btb.selection.frozens import FrozenSelector, AverageVelocitiyFromList
+from btb.selection.frozens import FrozenSelector, AverageVelocityFromList
 from btb.selection.bandit import UCB1Bandit, FrozenArm
 from btb.database import *
 import heapq, time
@@ -107,7 +107,7 @@ class RecentKVelocity(FrozenSelector):
 			# use heapify to get largest k elements from each all_k list
 			elts = all_k.get(fset.id, [])
 			recent_k[fset.id] = [x[1] for x in heapq.nlargest(self.k, elts)]
-			avg_velocities[fset.id] = AverageVelocitiyFromList(recent_k[fset.id], is_ascending=False)
+			avg_velocities[fset.id] = AverageVelocityFromList(recent_k[fset.id], is_ascending=False)
 
 			print "Frozen set %d (%s) has recent k: %s => velocity: %f" % (
 				fset.id, fset.algorithm, recent_k[fset.id], avg_velocities[fset.id])

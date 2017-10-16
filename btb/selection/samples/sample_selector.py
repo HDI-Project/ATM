@@ -1,8 +1,8 @@
-from btb.key import Key
-
 import numpy as np
 import random
 import math
+
+from btb.key import Key
 
 
 class SampleSelector(object):
@@ -11,10 +11,12 @@ class SampleSelector(object):
         Accepts a list of pamameter metadata structures.
         optimizables will look like this:
         [
-            ('C', 		KeyStruct(range=(1e-05, 100000), 	type='FLOAT_EXP', 	is_categorical=False)),
-            ('degree', 	KeyStruct(range=(2, 4), 			type='INT', 		is_categorical=False)),
-            ('coef0', 	KeyStruct(range=(0, 1), 		    type='INT', 		is_categorical=False)),
-            ('gamma', 	KeyStruct(range=(1e-05, 100000),	type='FLOAT_EXP', 	is_categorical=False))
+            ('degree', KeyStruct(range=(2, 4),
+                                 type='INT',
+                                 is_categorical=False)),
+            ('coef0', KeyStruct((0, 1), 'INT', False)),
+            ('C', KeyStruct((1e-05, 100000), 'FLOAT_EXP', False)),
+            ('gamma', KeyStruct((1e-05, 100000), 'FLOAT_EXP', False))
         ]
         """
         self.optimizables = optimizables

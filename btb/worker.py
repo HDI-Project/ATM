@@ -126,7 +126,7 @@ def save_learner_cloud(config, local_model_path, local_metric_path):
 
 
 def insert_learner(datarun, frozen_set, performance, params, model, started,
-                  config, save_files=True):
+                   config, save_files=True):
     """
     Inserts a learner and also updates the frozen_sets table.
 
@@ -211,9 +211,13 @@ def insert_error(datarun_id, frozen_set, params, error_msg):
     try:
         session = db.GetConnection()
         session.autoflush = False
-        learner = db.Learner(datarun_id=datarun_id, frozen_set_id=frozen_set.id,
-                             errored=datetime.datetime.now(), is_error=True, params=params,
-                             error_msg=error_msg, algorithm=frozen_set.algorithm)
+        learner = db.Learner(datarun_id=datarun_id,
+                             frozen_set_id=frozen_set.id,
+                             errored=datetime.datetime.now(),
+                             is_error=True,
+                             params=params,
+                             error_msg=error_msg,
+                             algorithm=frozen_set.algorithm)
         session.add(learner)
         session.commit()
         _log("Successfully reported error")
@@ -332,8 +336,6 @@ def select_params(datarun, frozen_set, score_target):
     optimizables = frozen_set.optimizables
 
     # If there aren't any optimizables, only run this frozen set once
-    # TODO: "Gridding Done" is kind of the wrong term, since it applies to
-    # non-grid sample selectors as well
     if not len(optimizables):
         _log("No optimizables for frozen set %d" % frozen_set.id)
         db.MarkFrozenSetGriddingDone(frozen_set.id)

@@ -1,4 +1,4 @@
-from btb.selection.frozens import FrozenSelector, AverageVelocitiyFromList
+from btb.selection.frozens import FrozenSelector, AverageVelocityFromList
 from btb.database import *
 from btb.utilities import *
 import heapq
@@ -43,7 +43,7 @@ class PureBestKVelocity(FrozenSelector):
 		for fset in self.frozen_sets:
 			# use heapify to get largest k elements from each all_k list
 			best_k[fset.id] = heapq.nlargest(self.k, all_k.get(fset.id, []))
-			avg_velocities[fset.id] = AverageVelocitiyFromList(best_k[fset.id], is_ascending=False)
+			avg_velocities[fset.id] = AverageVelocityFromList(best_k[fset.id], is_ascending=False)
 			print "Frozen set %d (%s) count=%d has best k: %s => velocity: %f" % (
 				fset.id, fset.algorithm, fset.trained, best_k[fset.id], avg_velocities[fset.id])
 

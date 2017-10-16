@@ -1,47 +1,55 @@
-import math, random
+import math
+import random
 
-class UCB1Bandit:
+class UCB1Bandit(object):
+    """
+    Simple multi-armed bandit class to aid in frozen set selection.
+    TODO: what is UCB1?
+    """
 
     COUNT_PADDING = 1.0
     REWARDS_PADDING = 1.0
 
     def __init__(self, arms, count, rewards):
         """
+        Args:
             arms = list of FrozenArm objects
             count = total count of learners tried in this run
             rewards = total rewards earned in this run
         """
         self.arms = arms
-        self.n_arms = len(arms)
-        self.scores = [0.0] * self.n_arms # a score for each of the arms
-        
-        # we pad these values in order not
-        # to divide by zero and insulate from
-        # the first round of results having high effect
-        self.count = count 
-        self.rewards = rewards
-        
-        if self.count == 0:
-        	self.count += UCB1Bandit.COUNT_PADDING
-        if self.rewards == 0:
-        	self.rewards += UCB1Bandit.REWARDS_PADDING
-        
+        self.scores = [0.0] * len(arms)   # a score for each of the arms
+
+        # don't want to divide by zero
+        # also don't want the first round of results have outsized effect
+        self.count = count or UCB1Bandit.COUNT_PADDING
+
+        # as far as I can tell this is never used, removing it for now
+        #self.rewards = rewards or UCB1Bandit.REWARDS_PADDING
+
     def score_arms(self):
+        """
+        TODO: where is this math from?
+        """
         for i, arm in enumerate(self.arms):
-            avg_reward = float(arm.rewards)  / float(arm.count)
-            score = avg_reward + math.sqrt(2.0 * math.log(self.count) / float(arm.count))
+            avg_reward = float(arm.rewards) / float(arm.count)
+            score = avg_reward + math.sqrt(2.0 * math.log(self.count) /
+                                           float(arm.count))
             self.scores[i] = score
             arm.score = score
+
         idx = self.scores.index(max(self.scores))
         return self.arms[idx].frozen_id
-            
-class FrozenArm:
+
+
+class FrozenArm(object):
 
     COUNT_PADDING = 1.0
     REWARDS_PADDING = 1.0
 
     def __init__(self, count, rewards, frozen_id):
         """
+        Args:
             count = total number of learners tried in this fset
             rewards = total rewards earned in this fset
             frozen_id = id of this fset
