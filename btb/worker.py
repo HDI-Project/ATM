@@ -326,30 +326,14 @@ def select_frozen_set(datarun):
 
 def select_params(datarun, frozen_set, score_target):
     _log("Sample selection: %s" % datarun.sample_selection)
-    Sampler = Mapping.SELECTION_SAMPLES_MAP[datarun.sample_selection]
-
-    needs_r_min = [SELECTION_SAMPLES_GP, SELECTION_SAMPLES_GP_EI,
-                   SELECTION_SAMPLES_GP_EI_VEL, SELECTION_SAMPLES_GP_EI_TIME]
-
-    # Use uniform selection -- simple.
-    if datarun.sample_selection == SELECTION_SAMPLES_UNIFORM:
-        sampler = Sampler(frozen_set=frozen_set)
+    Selector = Mapping.SELECTION_SAMPLES_MAP[datarun.sample_selection]
 
     # Get parameter metadata for this frozen set
     optimizables = frozen_set.optimizables
 
-    # Get previously-used parameters, excluding runs that errored
-    learners = db.GetLearnersInFrozen(frozen_set.id)
-    learners = [x for x in learners if x.completed]
-    # count the number of completed learners in this frozen set
-    n_complete = len([l for l in learners if l.completed is not None])
-
-    # Use uniform sample selection if there are not enough results to use
-    # another method
-    if datarun.sample_selection in needs_r_min and n_complete < datarun.r_min:
-        _log("Not enough previous results, falling back to strategy: %s"
-             % SELECTION_SAMPLES_UNIFORM)
-        Sampler = Mapping.SELECTION_SAMPLES_MAP[SELECTION_SAMPLES_UNIFORM]
+    # Get previously-used parameters
+    # every learner should either be completed or have thrown an error
+    learners = [x for x in db.GetLearnersInFrozen(frozen_set.id) if x.completed]
 
     # extract parameters and scores as numpy arrays from learners
     X = ParamsToVectors([l.params for l in learners], optimizables)
@@ -357,7 +341,7 @@ def select_params(datarun, frozen_set, score_target):
 
     # If there aren't any optimizables, only run this frozen set once
     # TODO: "Gridding Done" is kind of the wrong term, since it applies to
-    # non-grid samplers as well
+    # non-grid sample selectors as well
     if not len(optimizables):
         _log("No optimizables for frozen set %d" % frozen_set.id)
         db.MarkFrozenSetGriddingDone(frozen_set.id)
@@ -365,12 +349,12 @@ def select_params(datarun, frozen_set, score_target):
                               frozens=frozen_set.frozens,
                               constants=frozen_set.constants)
 
-    # propose a new set of parameters and convert them from vectors
-    sampler = Sampler(optimizables)
-    sampler.fit(X, y)
-    vector = sampler.propose()
-    if isinstance(sampler, GridSelector):
-        if sampler.finished:
+    # initialize the sampler and propose a new set of parameters
+    selector = Selector(optimizables, r_min=datarun.r_min)
+    selector.fit(X, y)
+    vector = selector.propose()
+    if isinstance(selector, GridSelector):
+        if selector.finished:
             _log("Gridding done for frozen set %d" % frozen_set.id)
             db.MarkFrozenSetGriddingDone(frozen_set.id)
 
@@ -378,6 +362,7 @@ def select_params(datarun, frozen_set, score_target):
         _log("No sample selected for frozen set %d" % frozen_set.id)
         return None
 
+    # convert the numpy array of parameters to useable params
     return VectorToParams(vector=vector, optimizables=optimizables,
                           frozens=frozen_set.frozens,
                           constants=frozen_set.constants)
@@ -444,11 +429,9 @@ def work(config, datarun_id=None, total_time=None, choose_randomly=True,
                 time.sleep(10)
                 continue
 
-            # use the configured sampler to choose a set of parameters within
-            # the frozen set
+            # use the configured sample selector to choose a set of parameters
+            # within the frozen set
             params = select_params(datarun, frozen_set, score_target)
-
-            # select the parameters based on the sampler
             if params is not None:
                 _log("Chose parameters for algorithm %s" % frozen_set.algorithm)
                 _log("Params chosen: %s" % params, False)

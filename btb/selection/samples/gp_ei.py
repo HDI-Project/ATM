@@ -13,7 +13,7 @@ from btb.selection.samples.uniform import UniformSampler
 from btb.utilities import *
 
 
-class GPEi(SamplesSelector):
+class GPEiSelector(SampleSelector):
 
     def __init__(self, frozen_set, metric):
         self.frozen_set = frozen_set
@@ -60,7 +60,7 @@ class GPEi(SamplesSelector):
                                   self.frozen_set.constants)
 
 
-class GPEiTime(SamplesSelector):
+class GPEiTimeSelector(SampleSelector):
 
     def __init__(self, frozen_set, metric):
         self.frozen_set = frozen_set
@@ -127,7 +127,7 @@ class GPEiTime(SamplesSelector):
                                   self.frozen_set.constants)
 
 
-class GPEiVelocity(SamplesSelector):
+class GPEiVelocitySelector(SampleSelector):
 
     MULTIPLIER = -100
     LIMIT = 5

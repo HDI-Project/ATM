@@ -3,19 +3,17 @@ import numpy as np
 
 from btb.key import Key
 from btb.selection.samples import SampleSelector
-from btb.utilities import *
-from sklearn.gaussian_process import GaussianProcess
 
 
 class GridSelector(SampleSelector):
-    def __init__(self, optimizables, grid_size=3):
+    def __init__(self, optimizables, **kwargs):
         """
         Grid space selector.
         grid_size determines how many possible values to try for each variable,
         i.e. how many blocks in the grid
         """
-        super(GridSelector, self).__init__(optimizables)
-        self.grid_size = grid_size
+        super(GridSelector, self).__init__(optimizables, **kwargs)
+        self.grid_size = kwargs.get('grid_size', 3)
         self.finished = False
         self._define_grid()
 
@@ -46,15 +44,6 @@ class GridSelector(SampleSelector):
 
             self._grid_values[k] = vals
 
-
-    def fit(self, X, y):
-        """
-        Not a whole lot here, since this class randomly chooses an untested
-        point on the grid.
-        """
-        self.finished = False
-        self.past_params = X
-
     def _last_candidate(self):
         """
         Compute the last candidate vector this class should generate; that way,
@@ -65,6 +54,14 @@ class GridSelector(SampleSelector):
             param_index = self.grid_size - 1
             vector[j] = self._grid_values[k][param_index]
         return vector
+
+    def fit(self, X, y):
+        """
+        Not a whole lot here, since this class randomly chooses an untested
+        point on the grid.
+        """
+        self.finished = False
+        self.past_params = X
 
     def create_candidates(self):
         """

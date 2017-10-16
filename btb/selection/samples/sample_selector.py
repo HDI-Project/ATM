@@ -7,7 +7,7 @@ import math
 
 
 class SampleSelector(object):
-    def __init__(self, optimizables):
+    def __init__(self, optimizables, **kwargs):
         """
         Accepts a list of pamameter metadata structures.
         optimizables will look like this:
@@ -19,6 +19,7 @@ class SampleSelector(object):
         ]
         """
         self.optimizables = optimizables
+        self.r_min = r_min
 
 
     def fit(self, X, y):
@@ -26,9 +27,6 @@ class SampleSelector(object):
         Args:
             X: np.ndarray of feature vectors (vectorized parameters)
             y: np.ndarray of scores
-
-        Returns:
-            self: SampleSelector
         """
         pass
 
@@ -80,3 +78,14 @@ class SampleSelector(object):
         predictions = self.predict(candidate_params)
         best = np.argmax(predictions)
         return candidate_params[best, :]
+
+
+class UniformSelector(SampleSelector):
+    """
+    Very bare_bones selector that returns a random set of parameters each time.
+    """
+    def propose(self):
+        """
+        Generate and return a random set of parameters.
+        """
+        return self.create_candidates(1)[0, :]
