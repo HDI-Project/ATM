@@ -67,19 +67,12 @@ class Mapping:
         ClassifierEnumerator.PASSIVE_AGGRESSIVE: EnumeratorPAC,
         ClassifierEnumerator.LRC: EnumeratorLRC}
 
-    # phasing these out
-    #SELECTION_SAMPLES_MAP = {
-        #SELECTION_SAMPLES_UNIFORM: UniformSampler,
-        #SELECTION_SAMPLES_GP: GP,
-        #SELECTION_SAMPLES_GP_EI: GPEi,
-        #SELECTION_SAMPLES_GP_EI_TIME: GPEiTime,
-        #SELECTION_SAMPLES_GP_EI_VEL: GPEiVelocity,
-        #SELECTION_SAMPLES_GRID: Grid,
-    #}
-
     SELECTION_SAMPLES_MAP = {
         SELECTION_SAMPLES_UNIFORM: UniformSelector,
         SELECTION_SAMPLES_GP: GPSelector,
+        SELECTION_SAMPLES_GP_EI: GPEiSelector,
+        #SELECTION_SAMPLES_GP_EI_TIME: GPEi,
+        SELECTION_SAMPLES_GP_EI_VEL: GPEiVelocitySelector,
         SELECTION_SAMPLES_GRID: GridSelector,
     }
 

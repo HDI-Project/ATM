@@ -1,12 +1,11 @@
-import math
-import numpy as np
 from __future__ import division
+import numpy as np
 from scipy.stats import norm
 
 from btb.key import Key
-from btb.selection.samples import SampleSelector
+from btb.selection.samples import SampleSelector, UniformSelector
 from btb.utilities import *
-from sklearn.gaussian_process import GaussianProcess
+from sklearn.gaussian_process import GaussianProcess, GaussianProcessRegressor
 
 
 class GPSelector(SampleSelector):
@@ -29,11 +28,14 @@ class GPSelector(SampleSelector):
         """
         if X.shape[0] < self.r_min:
             self.uniform = True
+            return
         else:
             self.uniform = False
 
-        self.gp = GaussianProcess(theta0=1e-2, thetaL=1e-4, thetaU=1e-1,
-                                  nugget=np.finfo(np.double).eps * 1000)
+        # old gaussian process code
+        #self.gp = GaussianProcess(theta0=1e-2, thetaL=1e-4, thetaU=1e-1,
+                                  #nugget=np.finfo(np.double).eps * 1000)
+        self.gp = GaussianProcessRegressor(normalize_y=True)
         self.gp.fit(X, y)
 
     def predict(self, X):
@@ -44,7 +46,9 @@ class GPSelector(SampleSelector):
         returns:
             y: np.ndarray of predicted scores
         """
-        return self.gp.predict(X, eval_MSE=True)
+        # old gaussian process code
+        #return self.gp.predict(X, eval_MSE=True)
+        return self.gp.predict(X)
 
     def propose(self):
         """
@@ -54,9 +58,11 @@ class GPSelector(SampleSelector):
         """
         if self.uniform:
             # we probably don't have enough
-            return UniformSampler().propose()
+            print 'not enough data, falling back to uniform sampler'
+            return UniformSelector(self.optimizables).propose()
         else:
-            # otherwise do the normal GPEi thing
+            # otherwise do the normal generate-predict thing
+            print 'using gaussian process to select parameters'
             return super(GPSelector, self).propose()
 
 
@@ -70,7 +76,7 @@ class GPEiSelector(GPSelector):
             y_est:  what the GP estimates the value of y will be
             stdev:  uncertainty of the GP's prediction
         """
-        z_score = (self.y_best - y_est) / stdev
+        z_score = (self.best_y - y_est) / stdev
         standard_normal = norm()
         ei = stdev * (z_score * standard_normal.cdf(z_score) +\
                       standard_normal.pdf(z_score))
@@ -85,7 +91,8 @@ class GPEiSelector(GPSelector):
         super(GPEiSelector, self).fit(X, y)
 
         # the only extra thing to do here is save the best y
-        self.best_y = max(y)
+        if len(y):
+            self.best_y = max(y)
 
     def predict(self, X):
         """
@@ -99,15 +106,15 @@ class GPEiSelector(GPSelector):
         returns:
             y: np.ndarray of predicted scores
         """
-        y, stdev = self.gp.predict(X, eval_MSE=True)
+        y, stdev = self.gp.predict(X, return_std=True)
         ei_y = [self._expected_improvement(y[i], stdev[i])
                 for i in range(len(y))]
         return np.array(ei_y)
 
 
 class GPEiVelocitySelector(GPEiSelector):
-    MULTIPLIER = -100
-    N_BEST_Y = 5
+    MULTIPLIER = -100   # magic number; modify with care
+    N_BEST_Y = 5        # this doesn't matter as much
 
     def fit(self, X, y):
         """
@@ -118,15 +125,17 @@ class GPEiVelocitySelector(GPEiSelector):
         # first, train a gaussian process like normal
         super(GPEiVelocitySelector, self).fit(X, y)
 
-        # get the best few scores so far, and compute the average distance
-        # between them.
-        best_few_y = sorted(y)[-self.N_BEST_Y:]
-        velocities = [y[i+1] - y[i] for i in range(len(best_few_y) - 1)]
+        self.probability_of_random = 0
+        if len(y) >= self.r_min:
+            # get the best few scores so far, and compute the average distance
+            # between them.
+            top_y = sorted(y)[-self.N_BEST_Y:]
+            velocities = [top_y[i+1] - top_y[i] for i in range(len(top_y) - 1)]
 
-        # the probability of returning random params scales inversely with
-        # density of top scores.
-        self.probability_of_random = np.exp(self.MULTIPLIER *
-                                            np.mean(velocities))
+            # the probability of returning random params scales inversely with
+            # density of top scores.
+            self.probability_of_random = np.exp(self.MULTIPLIER *
+                                                np.mean(velocities))
 
     def propose(self):
         """
@@ -136,7 +145,7 @@ class GPEiVelocitySelector(GPEiSelector):
         """
         if np.random.random() < self.probability_of_random:
             # choose params at random to avoid local minima
-            return UniformSampler().propose()
+            return UniformSelector(self.optimizables).propose()
         else:
             # otherwise do the normal GPEi thing
             return super(GPEiVelocitySelector, self).propose()

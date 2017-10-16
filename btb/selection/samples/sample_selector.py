@@ -1,6 +1,5 @@
-from btb.selection import Selector
-from btb.database import GetLearnersInFrozen
-import operator
+from btb.key import Key
+
 import numpy as np
 import random
 import math
@@ -19,8 +18,6 @@ class SampleSelector(object):
         ]
         """
         self.optimizables = optimizables
-        self.r_min = r_min
-
 
     def fit(self, X, y):
         """
@@ -40,7 +37,7 @@ class SampleSelector(object):
         """
         pass
 
-    def create_candidates(self, n=10000):
+    def create_candidates(self, n=1000):
         """
         Generate a number of random hyperparameter vectors based on the
         parameter specifications given to the constructor.

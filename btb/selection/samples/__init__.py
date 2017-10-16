@@ -1,7 +1,6 @@
-from sample_selector import SampleSelector
-from gp_selector import GPSelector
+from sample_selector import SampleSelector, UniformSelector
+from gp_selector import GPSelector, GPEiSelector, GPEiVelocitySelector
 from grid_selector import GridSelector
-from uniform_selector import UniformSelector
 
 SELECTION_SAMPLES_UNIFORM = "uniform"
 SELECTION_SAMPLES_GP = "gp"

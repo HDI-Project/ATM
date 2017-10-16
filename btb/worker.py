@@ -331,14 +331,6 @@ def select_params(datarun, frozen_set, score_target):
     # Get parameter metadata for this frozen set
     optimizables = frozen_set.optimizables
 
-    # Get previously-used parameters
-    # every learner should either be completed or have thrown an error
-    learners = [x for x in db.GetLearnersInFrozen(frozen_set.id) if x.completed]
-
-    # extract parameters and scores as numpy arrays from learners
-    X = ParamsToVectors([l.params for l in learners], optimizables)
-    y = np.array(float(getattr(l, score_target)) for l in learners)
-
     # If there aren't any optimizables, only run this frozen set once
     # TODO: "Gridding Done" is kind of the wrong term, since it applies to
     # non-grid sample selectors as well
@@ -348,6 +340,14 @@ def select_params(datarun, frozen_set, score_target):
         return VectorToParams(vector=[], optimizables=optimizables,
                               frozens=frozen_set.frozens,
                               constants=frozen_set.constants)
+
+    # Get previously-used parameters
+    # every learner should either be completed or have thrown an error
+    learners = [x for x in db.GetLearnersInFrozen(frozen_set.id) if x.completed]
+
+    # extract parameters and scores as numpy arrays from learners
+    X = ParamsToVectors([l.params for l in learners], optimizables)
+    y = np.array([float(getattr(l, score_target)) for l in learners])
 
     # initialize the sampler and propose a new set of parameters
     selector = Selector(optimizables, r_min=datarun.r_min)
