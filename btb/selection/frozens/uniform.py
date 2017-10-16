@@ -4,7 +4,7 @@ import random
 class Uniform(FrozenSelector):
 	def __init__(self, **kwargs):
 		super(Uniform, self).__init__(**kwargs)
-		
+
 	def select(self):
 		"""
 		Simply the uniform random selector.
