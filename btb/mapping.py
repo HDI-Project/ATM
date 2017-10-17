@@ -68,12 +68,12 @@ class Mapping:
         ClassifierEnumerator.LRC: EnumeratorLRC}
 
     SELECTION_SAMPLES_MAP = {
-        SELECTION_SAMPLES_UNIFORM: UniformSelector,
-        SELECTION_SAMPLES_GP: GPSelector,
-        SELECTION_SAMPLES_GP_EI: GPEiSelector,
+        SELECTION_SAMPLES_UNIFORM: Uniform,
+        SELECTION_SAMPLES_GP: GP,
+        SELECTION_SAMPLES_GP_EI: GPEi,
         #SELECTION_SAMPLES_GP_EI_TIME: GPEi,
-        SELECTION_SAMPLES_GP_EI_VEL: GPEiVelocitySelector,
-        SELECTION_SAMPLES_GRID: GridSelector,
+        SELECTION_SAMPLES_GP_EI_VEL: GPEiVelocity,
+        SELECTION_SAMPLES_GRID: Grid,
     }
 
     SELECTION_FROZENS_MAP = {
@@ -81,11 +81,12 @@ class Mapping:
         SELECTION_FROZENS_UCB1: UCB1,
         SELECTION_FROZENS_BEST_K: BestKReward,
         SELECTION_FROZENS_BEST_K_VEL: BestKVelocity,
+        SELECTION_FROZENS_PURE_BEST_K_VEL: PureBestKVelocity,
         SELECTION_FROZENS_RECENT_K: RecentKReward,
         SELECTION_FROZENS_RECENT_K_VEL: RecentKVelocity,
         SELECTION_FROZENS_HIER_ALG: HierarchicalByAlgorithm,
-        SELECTION_FROZENS_HIER_RAND: HierarchicalRandom,
-        SELECTION_FROZENS_PURE_BEST_K_VEL: PureBestKVelocity, }
+        #SELECTION_FROZENS_HIER_RAND: HierarchicalRandom,
+    }
 
 
 def CreateWrapper(params, judgment_metric):

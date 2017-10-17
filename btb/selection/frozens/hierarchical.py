@@ -1,68 +1,55 @@
-from btb.selection.frozens import FrozenSelector
-from btb.selection.frozens.ucb1 import UCB1
+from btb.selection.frozens import FrozenSelector, UCB1
 from btb.selection.bandit import UCB1Bandit, FrozenArm
-import math, random
+import random
 
 class HierarchicalByAlgorithm(FrozenSelector):
-	def __init__(self, **kwargs):
+	def __init__(self, choices, **kwargs):
 		"""
 		Needs:
-		frozen_sets
+            by_algorithm: {str -> list} grouping of frozen set choices by ML
+                algorithm
 		"""
-		super(HierarchicalByAlgorithm, self).__init__(**kwargs)
+		super(HierarchicalByAlgorithm, self).__init__(choices, **kwargs)
+        self.by_algorithm = kwargs.pop('by_algorithm')
 
-	def select(self):
+	def select(self, choice_scores):
 		"""
-		Groups the frozen sets by algorithm and first chooses
-		an algorithm based on the traditional UCB1 criteria.
+        Groups the frozen sets by algorithm and first chooses an algorithm based
+        on the traditional UCB1 criteria.
 
-		Next, from that algorithm's frozen sets, makes the
-		final set choice.
+        Next, from that algorithm's frozen sets, makes the final set choice.
 		"""
+        choice_scores = {c: s for c, s in choice_scores if c in self.choices}
 
-		# group the fsets by algorithm
-		by_algorithm = {} # algorithm => [ frozen_sets ]
-		for fset in self.frozen_sets:
-			if not fset.algorithm in by_algorithm:
-				by_algorithm[fset.algorithm] = []
-			by_algorithm[fset.algorithm].append(fset)
-
-		# now create arms and choose
+		# create arms and choose algorithm
 		algorithm_arms = []
-		total_count = 0
-		total_rewards = 0.0
-		for algorithm, fsets in by_algorithm.iteritems():
-			count = sum([x.trained for x in fsets])
-			rewards = float(sum([x.rewards for x in fsets]))
-			total_rewards += rewards
-			total_count += fset.trained
-			arm = FrozenArm(count, rewards, algorithm)
-			algorithm_arms.append(arm)
+        for algorithm, choices in self.by_algorithm.iteritems():
+            # only make arms for algorithms that have options
+            if not set(choices) & set(choice_scores.keys()):
+                continue
 
-		random.shuffle(algorithm_arms) # so arms are not picked in ordinal ID order
+			count = sum(len(choice_scores.get(c, [])) for c in choices)
+			rewards = sum(sum(choice_scores.get(c, [])) for c in choices)
+			frozen_arms.append(FrozenArm(count, rewards, algorithm))
+
+        total_rewards = sum(a.rewards for a in algorithm_arms)
+        total_count = sum(a.count for a in algorithm_arms)
+
+		random.shuffle(algorithm_arms)
 		bandit = UCB1Bandit(algorithm_arms, total_count, total_rewards)
 		best_algorithm = bandit.score_arms()
-		print "* Hierarchical picked algorithm: %s" % best_algorithm
 
 		# now use only the frozen sets from the chosen best algorithm
-		best_frozen_sets = by_algorithm[best_algorithm]
-		normal_ucb1 = UCB1(frozen_sets=best_frozen_sets)
-		return normal_ucb1.select()
+		best_subset = self.by_algorithm[best_algorithm]
+		normal_ucb1 = UCB1(choices=best_subset)
+		return normal_ucb1.select(choice_scores)
 
 class HierarchicalRandom(FrozenSelector):
-	def __init__(self, **kwargs):
-		"""
-		Needs:
-		frozens
-		"""
-		super(HierarchicalRandom, self).__init__(**kwargs)
-
 	def select(self):
 		"""
-		Groups the frozen sets randomly and first chooses
-		an algorithm based on the traditional UCB1 criteria.
+        Groups the frozen sets randomly and first chooses a random subset based
+        on the traditional UCB1 criteria.
 
-		Next, from that random set's frozen sets, makes the
-		final set choice.
+        Next, from that random set's frozen sets, makes the final set choice.
 		"""
 		pass

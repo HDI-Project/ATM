@@ -1,8 +1,8 @@
-from btb.database import *
+from btb.database import Database
 from sqlalchemy import and_
 
 
-class ClassifierInfo:
+class ClassifierInfo(object):
     def __init__(self):
         self.classifier_id = -1
         self.dataset_id = -1
@@ -33,8 +33,6 @@ class ClassifierInfo:
             str += '\t\t{} = {}\n'.format(key,value)
 
         return str
-
-
 
 
 def get_functions():

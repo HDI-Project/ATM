@@ -5,15 +5,15 @@ from btb.key import Key
 from btb.selection.samples import SampleSelector
 
 
-class GridSelector(SampleSelector):
+class Grid(SampleSelector):
     def __init__(self, optimizables, **kwargs):
         """
         Grid space selector.
         grid_size determines how many possible values to try for each variable,
         i.e. how many blocks in the grid
         """
-        super(GridSelector, self).__init__(optimizables, **kwargs)
-        self.grid_size = kwargs.get('grid_size', 3)
+        super(Grid, self).__init__(optimizables, **kwargs)
+        self.grid_size = kwargs.pop('grid_size', 3)
         self.finished = False
         self._define_grid()
 

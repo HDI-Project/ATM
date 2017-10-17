@@ -35,6 +35,17 @@ JUDGMENT_METRICS = {
     'roc_auc_macro': Metrics.ROC_AUC_MACRO,
 }
 
+METRIC_DEFAULT_SCORES = {
+    'accuracy': 0.0,
+    'f1': 0.0,
+    'f1_micro': 0.0,
+    'f1_macro': 0.0,
+    'f1_mu_sigma': 0.0,
+    'roc_auc': 0.5,
+    'roc_auc_micro': 0.5,
+    'roc_auc_macro': 0.5,
+}
+
 def get_metrics_binary(y_true, y_pred, y_pred_probs):
     y_pred_prob = y_pred_probs[:, 1]  # get probabilites for positive class (1)
 

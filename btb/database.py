@@ -16,7 +16,7 @@ from btb.utilities import *
 from btb.config import Config
 
 
-def try_with_session(default=lambda: None):
+def try_with_session(default=lambda: None, commit=False):
     """
     Decorator for instance methods on Database that need a sqlalchemy session.
 
@@ -35,8 +35,11 @@ def try_with_session(default=lambda: None):
             session = db.get_session()
             try:
                 result = func(db, session, *args, **kwargs)
+                if commit:
+                    session.commit()
             except Exception:
-                session.rollback()
+                if commit:
+                    session.rollback()
                 result = default()
                 argstr = ', ',join(args)
                 kwargstr = ', ',join(['%s=%s' % kv for kv in kwargs.items()])
@@ -299,11 +302,9 @@ class Database(object):
             return candidates[random.randint(0, len(candidates) - 1)]
         return candidates[0]
 
-    @try_with_session(lambda: True)
+    @try_with_session(default=lambda: True)
     def IsGriddingDoneForDatarun(self, session, datarun_id,
                                  min_num_errors_to_exclude=0):
-        """ Return a boolean indicating whether gridding is done for the
-        specified datarun. """
         frozen_sets = session.query(FrozenSet)\
             .filter(FrozenSet.datarun_id == datarun_id).all()
 
@@ -316,10 +317,11 @@ class Database(object):
                 elif min_num_errors_to_exclude == 0:
                     is_done = False
 
-    @try_with_session(list)
-    def GetIncompletedFrozenSets(self, session, datarun_id,
+    @try_with_session(default=list)
+    def GetIncompleteFrozenSets(self, session, datarun_id,
                                  min_num_errors_to_exclude=0):
-        """ Returns all the incomplete frozen sets in a given datarun by id.
+        """
+        Returns all the incomplete frozen sets in a given datarun by id.
         """
         frozen_sets = session.query(FrozenSet)\
             .filter(and_(FrozenSet.datarun_id == datarun_id,
@@ -336,20 +338,20 @@ class Database(object):
 
         return frozen_sets
 
-    @try_with_session(int)
+    @try_with_session(default=int)
     def GetNumberOfFrozenSetErrors(self, session, frozen_set_id):
         learners = session.query(Learner)\
             .filter(and_(Learner.frozen_set_id == frozen_set_id,
                          Learner.is_error == 1)).all()
         return len(learners)
 
-    @try_with_session(list)
+    @try_with_session(default=list)
     def GetLearnersInFrozen(self, session, frozen_set_id):
         """ Returns all learners in a frozen set. """
         return session.query(Learner)\
             .filter(Learner.frozen_set_id == frozen_set_id).all()
 
-    @try_with_session(list)
+    @try_with_session(default=list)
     def GetLearners(self, session, datarun_id):
         """ Returns all learners in a datarun.  """
         return session.query(Learner)\
@@ -362,24 +364,24 @@ class Database(object):
         return session.query(Learner).get(learner_id)
 
     @try_with_session()
-    def GetMaximumY(self, session, datarun_id, metric):
+    def GetMaximumY(self, session, datarun_id, score_target):
         """ Returns the maximum value of a numeric column by name, or None. """
-        result = session.query(func.max(getattr(Learner, metric)))\
+        result = session.query(func.max(getattr(Learner, score_target)))\
             .filter(Learner.datarun_id == datarun_id).one()[0]
         if result:
             return float(result)
         return None
 
-    @try_with_session(lambda: (0,0))
-    def get_best_so_far(self, session, datarun_id, metric):
+    @try_with_session(default=lambda: (0,0))
+    def get_best_so_far(self, session, datarun_id, score_target):
         """
-        Sort of like GetMaximumY, but looks for best standard dev below the
-        mean.
+        Sort of like GetMaximumY, but treats the absolute score as two standard
+        deviations below the mean.
         """
         maximum = 0
-        best_val, best_std = 0, 0
+        best_val, best_err = 0, 0
 
-        if metric == 'cv_judgment_metric':
+        if score_target == 'cv_judgment_metric':
             result = session.query(self.Learner.cv_judgment_metric,
                                    self.Learner.cv_judgment_metric_stdev)\
                             .filter(self.Learner.datarun_id == datarun_id)\
@@ -387,11 +389,11 @@ class Database(object):
             for val, std in result:
                 if val is None or std is None:
                     continue
-                if val - std > maximum:
-                    best_val, best_std = float(val), float(std)
-                    maximum = float(val - std)
+                if val - 2 * std > maximum:
+                    best_val, best_err = float(val), 2 * float(std)
+                    maximum = float(val - 2 * std)
 
-        elif metric == 'test_judgment_metric':
+        elif score_target == 'test_judgment_metric':
             result = session.query(func.max(self.Learner.test_judgment_metric))\
                             .filter(self.Learner.datarun_id == datarun_id)\
                             .one()[0]
@@ -399,29 +401,21 @@ class Database(object):
                 best_val = float(result)
                 maximum = best_val
 
-        return best_val, best_std
+        return best_val, best_err
 
-    @try_with_session()
+    @try_with_session(commit=True)
     def MarkFrozenSetGriddingDone(self, session, frozen_set_id):
         frozen_set = session.query(FrozenSet)\
             .filter(FrozenSet.id == frozen_set_id).one()
         frozen_set.is_gridding_done = 1
-        session.commit()
-        # set any sqlalchemy ORM objects created by this session to the
-        # detached state, so they can be used after the session is closed.
-        session.expunge_all()
 
-    @try_with_session()
+    @try_with_session(commit=True)
     def MarkDatarunGriddingDone(self, session, datarun_id):
         datarun = session.query(Datarun).filter(Datarun.id == datarun_id).one()
         datarun.is_gridding_done = 1
-        session.commit()
-        session.expunge_all()
 
-    @try_with_session()
+    @try_with_session(commit=True)
     def MarkDatarunDone(self, session, datarun_id):
         """ Sets the completed field of the Datarun to the current datetime. """
         datarun = session.query(Datarun)\
             .filter(Datarun.id == datarun_id).one()
-        datarun.completed = datetime.now()
-        session.commit()

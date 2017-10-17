@@ -3,12 +3,12 @@ import numpy as np
 from scipy.stats import norm
 
 from btb.key import Key
-from btb.selection.samples import SampleSelector, UniformSelector
+from btb.selection.samples import SampleSelector, Uniform
 from btb.utilities import *
 from sklearn.gaussian_process import GaussianProcess, GaussianProcessRegressor
 
 
-class GPSelector(SampleSelector):
+class GP(SampleSelector):
     def __init__(self, optimizables, **kwargs):
         """
         r_min: the minimum number of past results this selector needs in order
@@ -16,8 +16,8 @@ class GPSelector(SampleSelector):
         present during a fit(), subsequent calls to propose() will revert to
         uniform selection.
         """
-        super(GPSelector, self).__init__(optimizables, **kwargs)
-        self.r_min = kwargs.get('r_min', 2)
+        super(GP, self).__init__(optimizables, **kwargs)
+        self.r_min = kwargs.pop('r_min', 2)
         self.uniform = True
 
     def fit(self, X, y):
@@ -59,14 +59,14 @@ class GPSelector(SampleSelector):
         if self.uniform:
             # we probably don't have enough
             print 'not enough data, falling back to uniform sampler'
-            return UniformSelector(self.optimizables).propose()
+            return Uniform(self.optimizables).propose()
         else:
             # otherwise do the normal generate-predict thing
             print 'using gaussian process to select parameters'
-            return super(GPSelector, self).propose()
+            return super(GP, self).propose()
 
 
-class GPEiSelector(GPSelector):
+class GPEi(GP):
     def _expected_improvement(self, y_est, stdev):
         """
         Expected improvement criterion:
@@ -88,7 +88,7 @@ class GPEiSelector(GPSelector):
             X: np.ndarray of feature vectors (vectorized parameters)
             y: np.ndarray of scores
         """
-        super(GPEiSelector, self).fit(X, y)
+        super(GPEi, self).fit(X, y)
 
         # the only extra thing to do here is save the best y
         if len(y):
@@ -112,7 +112,7 @@ class GPEiSelector(GPSelector):
         return np.array(ei_y)
 
 
-class GPEiVelocitySelector(GPEiSelector):
+class GPEiVelocity(GPEi):
     MULTIPLIER = -100   # magic number; modify with care
     N_BEST_Y = 5        # this doesn't matter as much
 
@@ -123,7 +123,7 @@ class GPEiVelocitySelector(GPEiSelector):
             y: np.ndarray of scores
         """
         # first, train a gaussian process like normal
-        super(GPEiVelocitySelector, self).fit(X, y)
+        super(GPEiVelocity, self).fit(X, y)
 
         self.probability_of_random = 0
         if len(y) >= self.r_min:
@@ -145,7 +145,7 @@ class GPEiVelocitySelector(GPEiSelector):
         """
         if np.random.random() < self.probability_of_random:
             # choose params at random to avoid local minima
-            return UniformSelector(self.optimizables).propose()
+            return Uniform(self.optimizables).propose()
         else:
             # otherwise do the normal GPEi thing
-            return super(GPEiVelocitySelector, self).propose()
+            return super(GPEiVelocity, self).propose()

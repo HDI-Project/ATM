@@ -1,9 +1,8 @@
 from btb.datawrapper import DataWrapper
 from btb.config import Config
-from btb.database import *
 from btb.utilities import *
 from btb.mapping import FrozenSetsFromAlgorithmCodes
-import btb.database as db
+from btb.database import Database
 
 from boto.s3.connection import S3Connection, Key as S3Key
 import datetime
@@ -26,9 +25,7 @@ def Run(config, runname, description, metric, score_target, sample_selection,
     EnsureDirectory("models")
     EnsureDirectory("logs")
 
-    # call database method to define ORM objects in the db module
-    db.define_tables(config)
-
+    db = Database(config)
     print "Dataname: %s, description: %s" % (runname, description)
 
     assert alldatapath or (trainpath and testpath), \
@@ -100,7 +97,7 @@ def Run(config, runname, description, metric, score_target, sample_selection,
     print "Frozen selection: %s" % values["frozen_selection"]
 
     ### insert datarun ####
-    session = GetConnection()
+    session = db.get_session()
     datarun = None
     datarun_ids = []
     if not frozens_separately:
