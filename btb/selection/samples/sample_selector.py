@@ -79,7 +79,7 @@ class SampleSelector(object):
         return candidate_params[best, :]
 
 
-class UniformSelector(SampleSelector):
+class Uniform(SampleSelector):
     """
     Very bare_bones selector that returns a random set of parameters each time.
     """

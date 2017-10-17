@@ -12,8 +12,11 @@ from nolearn.dbn import DBN
 from btb.enumeration import Enumerator
 from btb.enumeration.classification import ClassifierEnumerator
 from btb.enumeration.classification.svm import EnumeratorSVC
-from btb.enumeration.classification.tree import EnumeratorDTC, EnumeratorRFC, EnumeratorETC
-from btb.enumeration.classification.probabilistic import EnumeratorGNB, EnumeratorBNB, EnumeratorMNB
+from btb.enumeration.classification.tree import EnumeratorDTC, EnumeratorRFC,\
+                                                EnumeratorETC
+from btb.enumeration.classification.probabilistic import EnumeratorGNB,\
+                                                         EnumeratorBNB,\
+                                                         EnumeratorMNB
 from btb.enumeration.classification.logistic import EnumeratorLRC
 from btb.enumeration.classification.nn import EnumeratorDBN, EnumeratorMLP
 from btb.enumeration.classification.knn import EnumeratorKNN
@@ -22,17 +25,15 @@ from btb.enumeration.classification.gp import EnumeratorGPC
 from btb.wrapper import Wrapper
 
 # sample selectors
-from btb.selection.samples import *
-
+from btb.selection.samples.constants import *
+from btb.selection.samples import Uniform as UniformSampler, Grid,\
+                                  GP, GPEi, GPEiVelocity
 # frozen selectors
-from btb.selection.frozens import *
-from btb.selection.frozens.ucb1 import UCB1
-from btb.selection.frozens.uniform import Uniform as UniformFrozens
-from btb.selection.frozens.best import BestKReward, BestKVelocity
-from btb.selection.frozens.recent import RecentKReward, RecentKVelocity
-from btb.selection.frozens.hierarchical import HierarchicalByAlgorithm, HierarchicalRandom
-from btb.selection.frozens.pure import PureBestKVelocity
-
+from btb.selection.frozens.constants import *
+from btb.selection.frozens import Uniform as UniformFrozens, UCB1,\
+                                  BestKReward, BestKVelocity,\
+                                  RecentKReward, RecentKVelocity,\
+                                  HierarchicalByAlgorithm, PureBestKVelocity
 
 class Mapping:
     LEARNER_CODE_CLASS_MAP = {
@@ -68,7 +69,7 @@ class Mapping:
         ClassifierEnumerator.LRC: EnumeratorLRC}
 
     SELECTION_SAMPLES_MAP = {
-        SELECTION_SAMPLES_UNIFORM: Uniform,
+        SELECTION_SAMPLES_UNIFORM: UniformSampler,
         SELECTION_SAMPLES_GP: GP,
         SELECTION_SAMPLES_GP_EI: GPEi,
         #SELECTION_SAMPLES_GP_EI_TIME: GPEi,

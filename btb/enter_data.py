@@ -28,7 +28,6 @@ def enter_data(config):
     else:
         runname = os.path.basename(alldatapath).replace(".csv", "")
 
-
     algorithm_codes = config.get(Config.RUN, Config.RUN_ALGORITHMS).split(', ')
     priority = int(config.get(Config.RUN, Config.RUN_PRIORITY))
 

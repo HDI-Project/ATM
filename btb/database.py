@@ -41,14 +41,16 @@ def try_with_session(default=lambda: None, commit=False):
                 if commit:
                     session.rollback()
                 result = default()
-                argstr = ', ',join(args)
-                kwargstr = ', ',join(['%s=%s' % kv for kv in kwargs.items()])
+                argstr = ', '.join([str(a) for a in args])
+                kwargstr = ', '.join(['%s=%s' % kv for kv in kwargs.items()])
                 print "Error in %s(%s, %s):" % (func.__name__, argstr, kwargstr)
                 print traceback.format_exc()
             finally:
                 session.close()
 
             return result
+        return call
+    return wrap
 
 
 class Database(object):
@@ -69,7 +71,9 @@ class Database(object):
             dialect, user, password, host, port, database, query)
         self.engine = create_engine(db_string)
 
-        self.get_session = sessionmaker(bind=engine, expire_on_commit=False)
+        self.get_session = sessionmaker(bind=self.engine,
+                                        expire_on_commit=False)
+        self.define_tables()
 
     def define_tables(self):
         metadata = MetaData(bind=self.engine)
@@ -280,13 +284,13 @@ class Database(object):
                 return randomly. If False, return the first datarun present in
                 the database (likely lowest id).
         """
-        query = session.query(Datarun)
+        query = session.query(self.Datarun)
         if ignore_completed:
-            query = query.filter(Datarun.completed == None)
+            query = query.filter(self.Datarun.completed == None)
         if ignore_grid_complete:
-            query = query.filter(Datarun.is_gridding_done == 0)
+            query = query.filter(self.Datarun.is_gridding_done == 0)
         if datarun_id:
-            query = query.filter(Datarun.id == datarun_id)
+            query = query.filter(self.Datarun.id == datarun_id)
 
         dataruns = query.all()
 
@@ -303,71 +307,81 @@ class Database(object):
         return candidates[0]
 
     @try_with_session(default=lambda: True)
-    def IsGriddingDoneForDatarun(self, session, datarun_id,
-                                 min_num_errors_to_exclude=0):
-        frozen_sets = session.query(FrozenSet)\
-            .filter(FrozenSet.datarun_id == datarun_id).all()
+    def IsGriddingDoneForDatarun(self, session, datarun_id, errors_to_exclude=0):
+        """
+        Check whether gridding is done for the entire datarun.
+        errors_to_exclude = 0 indicates we don't care about errors.
+        """
+        is_done = True
+        frozen_sets = session.query(self.FrozenSet)\
+            .filter(self.FrozenSet.datarun_id == datarun_id).all()
 
         for frozen_set in frozen_sets:
-            if frozen_set.is_gridding_done == 0:
-                if ((min_num_errors_to_exclude > 0) and
-                       (GetNumberOfFrozenSetErrors(frozen_set_id=frozen_set.id) <
-                        min_num_errors_to_exclude)):
+            if not frozen_set.is_gridding_done:
+                num_errors = self.GetNumberOfFrozenSetErrors(frozen_set.id)
+                if errors_to_exclude == 0 or num_errors < errors_to_exclude:
                     is_done = False
-                elif min_num_errors_to_exclude == 0:
-                    is_done = False
+
+        return is_done
 
     @try_with_session(default=list)
     def GetIncompleteFrozenSets(self, session, datarun_id,
-                                 min_num_errors_to_exclude=0):
+                                 errors_to_exclude=0):
         """
         Returns all the incomplete frozen sets in a given datarun by id.
         """
-        frozen_sets = session.query(FrozenSet)\
-            .filter(and_(FrozenSet.datarun_id == datarun_id,
-                         FrozenSet.is_gridding_done == 0)).all()
+        frozen_sets = session.query(self.FrozenSet)\
+            .filter(and_(self.FrozenSet.datarun_id == datarun_id,
+                         self.FrozenSet.is_gridding_done == 0)).all()
 
-        if min_num_errors_to_exclude > 0:
-            old_list = frozen_sets
-            frozen_sets = []
+        if not errors_to_exclude:
+            return frozen_sets
 
-            for frozen_set in old_list:
-                if GetNumberOfFrozenSetErrors(frozen_set_id=frozen_set.id) < \
-                        min_num_errors_to_exclude:
-                    frozen_sets.append(frozen_set)
+        old_list = frozen_sets
+        frozen_sets = []
+
+        for frozen_set in old_list:
+            if (self.GetNumberOfFrozenSetErrors(frozen_set.id) <
+                    errors_to_exclude):
+                frozen_sets.append(frozen_set)
 
         return frozen_sets
 
+    @try_with_session()
+    def GetFrozenSet(self, session, frozen_set_id):
+        """ Returns a specific learner.  """
+        return session.query(self.FrozenSet).get(frozen_set_id)
+
     @try_with_session(default=int)
     def GetNumberOfFrozenSetErrors(self, session, frozen_set_id):
-        learners = session.query(Learner)\
-            .filter(and_(Learner.frozen_set_id == frozen_set_id,
-                         Learner.is_error == 1)).all()
+        learners = session.query(self.Learner)\
+            .filter(and_(self.Learner.frozen_set_id == frozen_set_id,
+                         self.Learner.is_error == 1)).all()
         return len(learners)
 
     @try_with_session(default=list)
     def GetLearnersInFrozen(self, session, frozen_set_id):
         """ Returns all learners in a frozen set. """
-        return session.query(Learner)\
-            .filter(Learner.frozen_set_id == frozen_set_id).all()
+        return session.query(self.Learner)\
+            .filter(self.Learner.frozen_set_id == frozen_set_id).all()
 
     @try_with_session(default=list)
     def GetLearners(self, session, datarun_id):
         """ Returns all learners in a datarun.  """
-        return session.query(Learner)\
-            .filter(Learner.datarun_id == datarun_id)\
-            .order_by(Learner.started).all()
+        return session.query(self.Learner)\
+            .filter(self.Learner.datarun_id == datarun_id)\
+            .order_by(self.Learner.started).all()
 
     @try_with_session()
     def GetLearner(self, session, learner_id):
         """ Returns a specific learner.  """
-        return session.query(Learner).get(learner_id)
+        return session.query(self.Learner).get(learner_id)
 
     @try_with_session()
     def GetMaximumY(self, session, datarun_id, score_target):
         """ Returns the maximum value of a numeric column by name, or None. """
-        result = session.query(func.max(getattr(Learner, score_target)))\
-            .filter(Learner.datarun_id == datarun_id).one()[0]
+        result = session.query(func.max(getattr(self.Learner, score_target)))\
+            .filter(self.Learner.datarun_id == datarun_id).one()[0]
         if result:
             return float(result)
         return None
@@ -405,17 +419,17 @@ class Database(object):
 
     @try_with_session(commit=True)
     def MarkFrozenSetGriddingDone(self, session, frozen_set_id):
-        frozen_set = session.query(FrozenSet)\
-            .filter(FrozenSet.id == frozen_set_id).one()
+        frozen_set = session.query(self.FrozenSet)\
+            .filter(self.FrozenSet.id == frozen_set_id).one()
         frozen_set.is_gridding_done = 1
 
     @try_with_session(commit=True)
     def MarkDatarunGriddingDone(self, session, datarun_id):
-        datarun = session.query(Datarun).filter(Datarun.id == datarun_id).one()
+        datarun = session.query(self.Datarun).filter(self.Datarun.id == datarun_id).one()
         datarun.is_gridding_done = 1
 
     @try_with_session(commit=True)
     def MarkDatarunDone(self, session, datarun_id):
         """ Sets the completed field of the Datarun to the current datetime. """
-        datarun = session.query(Datarun)\
-            .filter(Datarun.id == datarun_id).one()
+        datarun = session.query(self.Datarun)\
+            .filter(self.Datarun.id == datarun_id).one()

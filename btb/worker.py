@@ -1,7 +1,7 @@
-from btb.selection.samples import SELECTION_SAMPLES_GRID
+from btb.selection.samples.constants import SELECTION_SAMPLES_GRID
 from btb.config import Config
-from btb.selection.samples import Grid
-from btb.utilities import EnsureDirectory
+from btb.utilities import EnsureDirectory, ParamsToVectors, VectorToParams,\
+                          HashDict, HashString, GetPublicIP
 from btb.mapping import Mapping, CreateWrapper
 from btb.model import Model
 from btb.database import Database
@@ -18,7 +18,9 @@ import time
 import traceback
 import warnings
 from decimal import Decimal
+from collections import defaultdict
 
+import numpy as np
 import pandas as pd
 from boto.s3.connection import S3Connection, Key as S3Key
 
@@ -85,6 +87,7 @@ class Worker(object):
         self.db = Database(config)
         self.datarun_id = datarun_id
         self.save_files = save_files
+        self.choose_randomly = choose_randomly
 
     def save_learner_cloud(self, local_model_path, local_metric_path):
         aws_key = self.config.get(Config.AWS, Config.AWS_ACCESS_KEY)
@@ -121,7 +124,8 @@ class Worker(object):
         _log('Deleting local copy of {}'.format(local_metric_path))
         os.remove(local_metric_path)
 
-    def insert_learner(self, datarun, frozen_set, performance, params, model, started):
+    def insert_learner(self, datarun, frozen_set, performance, params, model,
+                       started):
         """
         Inserts a learner and also updates the frozen_sets table.
 
@@ -251,7 +255,8 @@ class Worker(object):
             EnsureDirectory("data/processed/")
             if DownloadFileS3(self.config, datarun.local_testpath) !=\
                     datarun.local_testpath:
-                raise Exception("Something about test dataset caching is wrong...")
+                raise Exception("Something about test dataset caching is "
+                                "wrong...")
 
         # load the data into matrix format
         testX = read_btb_csv(datarun.local_testpath)
@@ -263,10 +268,10 @@ class Worker(object):
 
     def get_frozen_selector(self, datarun):
         frozen_sets = self.db.GetIncompleteFrozenSets(datarun.id,
-                                                      min_num_errors_to_exclude=20)
+                                                      errors_to_exclude=20)
         if not frozen_sets:
             if self.db.IsGriddingDoneForDatarun(datarun_id=datarun.id,
-                                                min_num_errors_to_exclude=20):
+                                                errors_to_exclude=20):
                 self.db.MarkDatarunGriddingDone(datarun_id=datarun.id)
             _log("No incomplete frozen sets for datarun present in database.")
 
@@ -287,10 +292,10 @@ class Worker(object):
 
     def select_frozen_set(self, datarun):
         frozen_sets = self.db.GetIncompleteFrozenSets(datarun.id,
-                                                      min_num_errors_to_exclude=20)
+                                                      errors_to_exclude=20)
         if not frozen_sets:
             if self.db.IsGriddingDoneForDatarun(datarun_id=datarun.id,
-                                                min_num_errors_to_exclude=20):
+                                                errors_to_exclude=20):
                 self.db.MarkDatarunGriddingDone(datarun_id=datarun.id)
             _log("No incomplete frozen sets for datarun present in database.")
             return None
@@ -300,12 +305,12 @@ class Worker(object):
         # don't have any learners. That way the selector can choose frozen sets
         # that haven't been scored yet.
         frozen_set_scores = {fs.id: [] for fs in frozen_sets}
-		learners = GetLearners(datarun.id)
+        learners = self.db.GetLearners(datarun.id)
         for l in learners:
             score = getattr(l, datarun.score_target)
             frozen_set_scores[l.frozen_set_id].append(score)
 
-        frozen_set_id = selector.select(choice_scores=frozen_set_scores)
+        frozen_set_id = self.frozen_selector.select(frozen_set_scores)
         frozen_set = self.db.GetFrozenSet(frozen_set_id)
 
         if not frozen_set:
@@ -370,9 +375,9 @@ class Worker(object):
                 # choose datarun to work on
                 _log("=" * 25)
                 started = time.strftime('%Y-%m-%d %H:%M:%S')
-                datarun = self.db.GetDatarun(datarun_id=datarun_id,
+                datarun = self.db.GetDatarun(datarun_id=self.datarun_id,
                                         ignore_grid_complete=False,
-                                        choose_randomly=choose_randomly)
+                                        choose_randomly=self.choose_randomly)
 
                 if datarun is None:
                     # If desired, we can sleep here and wait for a new datarun
@@ -388,8 +393,8 @@ class Worker(object):
                 endrun = False
 
                 # check to see if we're over the datarun/time budget
-                frozen_sets = self.db.GetIncompleteFrozenSets(
-                    datarun.id, min_num_errors_to_exclude=20)
+                frozen_sets = self.db.GetIncompleteFrozenSets(datarun.id,
+                                                              errors_to_exclude=20)
                 n_completed = sum([f.trained for f in frozen_sets])
 
                 if (budget_type == "learner" and
@@ -421,8 +426,8 @@ class Worker(object):
                     time.sleep(10)
                     continue
 
-                # use the configured sample selector to choose a set of parameters
-                # within the frozen set
+                # use the configured sample selector to choose a set of
+                # parameters within the frozen set
                 params = self.select_parameters(datarun, frozen_set)
                 if params is None:
                     _log("Frozen set finished. No parameters chosen.")
@@ -453,7 +458,7 @@ class Worker(object):
                                     params, model, started)
 
                 _log("Best so far: %.3f +- %.3f" %
-                     self.db.get_best_so_far(datarun_id,
+                     self.db.get_best_so_far(datarun.id,
                                              datarun.score_target))
 
             except Exception as e:

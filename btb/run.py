@@ -7,7 +7,6 @@ from btb.database import Database
 from boto.s3.connection import S3Connection, Key as S3Key
 import datetime
 import pdb
-
 import warnings
 
 warnings.filterwarnings("ignore")
