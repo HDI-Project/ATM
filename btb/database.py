@@ -16,353 +16,310 @@ from btb.utilities import *
 from btb.config import Config
 
 
-def define_tables(config):
+def try_with_session(default=lambda: None):
     """
-    Accepts a config (for database connection info), and defines SQLAlchemy ORM
-    objects for all the tables in the database.
+    Decorator for instance methods on Database that need a sqlalchemy session.
+
+    This wrapping function creates a new session with the Database's engine and
+    passes it to the instance method to use. Everything is inside a try-catch
+    statement, so if something goes wrong, this prints a nice error string and
+    fails gracefully.
+
+    In case of an error, the function passed to this decorator as `default` is
+    called (without arguments) to generate a response. This needs to be a
+    function instead of just a static argument to avoid issues with leaving
+    empty lists ([]) in method signatures.
     """
-    DIALECT = config.get(Config.DATAHUB, Config.DATAHUB_DIALECT)
-    DATABASE = config.get(Config.DATAHUB, Config.DATAHUB_DATABASE)
-    USER = config.get(Config.DATAHUB, Config.DATAHUB_USERNAME)
-    PASSWORD = config.get(Config.DATAHUB, Config.DATAHUB_PASSWORD)
-    HOST = config.get(Config.DATAHUB, Config.DATAHUB_HOST)
-    PORT = int(config.get(Config.DATAHUB, Config.DATAHUB_PORT))
-    QUERY = config.get(Config.DATAHUB, Config.DATAHUB_QUERY)
-
-    Base = declarative_base()
-    DB_STRING = '%s://%s:%s@%s:%d/%s?%s' % (
-        DIALECT, USER, PASSWORD, HOST, PORT, DATABASE, QUERY)
-    engine = create_engine(DB_STRING)
-    metadata = MetaData(bind=engine)
-
-    global Session
-    Session = sessionmaker(bind=engine, expire_on_commit=False)
-
-    global Datarun, FrozenSet, Algorithm, Learner
-
-    class Datarun(Base):
-        __table__ = Table('dataruns', metadata, autoload=True)
-
-        @property
-        def wrapper(self):
-            return Base64ToObject(self.datawrapper)
-
-        @wrapper.setter
-        def wrapper(self, value):
-            self.datawrapper = ObjectToBase64(value)
-
-        def __repr__(self):
-            base = "<%s:, frozen: %s, sampling: %s, budget: %s, status: %s>"
-            status = ""
-            if self.started == None:
-                status = "pending"
-            elif self.started != None and self.completed == None:
-                status = "running"
-            elif self.started != None and self.completed != None:
-                status = "done"
-            return base % (self.name, self.frozen_selection,
-                           self.sample_selection, self.budget, status)
-
-    class FrozenSet(Base):
-        __table__ = Table('frozen_sets', metadata, autoload=True)
-
-        @property
-        def optimizables(self):
-            return Base64ToObject(self.optimizables64)
-
-        @optimizables.setter
-        def optimizables(self, value):
-            self.optimizables64 = ObjectToBase64(value)
-
-        @property
-        def frozens(self):
-            return Base64ToObject(self.frozens64)
-
-        @frozens.setter
-        def frozens(self, value):
-            self.frozens64 = ObjectToBase64(value)
-
-        @property
-        def constants(self):
-            return Base64ToObject(self.constants64)
-
-        @constants.setter
-        def constants(self, value):
-            self.constants64 = ObjectToBase64(value)
-
-        def __repr__(self):
-            return "<%s: %s>" % (self.algorithm, self.frozen_hash)
-
-    class Algorithm(Base):
-        __table__ = Table('algorithms', metadata, autoload=True)
-        def __repr__(self):
-            return "<%s>" % self.name
-
-    class Learner(Base):
-        __table__ = Table('learners', metadata, autoload=True)
-
-        @property
-        def params(self):
-            return Base64ToObject(self.params64)
-
-        @params.setter
-        def params(self, value):
-            self.params64 = ObjectToBase64(value)
-
-        @property
-        def trainable_params(self):
-            return Base64ToObject(self.trainable_params64)
-
-        @trainable_params.setter
-        def trainable_params(self, value):
-            self.trainable_params64 = ObjectToBase64(value)
-
-        @property
-        def test_accuracies(self):
-            return Base64ToObject(self.test_accuracies64)
-
-        @test_accuracies.setter
-        def test_accuracies(self, value):
-            self.test_accuracies64 = ObjectToBase64(value)
+    def wrap(func):
+        def call(db, *args, **kwargs):
+            session = db.make_session()
+            try:
+                result = func(db, session, *args, **kwargs)
+            except Exception:
+                result = default()
+                argstr = ', ',join(args)
+                kwargstr = ', ',join(['%s=%s' % kv for kv in kwargs.items()])
+                print "Error in %s(%s, %s):" % (func.__name__, argstr, kwargstr)
+                print traceback.format_exc()
+            finally:
+                session.close()
+
+            return result
+
+
+class Database(object):
+    def __init__(self, config):
+        """
+        Accepts a config (for database connection info), and defines SQLAlchemy
+        ORM objects for all the tables in the database.
+        """
+        dialect = config.get(Config.DATAHUB, Config.DATAHUB_DIALECT)
+        user = config.get(Config.DATAHUB, Config.DATAHUB_USERNAME)
+        password = config.get(Config.DATAHUB, Config.DATAHUB_PASSWORD)
+        host = config.get(Config.DATAHUB, Config.DATAHUB_HOST)
+        port = int(config.get(Config.DATAHUB, Config.DATAHUB_PORT))
+        database = config.get(Config.DATAHUB, Config.DATAHUB_DATABASE)
+        query = config.get(Config.DATAHUB, Config.DATAHUB_QUERY)
+
+        db_string = '%s://%s:%s@%s:%d/%s?%s' % (
+            dialect, user, password, host, port, database, query)
+        self.engine = create_engine(db_string)
+
+        self.make_session = sessionmaker(bind=engine, expire_on_commit=False)
+
+    def define_tables(self):
+        metadata = MetaData(bind=self.engine)
+        Base = declarative_base()
+
+        class Algorithm(Base):
+            __table__ = Table('algorithms', metadata, autoload=True)
+            def __repr__(self):
+                return "<%s>" % self.name
+
+        self.Algorithm = Algorithm
+
+        class Datarun(Base):
+            __table__ = Table('dataruns', metadata, autoload=True)
+
+            @property
+            def wrapper(self):
+                return Base64ToObject(self.datawrapper)
+
+            @wrapper.setter
+            def wrapper(self, value):
+                self.datawrapper = ObjectToBase64(value)
+
+            def __repr__(self):
+                base = "<%s:, frozen: %s, sampling: %s, budget: %s, status: %s>"
+                status = ""
+                if self.started == None:
+                    status = "pending"
+                elif self.started != None and self.completed == None:
+                    status = "running"
+                elif self.started != None and self.completed != None:
+                    status = "done"
+                return base % (self.name, self.frozen_selection,
+                               self.sample_selection, self.budget, status)
+
+        self.Datarun = Datarun
+
+        class FrozenSet(Base):
+            __table__ = Table('frozen_sets', metadata, autoload=True)
+
+            @property
+            def optimizables(self):
+                return Base64ToObject(self.optimizables64)
+
+            @optimizables.setter
+            def optimizables(self, value):
+                self.optimizables64 = ObjectToBase64(value)
+
+            @property
+            def frozens(self):
+                return Base64ToObject(self.frozens64)
+
+            @frozens.setter
+            def frozens(self, value):
+                self.frozens64 = ObjectToBase64(value)
+
+            @property
+            def constants(self):
+                return Base64ToObject(self.constants64)
+
+            @constants.setter
+            def constants(self, value):
+                self.constants64 = ObjectToBase64(value)
+
+            def __repr__(self):
+                return "<%s: %s>" % (self.algorithm, self.frozen_hash)
 
-        @property
-        def test_cohen_kappas(self):
-            return Base64ToObject(self.test_cohen_kappas64)
+        self.FrozenSet = FrozenSet
 
-        @test_cohen_kappas.setter
-        def test_cohen_kappas(self, value):
-            self.test_cohen_kappas64 = ObjectToBase64(value)
+        class Learner(Base):
+            __table__ = Table('learners', metadata, autoload=True)
 
-        @property
-        def test_f1_scores(self):
-            return Base64ToObject(self.test_f1_scores64)
+            @property
+            def params(self):
+                return Base64ToObject(self.params64)
 
-        @test_f1_scores.setter
-        def test_f1_scores(self, value):
-            self.test_f1_scores64 = ObjectToBase64(value)
+            @params.setter
+            def params(self, value):
+                self.params64 = ObjectToBase64(value)
 
-        @property
-        def test_roc_curve_fprs(self):
-            return Base64ToObject(self.test_roc_curve_fprs64)
-
-        @test_roc_curve_fprs.setter
-        def test_roc_curve_fprs(self, value):
-            self.test_roc_curve_fprs64 = ObjectToBase64(value)
+            @property
+            def trainable_params(self):
+                return Base64ToObject(self.trainable_params64)
 
-        @property
-        def test_roc_curve_tprs(self):
-            return Base64ToObject(self.test_roc_curve_tprs64)
+            @trainable_params.setter
+            def trainable_params(self, value):
+                self.trainable_params64 = ObjectToBase64(value)
 
-        @test_roc_curve_tprs.setter
-        def test_roc_curve_tprs(self, value):
-            self.test_roc_curve_tprs64 = ObjectToBase64(value)
-
-        @property
-        def test_roc_curve_thresholds(self):
-            return Base64ToObject(self.test_roc_curve_thresholds64)
-
-        @test_roc_curve_thresholds.setter
-        def test_roc_curve_thresholds(self, value):
-            self.test_roc_curve_thresholds64 = ObjectToBase64(value)
-
-        @property
-        def test_roc_curve_aucs(self):
-            return Base64ToObject(self.test_roc_curve_aucs64)
-
-        @test_roc_curve_aucs.setter
-        def test_roc_curve_aucs(self, value):
-            self.test_roc_curve_aucs64 = ObjectToBase64(value)
-
-        @property
-        def test_pr_curve_precisions(self):
-            return Base64ToObject(self.test_pr_curve_precisions64)
-
-        @test_pr_curve_precisions.setter
-        def test_pr_curve_precisions(self, value):
-            self.test_pr_curve_precisions64 = ObjectToBase64(value)
-
-        @property
-        def test_pr_curve_recalls(self):
-            return Base64ToObject(self.test_pr_curve_recalls64)
-
-        @test_pr_curve_recalls.setter
-        def test_pr_curve_recalls(self, value):
-            self.test_pr_curve_recalls64 = ObjectToBase64(value)
-
-        @property
-        def test_pr_curve_thresholds(self):
-            return Base64ToObject(self.test_pr_curve_thresholds64)
-
-        @test_pr_curve_thresholds.setter
-        def test_pr_curve_thresholds(self, value):
-            self.test_pr_curve_thresholds64 = ObjectToBase64(value)
-
-        @property
-        def test_pr_curve_aucs(self):
-            return Base64ToObject(self.test_pr_curve_aucs64)
-
-        @test_pr_curve_aucs.setter
-        def test_pr_curve_aucs(self, value):
-            self.test_pr_curve_aucs64 = ObjectToBase64(value)
-
-        @property
-        def test_rank_accuracies(self):
-            return Base64ToObject(self.test_rank_accuracies64)
-
-        @test_rank_accuracies.setter
-        def test_rank_accuracies(self, value):
-            self.test_rank_accuracies64 = ObjectToBase64(value)
-
-        @property
-        def test_mu_sigmas(self):
-            return Base64ToObject(self.test_mu_sigmas64)
-
-        @test_mu_sigmas.setter
-        def test_mu_sigmas(self, value):
-            self.test_mu_sigmas64 = ObjectToBase64(value)
-
-        def __repr__(self):
-            return "<%s>" % self.algorithm
-
-
-def GetConnection():
-    """
-    Returns a database connection.
-
-    [***] DO NOT FORGET TO CLOSE AFTERWARDS:
-    >>> connection = GetConnection()
-    >>> # do some stuff ...
-    >>> connection.close()
-    """
-    return Session()
-
-
-def GetAllDataruns():
-    """
-    Return all dataruns in the database regardless of priority or completion
-    """
-    session = GetConnection()
-    dataruns = session.query(Datarun).all()
-    session.close()
-
-    return dataruns or []
-
-
-def GetDatarun(datarun_id=None, ignore_completed=True,
-               ignore_grid_complete=False, choose_randomly=True):
-    """
-    Among the incomplete dataruns with maximal priority,
-    returns one at random.
-    """
-    dataruns = []
-    session = GetConnection()
-    query = session.query(Datarun)
-    if ignore_completed:
-        query = query.filter(Datarun.completed == None)
-    if ignore_grid_complete:
-        query = query.filter(Datarun.is_gridding_done == 0)
-    if datarun_id:
-        query = query.filter(Datarun.id == datarun_id)
-
-    dataruns = query.all()
-    session.close()
-
-    if not dataruns:
-        return None
-
-    # select only those with max priority
-    max_priority = max([r.priority for r in dataruns])
-    candidates = [r for r in dataruns if r.priority == max_priority]
-
-    # choose a random candidate if necessary
-    if choose_randomly:
-        return candidates[random.randint(0, len(candidates) - 1)]
-    return candidates[0]
-
-
-def GetFrozenSet(frozen_set_id):
-    frozen_set = None
-    try:
-        session = GetConnection()
-        frozen_set = session.query(FrozenSet)\
-            .filter(FrozenSet.id == frozen_set_id).one()
-        session.commit()
-        session.expunge_all() # so we can use outside the session
-
-    except Exception:
-        print "Error in GetFrozenSet():", traceback.format_exc()
-
-    finally:
-        if session:
-            session.close()
-
-    return frozen_set
-
-
-def MarkFrozenSetGriddingDone(frozen_set_id):
-    session = None
-    try:
-        session = GetConnection()
+            @property
+            def test_accuracies(self):
+                return Base64ToObject(self.test_accuracies64)
+
+            @test_accuracies.setter
+            def test_accuracies(self, value):
+                self.test_accuracies64 = ObjectToBase64(value)
+
+            @property
+            def test_cohen_kappas(self):
+                return Base64ToObject(self.test_cohen_kappas64)
+
+            @test_cohen_kappas.setter
+            def test_cohen_kappas(self, value):
+                self.test_cohen_kappas64 = ObjectToBase64(value)
+
+            @property
+            def test_f1_scores(self):
+                return Base64ToObject(self.test_f1_scores64)
+
+            @test_f1_scores.setter
+            def test_f1_scores(self, value):
+                self.test_f1_scores64 = ObjectToBase64(value)
+
+            @property
+            def test_roc_curve_fprs(self):
+                return Base64ToObject(self.test_roc_curve_fprs64)
+
+            @test_roc_curve_fprs.setter
+            def test_roc_curve_fprs(self, value):
+                self.test_roc_curve_fprs64 = ObjectToBase64(value)
+
+            @property
+            def test_roc_curve_tprs(self):
+                return Base64ToObject(self.test_roc_curve_tprs64)
+
+            @test_roc_curve_tprs.setter
+            def test_roc_curve_tprs(self, value):
+                self.test_roc_curve_tprs64 = ObjectToBase64(value)
+
+            @property
+            def test_roc_curve_thresholds(self):
+                return Base64ToObject(self.test_roc_curve_thresholds64)
+
+            @test_roc_curve_thresholds.setter
+            def test_roc_curve_thresholds(self, value):
+                self.test_roc_curve_thresholds64 = ObjectToBase64(value)
+
+            @property
+            def test_roc_curve_aucs(self):
+                return Base64ToObject(self.test_roc_curve_aucs64)
+
+            @test_roc_curve_aucs.setter
+            def test_roc_curve_aucs(self, value):
+                self.test_roc_curve_aucs64 = ObjectToBase64(value)
+
+            @property
+            def test_pr_curve_precisions(self):
+                return Base64ToObject(self.test_pr_curve_precisions64)
+
+            @test_pr_curve_precisions.setter
+            def test_pr_curve_precisions(self, value):
+                self.test_pr_curve_precisions64 = ObjectToBase64(value)
+
+            @property
+            def test_pr_curve_recalls(self):
+                return Base64ToObject(self.test_pr_curve_recalls64)
+
+            @test_pr_curve_recalls.setter
+            def test_pr_curve_recalls(self, value):
+                self.test_pr_curve_recalls64 = ObjectToBase64(value)
+
+            @property
+            def test_pr_curve_thresholds(self):
+                return Base64ToObject(self.test_pr_curve_thresholds64)
+
+            @test_pr_curve_thresholds.setter
+            def test_pr_curve_thresholds(self, value):
+                self.test_pr_curve_thresholds64 = ObjectToBase64(value)
+
+            @property
+            def test_pr_curve_aucs(self):
+                return Base64ToObject(self.test_pr_curve_aucs64)
+
+            @test_pr_curve_aucs.setter
+            def test_pr_curve_aucs(self, value):
+                self.test_pr_curve_aucs64 = ObjectToBase64(value)
+
+            @property
+            def test_rank_accuracies(self):
+                return Base64ToObject(self.test_rank_accuracies64)
+
+            @test_rank_accuracies.setter
+            def test_rank_accuracies(self, value):
+                self.test_rank_accuracies64 = ObjectToBase64(value)
+
+            @property
+            def test_mu_sigmas(self):
+                return Base64ToObject(self.test_mu_sigmas64)
+
+            @test_mu_sigmas.setter
+            def test_mu_sigmas(self, value):
+                self.test_mu_sigmas64 = ObjectToBase64(value)
+
+            def __repr__(self):
+                return "<%s>" % self.algorithm
+
+        self.Learner = Learner
+
+    @try_with_session()
+    def GetDatarun(self, session, datarun_id=None, ignore_completed=True,
+                   ignore_grid_complete=False, choose_randomly=True):
+        """
+        Return a single datarun.
+        Args:
+            datarun_id: return the datarun with this id
+            ignore_completed: if True, ignore completed dataruns
+            ignore_grid_complete: if True, ignore dataruns with is_gridding_done
+            choose_randomly: if True, choose one of the possible dataruns to
+                return randomly. If False, return the first datarun present in
+                the database (likely lowest id).
+        """
+        query = session.query(Datarun)
+        if ignore_completed:
+            query = query.filter(Datarun.completed == None)
+        if ignore_grid_complete:
+            query = query.filter(Datarun.is_gridding_done == 0)
+        if datarun_id:
+            query = query.filter(Datarun.id == datarun_id)
+
+        dataruns = query.all()
+
+        if not dataruns:
+            return None
+
+        # select only those with max priority
+        max_priority = max([r.priority for r in dataruns])
+        candidates = [r for r in dataruns if r.priority == max_priority]
+
+        # choose a random candidate if necessary
+        if choose_randomly:
+            return candidates[random.randint(0, len(candidates) - 1)]
+        return candidates[0]
+
+    @try_with_session()
+    def MarkFrozenSetGriddingDone(self, session, frozen_set_id):
         frozen_set = session.query(FrozenSet)\
             .filter(FrozenSet.id == frozen_set_id).one()
         frozen_set.is_gridding_done = 1
         session.commit()
-        session.expunge_all() # so we can use outside the session
+        # set any sqlalchemy ORM objects created by this session to the
+        # detached state, so they can be used after the session is closed.
+        session.expunge_all()
 
-    except Exception:
-        print "Error in MarkFrozenSetGriddingDone():"
-        print traceback.format_exc()
-    finally:
-        if session:
-            session.close()
-
-
-def MarkDatarunGriddingDone(datarun_id):
-    session = None
-    try:
-        session = GetConnection()
+    @try_with_session()
+    def MarkDatarunGriddingDone(self, session, datarun_id):
         datarun = session.query(Datarun).filter(Datarun.id == datarun_id).one()
         datarun.is_gridding_done = 1
         session.commit()
-        session.expunge_all() # so we can use outside the session
+        session.expunge_all()
 
-    except Exception:
-        print "Error in MarkDatarunGriddingDone():", traceback.format_exc()
-
-    finally:
-        if session:
-            session.close()
-
-
-def GetFrozenSets(datarun_id):
-    """
-    Returns all the frozen sets in a given datarun by id.
-    """
-    session = None
-    frozen_sets = []
-    try:
-        session = GetConnection()
-        frozen_sets = session.query(FrozenSet)\
-            .filter(FrozenSet.datarun_id == datarun_id).all()
-
-    except Exception:
-        print "Error in GetFrozenSets():"
-        print traceback.format_exc()
-    finally:
-        if session:
-            session.close()
-
-    return frozen_sets
-
-
-def IsGriddingDoneForDatarun(datarun_id, min_num_errors_to_exclude=0):
-    """
-    Returns all the frozen sets in a given datarun by id.
-    """
-    session = None
-    is_done = True
-    try:
-        session = GetConnection()
+    @try_with_session(lambda: True)
+    def IsGriddingDoneForDatarun(self, session, datarun_id, min_num_errors_to_exclude=0):
+        """ Return a boolean indicating whether
+        Returns all the incomplete frozen sets in a given datarun by id.
+        """
         frozen_sets = session.query(FrozenSet)\
             .filter(FrozenSet.datarun_id == datarun_id).all()
 
@@ -375,24 +332,11 @@ def IsGriddingDoneForDatarun(datarun_id, min_num_errors_to_exclude=0):
                 elif min_num_errors_to_exclude == 0:
                     is_done = False
 
-    except Exception:
-        print "Error in IsGriddingDoneForDatarun():"
-        print traceback.format_exc()
-    finally:
-        if session:
-            session.close()
-
-    return is_done
-
-
-def GetIncompletedFrozenSets(datarun_id, min_num_errors_to_exclude=0):
-    """
-    Returns all the incomplete frozen sets in a given datarun by id.
-    """
-    session = None
-    frozen_sets = []
-    try:
-        session = GetConnection()
+    @try_with_session(list)
+    def GetIncompletedFrozenSets(self, session, datarun_id, min_num_errors_to_exclude=0):
+        """
+        Returns all the incomplete frozen sets in a given datarun by id.
+        """
         frozen_sets = session.query(FrozenSet)\
             .filter(and_(FrozenSet.datarun_id == datarun_id,
                          FrozenSet.is_gridding_done == 0)).all()
@@ -406,141 +350,56 @@ def GetIncompletedFrozenSets(datarun_id, min_num_errors_to_exclude=0):
                         min_num_errors_to_exclude:
                     frozen_sets.append(frozen_set)
 
-    except Exception:
-        print "Error in GetIncompletedFrozenSets():"
-        print traceback.format_exc()
-    finally:
-        if session:
-            session.close()
+        return frozen_sets
 
-    return frozen_sets
-
-
-def GetNumberOfFrozenSetErrors(frozen_set_id):
-    session = None
-    learners = []
-    try:
-        session = GetConnection()
+    @try_with_session(int)
+    def GetNumberOfFrozenSetErrors(self, session, frozen_set_id):
         learners = session.query(Learner)\
             .filter(and_(Learner.frozen_set_id == frozen_set_id,
                          Learner.is_error == 1)).all()
-    except:
-        print "Error in GetNumberOfFrozenSetErrors(%d):" % frozen_set_id
-        print traceback.format_exc()
-    finally:
-        if session:
-            session.close()
+        return len(learners)
 
-    return len(learners)
-
-
-def MarkDatarunDone(datarun_id):
-    """
-    Sets the completed field of the Datarun to the current datetime.
-    """
-    session = None
-    try:
-        session = GetConnection()
+    @try_with_session()
+    def MarkDatarunDone(self, session, datarun_id):
+        """
+        Sets the completed field of the Datarun to the current datetime.
+        """
         datarun = session.query(Datarun)\
             .filter(Datarun.id == datarun_id).one()
         datarun.completed = datetime.now()
         session.commit()
 
-    except Exception:
-        print "Error in MarkDatarunDone():"
-        print traceback.format_exc()
-    finally:
-        if session:
-            session.close()
-
-
-def GetMaximumY(datarun_id, metric, default=0.0):
-    """
-    Returns the maximum value of a numeric column by name.
-    """
-    session = GetConnection()
-    maximum = default
-    try:
+    @try_with_session()
+    def GetMaximumY(self, session, datarun_id, metric):
+        """
+        Returns the maximum value of a numeric column by name.
+        """
         result = session.query(func.max(getattr(Learner, metric)))\
             .filter(Learner.datarun_id == datarun_id).one()[0]
         if result:
-            maximum = float(result)
-    except:
-        print "Error in GetMaximumY(%d):" % datarun_id
-        print traceback.format_exc()
-    finally:
-        session.close()
-    return maximum
+            return float(result)
+        return None
 
-
-def GetLearnersInFrozen(frozen_set_id):
-    """
-    Returns all learners in this frozen set
-    """
-    session = None
-    learners = []
-    try:
-        session = GetConnection()
-        learners = session.query(Learner)\
+    @try_with_session(list)
+    def GetLearnersInFrozen(self, session, frozen_set_id):
+        """
+        Returns all learners in this frozen set
+        """
+        return session.query(Learner)\
             .filter(Learner.frozen_set_id == frozen_set_id).all()
-    except:
-        print "Error in GetLearnersInFrozen(%d):" % frozen_set_id
-        print traceback.format_exc()
-    finally:
-        if session:
-            session.close()
-    return learners
 
+    @try_with_session(list)
+    def GetLearners(self, session, datarun_id):
+        """
+        Returns all learners in datarun.
+        """
+        return session.query(Learner)\
+            .filter(Learner.datarun_id == datarun_id)\
+            .order_by(Learner.started).all()
 
-def GetLearners(datarun_id):
-    """
-    Returns all learners in datarun.
-    """
-    session = GetConnection()
-    learners = session.query(Learner)\
-        .filter(Learner.datarun_id == datarun_id)\
-        .order_by(Learner.started).all()
-    session.close()
-    return learners
-
-
-def GetBestLearner(datarun_id, metric, default=0):
-    """
-    Returns best learner in datarun.
-    """
-    session = GetConnection()
-    learners = session.query(Learner)\
-        .filter(Learner.datarun_id == datarun_id)\
-        .order_by(Learner.started).all()
-    session.close()
-
-    best_learner = None
-    best_score = default
-    for l in learners:
-        if getattr(l, metric) > best_score:
-            best_learner = l
-            best_score = getattr(l, metric)
-
-    return best_learner
-
-
-def GetLearner(learner_id):
-    """
-    Returns a specific learner.
-    """
-    session = None
-    learner = []
-    try:
-        session = GetConnection()
-        learner = session.query(Learner).filter(Learner.id == learner_id).all()
-    except:
-        print "Error in GetLearner(%d):" % learner_id
-        print traceback.format_exc()
-    finally:
-        if session:
-            session.close()
-
-    if len(learner) > 1:
-        raise RuntimeError('Multiple learners with the same id!')
-
-    return learner[0]
+    @try_with_session()
+    def GetLearner(self, session, learner_id):
+        """
+        Returns a specific learner.
+        """
+        return session.query(Learner).get(learner_id)
