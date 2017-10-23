@@ -3,26 +3,32 @@ BTB - Bayesian Tuning and Building
 
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://hdi-project.github.io/BTB/)
 
-## Quick start guide
+## Quick start setup
+1. Install database
+- for SQLite (simpler):
+```
+$ sudo apt install sqlite3
+```
 
-1. Install dependencies:
+- for MySQL: 
 ```
 $ sudo apt install mysql-server mysql-client
+```
+
+2. Install python dependencies
+```
 $ virtualenv venv
 $ . venv/bin/activate
 $ pip install -r requirements.txt
 ```
 
-2. Set up MySQL (replace 'username' and 'password' with your choices):
+3. Set up BTB database
+- for SQLite:
 ```
-$ mysql -u root -p            # you'll be prompted for your root password
-mysql> GRANT ALL ON btb.* TO 'username'@'localhost' IDENTIFIED BY 'password';
-mysql> CREATE DATABASE btb;
-mysql> exit
-Bye
+$ sqlite3 btb.db < setup/sqlite-setup.sql
 ```
 
-3. Set up the BTB database:
+- for MySQL:
 ```
 $ mysql -u username -p btb < setup/hyperbtb.sql
 ```
@@ -47,12 +53,36 @@ $ cp config/btb.cnf.template config/btb.cnf
 $ vim config/btb.cnf
 ```
 At the very least, you will need to change `alldatapath`, `models-dir`, and the
-MySQL settings under `[datahub]`. This is the trickiest part; if you run into
+database settings under `[datahub]`. This is the trickiest part; if you run into
 issues later on, it's probably because of your config file. 
 
-5. Create a datarun:
+For SQLite, the [datahub] config should specify 'dialect' and 'database', and
+leave everything else blank:
 ```
-$ python btb/enter_data.py --configpath ./config/btb.cnf
+dialect: sqlite
+database: ./btb.db
+username:
+password:
+host:
+port:
+query:
+```
+
+For MySQL, the config should look something like this: 
+```
+dialect: mysql
+database: btb
+username: username
+password: password
+host: localhost
+port: 3306
+query:
+```
+
+
+5. Create a datarun
+```
+$ python btb/enter_data.py --configpath config/btb.cnf
 ```
 You should get a lot of output, the end of which looks something like:
 
@@ -70,9 +100,9 @@ You should get a lot of output, the end of which looks something like:
 The important piece of information is the datarun ID.
 
 6. Start a worker, specifying your config file and the datarun you'd like to
-   compute:
+   compute on:
 ```
-$ python btb/worker.py --configpath ./config/btb.cnf --datarun 1
+$ python btb/worker.py --configpath config/btb.cnf --datarun 1
 ```
 
 This will start a process that computes learners and saves them in the models/

@@ -25,16 +25,16 @@ class BestKReward(FrozenSelector):
         TODO: are all of these stateless?
         """
         # if we don't have enough scores to do K-selection, fall back to UCB1
-        if min([len(s) for s in choice_scores]) < K_MIN:
+        if min([len(s) for s in choice_scores.values()]) < K_MIN:
             return self.ucb1.select(choice_scores)
 
         # sort each list of scores in ascending order
         # only use scores from our set of possible choices
-        sorted_scores = {c: sorted(s) for c, s in choice_scores
+        sorted_scores = {c: sorted(s) for c, s in choice_scores.items()
                          if c in self.choices}
 
         arms = []
-        for choice, scores in sorted_scores:
+        for choice, scores in sorted_scores.items():
             count = len(scores)
             rewards = sum(scores[-self.k:])
             arms.append(FrozenArm(count, rewards, choice))
@@ -42,7 +42,7 @@ class BestKReward(FrozenSelector):
         total_rewards = sum(a.rewards for a in arms)
         total_count = sum(a.count for a in arms)
 
-        random.shuffle(arms) # so arms are not picked in ordinal ID order
+        random.shuffle(arms)
         bandit = UCB1Bandit(arms, total_count, total_rewards)
         return bandit.score_arms()
 
@@ -64,15 +64,15 @@ class BestKVelocity(FrozenSelector):
         calculation
         """
         # if we don't have enough scores to do K-selection, fall back to UCB1
-        if min([len(s) for s in choice_scores]) < K_MIN:
+        if min([len(s) for s in choice_scores.values()]) < K_MIN:
             return self.ucb1.select(choice_scores)
 
         # sort each list of scores in ascending order
-        sorted_scores = {c: sorted(s) for c, s in choice_scores
+        sorted_scores = {c: sorted(s) for c, s in choice_scores.items()
                          if c in self.choices}
 
         arms = []
-        for choice, scores in sorted_scores:
+        for choice, scores in sorted_scores.items():
             count = len(scores)
             # truncate to the highest k scores and compute the velocity of those
             scores = scores[-self.k:]

@@ -3,6 +3,7 @@
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.engine.url import URL
 from sqlalchemy import func, and_
 
 import traceback
@@ -60,16 +61,16 @@ class Database(object):
         ORM objects for all the tables in the database.
         """
         dialect = config.get(Config.DATAHUB, Config.DATAHUB_DIALECT)
-        user = config.get(Config.DATAHUB, Config.DATAHUB_USERNAME)
-        password = config.get(Config.DATAHUB, Config.DATAHUB_PASSWORD)
-        host = config.get(Config.DATAHUB, Config.DATAHUB_HOST)
-        port = int(config.get(Config.DATAHUB, Config.DATAHUB_PORT))
         database = config.get(Config.DATAHUB, Config.DATAHUB_DATABASE)
-        query = config.get(Config.DATAHUB, Config.DATAHUB_QUERY)
+        user = config.get(Config.DATAHUB, Config.DATAHUB_USERNAME) or None
+        password = config.get(Config.DATAHUB, Config.DATAHUB_PASSWORD) or None
+        host = config.get(Config.DATAHUB, Config.DATAHUB_HOST) or None
+        port = config.get(Config.DATAHUB, Config.DATAHUB_PORT) or None
+        query = config.get(Config.DATAHUB, Config.DATAHUB_QUERY) or None
 
-        db_string = '%s://%s:%s@%s:%d/%s?%s' % (
-            dialect, user, password, host, port, database, query)
-        self.engine = create_engine(db_string)
+        db_url = URL(drivername=dialect, database=database, username=user,
+                     password=password, host=host, port=port, query=query)
+        self.engine = create_engine(db_url)
 
         self.get_session = sessionmaker(bind=self.engine,
                                         expire_on_commit=False)
@@ -307,7 +308,8 @@ class Database(object):
         return candidates[0]
 
     @try_with_session(default=lambda: True)
-    def IsGriddingDoneForDatarun(self, session, datarun_id, errors_to_exclude=0):
+    def IsGriddingDoneForDatarun(self, session, datarun_id,
+                                 errors_to_exclude=0):
         """
         Check whether gridding is done for the entire datarun.
         errors_to_exclude = 0 indicates we don't care about errors.
@@ -386,11 +388,12 @@ class Database(object):
             return float(result)
         return None
 
-    @try_with_session(default=lambda: (0,0))
+    @try_with_session(default=lambda: (0, 0))
     def get_best_so_far(self, session, datarun_id, score_target):
         """
-        Sort of like GetMaximumY, but treats the absolute score as two standard
-        deviations below the mean.
+        Sort of like GetMaximumY, but retuns the score with the highest lower
+        error bound. In other words, what is the highest value of (score.mean -
+        2 * score.std) for any learner?
         """
         maximum = 0
         best_val, best_err = 0, 0
@@ -425,7 +428,8 @@ class Database(object):
 
     @try_with_session(commit=True)
     def MarkDatarunGriddingDone(self, session, datarun_id):
-        datarun = session.query(self.Datarun).filter(self.Datarun.id == datarun_id).one()
+        datarun = session.query(self.Datarun)\
+            .filter(self.Datarun.id == datarun_id).one()
         datarun.is_gridding_done = 1
 
     @try_with_session(commit=True)
@@ -433,3 +437,4 @@ class Database(object):
         """ Sets the completed field of the Datarun to the current datetime. """
         datarun = session.query(self.Datarun)\
             .filter(self.Datarun.id == datarun_id).one()
+        datarun.completed = datetime.now()

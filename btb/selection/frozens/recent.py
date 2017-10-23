@@ -24,13 +24,14 @@ class RecentKReward(FrozenSelector):
         scores for usage in rewards for the bandit calculation
         """
         # if we don't have enough scores to do K-selection, fall back to UCB1
-        if min([len(s) for s in choice_scores]) < K_MIN:
+        if min([len(s) for s in choice_scores.values()]) < K_MIN:
             return self.ucb1.select(choice_scores)
 
-        choice_scores = {c: s for c, s in choice_scores if c in self.choices}
+        choice_scores = {c: s for c, s in choice_scores.items()
+                         if c in self.choices}
         arms = []
         # all scores are already in chronological order
-        for choice, scores in choice_scores:
+        for choice, scores in choice_scores.items():
             count = len(scores)
             rewards = sum(scores[-self.k:])
             arms.append(FrozenArm(count, rewards, choice))
@@ -60,13 +61,14 @@ class RecentKVelocity(FrozenSelector):
         calculation
         """
         # if we don't have enough scores to do K-selection, fall back to UCB1
-        if min([len(s) for s in choice_scores]) < K_MIN:
+        if min([len(s) for s in choice_scores.values()]) < K_MIN:
             return self.ucb1.select(choice_scores)
 
-        choice_scores = {c: s for c, s in choice_scores if c in self.choices}
+        choice_scores = {c: s for c, s in choice_scores.items()
+                         if c in self.choices}
         arms = []
         # all scores are already in chronological order
-        for choice, scores in choice_scores:
+        for choice, scores in choice_scores.items():
             count = len(scores)
             # truncate to the highest k scores and compute the velocity of those
             scores = scores[-self.k:]

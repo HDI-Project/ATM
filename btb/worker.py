@@ -166,11 +166,9 @@ class Worker(object):
             local_metric_path = None
 
         # compile fields
-        completed = time.strftime('%Y-%m-%d %H:%M:%S')
         trainables = model.algorithm.performance()['trainable_params']
-        fmt_completed = datetime.datetime.strptime(completed, SQL_DATE_FORMAT)
-        fmt_started = datetime.datetime.strptime(started, SQL_DATE_FORMAT)
-        seconds = (fmt_completed - fmt_started).total_seconds()
+        completed = datetime.datetime.now()
+        seconds = (completed - started).total_seconds()
 
         # create learner ORM object, and insert learner into the database
         # TODO: wrap this properly in a with session_context(): or the like
@@ -191,7 +189,7 @@ class Worker(object):
             test_judgment_metric=performance['test_judgment_metric'],
             metricpath=local_metric_path,
             started=started,
-            completed=datetime.datetime.now(),
+            completed=completed,
             host=GetPublicIP(),
             dimensions=model.algorithm.dimensions,
             frozen_hash=frozen_set.frozen_hash,
@@ -308,7 +306,9 @@ class Worker(object):
         learners = self.db.GetLearners(datarun.id)
         for l in learners:
             score = getattr(l, datarun.score_target)
-            frozen_set_scores[l.frozen_set_id].append(score)
+            # the cast to float is necessary because the score is a Decimal;
+            # doing Decimal-float arithmetic throws errors later on.
+            frozen_set_scores[l.frozen_set_id].append(float(score))
 
         frozen_set_id = self.frozen_selector.select(frozen_set_scores)
         frozen_set = self.db.GetFrozenSet(frozen_set_id)
@@ -374,10 +374,10 @@ class Worker(object):
             try:
                 # choose datarun to work on
                 _log("=" * 25)
-                started = time.strftime('%Y-%m-%d %H:%M:%S')
+                started = datetime.datetime.now()
                 datarun = self.db.GetDatarun(datarun_id=self.datarun_id,
-                                        ignore_grid_complete=False,
-                                        choose_randomly=self.choose_randomly)
+                                             ignore_grid_complete=False,
+                                             choose_randomly=self.choose_randomly)
 
                 if datarun is None:
                     # If desired, we can sleep here and wait for a new datarun
@@ -395,34 +395,31 @@ class Worker(object):
                 # check to see if we're over the datarun/time budget
                 frozen_sets = self.db.GetIncompleteFrozenSets(datarun.id,
                                                               errors_to_exclude=20)
-                n_completed = sum([f.trained for f in frozen_sets])
 
-                if (budget_type == "learner" and
-                        n_completed >= datarun.learner_budget):
-                    # this run is done
-                    self.db.MarkDatarunDone(datarun.id)
-                    endrun = True
-                    _log("Learner budget has run out!")
+                if budget_type == "learner":
+                    n_completed = sum([f.trained for f in frozen_sets])
+                    if n_completed >= datarun.learner_budget:
+                        endrun = True
+                        _log("Learner budget has run out!")
 
                 elif budget_type == "walltime":
                     deadline = datarun.deadline
                     if datetime.datetime.now() > deadline:
-                        # this run is done
-                        self.db.MarkDatarunDone(datarun.id)
                         endrun = True
                         _log("Walltime budget has run out!")
 
-                # did we end the run?
-                elif endrun == True:
+                if endrun == True:
                     # marked the run as done successfully
-                    _log("This datarun has ended, let's find another")
-                    time.sleep(2)   # TODO: why is this needed?
+                    self.db.MarkDatarunDone(datarun.id)
+                    _log("This datarun has ended.")
+                    time.sleep(2)
                     continue
 
                 # use the multi-arm bandit to choose which frozen set to use next
                 frozen_set = self.select_frozen_set(datarun)
                 if frozen_set is None:
-                    _log("Sleeping for 10 seconds, then trying again.")
+                    _log("No frozen set found. Sleeping for 10 seconds, then "
+                         "trying again.")
                     time.sleep(10)
                     continue
 
@@ -433,12 +430,12 @@ class Worker(object):
                     _log("Frozen set finished. No parameters chosen.")
                     continue
 
-                _log("Chose parameters for algorithm %s" % frozen_set.algorithm)
-                _log("Params chosen: %s" % params, False)
-                print "Params chosen:"
+                _log("Chose parameters for algorithm %s:" % frozen_set.algorithm)
+                _log(str(params), False)
                 for k, v in params.items():
                     print "\t%s = %s" % (k, v)
 
+                print "Testing learner..."
                 # train learner
                 params["function"] = frozen_set.algorithm
                 wrapper = CreateWrapper(params, datarun.metric)
@@ -451,6 +448,7 @@ class Worker(object):
                       performance["cv_judgment_metric"],
                       2 * performance["cv_judgment_metric_stdev"]))
 
+                print "Saving learner..."
                 model = Model(wrapper, datarun.wrapper)
 
                 # insert learner into the database

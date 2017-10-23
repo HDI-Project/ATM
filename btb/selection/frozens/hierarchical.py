@@ -21,7 +21,8 @@ class HierarchicalByAlgorithm(FrozenSelector):
 
         Next, from that algorithm's frozen sets, makes the final set choice.
         """
-        choice_scores = {c: s for c, s in choice_scores if c in self.choices}
+        choice_scores = {c: s for c, s in choice_scores.items()
+                         if c in self.choices}
 
         # create arms and choose algorithm
         algorithm_arms = []

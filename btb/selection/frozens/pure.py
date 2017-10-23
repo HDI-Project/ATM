@@ -17,8 +17,9 @@ class PureBestKVelocity(FrozenSelector):
         Select the choice with the highest best-K velocity. If any choices
         don't have MIN_K scores yet, return the one with the fewest.
         """
-        choice_scores = {c: s for c, s in choice_scores if c in self.choices}
-        score_counts = {c: len(s) for c, s in choice_scores}
+        choice_scores = {c: s for c, s in choice_scores.items()
+                         if c in self.choices}
+        score_counts = {c: len(s) for c, s in choice_scores.items()}
         if min(score_counts.values()) < K_MIN:
             print "We don't have enough frozen trials for this k! Attempt to "\
                   "get all sets to same K_MIN..."
@@ -26,7 +27,7 @@ class PureBestKVelocity(FrozenSelector):
             return min(score_counts, key=score_counts.get)
 
         velocities = {}
-        for c, scores in choice_scores:
+        for c, scores in choice_scores.items():
             # truncate to the highest k scores and compute the velocity of those
             scores = sorted(scores)[-self.k:]
             velocities[c] = np.mean([scores[i+1] - scores[i] for i in
