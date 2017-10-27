@@ -42,17 +42,17 @@ run-mode: local
 
 [datahub]
 # Database dialect
-dialect: mysql
+dialect: sqlite
 # Name of the database
-database: btb
+database: btb.db
 # Username to gain access to the database
-username: your-username
+username: 
 # Password to gain access to the database
-password: your-password
+password:
 # Host name of the device hosting the database
-host: localhost
+host: 
 # Port on host listening for database connections
-port: 3306
+port:
 # Optional field for specifying login details
 query: 
 

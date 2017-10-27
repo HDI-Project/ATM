@@ -1,10 +1,10 @@
 from btb.cpt import Choice, Combination
-from btb.enumeration import Enumerator 
+from btb.enumeration import Enumerator
 
 class ClassifierEnumerator(Enumerator):
 
     LEARNTYPE = "classification"
-    
+
     SVC = "classify_svm"
     KNN = "classify_knn"
     GAUSSIAN_NAIVE_BAYES = "classify_gnb"
@@ -19,10 +19,10 @@ class ClassifierEnumerator(Enumerator):
     PASSIVE_AGGRESSIVE = "classify_pa"
     LRC = "classify_logreg"
     GPC = "classify_gp"
-    
+
     def __init__(self, hypers, categoricals):
         super(ClassifierEnumerator, self).__init__(hypers, categoricals)
-    
+
     def combinations(self):
         if self.root:
             return self.root.combinations()

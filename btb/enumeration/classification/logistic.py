@@ -1,7 +1,7 @@
 from btb.cpt import Choice, Combination
 from btb.enumeration import Enumerator
 from btb.enumeration.classification import ClassifierEnumerator
-from btb.key import Key, KeyStruct
+from hyperselection import HyperParameter, ParamTypes
 import numpy as np
 
 class EnumeratorLRC(ClassifierEnumerator):
@@ -17,14 +17,14 @@ class EnumeratorLRC(ClassifierEnumerator):
     }
 
     DEFAULT_KEYS = {
-        # KeyStruct(range, key_type, is_categorical)
-        "C" : KeyStruct(DEFAULT_RANGES["C"], Key.TYPE_FLOAT_EXP, False),
-        "tol" : KeyStruct(DEFAULT_RANGES["tol"], Key.TYPE_FLOAT_EXP, False),
-        "penalty" : KeyStruct(DEFAULT_RANGES["penalty"], Key.TYPE_STRING, True),
-        "dual" : KeyStruct(DEFAULT_RANGES["dual"], Key.TYPE_BOOL, True),
-        "fit_intercept" : KeyStruct(DEFAULT_RANGES["fit_intercept"], Key.TYPE_BOOL, True),
-        "class_weight" : KeyStruct(DEFAULT_RANGES["class_weight"], Key.TYPE_STRING, True),
-        "_scale" : KeyStruct(DEFAULT_RANGES["_scale"], Key.TYPE_STRING, True),
+        # HyperParameter(range, key_type, is_categorical)
+        "C" : HyperParameter(DEFAULT_RANGES["C"], ParamTypes.FLOAT_EXP, False),
+        "tol" : HyperParameter(DEFAULT_RANGES["tol"], ParamTypes.FLOAT_EXP, False),
+        "penalty" : HyperParameter(DEFAULT_RANGES["penalty"], ParamTypes.STRING, True),
+        "dual" : HyperParameter(DEFAULT_RANGES["dual"], ParamTypes.BOOL, True),
+        "fit_intercept" : HyperParameter(DEFAULT_RANGES["fit_intercept"], ParamTypes.BOOL, True),
+        "class_weight" : HyperParameter(DEFAULT_RANGES["class_weight"], ParamTypes.STRING, True),
+        "_scale" : HyperParameter(DEFAULT_RANGES["_scale"], ParamTypes.STRING, True),
     }
 
     def __init__(self, ranges=None, keys=None):

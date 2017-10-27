@@ -1,5 +1,4 @@
 from collections import namedtuple
-import random
 
 # our KeyStruct named tuple
 KeyStruct = namedtuple('KeyStruct', 'range type is_categorical')
@@ -11,4 +10,4 @@ class Key:
 	TYPE_FLOAT_EXP = "FLOAT_EXP"
 	TYPE_STRING = "STRING"
 	TYPE_BOOL = "BOOL"
-	
+

@@ -1,4 +1,3 @@
 from btb.cpt import Node, Choice, Combination
-from btb.key import Key, KeyStruct
+from hyperselection import HyperParameter, ParamTypes
 from enumerator import Enumerator
-

@@ -1,7 +1,7 @@
 from btb.cpt import Choice, Combination
 from btb.enumeration import Enumerator
 from btb.enumeration.classification import ClassifierEnumerator
-from btb.key import Key, KeyStruct
+from hyperselection import HyperParameter, ParamTypes
 import numpy as np
 
 class EnumeratorDTC(ClassifierEnumerator):
@@ -15,12 +15,12 @@ class EnumeratorDTC(ClassifierEnumerator):
     }
 
     DEFAULT_KEYS = {
-        # KeyStruct(range, key_type, is_categorical)
-        "criterion": KeyStruct(DEFAULT_RANGES["criterion"], Key.TYPE_STRING, True),
-        "max_features": KeyStruct(DEFAULT_RANGES["max_features"], Key.TYPE_FLOAT, False),
-        "max_depth": KeyStruct(DEFAULT_RANGES["max_depth"], Key.TYPE_INT, False),
-        "min_samples_split": KeyStruct(DEFAULT_RANGES["min_samples_split"], Key.TYPE_INT, False),
-        "min_samples_leaf": KeyStruct(DEFAULT_RANGES["min_samples_leaf"], Key.TYPE_INT, False),
+        # HyperParameter(range, key_type, is_categorical)
+        "criterion": HyperParameter(DEFAULT_RANGES["criterion"], ParamTypes.STRING, True),
+        "max_features": HyperParameter(DEFAULT_RANGES["max_features"], ParamTypes.FLOAT, False),
+        "max_depth": HyperParameter(DEFAULT_RANGES["max_depth"], ParamTypes.INT, False),
+        "min_samples_split": HyperParameter(DEFAULT_RANGES["min_samples_split"], ParamTypes.INT, False),
+        "min_samples_leaf": HyperParameter(DEFAULT_RANGES["min_samples_leaf"], ParamTypes.INT, False),
     }
 
     def __init__(self, ranges=None, keys=None):
@@ -55,14 +55,14 @@ class EnumeratorRFC(ClassifierEnumerator):
     }
 
     DEFAULT_KEYS = {
-        # KeyStruct(range, key_type, is_categorical)
-        "criterion": KeyStruct(DEFAULT_RANGES["criterion"], Key.TYPE_STRING, True),
-        "max_features": KeyStruct(DEFAULT_RANGES["max_features"], Key.TYPE_FLOAT, False),
-        "max_depth": KeyStruct(DEFAULT_RANGES["max_depth"], Key.TYPE_INT, False),
-        "min_samples_split": KeyStruct(DEFAULT_RANGES["min_samples_split"], Key.TYPE_INT, False),
-        "min_samples_leaf": KeyStruct(DEFAULT_RANGES["min_samples_leaf"], Key.TYPE_INT, False),
-        "n_estimators": KeyStruct(DEFAULT_RANGES["n_estimators"], Key.TYPE_INT, True),
-        "n_jobs": KeyStruct(DEFAULT_RANGES["n_jobs"], Key.TYPE_INT, False),
+        # HyperParameter(range, key_type, is_categorical)
+        "criterion": HyperParameter(DEFAULT_RANGES["criterion"], ParamTypes.STRING, True),
+        "max_features": HyperParameter(DEFAULT_RANGES["max_features"], ParamTypes.FLOAT, False),
+        "max_depth": HyperParameter(DEFAULT_RANGES["max_depth"], ParamTypes.INT, False),
+        "min_samples_split": HyperParameter(DEFAULT_RANGES["min_samples_split"], ParamTypes.INT, False),
+        "min_samples_leaf": HyperParameter(DEFAULT_RANGES["min_samples_leaf"], ParamTypes.INT, False),
+        "n_estimators": HyperParameter(DEFAULT_RANGES["n_estimators"], ParamTypes.INT, True),
+        "n_jobs": HyperParameter(DEFAULT_RANGES["n_jobs"], ParamTypes.INT, False),
     }
 
     def __init__(self, ranges=None, keys=None):
@@ -103,14 +103,14 @@ class EnumeratorETC(ClassifierEnumerator):
     }
 
     DEFAULT_KEYS = {
-        # KeyStruct(range, key_type, is_categorical)
-        "criterion": KeyStruct(DEFAULT_RANGES["criterion"], Key.TYPE_STRING, True),
-        "max_features": KeyStruct(DEFAULT_RANGES["max_features"], Key.TYPE_FLOAT, False),
-        "max_depth": KeyStruct(DEFAULT_RANGES["max_depth"], Key.TYPE_INT, False),
-        "min_samples_split": KeyStruct(DEFAULT_RANGES["min_samples_split"], Key.TYPE_INT, False),
-        "min_samples_leaf": KeyStruct(DEFAULT_RANGES["min_samples_leaf"], Key.TYPE_INT, False),
-        "n_estimators": KeyStruct(DEFAULT_RANGES["n_estimators"], Key.TYPE_INT, True),
-        "n_jobs": KeyStruct(DEFAULT_RANGES["n_jobs"], Key.TYPE_INT, False),
+        # HyperParameter(range, key_type, is_categorical)
+        "criterion": HyperParameter(DEFAULT_RANGES["criterion"], ParamTypes.STRING, True),
+        "max_features": HyperParameter(DEFAULT_RANGES["max_features"], ParamTypes.FLOAT, False),
+        "max_depth": HyperParameter(DEFAULT_RANGES["max_depth"], ParamTypes.INT, False),
+        "min_samples_split": HyperParameter(DEFAULT_RANGES["min_samples_split"], ParamTypes.INT, False),
+        "min_samples_leaf": HyperParameter(DEFAULT_RANGES["min_samples_leaf"], ParamTypes.INT, False),
+        "n_estimators": HyperParameter(DEFAULT_RANGES["n_estimators"], ParamTypes.INT, True),
+        "n_jobs": HyperParameter(DEFAULT_RANGES["n_jobs"], ParamTypes.INT, False),
     }
 
     def __init__(self, ranges=None, keys=None):

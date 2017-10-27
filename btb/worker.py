@@ -1,10 +1,10 @@
-from btb.selection.samples.constants import SELECTION_SAMPLES_GRID
 from btb.config import Config
 from btb.utilities import EnsureDirectory, ParamsToVectors, VectorToParams,\
                           HashDict, HashString, GetPublicIP
-from btb.mapping import Mapping, CreateWrapper
+from btb.mapping import Mapping, create_wrapper
 from btb.model import Model
 from btb.database import Database
+from hyperselection.samples.constants import SELECTION_SAMPLES_GRID
 
 import argparse
 import ast
@@ -190,10 +190,10 @@ class Worker(object):
             metricpath=local_metric_path,
             started=started,
             completed=completed,
+            status='complete',
             host=GetPublicIP(),
             dimensions=model.algorithm.dimensions,
             frozen_hash=frozen_set.frozen_hash,
-            seconds=seconds,
             description=datarun.description)
         session.add(learner)
 
@@ -212,8 +212,8 @@ class Worker(object):
             session.autoflush = False
             learner = self.db.Learner(datarun_id=datarun_id,
                                       frozen_set_id=frozen_set.id,
-                                      errored=datetime.datetime.now(),
-                                      is_error=True,
+                                      completed=datetime.datetime.now(),
+                                      status='errored',
                                       params=params,
                                       error_msg=error_msg,
                                       algorithm=frozen_set.algorithm)
@@ -438,7 +438,7 @@ class Worker(object):
                 print "Testing learner..."
                 # train learner
                 params["function"] = frozen_set.algorithm
-                wrapper = CreateWrapper(params, datarun.metric)
+                wrapper = create_wrapper(params, datarun.metric)
                 trainX, testX, trainY, testY = self.load_data(datarun)
                 wrapper.load_data_from_objects(trainX, testX, trainY, testY)
                 performance = wrapper.start()
@@ -449,7 +449,7 @@ class Worker(object):
                       2 * performance["cv_judgment_metric_stdev"]))
 
                 print "Saving learner..."
-                model = Model(wrapper, datarun.wrapper)
+                model = Model(algorithm=wrapper, data=datarun.wrapper)
 
                 # insert learner into the database
                 self.insert_learner(datarun, frozen_set, performance,

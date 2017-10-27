@@ -1,7 +1,7 @@
 from btb.cpt import Choice, Combination
 from btb.enumeration import Enumerator
 from btb.enumeration.classification import ClassifierEnumerator
-from btb.key import Key, KeyStruct
+from hyperselection import HyperParameter, ParamTypes
 import numpy as np
 
 class EnumeratorSVC(ClassifierEnumerator):
@@ -20,17 +20,17 @@ class EnumeratorSVC(ClassifierEnumerator):
     }
 
     DEFAULT_KEYS = {
-        # KeyStruct(range, key_type, is_categorical)
-        "C" : KeyStruct(DEFAULT_RANGES["C"], Key.TYPE_FLOAT_EXP, False),
-        "gamma" : KeyStruct(DEFAULT_RANGES["gamma"], Key.TYPE_FLOAT_EXP, False),
-        "kernel" : KeyStruct(DEFAULT_RANGES["kernel"], Key.TYPE_STRING, True),
-        "degree" : KeyStruct(DEFAULT_RANGES["degree"], Key.TYPE_INT, False),
-        "coef0" : KeyStruct(DEFAULT_RANGES["coef0"], Key.TYPE_INT, False),
-        "probability" : KeyStruct(DEFAULT_RANGES["probability"], Key.TYPE_BOOL, True),
-        "shrinking" : KeyStruct(DEFAULT_RANGES["shrinking"], Key.TYPE_BOOL, True),
-        "cache_size" : KeyStruct(DEFAULT_RANGES["cache_size"], Key.TYPE_INT, False),
-        "class_weight" : KeyStruct(DEFAULT_RANGES["class_weight"], Key.TYPE_STRING, True),
-        "_scale" : KeyStruct(DEFAULT_RANGES["_scale"], Key.TYPE_BOOL, True),
+        # HyperParameter(range, key_type, is_categorical)
+        "C" : HyperParameter(DEFAULT_RANGES["C"], ParamTypes.FLOAT_EXP, False),
+        "gamma" : HyperParameter(DEFAULT_RANGES["gamma"], ParamTypes.FLOAT_EXP, False),
+        "kernel" : HyperParameter(DEFAULT_RANGES["kernel"], ParamTypes.STRING, True),
+        "degree" : HyperParameter(DEFAULT_RANGES["degree"], ParamTypes.INT, False),
+        "coef0" : HyperParameter(DEFAULT_RANGES["coef0"], ParamTypes.INT, False),
+        "probability" : HyperParameter(DEFAULT_RANGES["probability"], ParamTypes.BOOL, True),
+        "shrinking" : HyperParameter(DEFAULT_RANGES["shrinking"], ParamTypes.BOOL, True),
+        "cache_size" : HyperParameter(DEFAULT_RANGES["cache_size"], ParamTypes.INT, False),
+        "class_weight" : HyperParameter(DEFAULT_RANGES["class_weight"], ParamTypes.STRING, True),
+        "_scale" : HyperParameter(DEFAULT_RANGES["_scale"], ParamTypes.BOOL, True),
     }
 
     def __init__(self, ranges=None, keys=None):

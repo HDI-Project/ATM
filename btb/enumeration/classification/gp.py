@@ -1,7 +1,7 @@
 from btb.cpt import Choice, Combination
 from btb.enumeration import Enumerator
 from btb.enumeration.classification import ClassifierEnumerator
-from btb.key import Key, KeyStruct
+from hyperselection import HyperParameter, ParamTypes
 import numpy as np
 
 class EnumeratorGPC(ClassifierEnumerator):
@@ -13,14 +13,14 @@ class EnumeratorGPC(ClassifierEnumerator):
         "alpha" : (0.01, 100),
         "periodicity" : (0.01, 100)
     }
-    
+
     DEFAULT_KEYS = {
-        # KeyStruct(range, key_type, is_categorical)
-        "kernel" : KeyStruct(DEFAULT_RANGES["kernel"], Key.TYPE_STRING, True),
-        "nu" : KeyStruct(DEFAULT_RANGES["nu"], Key.TYPE_INT, True),
-        "length_scale" : KeyStruct(DEFAULT_RANGES["length_scale"], Key.TYPE_FLOAT, False),
-        "alpha" : KeyStruct(DEFAULT_RANGES["alpha"], Key.TYPE_FLOAT, False),
-        "periodicity": KeyStruct(DEFAULT_RANGES["periodicity"], Key.TYPE_FLOAT, False),
+        # HyperParameter(range, key_type, is_categorical)
+        "kernel" : HyperParameter(DEFAULT_RANGES["kernel"], ParamTypes.STRING, True),
+        "nu" : HyperParameter(DEFAULT_RANGES["nu"], ParamTypes.INT, True),
+        "length_scale" : HyperParameter(DEFAULT_RANGES["length_scale"], ParamTypes.FLOAT, False),
+        "alpha" : HyperParameter(DEFAULT_RANGES["alpha"], ParamTypes.FLOAT, False),
+        "periodicity": HyperParameter(DEFAULT_RANGES["periodicity"], ParamTypes.FLOAT, False),
     }
 
     def __init__(self, ranges=None, keys=None):
@@ -28,7 +28,7 @@ class EnumeratorGPC(ClassifierEnumerator):
             ranges or EnumeratorGPC.DEFAULT_RANGES, keys or EnumeratorGPC.DEFAULT_KEYS)
         self.code = ClassifierEnumerator.GPC
         self.create_cpt()
-        
+
     def create_cpt(self):
         kernel = Choice("kernel", self.ranges["kernel"])
         nu = Choice("nu", self.ranges["nu"])
@@ -48,5 +48,5 @@ class EnumeratorGPC(ClassifierEnumerator):
         gpc = Combination([kernel])
         gpcroot = Choice("function", [ClassifierEnumerator.GPC])
         gpcroot.add_condition(ClassifierEnumerator.GPC, [gpc])
-        
+
         self.root = gpcroot

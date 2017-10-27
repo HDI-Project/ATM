@@ -1,7 +1,7 @@
 from btb.datawrapper import DataWrapper
 from btb.config import Config
 from btb.utilities import *
-from btb.mapping import FrozenSetsFromAlgorithmCodes
+from btb.mapping import frozen_sets_from_algorithm_codes
 from btb.database import Database
 
 from boto.s3.connection import S3Connection, Key as S3Key

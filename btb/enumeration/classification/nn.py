@@ -1,7 +1,7 @@
 from btb.cpt import Choice, Combination
 from btb.enumeration import Enumerator
 from btb.enumeration.classification import ClassifierEnumerator
-from btb.key import Key, KeyStruct
+from hyperselection import HyperParameter, ParamTypes
 import numpy as np
 
 class EnumeratorDBN(ClassifierEnumerator):
@@ -23,20 +23,20 @@ class EnumeratorDBN(ClassifierEnumerator):
     }
 
     DEFAULT_KEYS = {
-        # KeyStruct(range, key_type, is_categorical)
-        "inlayer_size" : KeyStruct(DEFAULT_RANGES["inlayer_size"], Key.TYPE_INT, True),
-        "outlayer_size" : KeyStruct(DEFAULT_RANGES["outlayer_size"], Key.TYPE_INT, True),
-        "minibatch_size": KeyStruct(DEFAULT_RANGES["minibatch_size"], Key.TYPE_INT, True),
-        "num_hidden_layers" : KeyStruct(DEFAULT_RANGES["num_hidden_layers"], Key.TYPE_INT, True),
-        "hidden_size_layer1" : KeyStruct(DEFAULT_RANGES["hidden_size_layer1"], Key.TYPE_INT, False),
-        "hidden_size_layer2" : KeyStruct(DEFAULT_RANGES["hidden_size_layer2"], Key.TYPE_INT, False),
-        "hidden_size_layer3" : KeyStruct(DEFAULT_RANGES["hidden_size_layer3"], Key.TYPE_INT, False),
-        "learn_rates" : KeyStruct(DEFAULT_RANGES["learn_rates"], Key.TYPE_FLOAT, False),
-        "learn_rate_decays" : KeyStruct(DEFAULT_RANGES["learn_rate_decays"], Key.TYPE_FLOAT, False),
-        "learn_rates_pretrain" : KeyStruct(DEFAULT_RANGES["learn_rates_pretrain"], Key.TYPE_FLOAT, False),
-        "epochs" : KeyStruct(DEFAULT_RANGES["epochs"], Key.TYPE_INT, False),
-        "output_act_funct" : KeyStruct(DEFAULT_RANGES["output_act_funct"], Key.TYPE_STRING, True),
-        "_scale" : KeyStruct(DEFAULT_RANGES["_scale"], Key.TYPE_BOOL, True),
+        # HyperParameter(range, key_type, is_categorical)
+        "inlayer_size" : HyperParameter(DEFAULT_RANGES["inlayer_size"], ParamTypes.INT, True),
+        "outlayer_size" : HyperParameter(DEFAULT_RANGES["outlayer_size"], ParamTypes.INT, True),
+        "minibatch_size": HyperParameter(DEFAULT_RANGES["minibatch_size"], ParamTypes.INT, True),
+        "num_hidden_layers" : HyperParameter(DEFAULT_RANGES["num_hidden_layers"], ParamTypes.INT, True),
+        "hidden_size_layer1" : HyperParameter(DEFAULT_RANGES["hidden_size_layer1"], ParamTypes.INT, False),
+        "hidden_size_layer2" : HyperParameter(DEFAULT_RANGES["hidden_size_layer2"], ParamTypes.INT, False),
+        "hidden_size_layer3" : HyperParameter(DEFAULT_RANGES["hidden_size_layer3"], ParamTypes.INT, False),
+        "learn_rates" : HyperParameter(DEFAULT_RANGES["learn_rates"], ParamTypes.FLOAT, False),
+        "learn_rate_decays" : HyperParameter(DEFAULT_RANGES["learn_rate_decays"], ParamTypes.FLOAT, False),
+        "learn_rates_pretrain" : HyperParameter(DEFAULT_RANGES["learn_rates_pretrain"], ParamTypes.FLOAT, False),
+        "epochs" : HyperParameter(DEFAULT_RANGES["epochs"], ParamTypes.INT, False),
+        "output_act_funct" : HyperParameter(DEFAULT_RANGES["output_act_funct"], ParamTypes.STRING, True),
+        "_scale" : HyperParameter(DEFAULT_RANGES["_scale"], ParamTypes.BOOL, True),
     }
 
     def __init__(self, ranges=None, keys=None):
@@ -97,20 +97,20 @@ class EnumeratorMLP(ClassifierEnumerator):
     }
 
     DEFAULT_KEYS = {
-        # KeyStruct(range, key_type, is_categorical)
-        "batch_size": KeyStruct(DEFAULT_RANGES["batch_size"], Key.TYPE_STRING, True),
-        "solver": KeyStruct(DEFAULT_RANGES["solver"], Key.TYPE_STRING, True),
-        "alpha": KeyStruct(DEFAULT_RANGES["alpha"], Key.TYPE_FLOAT, False),
-        "num_hidden_layers": KeyStruct(DEFAULT_RANGES["num_hidden_layers"], Key.TYPE_INT, True),
-        "hidden_size_layer1": KeyStruct(DEFAULT_RANGES["hidden_size_layer1"], Key.TYPE_INT, False),
-        "hidden_size_layer2": KeyStruct(DEFAULT_RANGES["hidden_size_layer2"], Key.TYPE_INT, False),
-        "hidden_size_layer3": KeyStruct(DEFAULT_RANGES["hidden_size_layer3"], Key.TYPE_INT, False),
-        "learning_rate_init": KeyStruct(DEFAULT_RANGES["learning_rate_init"], Key.TYPE_FLOAT, False),
-        "beta_1": KeyStruct(DEFAULT_RANGES["beta_1"], Key.TYPE_FLOAT, False),
-        "beta_2": KeyStruct(DEFAULT_RANGES["beta_2"], Key.TYPE_FLOAT, False),
-        "learning_rate": KeyStruct(DEFAULT_RANGES["learning_rate"], Key.TYPE_STRING, True),
-        "activation": KeyStruct(DEFAULT_RANGES["activation"], Key.TYPE_STRING, True),
-        "_scale": KeyStruct(DEFAULT_RANGES["_scale"], Key.TYPE_BOOL, True),
+        # HyperParameter(range, key_type, is_categorical)
+        "batch_size": HyperParameter(DEFAULT_RANGES["batch_size"], ParamTypes.STRING, True),
+        "solver": HyperParameter(DEFAULT_RANGES["solver"], ParamTypes.STRING, True),
+        "alpha": HyperParameter(DEFAULT_RANGES["alpha"], ParamTypes.FLOAT, False),
+        "num_hidden_layers": HyperParameter(DEFAULT_RANGES["num_hidden_layers"], ParamTypes.INT, True),
+        "hidden_size_layer1": HyperParameter(DEFAULT_RANGES["hidden_size_layer1"], ParamTypes.INT, False),
+        "hidden_size_layer2": HyperParameter(DEFAULT_RANGES["hidden_size_layer2"], ParamTypes.INT, False),
+        "hidden_size_layer3": HyperParameter(DEFAULT_RANGES["hidden_size_layer3"], ParamTypes.INT, False),
+        "learning_rate_init": HyperParameter(DEFAULT_RANGES["learning_rate_init"], ParamTypes.FLOAT, False),
+        "beta_1": HyperParameter(DEFAULT_RANGES["beta_1"], ParamTypes.FLOAT, False),
+        "beta_2": HyperParameter(DEFAULT_RANGES["beta_2"], ParamTypes.FLOAT, False),
+        "learning_rate": HyperParameter(DEFAULT_RANGES["learning_rate"], ParamTypes.STRING, True),
+        "activation": HyperParameter(DEFAULT_RANGES["activation"], ParamTypes.STRING, True),
+        "_scale": HyperParameter(DEFAULT_RANGES["_scale"], ParamTypes.BOOL, True),
     }
 
     def __init__(self, ranges=None, keys=None):

@@ -163,110 +163,6 @@ class Database(object):
             def trainable_params(self, value):
                 self.trainable_params64 = ObjectToBase64(value)
 
-            @property
-            def test_accuracies(self):
-                return Base64ToObject(self.test_accuracies64)
-
-            @test_accuracies.setter
-            def test_accuracies(self, value):
-                self.test_accuracies64 = ObjectToBase64(value)
-
-            @property
-            def test_cohen_kappas(self):
-                return Base64ToObject(self.test_cohen_kappas64)
-
-            @test_cohen_kappas.setter
-            def test_cohen_kappas(self, value):
-                self.test_cohen_kappas64 = ObjectToBase64(value)
-
-            @property
-            def test_f1_scores(self):
-                return Base64ToObject(self.test_f1_scores64)
-
-            @test_f1_scores.setter
-            def test_f1_scores(self, value):
-                self.test_f1_scores64 = ObjectToBase64(value)
-
-            @property
-            def test_roc_curve_fprs(self):
-                return Base64ToObject(self.test_roc_curve_fprs64)
-
-            @test_roc_curve_fprs.setter
-            def test_roc_curve_fprs(self, value):
-                self.test_roc_curve_fprs64 = ObjectToBase64(value)
-
-            @property
-            def test_roc_curve_tprs(self):
-                return Base64ToObject(self.test_roc_curve_tprs64)
-
-            @test_roc_curve_tprs.setter
-            def test_roc_curve_tprs(self, value):
-                self.test_roc_curve_tprs64 = ObjectToBase64(value)
-
-            @property
-            def test_roc_curve_thresholds(self):
-                return Base64ToObject(self.test_roc_curve_thresholds64)
-
-            @test_roc_curve_thresholds.setter
-            def test_roc_curve_thresholds(self, value):
-                self.test_roc_curve_thresholds64 = ObjectToBase64(value)
-
-            @property
-            def test_roc_curve_aucs(self):
-                return Base64ToObject(self.test_roc_curve_aucs64)
-
-            @test_roc_curve_aucs.setter
-            def test_roc_curve_aucs(self, value):
-                self.test_roc_curve_aucs64 = ObjectToBase64(value)
-
-            @property
-            def test_pr_curve_precisions(self):
-                return Base64ToObject(self.test_pr_curve_precisions64)
-
-            @test_pr_curve_precisions.setter
-            def test_pr_curve_precisions(self, value):
-                self.test_pr_curve_precisions64 = ObjectToBase64(value)
-
-            @property
-            def test_pr_curve_recalls(self):
-                return Base64ToObject(self.test_pr_curve_recalls64)
-
-            @test_pr_curve_recalls.setter
-            def test_pr_curve_recalls(self, value):
-                self.test_pr_curve_recalls64 = ObjectToBase64(value)
-
-            @property
-            def test_pr_curve_thresholds(self):
-                return Base64ToObject(self.test_pr_curve_thresholds64)
-
-            @test_pr_curve_thresholds.setter
-            def test_pr_curve_thresholds(self, value):
-                self.test_pr_curve_thresholds64 = ObjectToBase64(value)
-
-            @property
-            def test_pr_curve_aucs(self):
-                return Base64ToObject(self.test_pr_curve_aucs64)
-
-            @test_pr_curve_aucs.setter
-            def test_pr_curve_aucs(self, value):
-                self.test_pr_curve_aucs64 = ObjectToBase64(value)
-
-            @property
-            def test_rank_accuracies(self):
-                return Base64ToObject(self.test_rank_accuracies64)
-
-            @test_rank_accuracies.setter
-            def test_rank_accuracies(self, value):
-                self.test_rank_accuracies64 = ObjectToBase64(value)
-
-            @property
-            def test_mu_sigmas(self):
-                return Base64ToObject(self.test_mu_sigmas64)
-
-            @test_mu_sigmas.setter
-            def test_mu_sigmas(self, value):
-                self.test_mu_sigmas64 = ObjectToBase64(value)
-
             def __repr__(self):
                 return "<%s>" % self.algorithm
 
@@ -358,7 +254,7 @@ class Database(object):
     def GetNumberOfFrozenSetErrors(self, session, frozen_set_id):
         learners = session.query(self.Learner)\
             .filter(and_(self.Learner.frozen_set_id == frozen_set_id,
-                         self.Learner.is_error == 1)).all()
+                         self.Learner.status == 'errored')).all()
         return len(learners)
 
     @try_with_session(default=list)

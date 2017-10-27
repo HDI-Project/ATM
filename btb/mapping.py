@@ -25,15 +25,15 @@ from btb.enumeration.classification.gp import EnumeratorGPC
 from btb.wrapper import Wrapper
 
 # sample selectors
-from btb.selection.samples.constants import *
-from btb.selection.samples import Uniform as UniformSampler, Grid,\
-                                  GP, GPEi, GPEiVelocity
+from hyperselection.samples.constants import *
+from hyperselection.samples import Uniform as UniformSampler, Grid,\
+                                   GP, GPEi, GPEiVelocity
 # frozen selectors
-from btb.selection.frozens.constants import *
-from btb.selection.frozens import Uniform as UniformFrozens, UCB1,\
-                                  BestKReward, BestKVelocity,\
-                                  RecentKReward, RecentKVelocity,\
-                                  HierarchicalByAlgorithm, PureBestKVelocity
+from hyperselection.frozens.constants import *
+from hyperselection.frozens import Uniform as UniformFrozens, UCB1,\
+                                   BestKReward, BestKVelocity,\
+                                   RecentKReward, RecentKVelocity,\
+                                   HierarchicalByAlgorithm, PureBestKVelocity
 
 class Mapping:
     LEARNER_CODE_CLASS_MAP = {
@@ -90,12 +90,12 @@ class Mapping:
     }
 
 
-def CreateWrapper(params, judgment_metric):
+def create_wrapper(params, judgment_metric):
     learner_class = Mapping.LEARNER_CODE_CLASS_MAP[params["function"]]
     return Wrapper(params["function"], judgment_metric, params, learner_class)
 
 
-def FrozenSetsFromAlgorithmCodes(codes, verbose=False):
+def frozen_sets_from_algorithm_codes(codes, verbose=False):
     """
     Takes in string codes and outputs frozen sets.
     """
@@ -109,14 +109,13 @@ def FrozenSetsFromAlgorithmCodes(codes, verbose=False):
     #
     #   algorithm_code => [
     #       categorical keys => optimizable keys, constant keys # frozen set 1
-    #       categorical keys => optimizable keys, constant keys # frozen set 2
-    #       categorical keys => optimizable keys, constant keys # frozen set 3
-    #       categorical keys => optimizable keys, constant keys # frozen set 4
+    #       etc.
     #   ]
     #
-    # Each algorithm has a mapping from each unique categorical key set (the frozen keys)
-    # to the corresponding continuously varying keys (the optimizable keys) for which
-    # our hyperparameter optimization may take place.
+    # Each algorithm has a mapping from each unique categorical key set (the
+    # frozen keys) to the corresponding continuously varying keys (the
+    # optimizable keys) for which our hyperparameter optimization may take
+    # place.
     frozen_sets = {}
     for algorithm in algorithms:
 
@@ -130,7 +129,6 @@ def FrozenSetsFromAlgorithmCodes(codes, verbose=False):
         categoricals_to_optimizables = {}
 
         for params in algorithm.combinations():
-
             # only get the k,v pairs which are from
             # categorical keys
             categorical_set = []
