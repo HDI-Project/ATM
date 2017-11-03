@@ -1,8 +1,8 @@
-from btb.datawrapper import DataWrapper
-from btb.config import Config
-from btb.utilities import *
-from btb.mapping import frozen_sets_from_algorithm_codes
-from btb.database import Database
+from atm.datawrapper import DataWrapper
+from atm.config import Config
+from atm.utilities import *
+from atm.mapping import frozen_sets_from_algorithm_codes
+from atm.database import Database
 
 from boto.s3.connection import S3Connection, Key as S3Key
 import datetime
@@ -49,7 +49,8 @@ def Run(config, runname, description, metric, score_target, sample_selection,
     print "Testing data: %s" % local_testing_path
 
     # create all combinations necessary
-    frozen_sets = FrozenSetsFromAlgorithmCodes(algorithm_codes, verbose=verbose)
+    frozen_sets = frozen_sets_from_algorithm_codes(algorithm_codes,
+                                                   verbose=verbose)
 
     ### create datarun ###
     values = {

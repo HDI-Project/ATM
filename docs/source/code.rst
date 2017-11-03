@@ -1,4 +1,4 @@
-btb
+atm
 ======
 
 Adding a classifier
@@ -10,10 +10,10 @@ The classifier must be a python class that has the following functions:
 2) ``predict``: given data sample(s), predicts the label(s)
 
 
-In ``btb/mapping.py``, enter the function in the ``LEARNER_CODE_CLASS_MAP`` variable and the classifier enumerator (see below) in the ``ENUMERATOR_CODE_CLASS_MAP`` variable.
-Decide a code for the classifier (e.g., classify_knn) and enter this in the ``__init__.py`` file in ``btb/enumeration/classification``.
+In ``atm/mapping.py``, enter the function in the ``LEARNER_CODE_CLASS_MAP`` variable and the classifier enumerator (see below) in the ``ENUMERATOR_CODE_CLASS_MAP`` variable.
+Decide a code for the classifier (e.g., classify_knn) and enter this in the ``__init__.py`` file in ``atm/enumeration/classification``.
 
-Create an Enumerator for the classifier in the ``btb/enumeration/classification`` folder.
+Create an Enumerator for the classifier in the ``atm/enumeration/classification`` folder.
 In this file:
 
 a) define the ranges of the parameters in a variable called ``DEFAULT_RANGES``
@@ -22,10 +22,10 @@ c) define the Conditional Parameter Tree (CPT) in a function called ``create_cpt
 
 .. code:: python
 
-  from btb.cpt import Choice, Combination
-  from btb.enumeration import Enumerator
-  from btb.enumeration.classification import ClassifierEnumerator
-  from btb.key import Key, KeyStruct
+  from atm.cpt import Choice, Combination
+  from atm.enumeration import Enumerator
+  from atm.enumeration.classification import ClassifierEnumerator
+  from atm.key import Key, KeyStruct
   import numpy as np
 
   class EnumeratorExample(ClassifierEnumerator):
@@ -63,7 +63,7 @@ c) define the Conditional Parameter Tree (CPT) in a function called ``create_cpt
 
           self.root = exampleroot
 
-Since sklearn uses consistent framework across classifiers (fit, predict, etc.), btb creates a pipeline with the classifier and uses the sklearn standard framework to learn the classifier and make predictions.
+Since sklearn uses consistent framework across classifiers (fit, predict, etc.), atm creates a pipeline with the classifier and uses the sklearn standard framework to learn the classifier and make predictions.
 
 
 
@@ -73,16 +73,16 @@ A parameter selector can be created by creating a class which inherits the ``Sam
 The class must have a ``select`` function which returns the chose parameters.
 A few examples which use a Gaussian Process to choose parameters is shown below.
 
-.. literalinclude:: ../../btb/selection/samples/gp_ei.py
+.. literalinclude:: ../../atm/selection/samples/gp_ei.py
 
 
 Changing the Acquisition Function
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The Gaussian Process Expected Improvement selection scheme makes use of an acquisition function to decide which parameter set will offer the best performance improvement.
 The current acquisition function (seen below) makes use of the predicted performance and the confidence of the performance to create a new metric for deciding which parameter set will likely offer the best performance.
-This metric can be altered depending on the needs of a particular problem in the ``acquisition.py`` file in the ``btb/selection`` folder.
+This metric can be altered depending on the needs of a particular problem in the ``acquisition.py`` file in the ``atm/selection`` folder.
 
-.. literalinclude:: ../../btb/selection/acquisition.py
+.. literalinclude:: ../../atm/selection/acquisition.py
 
 
 
@@ -92,4 +92,4 @@ A parameter selector can be created by creating a class which inherits the ``Fro
 The class must have a ``select`` function which returns the chose parameters.
 An example which uses the UCB1 algorithm to choose the hyperpartition is shown below.
 
-.. literalinclude:: ../../btb/selection/frozens/ucb1.py
+.. literalinclude:: ../../atm/selection/frozens/ucb1.py

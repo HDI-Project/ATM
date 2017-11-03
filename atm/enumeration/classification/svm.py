@@ -1,7 +1,7 @@
-from btb.cpt import Choice, Combination
-from btb.enumeration import Enumerator
-from btb.enumeration.classification import ClassifierEnumerator
-from hyperselection import HyperParameter, ParamTypes
+from atm.cpt import Choice, Combination
+from atm.enumeration import Enumerator
+from atm.enumeration.classification import ClassifierEnumerator
+from btb import HyperParameter, ParamTypes
 import numpy as np
 
 class EnumeratorSVC(ClassifierEnumerator):

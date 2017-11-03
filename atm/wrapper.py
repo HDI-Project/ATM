@@ -9,9 +9,9 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn import decomposition
 from gdbn.activationFunctions import Softmax, Sigmoid, Linear, Tanh
 from sklearn.gaussian_process.kernels import ConstantKernel, RBF, Matern, ExpSineSquared, RationalQuadratic
-from btb.metrics import Metrics, JUDGMENT_METRICS
-from btb.metrics import get_metrics_binary, get_metrics_small_multiclass, \
-                        get_metrics_large_multiclass, btb_cross_val
+from atm.metrics import Metrics, JUDGMENT_METRICS
+from atm.metrics import get_metrics_binary, get_metrics_small_multiclass, \
+                        get_metrics_large_multiclass, atm_cross_val
 import numpy as np
 import time
 
@@ -27,7 +27,7 @@ class Wrapper(object):
     PCA_DIMS = "_pca_dimensions"
 
     # list of all such keys
-    BTB_KEYS = [
+    ATM_KEYS = [
         SCALE, PCA, WHITEN, MINMAX, PCA_DIMS]
 
     # number of folds for cross-validation (arbitrary, for speed)
@@ -108,7 +108,7 @@ class Wrapper(object):
                 self.judgment_metric = 'mu_sigmas'
 
     def cross_validate(self):
-        self.cv_scores = btb_cross_val(self.pipeline, self.trainX, self.trainY,
+        self.cv_scores = atm_cross_val(self.pipeline, self.trainX, self.trainY,
                                        self.num_classes, self.judgment_metric,
                                        cv=self.CV_COUNT)
 
@@ -365,7 +365,7 @@ class Wrapper(object):
 
         # create a learner with specified parameters
         learner_params = {k: v for k, v in self.params.iteritems() if k not in
-                          Wrapper.BTB_KEYS}
+                          Wrapper.ATM_KEYS}
 
         # do special converstions
         learner_params = self.special_conversions(learner_params)

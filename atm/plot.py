@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import time
 import datetime
 from sqlalchemy import asc
-from btb.database import * 
+from atm.database import * 
 
 def Scatter(filename, xs, ys, title, xlabel, ylabel, xlim, ylim, 
 			xlog=False, ylog=False, legend_loc='lower right'):	

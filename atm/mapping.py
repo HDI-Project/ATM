@@ -9,31 +9,30 @@ from sklearn.linear_model import SGDRegressor, LogisticRegression
 from sklearn.gaussian_process import GaussianProcessClassifier
 from nolearn.dbn import DBN
 
-from btb.enumeration import Enumerator
-from btb.enumeration.classification import ClassifierEnumerator
-from btb.enumeration.classification.svm import EnumeratorSVC
-from btb.enumeration.classification.tree import EnumeratorDTC, EnumeratorRFC,\
+from atm.enumeration import Enumerator
+from atm.enumeration.classification import ClassifierEnumerator
+from atm.enumeration.classification.svm import EnumeratorSVC
+from atm.enumeration.classification.tree import EnumeratorDTC, EnumeratorRFC,\
                                                 EnumeratorETC
-from btb.enumeration.classification.probabilistic import EnumeratorGNB,\
+from atm.enumeration.classification.probabilistic import EnumeratorGNB,\
                                                          EnumeratorBNB,\
                                                          EnumeratorMNB
-from btb.enumeration.classification.logistic import EnumeratorLRC
-from btb.enumeration.classification.nn import EnumeratorDBN, EnumeratorMLP
-from btb.enumeration.classification.knn import EnumeratorKNN
-from btb.enumeration.classification.gd import EnumeratorSGDC, EnumeratorPAC
-from btb.enumeration.classification.gp import EnumeratorGPC
-from btb.wrapper import Wrapper
+from atm.enumeration.classification.logistic import EnumeratorLRC
+from atm.enumeration.classification.nn import EnumeratorDBN, EnumeratorMLP
+from atm.enumeration.classification.knn import EnumeratorKNN
+from atm.enumeration.classification.gd import EnumeratorSGDC, EnumeratorPAC
+from atm.enumeration.classification.gp import EnumeratorGPC
+from atm.wrapper import Wrapper
 
-# sample selectors
-from hyperselection.samples.constants import *
-from hyperselection.samples import Uniform as UniformSampler, Grid,\
-                                   GP, GPEi, GPEiVelocity
+# sample tuning
+from btb.tuning.constants import Tuners
+from btb.tuning import Uniform as UniformTuner, Grid, GP, GPEi, GPEiVelocity
 # frozen selectors
-from hyperselection.frozens.constants import *
-from hyperselection.frozens import Uniform as UniformFrozens, UCB1,\
-                                   BestKReward, BestKVelocity,\
-                                   RecentKReward, RecentKVelocity,\
-                                   HierarchicalByAlgorithm, PureBestKVelocity
+from btb.selection.constants import Selectors
+from btb.selection import Uniform as UniformSelector, UCB1,\
+                                     BestKReward, BestKVelocity,\
+                                     RecentKReward, RecentKVelocity,\
+                                     HierarchicalByAlgorithm, PureBestKVelocity
 
 class Mapping:
     LEARNER_CODE_CLASS_MAP = {
@@ -68,25 +67,25 @@ class Mapping:
         ClassifierEnumerator.PASSIVE_AGGRESSIVE: EnumeratorPAC,
         ClassifierEnumerator.LRC: EnumeratorLRC}
 
-    SELECTION_SAMPLES_MAP = {
-        SELECTION_SAMPLES_UNIFORM: UniformSampler,
-        SELECTION_SAMPLES_GP: GP,
-        SELECTION_SAMPLES_GP_EI: GPEi,
-        #SELECTION_SAMPLES_GP_EI_TIME: GPEi,
-        SELECTION_SAMPLES_GP_EI_VEL: GPEiVelocity,
-        SELECTION_SAMPLES_GRID: Grid,
+    TUNERS_MAP = {
+        Tuners.UNIFORM: UniformTuner,
+        Tuners.GP: GP,
+        Tuners.GP_EI: GPEi,
+        #Tuners.GP_EI_TIME: GPEi,
+        Tuners.GP_EI_VEL: GPEiVelocity,
+        Tuners.GRID: Grid,
     }
 
-    SELECTION_FROZENS_MAP = {
-        SELECTION_FROZENS_UNIFORM: UniformFrozens,
-        SELECTION_FROZENS_UCB1: UCB1,
-        SELECTION_FROZENS_BEST_K: BestKReward,
-        SELECTION_FROZENS_BEST_K_VEL: BestKVelocity,
-        SELECTION_FROZENS_PURE_BEST_K_VEL: PureBestKVelocity,
-        SELECTION_FROZENS_RECENT_K: RecentKReward,
-        SELECTION_FROZENS_RECENT_K_VEL: RecentKVelocity,
-        SELECTION_FROZENS_HIER_ALG: HierarchicalByAlgorithm,
-        #SELECTION_FROZENS_HIER_RAND: HierarchicalRandom,
+    SELECTORS_MAP = {
+        Selectors.UNIFORM: UniformSelector,
+        Selectors.UCB1: UCB1,
+        Selectors.BEST_K: BestKReward,
+        Selectors.BEST_K_VEL: BestKVelocity,
+        Selectors.PURE_BEST_K_VEL: PureBestKVelocity,
+        Selectors.RECENT_K: RecentKReward,
+        Selectors.RECENT_K_VEL: RecentKVelocity,
+        Selectors.HIER_ALG: HierarchicalByAlgorithm,
+        #Selectors.HIER_RAND: HierarchicalRandom,
     }
 
 

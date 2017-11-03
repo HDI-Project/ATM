@@ -59,19 +59,16 @@ CREATE TABLE `frozen_sets` (
   CHECK (`trained` >= 0)
 );
 
-CREATE TABLE `learners` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE `learners` (
+  `id` integer NOT NULL PRIMARY KEY AUTOINCREMENT,
   `frozen_set_id` bigint,
   `datarun_id` integer,
   `dataname` varchar(100) DEFAULT ('') NOT NULL,
   `description` varchar(200) DEFAULT (''),
-  `algorithm` varchar(15) DEFAULT ('') NOT NULL,
   `trainpath` varchar(300),
   `testpath` varchar(300),
   `modelpath` varchar(300),
   `metricpath` varchar(300),
-  `params_hash` varchar(32) DEFAULT ('') NOT NULL,
-  `frozen_hash` varchar(32) DEFAULT ('') NOT NULL,
-  `datarun_name_hash` varchar(32),
   `params64` text NOT NULL,
   `trainable_params64` text,
   `dimensions` bigint,
@@ -80,14 +77,11 @@ CREATE TABLE `learners` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT,
   `test_judgment_metric` numeric(20, 10),
   `started` timestamp,
   `completed` timestamp,
-  `seconds` bigint,
-  `errored` timestamp,
-  `is_error` boolean DEFAULT (0) NOT NULL,
+  `status` varchar(255) DEFAULT 'started' NOT NULL,
   `error_msg` text,
   `host` varchar(50),
   CHECK (`frozen_set_id` >= 0),
-  CHECK (`dimensions` >= 0),
-  CHECK (`seconds` >= 0)
+  CHECK (`dimensions` >= 0)
 );
 
 CREATE INDEX `dataruns_name_desc_unq` ON `dataruns` (`name`, `description`);

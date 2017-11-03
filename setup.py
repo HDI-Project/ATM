@@ -12,7 +12,7 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 setup(
-    name='btb',
+    name='atm',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -22,7 +22,7 @@ setup(
     description='A multi user, multi data, model exploration system',
 
     # The project's main homepage.
-    url='https://github.com/HDI-project/BTB',
+    url='https://github.com/HDI-project/ATM',
 
     # Choose your license
     license='MIT',

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Setup &mdash; btb 0.9 documentation</title>
+  <title>Setup &mdash; atm 0.9 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="btb 0.9 documentation" href="index.html"/>
+    <link rel="top" title="atm 0.9 documentation" href="index.html"/>
         <link rel="next" title="Tutorial" href="tutorial.html"/>
         <link rel="prev" title="Introduction" href="intro.html"/> 
 
@@ -56,7 +56,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> btb
+            <a href="index.html" class="icon icon-home"> atm
           
 
           
@@ -101,7 +101,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">btb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">atm</a></li>
 </ul>
 
             
@@ -116,7 +116,7 @@
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">btb</a>
+          <a href="index.html">atm</a>
         
       </nav>
 
@@ -186,13 +186,13 @@ source /usr/local/bin/virtualenvwrapper_lazy.sh
 <div class="section" id="virtual-environment-setup">
 <h3>Virtual Environment Setup<a class="headerlink" href="#virtual-environment-setup" title="Permalink to this headline">¶</a></h3>
 <p>Create the virtual environment and enter into it:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ mkvirtualenv btb-env
-$ workon btb-env
-(btb-env) $
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ mkvirtualenv atm-env
+$ workon atm-env
+(atm-env) $
 </pre></div>
 </div>
 <p>Install the required packages:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>(btb-env) $ pip install -r setup/reqs.txt
+<div class="highlight-default"><div class="highlight"><pre><span></span>(atm-env) $ pip install -r setup/reqs.txt
 </pre></div>
 </div>
 <p>The required packages are:</p>
@@ -273,11 +273,11 @@ $ workon btb-env
 </pre></div>
 </div>
 <p>and following the instructions.
-Once MySQL is installed, setup the BTB DataHub database:</p>
+Once MySQL is installed, setup the ATM DataHub database:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ mysql
-mysql&gt; create database btb_db;
+mysql&gt; create database atm_db;
 mysql&gt; exit;
-$ mysql btb_db &lt; setup/hyperbtb.sql
+$ mysql atm_db &lt; setup/hyperatm.sql
 </pre></div>
 </div>
 </div>

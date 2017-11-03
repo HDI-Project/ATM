@@ -13,8 +13,8 @@ from datetime import datetime
 import warnings
 import pdb
 
-from btb.utilities import *
-from btb.config import Config
+from atm.utilities import *
+from atm.config import Config
 
 
 def try_with_session(default=lambda: None, commit=False):
@@ -164,7 +164,7 @@ class Database(object):
                 self.trainable_params64 = ObjectToBase64(value)
 
             def __repr__(self):
-                return "<%s>" % self.algorithm
+                return "<%s>" % self.params
 
         self.Learner = Learner
 
@@ -268,6 +268,14 @@ class Database(object):
         """ Returns all learners in a datarun.  """
         return session.query(self.Learner)\
             .filter(self.Learner.datarun_id == datarun_id)\
+            .order_by(self.Learner.started).all()
+
+    @try_with_session(default=list)
+    def GetCompleteLearners(self, session, datarun_id):
+        """ Returns all complete learners in a datarun.  """
+        return session.query(self.Learner)\
+            .filter(self.Learner.datarun_id == datarun_id)\
+            .filter(self.Learner.status == 'complete')\
             .order_by(self.Learner.started).all()
 
     @try_with_session()

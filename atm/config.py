@@ -48,7 +48,7 @@ class Config(ConfigParser):
 
     # subheading: Run
     RUN_ALGORITHMS = "algorithms"
-    RUN_BTB = "btb-path"
+    RUN_ATM = "atm-path"
     RUN_MODELS_DIR = "models-dir"
     RUN_DROP_VALUES = "drop-values"
     RUN_TEST_RATIO = 'test-ratio'

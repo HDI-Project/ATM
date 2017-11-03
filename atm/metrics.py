@@ -254,7 +254,7 @@ def get_metrics_large_multiclass(y_true, y_pred, y_pred_probs, rank):
     return results
 
 
-def btb_cross_val_binary(pipeline, X, y, judgment_metric, cv=10):
+def atm_cross_val_binary(pipeline, X, y, judgment_metric, cv=10):
     skf = StratifiedKFold(n_splits=cv)
     skf.get_n_splits(X, y)
 
@@ -340,7 +340,7 @@ def btb_cross_val_binary(pipeline, X, y, judgment_metric, cv=10):
     return cv_results
 
 
-def btb_cross_val_small_multiclass(pipeline, X, y, judgment_metric, cv=10):
+def atm_cross_val_small_multiclass(pipeline, X, y, judgment_metric, cv=10):
     skf = StratifiedKFold(n_splits=cv)
     skf.get_n_splits(X, y)
 
@@ -440,7 +440,7 @@ def rank_n_accuracy(y_true, y_prob_mat, rank=5):
     return correct_sample_count / num_samples
 
 
-def btb_cross_val_large_multiclass(pipeline, X, y, judgment_metric, cv=10, rank=5):
+def atm_cross_val_large_multiclass(pipeline, X, y, judgment_metric, cv=10, rank=5):
     skf = StratifiedKFold(n_splits=cv)
     skf.get_n_splits(X, y)
 
@@ -523,12 +523,12 @@ def btb_cross_val_large_multiclass(pipeline, X, y, judgment_metric, cv=10, rank=
     return cv_results
 
 
-def btb_cross_val(pipeline, X, y, num_classes, judgment_metric, cv=10):
+def atm_cross_val(pipeline, X, y, num_classes, judgment_metric, cv=10):
     if num_classes == 2:
-        return btb_cross_val_binary(pipeline, X, y, judgment_metric, cv=cv)
+        return atm_cross_val_binary(pipeline, X, y, judgment_metric, cv=cv)
     elif (num_classes >= 3) and (num_classes <= 5):
-        return btb_cross_val_small_multiclass(pipeline, X, y, judgment_metric, cv=cv)
+        return atm_cross_val_small_multiclass(pipeline, X, y, judgment_metric, cv=cv)
     else:
-        return btb_cross_val_large_multiclass(pipeline, X, y, judgment_metric, cv=cv)
+        return atm_cross_val_large_multiclass(pipeline, X, y, judgment_metric, cv=cv)
 
 

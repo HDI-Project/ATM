@@ -1,7 +1,7 @@
-BTB - Bayesian Tuning and Building
+ATM - Bayesian Tuning and Building
 ====
 
-[![](https://img.shields.io/badge/docs-latest-blue.svg)](https://hdi-project.github.io/BTB/)
+[![](https://img.shields.io/badge/docs-latest-blue.svg)](https://hdi-project.github.io/ATM/)
 
 ## Quick start setup
 1. Install database
@@ -22,22 +22,22 @@ $ . venv/bin/activate
 $ pip install -r requirements.txt
 ```
 
-3. Set up BTB database
+3. Set up ATM database
 - for SQLite:
 ```
-$ sqlite3 btb.db < setup/sqlite-setup.sql
+$ sqlite3 atm.db < setup/sqlite-setup.sql
 ```
 
 - for MySQL:
 ```
-$ mysql -u username -p btb < setup/hyperbtb.sql
+$ mysql -u username -p atm < setup/hyperatm.sql
 ```
 Check to make sure it worked.
 ```
-$ mysql -u username -p btb
+$ mysql -u username -p atm
 mysql> show tables;
 +---------------+
-| Tables_in_btb |
+| Tables_in_atm |
 +---------------+
 | algorithms    |
 | dataruns      |
@@ -49,8 +49,8 @@ mysql> show tables;
 
 4. Create a copy of the sample config file, and edit it to add your settings:
 ```
-$ cp config/btb.cnf.template config/btb.cnf
-$ vim config/btb.cnf
+$ cp config/atm.cnf.template config/atm.cnf
+$ vim config/atm.cnf
 ```
 At the very least, you will need to change `alldatapath`, `models-dir`, and the
 database settings under `[datahub]`. This is the trickiest part; if you run into
@@ -60,7 +60,7 @@ For SQLite, the [datahub] config should specify 'dialect' and 'database', and
 leave everything else blank:
 ```
 dialect: sqlite
-database: ./btb.db
+database: ./atm.db
 username:
 password:
 host:
@@ -71,7 +71,7 @@ query:
 For MySQL, the config should look something like this: 
 ```
 dialect: mysql
-database: btb
+database: atm
 username: username
 password: password
 host: localhost
@@ -82,7 +82,7 @@ query:
 
 5. Create a datarun
 ```
-$ python btb/enter_data.py --configpath config/btb.cnf
+$ python atm/enter_data.py --configpath config/atm.cnf
 ```
 You should get a lot of output, the end of which looks something like:
 
@@ -102,7 +102,7 @@ The important piece of information is the datarun ID.
 6. Start a worker, specifying your config file and the datarun you'd like to
    compute on:
 ```
-$ python btb/worker.py --configpath config/btb.cnf --datarun 1
+$ python atm/worker.py --configpath config/atm.cnf --datarun 1
 ```
 
 This will start a process that computes learners and saves them in the models/

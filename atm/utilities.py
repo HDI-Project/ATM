@@ -1,4 +1,4 @@
-from btb.config import Config
+from atm.config import Config
 import pickle
 import urllib2
 import platform, socket
@@ -124,9 +124,9 @@ def GetMemory():
 
 public_ip = None
 def GetPublicIP():
+    global public_ip
     if public_ip is None:
         try:
-            global public_ip
             public_ip = urllib2.urlopen(PUBLIC_IP_URL).read().strip()
         except Exception:  # any exception, doesn't matter
             public_ip = None
@@ -223,7 +223,7 @@ def DownloadFileHTTP(url, verbose=False):
     return original_filename
 
 
-def BTBToScikit(learner_params):
+def ATMToScikit(learner_params):
     """
         TODO: Make this logic into subclasses
 

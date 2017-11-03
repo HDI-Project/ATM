@@ -1,12 +1,15 @@
-from btb.config import Config
-from btb.utilities import *
+from atm.config import Config
+from atm.utilities import *
 from novaclient.v1_1 import client
 import os, sys
 import random
 
-class Openstack:
-	
-    HOME = "/ubuntu/btb"
+class Launcher:
+
+    LAUNCH_TYPE_WORKERS = "workers"
+    LAUNCH_NAME_WORKERS = "grid-worker"
+
+    HOME = "/root/hyperatm"
 
     def __init__(self, config):
         """
@@ -17,6 +20,9 @@ class Openstack:
             config.get(Config.CLOUD, Config.CLOUD_TENANT), config.get(Config.CLOUD, Config.CLOUD_AUTH_URL),
             service_type=config.get(Config.CLOUD, Config.CLOUD_SERVICE))
         self.config = config
+        self.files = {}
+        self.userdata = ""
+        self.launch_name = ""
         
     def killall(self, name, key_name):
         """
@@ -59,7 +65,7 @@ class Openstack:
             try:
                 print "[*] Syncing models from %s..." % ip
                 os.system("sh sync_models.sh %s" % ip)
-            except Exception:
+            except Exception as e:
                 print "Exception in syncing %s" % ip
     
     def purge_errors(self):
@@ -83,3 +89,4 @@ class Openstack:
             if node.addresses["inet"][0]["addr"] in klist:
                 print "Now terminating %s..." % node
                 node.delete()
+          

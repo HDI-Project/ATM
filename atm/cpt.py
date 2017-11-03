@@ -2,7 +2,7 @@ import numpy as np
 import sys, os
 import itertools
 from collections import OrderedDict
-from btb.utilities import IsNumeric
+from atm.utilities import IsNumeric
 import random
 
 class Node():

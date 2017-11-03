@@ -7,7 +7,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 from sklearn_pandas import DataFrameMapper
 
-from btb.utilities import *
+from atm.utilities import *
 
 
 class DataWrapper(object):

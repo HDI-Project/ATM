@@ -1,7 +1,7 @@
 import argparse
 import os
-from btb.config import Config
-from btb.run import Run
+from atm.config import Config
+from atm.run import Run
 
 
 def enter_data(config):
@@ -74,7 +74,7 @@ def enter_data(config):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Processes a ')
     parser.add_argument('--configpath', help='Location of config file',
-                        default=os.getenv('BTB_CONFIG_FILE', 'config/btb.cnf'),
+                        default=os.getenv('ATM_CONFIG_FILE', 'config/atm.cnf'),
                         required=False)
     args = parser.parse_args()
     config = Config(args.configpath)

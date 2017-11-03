@@ -1,10 +1,10 @@
-from btb.config import Config
-from btb.utilities import EnsureDirectory, ParamsToVectors, VectorToParams,\
+from atm.config import Config
+from atm.utilities import EnsureDirectory, ParamsToVectors, VectorToParams,\
                           HashDict, HashString, GetPublicIP
-from btb.mapping import Mapping, create_wrapper
-from btb.model import Model
-from btb.database import Database
-from hyperselection.samples.constants import SELECTION_SAMPLES_GRID
+from atm.mapping import Mapping, create_wrapper
+from atm.model import Model
+from atm.database import Database
+from btb.tuning.constants import Tuners
 
 import argparse
 import ast
@@ -43,10 +43,10 @@ SQL_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
 # csv loading utility function
-def read_btb_csv(filepath):
+def read_atm_csv(filepath):
     """
     read a csv and return a numpy array.
-    this works from the assumption the data has been preprocessed by btb:
+    this works from the assumption the data has been preprocessed by atm:
     no headers, numerical data only
     """
     num_cols = len(open(filepath).readline().split(','))
@@ -174,27 +174,24 @@ class Worker(object):
         # TODO: wrap this properly in a with session_context(): or the like
         session = self.db.get_session()
         learner = self.db.Learner(
-            datarun_id=datarun.id,
             frozen_set_id=frozen_set.id,
+            datarun_id=datarun.id,
             dataname=datarun.name,
-            algorithm=frozen_set.algorithm,
+            description=datarun.description,
             trainpath=datarun.trainpath,
             testpath=datarun.testpath,
             modelpath=local_model_path,
-            params_hash=phash,
+            metricpath=local_metric_path,
             params=params,
             trainable_params=trainables,
+            dimensions=model.algorithm.dimensions,
             cv_judgment_metric=performance['cv_judgment_metric'],
             cv_judgment_metric_stdev=performance['cv_judgment_metric_stdev'],
             test_judgment_metric=performance['test_judgment_metric'],
-            metricpath=local_metric_path,
             started=started,
             completed=completed,
             status='complete',
-            host=GetPublicIP(),
-            dimensions=model.algorithm.dimensions,
-            frozen_hash=frozen_set.frozen_hash,
-            description=datarun.description)
+            host=GetPublicIP())
         session.add(learner)
 
         # update this session's frozen set entry
@@ -212,11 +209,10 @@ class Worker(object):
             session.autoflush = False
             learner = self.db.Learner(datarun_id=datarun_id,
                                       frozen_set_id=frozen_set.id,
-                                      completed=datetime.datetime.now(),
-                                      status='errored',
                                       params=params,
-                                      error_msg=error_msg,
-                                      algorithm=frozen_set.algorithm)
+                                      status='errored',
+                                      error_msg=error_msg)
+
             session.add(learner)
             session.commit()
             _log("Successfully reported error")
@@ -243,7 +239,7 @@ class Worker(object):
                 raise Exception("Something about train dataset caching is wrong...")
 
         # load the data into matrix format
-        trainX = read_btb_csv(datarun.local_trainpath)
+        trainX = read_atm_csv(datarun.local_trainpath)
         labelcol = datarun.labelcol
         trainY = trainX[:, labelcol]
         trainX = np.delete(trainX, labelcol, axis=1)
@@ -257,7 +253,7 @@ class Worker(object):
                                 "wrong...")
 
         # load the data into matrix format
-        testX = read_btb_csv(datarun.local_testpath)
+        testX = read_atm_csv(datarun.local_testpath)
         labelcol = datarun.labelcol
         testY = testX[:, labelcol]
         testX = np.delete(testX, labelcol, axis=1)
@@ -275,7 +271,7 @@ class Worker(object):
 
         # load the class for selecting the frozen set
         _log("Frozen Selection: %s" % datarun.frozen_selection)
-        Selector = Mapping.SELECTION_FROZENS_MAP[datarun.frozen_selection]
+        Selector = Mapping.SELECTORS_MAP[datarun.frozen_selection]
 
         # generate the arguments we need
         frozen_set_ids = [s.id for s in frozen_sets]
@@ -303,7 +299,7 @@ class Worker(object):
         # don't have any learners. That way the selector can choose frozen sets
         # that haven't been scored yet.
         frozen_set_scores = {fs.id: [] for fs in frozen_sets}
-        learners = self.db.GetLearners(datarun.id)
+        learners = self.db.GetCompleteLearners(datarun.id)
         for l in learners:
             score = getattr(l, datarun.score_target)
             # the cast to float is necessary because the score is a Decimal;
@@ -320,7 +316,7 @@ class Worker(object):
 
     def select_parameters(self, datarun, frozen_set):
         _log("Sample selection: %s" % datarun.sample_selection)
-        Selector = Mapping.SELECTION_SAMPLES_MAP[datarun.sample_selection]
+        Selector = Mapping.TUNERS_MAP[datarun.sample_selection]
 
         # Get parameter metadata for this frozen set
         optimizables = frozen_set.optimizables
@@ -335,8 +331,8 @@ class Worker(object):
 
         # Get previously-used parameters
         # every learner should either be completed or have thrown an error
-        learners = [x for x in self.db.GetLearnersInFrozen(frozen_set.id)
-                    if x.completed]
+        learners = [l for l in self.db.GetLearnersInFrozen(frozen_set.id)
+                    if l.status == 'complete']
 
         # extract parameters and scores as numpy arrays from learners
         X = ParamsToVectors([l.params for l in learners], optimizables)
@@ -351,7 +347,7 @@ class Worker(object):
         # check if gridding is done after the latest proposal
         # TODO this might be wrong -- maybe we shouldn't mark this done until
         # the actual learner has been completed.
-        if datarun.sample_selection == SELECTION_SAMPLES_GRID:
+        if datarun.sample_selection == Tuners.GRID:
             if selector.finished:
                 _log("Gridding done for frozen set %d" % frozen_set.id)
                 self.db.MarkFrozenSetGriddingDone(frozen_set.id)
@@ -479,7 +475,7 @@ class Worker(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Add more learners to database')
     parser.add_argument('-c', '--configpath', help='Location of config file',
-                        default=os.getenv('BTB_CONFIG_FILE', 'config/btb.cnf'), required=False)
+                        default=os.getenv('ATM_CONFIG_FILE', 'config/atm.cnf'), required=False)
     parser.add_argument('-d', '--datarun-id', help='Only train on datasets with this id', default=None, required=False)
     parser.add_argument('-t', '--time', help='Number of seconds to run worker', default=None, required=False)
 

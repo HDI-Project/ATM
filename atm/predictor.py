@@ -1,5 +1,5 @@
-from btb.model import Model
-from btb.utilities import *
+from atm.model import Model
+from atm.utilities import *
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from nolearn.dbn import DBN

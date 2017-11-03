@@ -1,5 +1,5 @@
-from btb.cpt import Choice, Combination
-from btb.enumeration import Enumerator
+from atm.cpt import Choice, Combination
+from atm.enumeration import Enumerator
 
 class ClassifierEnumerator(Enumerator):
 

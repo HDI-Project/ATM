@@ -7,9 +7,9 @@ models/*
 metrics/*
 # ignore configuration files except the template
 config/*
-!config/btb.cnf.template
+!config/atm.cnf.template
 .DS_Store
 .idea/*
-btb-env/*
+atm-env/*
 *.pickle
 *.tsv

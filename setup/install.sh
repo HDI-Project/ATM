@@ -10,4 +10,4 @@ virtualenv venv
 pip install -r requirements.txt
 
 # set up sqlite database
-sqlite3 btb.db < setup/sqlite-setup.sql
+sqlite3 atm.db < setup/sqlite-setup.sql

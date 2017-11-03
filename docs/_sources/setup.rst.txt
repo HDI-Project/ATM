@@ -24,13 +24,13 @@ Virtual Environment Setup
 
 Create the virtual environment and enter into it::
 
-    $ mkvirtualenv btb-env
-    $ workon btb-env
-    (btb-env) $
+    $ mkvirtualenv atm-env
+    $ workon atm-env
+    (atm-env) $
 
 Install the required packages::
 
-    (btb-env) $ pip install -r setup/reqs.txt
+    (atm-env) $ pip install -r setup/reqs.txt
 
 The required packages are:
 
@@ -45,9 +45,9 @@ On Ubuntu, MySQL can be installed with the command::
     $ sudo apt-get install git python-dev mysql-server mysql-client gfortran libatlas-base-dev libmysqlclient-dev build-essential python-dev python-setuptools python-numpy python-scipy libatlas-dev libatlas3gf-base libfreetype6-dev libxft-dev libssl-dev
 
 and following the instructions.
-Once MySQL is installed, setup the BTB DataHub database::
+Once MySQL is installed, setup the ATM DataHub database::
 
     $ mysql
-    mysql> create database btb_db;
+    mysql> create database atm_db;
     mysql> exit;
-    $ mysql btb_db < setup/hyperbtb.sql
+    $ mysql atm_db < setup/hyperatm.sql
