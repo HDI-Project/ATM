@@ -1,9 +1,9 @@
 from fabric.api import *
 from fabric.colors import green as _green, yellow as _yellow
-import boto
 import boto.ec2
 import time
 from atm.config import Config
+
 
 def check_instances_pending(instances):
     isPending = False
@@ -14,12 +14,14 @@ def check_instances_pending(instances):
 
     return isPending
 
+
 def query_active_instances():
     ec2_region = config.get(Config.AWS, Config.AWS_EC2_REGION)
     ec2_key = config.get(Config.AWS, Config.AWS_ACCESS_KEY)
     ec2_secret = config.get(Config.AWS, Config.AWS_SECRET_KEY)
 
-    conn = boto.ec2.connect_to_region(ec2_region, aws_access_key_id=ec2_key, aws_secret_access_key=ec2_secret)
+    conn = boto.ec2.connect_to_region(ec2_region, aws_access_key_id=ec2_key,
+                                      aws_secret_access_key=ec2_secret)
     reservations = conn.get_all_reservations()
 
     public_dns_names = []
@@ -33,6 +35,7 @@ def query_active_instances():
 
     return public_dns_names
 
+
 def create_instances():
     """
     Creates EC2 Instance
@@ -43,7 +46,8 @@ def create_instances():
     ec2_region = config.get(Config.AWS, Config.AWS_EC2_REGION)
     ec2_key = config.get(Config.AWS, Config.AWS_ACCESS_KEY)
     ec2_secret = config.get(Config.AWS, Config.AWS_SECRET_KEY)
-    conn = boto.ec2.connect_to_region(ec2_region, aws_access_key_id=ec2_key, aws_secret_access_key=ec2_secret)
+    conn = boto.ec2.connect_to_region(ec2_region, aws_access_key_id=ec2_key,
+                                      aws_secret_access_key=ec2_secret)
 
     ec2_ami = config.get(Config.AWS, Config.AWS_EC2_AMI)
     image = conn.get_image(ec2_ami)
@@ -52,7 +56,9 @@ def create_instances():
     ec2_instance_type = config.get(Config.AWS, Config.AWS_EC2_INSTANCE_TYPE)
     num_instances = config.get(Config.AWS, Config.AWS_NUM_INSTANCES)
     # must give num_instances twice because 1 min num and 1 max num
-    reservation = image[0].run(num_instances, num_instances, key_name=ec2_key_pair, instance_type=ec2_instance_type)
+    reservation = image[0].run(num_instances, num_instances,
+                               key_name=ec2_key_pair,
+                               instance_type=ec2_instance_type)
 
     while check_instances_pending(reservation.instances):
         print(_yellow("Instances still pending"))
@@ -62,14 +68,17 @@ def create_instances():
         print(_green("Instance state: %s" % instance.state))
         print(_green("Public dns: %s" % instance.public_dns_name))
 
+
 #@parallel
 def deploy():
     code_dir = '/home/ubuntu/atm'
-    WORKERS_PER_MACHINE = int(config.get(Config.AWS, Config.AWS_NUM_WORKERS_PER_INSTACNCES))
+    WORKERS_PER_MACHINE = int(config.get(Config.AWS,
+                                         Config.AWS_NUM_WORKERS_PER_INSTACNCES))
     with settings(warn_only=True):
         if run("test -d %s" % code_dir).failed:
             run("git clone https://%s:%s@%s %s" % (
-                config.get(Config.GIT, Config.GIT_USER), config.get(Config.GIT, Config.GIT_PASS),
+                config.get(Config.GIT, Config.GIT_USER),
+                config.get(Config.GIT, Config.GIT_PASS),
                 config.get(Config.GIT, Config.GIT_REPO), code_dir))
             with cd(code_dir):
                 run("git pull")

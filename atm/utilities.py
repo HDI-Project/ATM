@@ -36,14 +36,17 @@ def get_public_ip():
     global public_ip
     if public_ip is None:
         try:
-            public_ip = urllib2.urlopen(PUBLIC_IP_URL).read().strip()
+            response = urllib2.urlopen(PUBLIC_IP_URL).read().strip()
+            match = re.search('\d+\.\d+\.\d+\.\d+', response)
+            if match:
+                public_ip = match.group()
         except Exception:  # any exception, doesn't matter
-            public_ip = None
+            pass
 
     return public_ip
 
 
-def object_to_base64(obj):
+def object_to_base_64(obj):
     """
         Takes object in memory, then pickles and
         base64 encodes it.

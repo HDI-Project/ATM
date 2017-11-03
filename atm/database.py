@@ -17,6 +17,12 @@ from atm.utilities import object_to_base_64, base_64_to_object
 from atm.config import Config
 
 
+class LearnerStatus:
+    STARTED = 'started'
+    ERRORED = 'errored'
+    COMPLETE = 'complete'
+
+
 def try_with_session(default=lambda: None, commit=False):
     """
     Decorator for instance methods on Database that need a sqlalchemy session.
@@ -254,7 +260,7 @@ class Database(object):
     def GetNumberOfFrozenSetErrors(self, session, frozen_set_id):
         learners = session.query(self.Learner)\
             .filter(and_(self.Learner.frozen_set_id == frozen_set_id,
-                         self.Learner.status == 'errored')).all()
+                         self.Learner.status == LearnerStatus.ERRORED)).all()
         return len(learners)
 
     @try_with_session(default=list)
@@ -275,7 +281,7 @@ class Database(object):
         """ Returns all complete learners in a datarun.  """
         return session.query(self.Learner)\
             .filter(self.Learner.datarun_id == datarun_id)\
-            .filter(self.Learner.status == 'complete')\
+            .filter(self.Learner.status == LearnerStatus.COMPLETE)\
             .order_by(self.Learner.started).all()
 
     @try_with_session()
@@ -306,7 +312,7 @@ class Database(object):
             result = session.query(self.Learner.cv_judgment_metric,
                                    self.Learner.cv_judgment_metric_stdev)\
                             .filter(self.Learner.datarun_id == datarun_id)\
-                            .filter(self.Learner.status == datarun_id)\
+                            .filter(self.Learner.status == LearnerStatus.COMPLETE)\
                             .all()
             for val, std in result:
                 if val is None or std is None:

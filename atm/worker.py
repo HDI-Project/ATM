@@ -4,7 +4,7 @@ from atm.utilities import ensure_directory, params_to_vectors,\
                           get_public_ip
 from atm.mapping import Mapping, create_wrapper
 from atm.model import Model
-from atm.database import Database
+from atm.database import Database, LearnerStatus
 from btb.tuning.constants import Tuners
 
 import argparse
@@ -191,7 +191,7 @@ class Worker(object):
             test_judgment_metric=performance['test_judgment_metric'],
             started=started,
             completed=completed,
-            status='complete',
+            status=LearnerStatus.COMPLETE,
             host=get_public_ip())
         session.add(learner)
 
@@ -211,7 +211,7 @@ class Worker(object):
             learner = self.db.Learner(datarun_id=datarun_id,
                                       frozen_set_id=frozen_set.id,
                                       params=params,
-                                      status='errored',
+                                      status=LearnerStatus.ERRORED,
                                       error_msg=error_msg)
 
             session.add(learner)
@@ -333,7 +333,7 @@ class Worker(object):
         # Get previously-used parameters
         # every learner should either be completed or have thrown an error
         learners = [l for l in self.db.GetLearnersInFrozen(frozen_set.id)
-                    if l.status == 'complete']
+                    if l.status == LearnerStatus.COMPLETE]
 
         # extract parameters and scores as numpy arrays from learners
         X = params_to_vectors([l.params for l in learners], optimizables)
