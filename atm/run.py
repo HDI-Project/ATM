@@ -1,13 +1,13 @@
-from atm.datawrapper import DataWrapper
-from atm.config import Config
-from atm.utilities import *
-from atm.mapping import frozen_sets_from_algorithm_codes
-from atm.database import Database
-
-from boto.s3.connection import S3Connection, Key as S3Key
 import datetime
 import pdb
 import warnings
+
+from atm.datawrapper import DataWrapper
+from atm.config import Config
+from atm.utilities import ensure_directory, hash_nested_tuple
+from atm.mapping import frozen_sets_from_algorithm_codes
+from atm.database import Database
+from boto.s3.connection import S3Connection, Key as S3Key
 
 warnings.filterwarnings("ignore")
 
@@ -21,8 +21,8 @@ def Run(config, runname, description, metric, score_target, sample_selection,
         algorithm_codes, learner_budget=None, walltime_budget=None,
         alldatapath=None, dataset_description=None, trainpath=None,
         testpath=None, verbose=True, frozens_separately=False):
-    EnsureDirectory("models")
-    EnsureDirectory("logs")
+    ensure_directory("models")
+    ensure_directory("logs")
 
     db = Database(config)
     print "Dataname: %s, description: %s" % (runname, description)
@@ -87,8 +87,10 @@ def Run(config, runname, description, metric, score_target, sample_selection,
     elif walltime_budget:
         minutes = walltime_budget
         values["walltime_budget_minutes"] = walltime_budget
-        values["deadline"] = datetime.datetime.now() + datetime.timedelta(minutes=minutes)
-        print "Walltime budget: %d minutes, deadline=%s" % (minutes, str(values["deadline"]))
+        values["deadline"] = datetime.datetime.now() +\
+            datetime.timedelta(minutes=minutes)
+        print "Walltime budget: %d minutes, deadline=%s" % (minutes,
+                                                            str(values["deadline"]))
 
     # selection strategies
     values["sample_selection"] = sample_selection
@@ -123,7 +125,7 @@ def Run(config, runname, description, metric, score_target, sample_selection,
                 datarun_id = datarun.id
                 datarun_ids.append(datarun_id)
 
-            fhash = HashNestedTuple(fsettings)
+            fhash = hash_nested_tuple(fsettings)
             fset = db.FrozenSet(**{
                 "datarun_id": datarun.id,
                 "algorithm": algorithm,
@@ -146,9 +148,11 @@ def Run(config, runname, description, metric, score_target, sample_selection,
         ktrain = S3Key(bucket)
 
         if config.get(Config.AWS, Config.AWS_S3_FOLDER).strip():
-            aws_training_path = os.path.join(config.get(Config.AWS, Config.AWS_S3_FOLDER),
+            aws_training_path = os.path.join(config.get(Config.AWS,
+                                                        Config.AWS_S3_FOLDER),
                                              local_training_path)
-            aws_testing_path = os.path.join(config.get(Config.AWS, Config.AWS_S3_FOLDER),
+            aws_testing_path = os.path.join(config.get(Config.AWS,
+                                                       Config.AWS_S3_FOLDER),
                                             local_testing_path)
         else:
             aws_training_path = local_training_path

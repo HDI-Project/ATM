@@ -1,13 +1,13 @@
 import pandas as pd
 import numpy as np
 import os
+
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 from sklearn_pandas import DataFrameMapper
-
-from atm.utilities import *
+from atm.utilities import ensure_directory
 
 
 class DataWrapper(object):
@@ -145,7 +145,7 @@ class DataWrapper(object):
             "Cannot have NaN values for labels!"
 
         # now save training and testing as separate files
-        EnsureDirectory(self.outfolder)
+        ensure_directory(self.outfolder)
 
         training = data[:num_train_samples,:]
         testing = data[-num_test_samples:,:]
@@ -184,8 +184,10 @@ class DataWrapper(object):
             "majority" : majority_percentage,
             "dataname" : self.dataname,
             "training" : self.training_path,
-            "testing" : self.testing_path}#,
-            #"testing_ratio" : float(testing_matrix.shape[0]) / float(training_matrix.shape[0] + testing_matrix.shape[0])}
+            "testing" : self.testing_path,
+            #"testing_ratio" : (float(testing_matrix.shape[0]) /
+            #   float(training_matrix.shape[0] + testing_matrix.shape[0])),
+        }
         print self.statistics
 
     def wrap_single_file(self):
@@ -260,7 +262,7 @@ class DataWrapper(object):
             "Cannot have NaN values for labels!"
 
         # now save training and testing as separate files
-        EnsureDirectory(self.outfolder)
+        ensure_directory(self.outfolder)
 
         # now split the data
         data_train, data_test, labels_train, labels_test = \
@@ -301,7 +303,9 @@ class DataWrapper(object):
             "dataname" : self.dataname,
             "training" : self.training_path,
             "testing" : self.testing_path,
-            "testing_ratio" : float(testing_matrix.shape[0]) / float(training_matrix.shape[0] + testing_matrix.shape[0])}
+            "testing_ratio" : float(testing_matrix.shape[0]) /
+                float(training_matrix.shape[0] + testing_matrix.shape[0]),
+        }
         print self.statistics
 
     def __repr__(self):

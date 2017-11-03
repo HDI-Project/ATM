@@ -13,7 +13,7 @@ from datetime import datetime
 import warnings
 import pdb
 
-from atm.utilities import *
+from atm.utilities import object_to_base_64, base_64_to_object
 from atm.config import Config
 
 
@@ -92,11 +92,11 @@ class Database(object):
 
             @property
             def wrapper(self):
-                return Base64ToObject(self.datawrapper)
+                return base_64_to_object(self.datawrapper)
 
             @wrapper.setter
             def wrapper(self, value):
-                self.datawrapper = ObjectToBase64(value)
+                self.datawrapper = object_to_base_64(value)
 
             def __repr__(self):
                 base = "<%s:, frozen: %s, sampling: %s, budget: %s, status: %s>"
@@ -117,27 +117,27 @@ class Database(object):
 
             @property
             def optimizables(self):
-                return Base64ToObject(self.optimizables64)
+                return base_64_to_object(self.optimizables64)
 
             @optimizables.setter
             def optimizables(self, value):
-                self.optimizables64 = ObjectToBase64(value)
+                self.optimizables64 = object_to_base_64(value)
 
             @property
             def frozens(self):
-                return Base64ToObject(self.frozens64)
+                return base_64_to_object(self.frozens64)
 
             @frozens.setter
             def frozens(self, value):
-                self.frozens64 = ObjectToBase64(value)
+                self.frozens64 = object_to_base_64(value)
 
             @property
             def constants(self):
-                return Base64ToObject(self.constants64)
+                return base_64_to_object(self.constants64)
 
             @constants.setter
             def constants(self, value):
-                self.constants64 = ObjectToBase64(value)
+                self.constants64 = object_to_base_64(value)
 
             def __repr__(self):
                 return "<%s: %s>" % (self.algorithm, self.frozen_hash)
@@ -149,19 +149,19 @@ class Database(object):
 
             @property
             def params(self):
-                return Base64ToObject(self.params64)
+                return base_64_to_object(self.params64)
 
             @params.setter
             def params(self, value):
-                self.params64 = ObjectToBase64(value)
+                self.params64 = object_to_base_64(value)
 
             @property
             def trainable_params(self):
-                return Base64ToObject(self.trainable_params64)
+                return base_64_to_object(self.trainable_params64)
 
             @trainable_params.setter
             def trainable_params(self, value):
-                self.trainable_params64 = ObjectToBase64(value)
+                self.trainable_params64 = object_to_base_64(value)
 
             def __repr__(self):
                 return "<%s>" % self.params
@@ -306,6 +306,7 @@ class Database(object):
             result = session.query(self.Learner.cv_judgment_metric,
                                    self.Learner.cv_judgment_metric_stdev)\
                             .filter(self.Learner.datarun_id == datarun_id)\
+                            .filter(self.Learner.status == datarun_id)\
                             .all()
             for val, std in result:
                 if val is None or std is None:

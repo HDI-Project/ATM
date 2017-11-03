@@ -1,6 +1,7 @@
 from atm.config import Config
-from atm.utilities import EnsureDirectory, ParamsToVectors, VectorToParams,\
-                          HashDict, HashString, GetPublicIP
+from atm.utilities import ensure_directory, params_to_vectors,\
+                          vector_to_params, hash_dict, hash_string,\
+                          get_public_ip
 from atm.mapping import Mapping, create_wrapper
 from atm.model import Model
 from atm.database import Database
@@ -32,9 +33,9 @@ os.environ["GNUMPY_IMPLICIT_CONVERSION"] = "allow"
 
 # get the file system in order
 # make sure we have directories where we need them
-EnsureDirectory("models")
-EnsureDirectory("metrics")
-EnsureDirectory("logs")
+ensure_directory("models")
+ensure_directory("metrics")
+ensure_directory("logs")
 
 # name log file after the local hostname
 LOG_FILE = "logs/%s.txt" % socket.gethostname()
@@ -133,8 +134,8 @@ class Worker(object):
         frozen_set: frozen set object
         """
         # save model to local filesystem
-        phash = HashDict(params)
-        rhash = HashString(datarun.name)
+        phash = hash_dict(params)
+        rhash = hash_string(datarun.name)
 
         # whether to save things to local filesystem
         if self.save_files:
@@ -191,7 +192,7 @@ class Worker(object):
             started=started,
             completed=completed,
             status='complete',
-            host=GetPublicIP())
+            host=get_public_ip())
         session.add(learner)
 
         # update this session's frozen set entry
@@ -233,7 +234,7 @@ class Worker(object):
         basepath = os.path.basename(datarun.local_trainpath)
 
         if not os.path.isfile(datarun.local_trainpath):
-            EnsureDirectory("data/processed/")
+            ensure_directory("data/processed/")
             if DownloadFileS3(self.config, datarun.local_trainpath) !=\
                     datarun.local_trainpath:
                 raise Exception("Something about train dataset caching is wrong...")
@@ -246,7 +247,7 @@ class Worker(object):
 
         basepath = os.path.basename(datarun.local_testpath)
         if not os.path.isfile(datarun.local_testpath):
-            EnsureDirectory("data/processed/")
+            ensure_directory("data/processed/")
             if DownloadFileS3(self.config, datarun.local_testpath) !=\
                     datarun.local_testpath:
                 raise Exception("Something about test dataset caching is "
@@ -325,7 +326,7 @@ class Worker(object):
         if not len(optimizables):
             _log("No optimizables for frozen set %d" % frozen_set.id)
             self.db.MarkFrozenSetGriddingDone(frozen_set.id)
-            return VectorToParams(vector=[], optimizables=optimizables,
+            return vector_to_params(vector=[], optimizables=optimizables,
                                   frozens=frozen_set.frozens,
                                   constants=frozen_set.constants)
 
@@ -335,7 +336,7 @@ class Worker(object):
                     if l.status == 'complete']
 
         # extract parameters and scores as numpy arrays from learners
-        X = ParamsToVectors([l.params for l in learners], optimizables)
+        X = params_to_vectors([l.params for l in learners], optimizables)
         y = np.array([float(getattr(l, datarun.score_target))
                       for l in learners])
 
@@ -357,7 +358,7 @@ class Worker(object):
             return None
 
         # convert the numpy array of parameters to useable params
-        return VectorToParams(vector=vector, optimizables=optimizables,
+        return vector_to_params(vector=vector, optimizables=optimizables,
                               frozens=frozen_set.frozens,
                               constants=frozen_set.constants)
 
@@ -427,11 +428,10 @@ class Worker(object):
                     continue
 
                 _log("Chose parameters for algorithm %s:" % frozen_set.algorithm)
-                _log(str(params), False)
                 for k, v in params.items():
-                    print "\t%s = %s" % (k, v)
+                    _log("\t%s = %s" % (k, v))
 
-                print "Testing learner..."
+                _log("Testing learner...")
                 # train learner
                 params["function"] = frozen_set.algorithm
                 wrapper = create_wrapper(params, datarun.metric)
@@ -444,7 +444,7 @@ class Worker(object):
                       performance["cv_judgment_metric"],
                       2 * performance["cv_judgment_metric_stdev"]))
 
-                print "Saving learner..."
+                _log("Saving learner...")
                 model = Model(algorithm=wrapper, data=datarun.wrapper)
 
                 # insert learner into the database

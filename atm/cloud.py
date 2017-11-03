@@ -1,11 +1,10 @@
 from atm.config import Config
-from atm.utilities import *
 from novaclient.v1_1 import client
-import os, sys
+import os
 import random
 
-class Openstack:
-	
+class Openstack(object):
+
     HOME = "/ubuntu/atm"
 
     def __init__(self, config):
@@ -13,18 +12,20 @@ class Openstack:
             Create our connection to the cloud.
         """
         self.cloud = client.Client(
-            config.get(Config.CLOUD, Config.CLOUD_USER), config.get(Config.CLOUD, Config.CLOUD_PASS),
-            config.get(Config.CLOUD, Config.CLOUD_TENANT), config.get(Config.CLOUD, Config.CLOUD_AUTH_URL),
+            config.get(Config.CLOUD, Config.CLOUD_USER),
+            config.get(Config.CLOUD, Config.CLOUD_PASS),
+            config.get(Config.CLOUD, Config.CLOUD_TENANT),
+            config.get(Config.CLOUD, Config.CLOUD_AUTH_URL),
             service_type=config.get(Config.CLOUD, Config.CLOUD_SERVICE))
         self.config = config
-        
+
     def killall(self, name, key_name):
         """
             Kill all nodes with given name and keypair name.
         """
         print "Run name: %s" % name
         print "My key: %s" % key_name
-        
+
         # get all instances running in evo
         nodes = self.cloud.servers.list()
         count = 0
@@ -42,7 +43,8 @@ class Openstack:
         """
         ips = []
         for node in self.cloud.servers.list():
-            if node.name.startswith(name_startswith) and node.key_name == key_name:
+            if (node.name.startswith(name_startswith) and
+                    node.key_name == key_name):
                 try:
                     ips.append(node.addresses["inet"][0]["addr"])
                 except Exception as e:
@@ -61,7 +63,7 @@ class Openstack:
                 os.system("sh sync_models.sh %s" % ip)
             except Exception:
                 print "Exception in syncing %s" % ip
-    
+
     def purge_errors(self):
         """
             Removes servers in an error state.
@@ -76,7 +78,7 @@ class Openstack:
     def kill_hostnames(self, klist):
         """
             Given a list of hostnames, kills those nodes.
-        """    
+        """
         # get all instances running in evo
         nodes = self.cloud.servers.list()
         for node in nodes:

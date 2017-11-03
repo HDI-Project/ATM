@@ -1,7 +1,6 @@
 from ConfigParser import ConfigParser
 
 class Config(ConfigParser):
-
     # headings
     CLOUD = "cloud"
     GIT = "git"
@@ -103,5 +102,3 @@ class Config(ConfigParser):
         self.configpath = cfgpath
         if self.configpath:
             self.read(self.configpath)
-            #self.content = open(cfgpath, "r").read()
-
