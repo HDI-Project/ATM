@@ -1,4 +1,4 @@
-ATM - Bayesian Tuning and Building
+ATM - Auto Testing Models
 ====
 
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://hdi-project.github.io/ATM/)
