@@ -132,7 +132,6 @@ CREATE TABLE `learners` (
   `datarun_id` int(11) DEFAULT NULL,
   `dataname` varchar(100) NOT NULL DEFAULT '',
   `description` varchar(200) NOT NULL DEFAULT '',
-  `algorithm` varchar(15) NOT NULL DEFAULT '',
   `trainpath` varchar(300) DEFAULT NULL,
   `testpath` varchar(300) DEFAULT NULL,
   `modelpath` varchar(300) DEFAULT NULL,
