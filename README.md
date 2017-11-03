@@ -1,4 +1,4 @@
-ATM - Auto Testing Models
+ATM - Auto Test Models
 ====
 
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://hdi-project.github.io/ATM/)
