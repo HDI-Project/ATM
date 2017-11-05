@@ -78,7 +78,7 @@ CREATE TABLE `dataruns` (
   `d` int(11) unsigned NOT NULL,
   `majority` decimal(10,9) NOT NULL,
   `size_kb` int(11) unsigned NOT NULL,
-  `sample_selection` enum('uniform','gp', 'gp_ei', 'gp_eitime', 'gp_eivel', 'grid', 'custom') NOT NULL DEFAULT 'uniform',
+  `sample_selection` enum('uniform','gp', 'gp_ei', 'gp_eivel', 'custom') NOT NULL DEFAULT 'uniform',
   `frozen_selection` enum('uniform','ucb1', 'bestk', 'bestkvel', 'recentk', 'recentkvel', 'hieralg', 'hierrand', 'purebestkvel') NOT NULL DEFAULT 'uniform',
   `priority` smallint(10) DEFAULT '5',
   `started` datetime DEFAULT NULL,

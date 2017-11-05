@@ -42,6 +42,8 @@ LOG_FILE = "logs/%s.txt" % socket.gethostname()
 LOOP_WAIT = 6
 SQL_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
+GRID_TUNERS = []
+
 
 # csv loading utility function
 def read_atm_csv(filepath):
@@ -318,7 +320,9 @@ class Worker(object):
     def select_parameters(self, datarun, frozen_set):
         _log("Sample selection: %s" % datarun.sample_selection)
         Tuner = Mapping.TUNERS_MAP[datarun.sample_selection]
-        use_grid = datarun.sample_selection == Tuners.GRID
+
+        # are we using a grid-based tuner?
+        use_grid = datarun.sample_selection in GRID_TUNERS
 
         # Get parameter metadata for this frozen set
         optimizables = frozen_set.optimizables

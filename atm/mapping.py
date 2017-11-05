@@ -26,7 +26,7 @@ from atm.wrapper import Wrapper
 
 # sample tuning
 from btb.tuning.constants import Tuners
-from btb.tuning import Uniform as UniformTuner, Grid, GP, GPEi, GPEiVelocity
+from btb.tuning import Uniform as UniformTuner, GP, GPEi, GPEiVelocity
 # frozen selectors
 from btb.selection.constants import Selectors
 from btb.selection import Uniform as UniformSelector, UCB1,\
@@ -72,7 +72,6 @@ class Mapping:
         Tuners.GP: GP,
         Tuners.GP_EI: GPEi,
         Tuners.GP_EI_VEL: GPEiVelocity,
-        Tuners.GRID: UniformTuner,
     }
 
     SELECTORS_MAP = {
@@ -143,7 +142,8 @@ def frozen_sets_from_algorithm_codes(codes, verbose=False):
             # convert to tuple of tuples so it is hashable
             categorical_set = tuple(categorical_set)
             seen_categorical_settings.add(categorical_set)
-            categoricals_to_optimizables[categorical_set] = (optimizable_set, constant_optimizable_set)
+            categoricals_to_optimizables[categorical_set] = (optimizable_set,
+                                                             constant_optimizable_set)
 
         # add to our list of frozen sets
         if not algorithm.code in frozen_sets:
