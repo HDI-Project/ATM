@@ -317,7 +317,8 @@ class Worker(object):
 
     def select_parameters(self, datarun, frozen_set):
         _log("Sample selection: %s" % datarun.sample_selection)
-        Selector = Mapping.TUNERS_MAP[datarun.sample_selection]
+        Tuner = Mapping.TUNERS_MAP[datarun.sample_selection]
+        use_grid = datarun.sample_selection == Tuners.GRID
 
         # Get parameter metadata for this frozen set
         optimizables = frozen_set.optimizables
@@ -327,8 +328,8 @@ class Worker(object):
             _log("No optimizables for frozen set %d" % frozen_set.id)
             self.db.MarkFrozenSetGriddingDone(frozen_set.id)
             return vector_to_params(vector=[], optimizables=optimizables,
-                                  frozens=frozen_set.frozens,
-                                  constants=frozen_set.constants)
+                                    frozens=frozen_set.frozens,
+                                    constants=frozen_set.constants)
 
         # Get previously-used parameters
         # every learner should either be completed or have thrown an error
@@ -340,27 +341,23 @@ class Worker(object):
         y = np.array([float(getattr(l, datarun.score_target))
                       for l in learners])
 
-        # initialize the sampler and propose a new set of parameters
-        selector = Selector(optimizables, r_min=datarun.r_min)
-        selector.fit(X, y)
-        vector = selector.propose()
-
-        # check if gridding is done after the latest proposal
-        # TODO this might be wrong -- maybe we shouldn't mark this done until
-        # the actual learner has been completed.
-        if datarun.sample_selection == Tuners.GRID:
-            if selector.finished:
-                _log("Gridding done for frozen set %d" % frozen_set.id)
-                self.db.MarkFrozenSetGriddingDone(frozen_set.id)
+        # initialize the tuner and propose a new set of parameters
+        tuner = Tuner(optimizables, grid=use_grid, r_min=datarun.r_min)
+        tuner.fit(X, y)
+        vector = tuner.propose()
 
         if vector is None:
-            _log("No sample selected for frozen set %d" % frozen_set.id)
+            if use_grid:
+                _log("Gridding done for frozen set %d" % frozen_set.id)
+                self.db.MarkFrozenSetGriddingDone(frozen_set.id)
+            else:
+                _log("No sample selected for frozen set %d" % frozen_set.id)
             return None
 
         # convert the numpy array of parameters to useable params
         return vector_to_params(vector=vector, optimizables=optimizables,
-                              frozens=frozen_set.frozens,
-                              constants=frozen_set.constants)
+                                frozens=frozen_set.frozens,
+                                constants=frozen_set.constants)
 
     def work(self, total_time=None):
         start_time = datetime.datetime.now()

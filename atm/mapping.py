@@ -71,9 +71,8 @@ class Mapping:
         Tuners.UNIFORM: UniformTuner,
         Tuners.GP: GP,
         Tuners.GP_EI: GPEi,
-        #Tuners.GP_EI_TIME: GPEi,
         Tuners.GP_EI_VEL: GPEiVelocity,
-        Tuners.GRID: Grid,
+        Tuners.GRID: UniformTuner,
     }
 
     SELECTORS_MAP = {

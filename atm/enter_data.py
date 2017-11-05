@@ -8,7 +8,7 @@ def enter_data(config):
     """
     Given a config, creates a set of dataruns for the config and enters them into
     the database.
-    Returns the IDs for the created dataruns.
+    Returns the IDs of the created dataruns.
     """
     data_filelist = config.get(Config.DATA, Config.DATA_FILELIST)
     alldatapath = config.get(Config.DATA, Config.DATA_ALLDATAPATH)
@@ -16,17 +16,13 @@ def enter_data(config):
     testpath = config.get(Config.DATA, Config.DATA_TESTPATH)
     dataset_description = config.get(Config.DATA, Config.DATA_DESCRIPTION)
 
+    # is the data in train-test format already?
     if alldatapath:
-        isPreSplit = False
+        runname = os.path.basename(alldatapath).replace(".csv", "")
     else:
-        isPreSplit = True
-
-    if isPreSplit:
         runname = os.path.basename(trainpath)
         runname = runname.replace("_train", "")
         runname = runname.replace(".csv", "")
-    else:
-        runname = os.path.basename(alldatapath).replace(".csv", "")
 
     algorithm_codes = config.get(Config.RUN, Config.RUN_ALGORITHMS).split(', ')
     priority = int(config.get(Config.RUN, Config.RUN_PRIORITY))
@@ -72,7 +68,8 @@ def enter_data(config):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Processes a ')
+    parser = argparse.ArgumentParser(
+        description='Creates a set of dataruns from a config file.')
     parser.add_argument('--configpath', help='Location of config file',
                         default=os.getenv('ATM_CONFIG_FILE', 'config/atm.cnf'),
                         required=False)
