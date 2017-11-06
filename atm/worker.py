@@ -1,7 +1,5 @@
 from atm.config import Config
-from atm.utilities import ensure_directory, params_to_vectors,\
-                          vector_to_params, hash_dict, hash_string,\
-                          get_public_ip
+from atm.utilities import *
 from atm.mapping import Mapping, create_wrapper
 from atm.model import Model
 from atm.database import Database, LearnerStatus

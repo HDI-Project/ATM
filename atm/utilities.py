@@ -152,3 +152,17 @@ def params_to_vectors(params, optimizables):
         for j, k in enumerate(keys):
             vectors[i, j] = p[k]
     return vectors
+
+
+def MakeModelPath(model_dir, params_hash, run_hash, desc):
+    return os.path.join(model_dir, "%s-%s-%s.model" % (run_hash, params_hash, desc))
+
+
+def MakeMetricPath(model_dir, params_hash, run_hash, desc):
+    return os.path.join(model_dir, "%s-%s-%s.metric" % (run_hash, params_hash, desc))
+
+
+def SaveMetric(metric_path, object):
+    with open(metric_path, 'wb') as handle:
+        pickle.dump(object, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
