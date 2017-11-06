@@ -235,7 +235,7 @@ class Worker(object):
 
         if not os.path.isfile(datarun.local_trainpath):
             ensure_directory("data/processed/")
-            if DownloadFileS3(self.config, datarun.local_trainpath) !=\
+            if download_file_s3(self.config, datarun.local_trainpath) !=\
                     datarun.local_trainpath:
                 raise Exception("Something about train dataset caching is wrong...")
 
@@ -248,7 +248,7 @@ class Worker(object):
         basepath = os.path.basename(datarun.local_testpath)
         if not os.path.isfile(datarun.local_testpath):
             ensure_directory("data/processed/")
-            if DownloadFileS3(self.config, datarun.local_testpath) !=\
+            if download_file_s3(self.config, datarun.local_testpath) !=\
                     datarun.local_testpath:
                 raise Exception("Something about test dataset caching is "
                                 "wrong...")

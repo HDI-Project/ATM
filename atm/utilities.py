@@ -4,6 +4,8 @@ import hashlib
 import numpy as np
 import os
 import base64
+from boto.s3.connection import S3Connection, Key
+from atm.config import Config
 
 # global variable storing this machine's public IP address
 # (so we only have to fetch it once)
@@ -167,3 +169,25 @@ def make_metric_path(model_dir, params_hash, run_hash, desc):
 def save_metric(metric_path, object):
     with open(metric_path, 'wb') as handle:
         pickle.dump(object, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def download_file_s3(config, keyname):
+    aws_key = config.get(Config.AWS, Config.AWS_ACCESS_KEY)
+    aws_secret = config.get(Config.AWS, Config.AWS_SECRET_KEY)
+
+    conn = S3Connection(aws_key, aws_secret)
+    s3_bucket = config.get(Config.AWS, Config.AWS_S3_BUCKET)
+    bucket = conn.get_bucket(s3_bucket)
+
+    if config.get(Config.AWS, Config.AWS_S3_FOLDER) and not config.get(Config.AWS, Config.AWS_S3_FOLDER).isspace():
+        aws_keyname = os.path.join(config.get(Config.AWS, Config.AWS_S3_FOLDER), keyname)
+    else:
+        aws_keyname = keyname
+
+
+    s3key = Key(bucket)
+    s3key.key = aws_keyname
+
+    s3key.get_contents_to_filename(keyname)
+
+    return keyname
