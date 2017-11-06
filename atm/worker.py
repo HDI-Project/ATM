@@ -139,16 +139,16 @@ class Worker(object):
 
         # whether to save things to local filesystem
         if self.save_files:
-            local_model_path = MakeModelPath("models", phash, rhash,
-                                             datarun.description)
+            local_model_path = make_model_path("models", phash, rhash,
+                                               datarun.description)
             model.save(local_model_path)
             _log("Saving model in: %s" % local_model_path)
 
-            local_metric_path = MakeMetricPath("metrics", phash, rhash,
-                                               datarun.description)
+            local_metric_path = make_metric_path("metrics", phash, rhash,
+                                                 datarun.description)
             metric_obj = dict(cv=performance['cv_object'],
                               test=performance['test_object'])
-            SaveMetric(local_metric_path, object=metric_obj)
+            save_metric(local_metric_path, object=metric_obj)
             _log("Saving metrics in: %s" % local_model_path)
 
             # mode: cloud or local?

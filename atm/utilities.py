@@ -5,7 +5,10 @@ import numpy as np
 import os
 import base64
 
-PUBLIC_IP_URL = "http://ifconfig.me/ip"  # "http://ipecho.net/plain"
+# global variable storing this machine's public IP address
+# (so we only have to fetch it once)
+public_ip = None
+PUBLIC_IP_URL = "http://ifconfig.me/ip"
 
 
 def hash_dict(dictionary, ignored_keys=[]):
@@ -31,7 +34,6 @@ def ensure_directory(directory):
         os.makedirs(directory)
 
 
-public_ip = None
 def get_public_ip():
     global public_ip
     if public_ip is None:
@@ -154,15 +156,14 @@ def params_to_vectors(params, optimizables):
     return vectors
 
 
-def MakeModelPath(model_dir, params_hash, run_hash, desc):
+def make_model_path(model_dir, params_hash, run_hash, desc):
     return os.path.join(model_dir, "%s-%s-%s.model" % (run_hash, params_hash, desc))
 
 
-def MakeMetricPath(model_dir, params_hash, run_hash, desc):
+def make_metric_path(model_dir, params_hash, run_hash, desc):
     return os.path.join(model_dir, "%s-%s-%s.metric" % (run_hash, params_hash, desc))
 
 
-def SaveMetric(metric_path, object):
+def save_metric(metric_path, object):
     with open(metric_path, 'wb') as handle:
         pickle.dump(object, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
