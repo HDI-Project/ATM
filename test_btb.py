@@ -35,7 +35,10 @@ if __name__ == '__main__':
     if args.selector:
         config.set(Config.STRATEGY, Config.STRATEGY_FROZENS, args.selector)
     if args.gridding:
-        config.set(Config.STRATEGY, Config.STRATEGY_GRIDDING, args.gridding)
+        # ALERT: you must set the value on the config as a string.
+        # https://stackoverflow.com/questions/21484716/python-dictionary-from-config-parser-if-value-and-in-value-argument-of-typ
+        config.set(Config.STRATEGY, Config.STRATEGY_GRIDDING,
+                   str(args.gridding))
 
     print 'downloading data...'
     data_file = config.get(Config.DATA, Config.DATA_ALLDATAPATH)
