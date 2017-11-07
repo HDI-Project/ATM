@@ -47,7 +47,7 @@ class EnumeratorRFC(ClassifierEnumerator):
     DEFAULT_RANGES = {
         "criterion": ("entropy", "gini"),
         "max_features": (0.1, 1.0),
-        "max_depth": (2, 5, 10),
+        "max_depth": (2, 10),
         "min_samples_split": (2, 3),
         "min_samples_leaf": (1, 2),
         "n_estimators": (1000, 1000),
