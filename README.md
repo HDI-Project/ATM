@@ -4,7 +4,13 @@ ATM - Auto Tune Models
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://hdi-project.github.io/ATM/)
 
 ## Quick start setup
-1. Install database
+1. Clone project
+```
+$ git clone https://github.com/hdi-project/atm.git /path/to/atm
+$ cd /path/to/atm
+```
+
+2. Install database
 - for SQLite (simpler):
 ```
 $ sudo apt install sqlite3
@@ -15,14 +21,14 @@ $ sudo apt install sqlite3
 $ sudo apt install mysql-server mysql-client
 ```
 
-2. Install python dependencies
+3. Install python dependencies
 ```
 $ virtualenv venv
 $ . venv/bin/activate
 $ pip install -r requirements.txt
 ```
 
-3. Set up ATM database
+4. Set up ATM database
 - for SQLite:
 ```
 $ sqlite3 atm.db < setup/sqlite-setup.sql
@@ -47,7 +53,7 @@ mysql> show tables;
 4 rows in set (0.00 sec)
 ``` 
 
-4. Create a copy of the sample config file, and edit it to add your settings:
+5. Create a copy of the sample config file, and edit it to add your settings:
 ```
 $ cp config/atm.cnf.template config/atm.cnf
 $ vim config/atm.cnf
@@ -80,7 +86,7 @@ query:
 ```
 
 
-5. Create a datarun
+6. Create a datarun
 ```
 $ python atm/enter_data.py --configpath config/atm.cnf
 ```
@@ -99,7 +105,7 @@ You should get a lot of output, the end of which looks something like:
 
 The important piece of information is the datarun ID.
 
-6. Start a worker, specifying your config file and the datarun you'd like to
+7. Start a worker, specifying your config file and the datarun you'd like to
    compute on:
 ```
 $ python atm/worker.py --configpath config/atm.cnf --datarun 1
