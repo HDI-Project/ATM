@@ -27,6 +27,9 @@ $ virtualenv venv
 $ . venv/bin/activate
 $ pip install -r requirements.txt
 ```
+This will also install [btb](https://github.com/hdi-project/btb), another
+project in development at DAI Lab, as an egg which will track changes to the git
+repository.
 
 4. Set up ATM database
 - for SQLite:
@@ -64,26 +67,24 @@ issues later on, it's probably because of your config file.
 
 For SQLite, the [datahub] config should specify 'dialect' and 'database', and
 leave everything else blank:
-```
-dialect: sqlite
-database: ./atm.db
-username:
-password:
-host:
-port:
-query:
-```
+
+    dialect: sqlite
+    database: ./atm.db
+    username:
+    password:
+    host:
+    port:
+    query:
 
 For MySQL, the config should look something like this: 
-```
-dialect: mysql
-database: atm
-username: username
-password: password
-host: localhost
-port: 3306
-query:
-```
+
+    dialect: mysql
+    database: atm
+    username: username
+    password: password
+    host: localhost
+    port: 3306
+    query:
 
 
 6. Create a datarun
@@ -134,5 +135,46 @@ the same command; it will pick up right where it left off. You can also start
 multiple workers at the same time in different terminals to parallelize the
 work. When all 20 learners in your budget have been computed, all workers will
 exit gracefully.
+
+## Testing Tuners and Selectors
+
+The script `test_btb.py`, in the main directory, allows you to test different
+BTB Tuners and Selectors using ATM. You will need AWS access keys from DAI lab
+in order to download data from the S3 bucket. To use the script, edit your
+config file as described above, then add the following fields (replacing the
+API keys with your own):
+
+```
+[aws]
+access_key: YOURACCESSKEY
+secret_key: YoUrSECr3tKeY
+s3_bucket: mit-dai-delphi-datastore
+s3_folder: downloaded
+```
+
+Then, add the name of the data file you want to test:
+
+```
+[data]
+alldatapath: filename.csv
+```
+
+To test a custom implementation of a BTB tuner or selector, define a new class called:
+  * for Tuners, CustomTuner (inheriting from btb.tuning.Tuner)
+  * for Selectors, CustomSelector (inheriting from btb.selection.Selector)
+You can see examples of custom implementations in
+btb/selection/custom\_selector.py and btb/tuning/custom\_tuning.py. Then, run
+the script:
+
+```
+python test_btb.py --config config/atm.cnf --tuner /path/to/custom_tuner.py --selector /path/to/custom_selector.py
+```
+
+This will create a new datarun and start a worker to run it to completion. You
+can also choose to use the default tuners and selectors included with BTB:
+
+```
+python test_btb.py --config config/atm.cnf --tuner gp --selector ucb1
+```
 
 <!--Note: Any dataset with less than 30 samples will fail for the DBN classifier unless the DBN `minibatch_size` constant is changed to match the number of samples.-->
