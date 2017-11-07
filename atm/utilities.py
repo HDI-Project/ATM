@@ -4,13 +4,14 @@ import hashlib
 import numpy as np
 import os
 import base64
+import re
 from boto.s3.connection import S3Connection, Key
 from atm.config import Config
 
 # global variable storing this machine's public IP address
 # (so we only have to fetch it once)
 public_ip = None
-PUBLIC_IP_URL = "http://ifconfig.me/ip"
+PUBLIC_IP_URL = "http://ip.42.pl/raw"
 
 
 def hash_dict(dictionary, ignored_keys=[]):
@@ -44,8 +45,9 @@ def get_public_ip():
             match = re.search('\d+\.\d+\.\d+\.\d+', response)
             if match:
                 public_ip = match.group()
-        except Exception:  # any exception, doesn't matter
-            pass
+        except Exception as e:  # any exception, doesn't matter
+            print 'could not get public IP:', e
+            public_ip = 'localhost'
 
     return public_ip
 

@@ -37,7 +37,8 @@ ensure_directory("logs")
 
 # name log file after the local hostname
 LOG_FILE = "logs/%s.txt" % socket.gethostname()
-LOOP_WAIT = 6
+# how long to wait between training learners (or attempting to)
+LOOP_WAIT = 1.
 SQL_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 GRID_TUNERS = []
@@ -462,8 +463,8 @@ class Worker(object):
                 else:
                     _log("Error in main work loop (no datarun or frozen set):" + msg)
 
-            finally:
-                time.sleep(LOOP_WAIT)
+            _log("Learner finished. Sleeping %d seconds." % LOOP_WAIT)
+            time.sleep(LOOP_WAIT)
 
             elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
             if total_time is not None and elapsed_time >= total_time:
