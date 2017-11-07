@@ -23,6 +23,7 @@ CREATE TABLE `dataruns` (
   `size_kb` bigint NOT NULL,
   `sample_selection` varchar(255) DEFAULT ('uniform') NOT NULL,
   `frozen_selection` varchar(255) DEFAULT ('uniform') NOT NULL,
+  `gridding` integer DEFAULT (0) NOT NULL,
   `priority` integer DEFAULT (5),
   `started` timestamp,
   `completed` timestamp,

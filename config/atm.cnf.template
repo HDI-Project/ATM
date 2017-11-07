@@ -112,13 +112,13 @@ walltime-budget: 5
 
 
 [strategy]
-# How should BTB sample a hyperpartition (frozen set) that it must explore?
+# How should ATM sample hyperparameters from a given frozen set?
 # 	- uniform: pick randomly! (baseline)
+# 	- gp: vanilla Gaussian Process
 # 	- gp_ei: Gaussian Process expected improvement criterion
-# 	- gp_eitime: Gaussian Process expected improvement criterion per unit time
-# 	- gp_eivel: GPEI criterion per unit velocity
-# 	- grid: grid selection
-sample_selection: grid
+# 	- gp_eivel: Gaussian Process expected improvement, with randomness added in
+#   	  based on velocity of improvement
+sample_selection: gp
 # r_min is the number of random runs performed in each hyperpartition before 
 # allowing bayesian opt to select parameters. Consult the thesis to understand
 # what those mean, but essentially: 
@@ -128,14 +128,26 @@ sample_selection: grid
 # 	else
 # 		# train using uniform (baseline)
 r_min: 2
-# How should BTB select a particular hyperpartition (frozen set) from the 
+# gridding determines whether or not sample selection will happen on a grid. 
+# If any positive integer, a grid with `gridding` points on each axis is
+# established, and hyperparameter vectors are sampled from this finite space.
+# If 0 (or blank), hyperparameters are sampled from continuous space, and there
+# is no limit to the number of hyperparameter vectors that may be tried.
+gridding: 0
+# How should ATM select a particular hyperpartition (frozen set) from the 
 # set of all hyperpartitions? 
-# options: uniform, ucb1, best_k, best_k_vel, recent_k, recent_k_vel, hier_alg,
-#          hier_rand, pure_best_k_vel
-# Again, each is a different method, consult the thesis.
-frozen_selection: uniform
-# k is number that xxx_k methods use. It is similar to r_min, except it is 
-# called k_window and determines how much "history" BTB considers for certain
+# Options:
+#   - uniform: pick randomly
+#   - ucb1: vanilla multi-armed bandit
+#   - bestk: MAB using only the best K runs in each frozen set
+#   - bestkvel: MAB with velocity of best K runs
+#   - purebestkvel: always return frozen set with highest velocity
+#   - recentk: MAB with most recent K runs
+#   - recentkvel: MAB with velocity of most recent K runs
+#   - hieralg: hierarchical MAB: choose a classifier first, then choose frozen
+frozen_selection: bestk
+# k is number that xxx-k methods use. It is similar to r_min, except it is 
+# called k_window and determines how much "history" ATM considers for certain
 # frozen selection logics.
 k_window: 5
 # Which field to use for judgment of performance

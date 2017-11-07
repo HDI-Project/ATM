@@ -38,6 +38,7 @@ def enter_data(config):
 
     sample_selection = config.get(Config.STRATEGY, Config.STRATEGY_SELECTION)
     frozen_selection = config.get(Config.STRATEGY, Config.STRATEGY_FROZENS)
+    gridding = int(config.get(Config.STRATEGY, Config.STRATEGY_GRIDDING) or 0)
 
     description =  "__".join([sample_selection, frozen_selection])
 
@@ -51,18 +52,18 @@ def enter_data(config):
                 alldatapath = line.strip()
                 runname = os.path.basename(alldatapath).replace(".csv", "")
 
-                ids.append(Run(config, runname, description, metric,
+                ids.extend(Run(config, runname, description, metric,
                                score_target, sample_selection, frozen_selection,
-                               budget_type, priority, k_window, r_min,
+                               gridding, budget_type, priority, k_window, r_min,
                                algorithm_codes, learner_budget, walltime_budget,
                                alldatapath, dataset_description, trainpath,
                                testpath))
     else:
-        ids = [Run(config, runname, description, metric, score_target,
-                   sample_selection, frozen_selection, budget_type, priority,
-                   k_window, r_min, algorithm_codes, learner_budget,
-                   walltime_budget, alldatapath, dataset_description, trainpath,
-                   testpath)]
+        ids = Run(config, runname, description, metric, score_target,
+                  sample_selection, frozen_selection, gridding, budget_type,
+                  priority, k_window, r_min, algorithm_codes, learner_budget,
+                  walltime_budget, alldatapath, dataset_description, trainpath,
+                  testpath)
 
     return ids
 

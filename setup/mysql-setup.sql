@@ -80,6 +80,7 @@ CREATE TABLE `dataruns` (
   `size_kb` int(11) unsigned NOT NULL,
   `sample_selection` enum('uniform','gp', 'gp_ei', 'gp_eivel', 'custom') NOT NULL DEFAULT 'uniform',
   `frozen_selection` enum('uniform','ucb1', 'bestk', 'bestkvel', 'recentk', 'recentkvel', 'hieralg', 'hierrand', 'purebestkvel') NOT NULL DEFAULT 'uniform',
+  `gridding` int(11) unsigned NOT NULL default 0,
   `priority` smallint(10) DEFAULT '5',
   `started` datetime DEFAULT NULL,
   `completed` datetime DEFAULT NULL,

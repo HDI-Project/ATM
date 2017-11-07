@@ -62,6 +62,7 @@ class Config(ConfigParser):
     # subheading: strategy
     STRATEGY_SELECTION = "sample_selection"
     STRATEGY_FROZENS = "frozen_selection"
+    STRATEGY_GRIDDING = "gridding"
     STRATEGY_METRIC = "metric"
     STRATEGY_SCORE_TARGET = "score_target"
     STRATEGY_K = "k_window"

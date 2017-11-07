@@ -135,18 +135,26 @@ def vector_to_params(vector, optimizables, frozens, constants):
 
 def params_to_vectors(params, optimizables):
     """
-    params is a list of {'key' -> value}
+    Converts a list of parameter vectors (with metadata) into a numpy array
+    ready for BTB tuning.
 
-    Example of optimizables below:
+    Args:
+        params: list of hyperparameter vectors. Each vector is a dict mapping
+            the names of parameters to those parameters' values.
+        optimizables: list of HyperParameter metadata structures describing all
+            the optimizable hyperparameters that should be in each vector. e.g.
 
-    optimizables = [
-        ('C', 		KeyStruct(range=(1e-05, 100000), 	type='FLOAT_EXP', 	is_categorical=False)),
-        ('degree', 	KeyStruct(range=(2, 4), 			type='INT', 		is_categorical=False)),
-        ('coef0', 	KeyStruct(range=(0, 1), 			type='INT', 		is_categorical=False)),
-        ('gamma', 	KeyStruct(range=(1e-05, 100000),	type='FLOAT_EXP', 	is_categorical=False))
-    ]
+        optimizables = [
+            ('C',  HyperParameter(range=(1e-5, 1e5), type='FLOAT_EXP', is_categorical=False)),
+            ('degree',  HyperParameter((2, 4), 'INT', False)),
+            ('coef0',  HyperParameter((0, 1), 'INT', False)),
+            ('gamma',  HyperParameter((1e-05, 100000), 'FLOAT_EXP', False))
+        ]
 
-    Creates vectors ready to be optimized by a Gaussian Process.
+    Returns:
+        vectors: np.array of parameter vectors ready to be optimized by a
+            Gaussian Process (or what have you).
+            vectors.shape = (len(params), len(optimizables))
     """
     # make sure params is iterable
     if not isinstance(params, (list, np.ndarray)):
@@ -176,20 +184,20 @@ def save_metric(metric_path, object):
 def download_file_s3(config, keyname):
     aws_key = config.get(Config.AWS, Config.AWS_ACCESS_KEY)
     aws_secret = config.get(Config.AWS, Config.AWS_SECRET_KEY)
-
-    conn = S3Connection(aws_key, aws_secret)
     s3_bucket = config.get(Config.AWS, Config.AWS_S3_BUCKET)
+    s3_folder = config.get(Config.AWS, Config.AWS_S3_FOLDER).strip()
+
+    print 'getting S3 connection...'
+    conn = S3Connection(aws_key, aws_secret)
     bucket = conn.get_bucket(s3_bucket)
 
-    if config.get(Config.AWS, Config.AWS_S3_FOLDER) and not config.get(Config.AWS, Config.AWS_S3_FOLDER).isspace():
-        aws_keyname = os.path.join(config.get(Config.AWS, Config.AWS_S3_FOLDER), keyname)
+    if s3_folder:
+        aws_keyname = os.path.join(s3_folder, keyname)
     else:
         aws_keyname = keyname
 
-
     s3key = Key(bucket)
     s3key.key = aws_keyname
-
     s3key.get_contents_to_filename(keyname)
 
     return keyname

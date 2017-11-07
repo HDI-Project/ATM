@@ -18,7 +18,7 @@ LABEL_COLUMN = "class"
 
 
 def Run(config, runname, description, metric, score_target, sample_selection,
-        frozen_selection, budget_type, priority, k_window, r_min,
+        frozen_selection, gridding, budget_type, priority, k_window, r_min,
         algorithm_codes, learner_budget=None, walltime_budget=None,
         alldatapath=None, dataset_description=None, trainpath=None,
         testpath=None, verbose=True, frozens_separately=False):
@@ -95,7 +95,9 @@ def Run(config, runname, description, metric, score_target, sample_selection,
 
     # selection strategies
     values["sample_selection"] = sample_selection
-    print "Sample selection: %s" % values["sample_selection"]
+    values["gridding"] = gridding
+    print "Sample selection: %s (gridding = %s)" % (values["sample_selection"],
+                                                    gridding or 'None')
     values["frozen_selection"] = frozen_selection
     print "Frozen selection: %s" % values["frozen_selection"]
 

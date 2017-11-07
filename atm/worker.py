@@ -1,3 +1,4 @@
+#!/usr/bin/python2.7
 from atm.config import Config
 from atm.utilities import *
 from atm.mapping import Mapping, create_wrapper
@@ -8,6 +9,7 @@ from btb.tuning.constants import Tuners
 import argparse
 import ast
 import datetime
+import imp
 import os
 import pdb
 import random
@@ -76,12 +78,14 @@ def _log(msg, stdout=True):
 
 class Worker(object):
     def __init__(self, config, datarun_id=None, save_files=False,
-                 choose_randomly=True):
+                 tuner=None, selector=None, choose_randomly=True):
         """
         config: Config object with all the info we need.
         datarun_id: id of datarun to work on, or None. If None, this worker will
             work on whatever incomplete dataruns it finds.
         save_files: if True, save model and metrics files to disk or cloud.
+        tuner: if set, use this class as a tuner regardless of config
+        selector: if set, use this class as a selector regardless of config
         choose_randomly: if True, choose a random datarun; if False, use the
             first one in id-order.
         """
@@ -90,6 +94,8 @@ class Worker(object):
         self.datarun_id = datarun_id
         self.save_files = save_files
         self.choose_randomly = choose_randomly
+        self.tuner_class = tuner
+        self.selector_class = selector
 
     def save_learner_cloud(self, local_model_path, local_metric_path):
         aws_key = self.config.get(Config.AWS, Config.AWS_ACCESS_KEY)
@@ -231,9 +237,10 @@ class Worker(object):
         Loads the data from HTTP (if necessary) and then from
         disk into memory.
         """
-        # download data if necessary
         basepath = os.path.basename(datarun.local_trainpath)
 
+        # if the data are not present locally, check the S3 bucket detailed in
+        # the config for it.
         if not os.path.isfile(datarun.local_trainpath):
             ensure_directory("data/processed/")
             if download_file_s3(self.config, datarun.local_trainpath) !=\
@@ -272,8 +279,14 @@ class Worker(object):
             _log("No incomplete frozen sets for datarun present in database.")
 
         # load the class for selecting the frozen set
-        _log("Frozen Selection: %s" % datarun.frozen_selection)
-        Selector = Mapping.SELECTORS_MAP[datarun.frozen_selection]
+        # frozen_selection will either be a key into SELECTORS_MAP or a path to
+        # a file that defines a class called CustomSelector.
+        if datarun.frozen_selection in Mapping.SELECTORS_MAP:
+            Selector = Mapping.SELECTORS_MAP[datarun.frozen_selection]
+        else:
+            mod = imp.load_source('btb.selection.custom', datarun.frozen_selection)
+            Selector = mod.CustomSelector
+        _log("Selector: %s" % Selector)
 
         # generate the arguments we need
         frozen_set_ids = [s.id for s in frozen_sets]
@@ -303,10 +316,13 @@ class Worker(object):
         frozen_set_scores = {fs.id: [] for fs in frozen_sets}
         learners = self.db.GetCompleteLearners(datarun.id)
         for l in learners:
-            score = getattr(l, datarun.score_target)
+            # ignore frozen sets for which gridding is done
+            if l.frozen_set_id not in frozen_set_scores:
+                continue
             # the cast to float is necessary because the score is a Decimal;
             # doing Decimal-float arithmetic throws errors later on.
-            frozen_set_scores[l.frozen_set_id].append(float(score))
+            score = float(getattr(l, datarun.score_target))
+            frozen_set_scores[l.frozen_set_id].append(score)
 
         frozen_set_id = self.frozen_selector.select(frozen_set_scores)
         frozen_set = self.db.GetFrozenSet(frozen_set_id)
@@ -317,11 +333,14 @@ class Worker(object):
         return frozen_set
 
     def select_parameters(self, datarun, frozen_set):
-        _log("Sample selection: %s" % datarun.sample_selection)
-        Tuner = Mapping.TUNERS_MAP[datarun.sample_selection]
-
-        # are we using a grid-based tuner?
-        use_grid = datarun.sample_selection in GRID_TUNERS
+        # sample_selection will either be a key into TUNERS_MAP or a path to
+        # a file that defines a class called CustomTuner.
+        if datarun.sample_selection in Mapping.TUNERS_MAP:
+            Tuner = Mapping.TUNERS_MAP[datarun.sample_selection]
+        else:
+            mod = imp.load_source('btb.tuning.custom', datarun.sample_selection)
+            Tuner = mod.CustomTuner
+        _log("Tuner: %s" % Tuner)
 
         # Get parameter metadata for this frozen set
         optimizables = frozen_set.optimizables
@@ -345,12 +364,12 @@ class Worker(object):
                       for l in learners])
 
         # initialize the tuner and propose a new set of parameters
-        tuner = Tuner(optimizables, grid=use_grid, r_min=datarun.r_min)
+        tuner = Tuner(optimizables, datarun.gridding, r_min=datarun.r_min)
         tuner.fit(X, y)
         vector = tuner.propose()
 
         if vector is None:
-            if use_grid:
+            if datarun.gridding:
                 _log("Gridding done for frozen set %d" % frozen_set.id)
                 self.db.MarkFrozenSetGriddingDone(frozen_set.id)
             else:
