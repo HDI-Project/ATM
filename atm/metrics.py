@@ -95,7 +95,7 @@ def get_metrics_small_multiclass(y_true, y_pred, y_pred_probs):
     pair_level_roc_curve_aucs = []
 
     # for each pair, generate roc curve (positive class is the larger class in the pair, i.e., pair[1])
-    for pair in itertools.combinations(y_true, 2):
+    for pair in itertools.combinations(np.unique(y_true), 2):
         if np.any(np.isnan(y_pred_probs[:, int(pair[1])])):
             fpr = 'nan probabilities, cannot compute roc curve'
             tpr = 'nan probabilities, cannot compute roc curve'
@@ -420,8 +420,9 @@ def atm_cross_val_small_multiclass(pipeline, X, y, judgment_metric, cv=10):
                       rank_accuracies=rank_accuracies,
                       mu_sigmas=mu_sigmas)
 
-    cv_results['judgment_metric'] = np.mean(cv_results[judgment_metric])
-    cv_results['judgment_metric_std'] = np.std(cv_results[judgment_metric])
+    # TODO: Calculate mu-sigma for f1, accuracy, and roc_auc and make it selectable
+    cv_results['judgment_metric'] = np.mean(cv_results['mu_sigmas'])
+    cv_results['judgment_metric_std'] = np.std(cv_results['mu_sigmas'])
 
     return cv_results
 
@@ -516,9 +517,10 @@ def atm_cross_val_large_multiclass(pipeline, X, y, judgment_metric, cv=10, rank=
                       rank_accuracies=rank_accuracies,
                       mu_sigmas=mu_sigmas)
 
-    assert judgment_metric in ['f1_score_micros', 'f1_score_macros', 'mu_sigmas']
-    cv_results['judgment_metric'] = np.mean(cv_results[judgment_metric])
-    cv_results['judgment_metric_std'] = np.std(cv_results[judgment_metric])
+    # assert judgment_metric in ['f1_score_micros', 'f1_score_macros', 'mu_sigmas']
+    # TODO: Calculate mu-sigma for f1, accuracy, and roc_auc and make it selectable
+    cv_results['judgment_metric'] = np.mean(cv_results['mu_sigmas'])
+    cv_results['judgment_metric_std'] = np.std(cv_results['mu_sigmas'])
 
     return cv_results
 

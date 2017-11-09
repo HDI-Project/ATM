@@ -204,8 +204,7 @@ class Worker(object):
 
         # update this session's frozen set entry
         # TODO this should be a method on Database
-        frozen_set = session.query(self.db.FrozenSet)\
-            .filter(self.db.FrozenSet.id == frozen_set.id).one()
+        frozen_set = session.query(self.db.FrozenSet).filter(self.db.FrozenSet.id == frozen_set.id).one()
         frozen_set.trained += 1
         frozen_set.rewards += Decimal(performance[datarun.score_target])
         session.commit()

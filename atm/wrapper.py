@@ -180,7 +180,8 @@ class Wrapper(object):
                                     roc_curve_thresholds=results['pair_level_roc_curve_thresholds'],
                                     rank_accuracies=None,
                                     mu_sigmas=results['mu_sigma'])
-            self.test_scores['judgment_metric'] = self.test_scores[self.judgment_metric]
+            # TODO: Calculate mu-sigma for f1, accuracy, and roc_auc and make it selectable
+            self.test_scores['judgment_metric'] = self.test_scores['mu_sigmas']
 
         else:
             last_step = self.pipeline.steps[-1]
@@ -210,7 +211,8 @@ class Wrapper(object):
                                     pr_curve_aucs=None,
                                     rank_accuracies=results['rank_accuracy'],
                                     mu_sigmas=results['mu_sigma'])
-            self.test_scores['judgment_metric'] = self.test_scores[self.judgment_metric]
+            # TODO: Calculate mu-sigma for f1, accuracy, and roc_auc and make it selectable
+            self.test_scores['judgment_metric'] = self.test_scores['mu_sigmas']
 
 
     def predict(self, examples, probability=False):
