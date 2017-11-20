@@ -4,7 +4,6 @@ import os
 
 from atm.enter_data import enter_data
 from atm.worker import Worker
-from atm.config import Config
 from atm.utilities import download_file_s3
 
 parser = argparse.ArgumentParser(description='''
@@ -18,7 +17,6 @@ of these files to --tuner and --selector, respectively.
 The script will create a datarun using your tuner and selector, then run a
 worker until the job is finished.
 ''')
-parser.add_argument('--config', help='Location of config file', required=True)
 parser.add_argument('--selector', help='path to BTB selector', default=None)
 parser.add_argument('--tuner', help='path to BTB tuner', default=None)
 parser.add_argument('--gridding', type=int, default=0,
@@ -29,7 +27,6 @@ args = parser.parse_args()
 
 if __name__ == '__main__':
     print 'generating config...'
-    config = Config(args.config)
     if args.tuner:
         config.set(Config.STRATEGY, Config.STRATEGY_SELECTION, args.tuner)
     if args.selector:
