@@ -3,6 +3,7 @@
 *.csv
 logs/*
 data/*
+!data/samples/*
 models/*
 metrics/*
 # ignore configuration files except templates
