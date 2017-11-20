@@ -1,0 +1,24 @@
+# AWS access key
+access_key: 
+# AWS secret key
+secret_key: 
+# Number of AWS instances to start
+num_instances: 
+# Number of BTB workers per instances
+num_workers_per_instance: 
+# AWS S3 bucket to store data
+s3_bucket:
+# Folder in AWS S3 bucket in which to store data
+s3_folder:
+# Region to start instances in
+ec2_region: 
+# Name of BTB AMI
+ec2_amis: 
+# AWS key pair to use for EC2 instances
+ec2_key_pair: 
+# Local path to key file (must match ec2_key_pair)
+ec2_keyfile: 
+# Type of EC2 instance to start
+ec2_instance_type: 
+# Username to log into EC2 instance
+ec2_username: 

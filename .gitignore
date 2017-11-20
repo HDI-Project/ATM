@@ -3,12 +3,12 @@
 *.csv
 logs/*
 data/*
-!data/samples/*
+!data/samples/*.csv
 models/*
 metrics/*
 # ignore configuration files except templates
 config/*
-!config/templates/*
+!config/templates/*.yaml
 .DS_Store
 .idea/*
 atm-env/*
