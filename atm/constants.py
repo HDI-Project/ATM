@@ -14,8 +14,8 @@ class Defaults:
     """ Default values for all required arguments """
     SQL_DIALECT = 'sqlite'
     DATABASE = 'atm.db'
-    TRAIN_PATH = 'data/pollution_1.csv'
-    OUTPUT_FOLDER = 'data/processed'
+    TRAIN_PATH = 'data/samples/pollution_1.csv'
+    OUTPUT_FOLDER = 'data/processed/'
     LABEL_COLUMN = 'class'
     ALGORITHMS = ['logreg', 'dt', 'gp', 'knn']
     PRIORITY = 1
