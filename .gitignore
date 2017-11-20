@@ -5,9 +5,9 @@ logs/*
 data/*
 models/*
 metrics/*
-# ignore configuration files except the template
+# ignore configuration files except templates
 config/*
-!config/atm.cnf.template
+!config/templates/*
 .DS_Store
 .idea/*
 atm-env/*

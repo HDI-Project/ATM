@@ -176,7 +176,7 @@ class DataWrapper(object):
             # label class at column 0
             # TODO do something about there being both label_col and labelcol
             # and them sometimes but not always meaning the same thing
-            "label_col" : 0,
+            "label_column" : 0,
             "datasize_bytes" : np.array(data).nbytes,
             "categorical" : categorical,
             "ordinal" : ordinal,
@@ -286,7 +286,6 @@ class DataWrapper(object):
         np.savetxt(self.testing_path, testing_matrix, delimiter=self.sep, fmt="%s")
 
         # statistics
-
         self.statistics = {
             "unique_classes" : list(unique_classes),
             "n_examples" : n,
@@ -294,7 +293,7 @@ class DataWrapper(object):
             "k_classes" : k,
             # this is 0 because the processed version of the data file store the
             # label class at column 0
-            "label_col" : 0,
+            "label_column" : 0,
             "datasize_bytes" : np.array(data).nbytes,
             "categorical" : categorical,
             "ordinal" : ordinal,

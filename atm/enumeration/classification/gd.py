@@ -40,13 +40,12 @@ class EnumeratorSGDC(ClassifierEnumerator):
     }
 
     def __init__(self, ranges=None, keys=None):
-        super(EnumeratorSGDC, self).__init__(
-            ranges or EnumeratorSGDC.DEFAULT_RANGES, keys or EnumeratorSGDC.DEFAULT_KEYS)
+        super(EnumeratorSGDC, self).__init__(ranges or EnumeratorSGDC.DEFAULT_RANGES,
+                                             keys or EnumeratorSGDC.DEFAULT_KEYS)
         self.code = ClassifierEnumerator.SGD
         self.create_cpt()
 
     def create_cpt(self):
-
         loss = Choice("loss", self.ranges["loss"])
         penalty = Choice("penalty", self.ranges["penalty"])
         alpha = Choice("alpha", self.ranges["alpha"])
@@ -67,6 +66,7 @@ class EnumeratorSGDC(ClassifierEnumerator):
         sgdroot.add_condition(ClassifierEnumerator.SGD, [sgd])
 
         self.root = sgdroot
+
 
 class EnumeratorPAC(ClassifierEnumerator):
 
@@ -92,13 +92,12 @@ class EnumeratorPAC(ClassifierEnumerator):
     }
 
     def __init__(self, ranges=None, keys=None):
-        super(EnumeratorPAC, self).__init__(
-            ranges or EnumeratorPAC.DEFAULT_RANGES, keys or EnumeratorPAC.DEFAULT_KEYS)
+        super(EnumeratorPAC, self).__init__(ranges or EnumeratorPAC.DEFAULT_RANGES,
+                                            keys or EnumeratorPAC.DEFAULT_KEYS)
         self.code = ClassifierEnumerator.PASSIVE_AGGRESSIVE
         self.create_cpt()
 
     def create_cpt(self):
-
         loss = Choice("loss", self.ranges["loss"])
         fit_intercept = Choice("fit_intercept", self.ranges["fit_intercept"])
         n_iter = Choice("n_iter", self.ranges["n_iter"])

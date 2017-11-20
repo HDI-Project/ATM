@@ -6,7 +6,6 @@ import os
 import base64
 import re
 from boto.s3.connection import S3Connection, Key
-from atm.config import Config
 
 # global variable storing this machine's public IP address
 # (so we only have to fetch it once)
@@ -181,23 +180,23 @@ def save_metric(metric_path, object):
         pickle.dump(object, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def download_file_s3(config, keyname):
-    aws_key = config.get(Config.AWS, Config.AWS_ACCESS_KEY)
-    aws_secret = config.get(Config.AWS, Config.AWS_SECRET_KEY)
-    s3_bucket = config.get(Config.AWS, Config.AWS_S3_BUCKET)
-    s3_folder = config.get(Config.AWS, Config.AWS_S3_FOLDER).strip()
+def read_atm_csv(filepath):
+    """
+    read a csv and return a numpy array.
+    this works from the assumption the data has been preprocessed by atm:
+    no headers, numerical data only
+    """
+    num_cols = len(open(filepath).readline().split(','))
+    with open(filepath) as f:
+        for i, _ in enumerate(f):
+            pass
+    num_rows = i + 1
 
-    print 'getting S3 connection...'
-    conn = S3Connection(aws_key, aws_secret)
-    bucket = conn.get_bucket(s3_bucket)
+    data = np.zeros((num_rows, num_cols))
 
-    if s3_folder:
-        aws_keyname = os.path.join(s3_folder, keyname)
-    else:
-        aws_keyname = keyname
+    with open(filepath) as f:
+        for i, line in enumerate(f):
+            for j, cell in enumerate(line.split(',')):
+                data[i, j] = float(cell)
 
-    s3key = Key(bucket)
-    s3key.key = aws_keyname
-    s3key.get_contents_to_filename(keyname)
-
-    return keyname
+    return data

@@ -56,6 +56,28 @@ VALUES
 /*!40000 ALTER TABLE `algorithms` ENABLE KEYS */;
 UNLOCK TABLES;
 
+# Dump of table datasets
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `datasets`;
+
+CREATE TABLE `datasets` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL DEFAULT '',
+  `description` varchar(1000) NOT NULL DEFAULT '',
+  `train_path` varchar(200) NOT NULL DEFAULT '',
+  `test_path` varchar(200) NOT NULL DEFAULT '',
+  `wrapper` longtext NOT NULL,
+  `label_column` int(11) unsigned NOT NULL,
+  `n_examples` int(11) unsigned NOT NULL,
+  `k_classes` int(11) unsigned NOT NULL,
+  `d_features` int(11) unsigned NOT NULL,
+  `majority` decimal(10,9) NOT NULL,
+  `size_kb` int(11) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
 
 # Dump of table dataruns
 # ------------------------------------------------------------
@@ -64,37 +86,24 @@ DROP TABLE IF EXISTS `dataruns`;
 
 CREATE TABLE `dataruns` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL DEFAULT '',
+  `dataset_id` int(11) unsigned DEFAULT NULL,
   `description` varchar(200) NOT NULL DEFAULT '',
-  `dataset_description` varchar(1000) NOT NULL DEFAULT '',
-  `trainpath` varchar(200) NOT NULL DEFAULT '',
-  `testpath` varchar(200) NOT NULL DEFAULT '',
-  `local_trainpath` varchar(300) DEFAULT NULL,
-  `local_testpath` varchar(300) DEFAULT NULL,
-  `datawrapper` longtext NOT NULL,
-  `labelcol` int(11) unsigned NOT NULL,
-  `n` int(11) unsigned NOT NULL,
-  `k` int(11) unsigned NOT NULL,
-  `d` int(11) unsigned NOT NULL,
-  `majority` decimal(10,9) NOT NULL,
-  `size_kb` int(11) unsigned NOT NULL,
-  `sample_selection` enum('uniform','gp', 'gp_ei', 'gp_eivel', 'custom') NOT NULL DEFAULT 'uniform',
-  `frozen_selection` enum('uniform','ucb1', 'bestk', 'bestkvel', 'recentk', 'recentkvel', 'hieralg', 'hierrand', 'purebestkvel') NOT NULL DEFAULT 'uniform',
-  `gridding` int(11) unsigned NOT NULL default 0,
+  `tuner` enum('uniform', 'gp', 'gp_ei', 'gp_eivel', 'custom') NOT NULL DEFAULT 'uniform',
+  `selector` enum('uniform', 'ucb1', 'bestk', 'bestkvel', 'recentk', 'recentkvel', 'hieralg', 'hierrand', 'purebestkvel') NOT NULL DEFAULT 'uniform',
+  `gridding` int(11) unsigned NOT NULL default '0',
   `priority` smallint(10) DEFAULT '5',
   `started` datetime DEFAULT NULL,
   `completed` datetime DEFAULT NULL,
-  `budget` enum('none','walltime','learner') DEFAULT 'none',
-  `learner_budget` int(11) unsigned DEFAULT NULL,
-  `walltime_budget_minutes` int(11) unsigned DEFAULT NULL,
+  `budget_type` enum('none', 'walltime', 'learner') DEFAULT 'none',
+  `budget` int(11) unsigned DEFAULT NULL,
   `deadline` datetime DEFAULT NULL,
   `metric` enum('f1', 'f1_micro', 'f1_macro', 'f1_mu_sigma', 'roc_auc', 'roc_auc_micro', 'roc_auc_macro', 'accuracy') DEFAULT NULL,
-  `score_target` enum('cv_judgment_metric', 'test_judgment_metric') DEFAULT NULL,
+  `score_target` enum('cv', 'test') DEFAULT NULL,
   `k_window` int(11) DEFAULT NULL,
   `r_min` int(11) DEFAULT NULL,
-  `is_gridding_done` tinyint(1) NOT NULL DEFAULT '0',
+  `status` enum('pending', 'running', 'done') DEFAULT 'pending',
   PRIMARY KEY (`id`),
-  KEY `name_desc_unq` (`name`,`description`)
+  KEY `name_desc_unq` (`name`, `description`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 
@@ -109,7 +118,6 @@ CREATE TABLE `frozen_sets` (
   `datarun_id` int(11) unsigned DEFAULT NULL,
   `algorithm` varchar(15) NOT NULL DEFAULT '',
   `trained` int(11) unsigned DEFAULT '0',
-  `rewards` decimal(20,10) signed DEFAULT '0.0000000000',
   `is_gridding_done` tinyint(1) NOT NULL DEFAULT '0',
   `optimizables64` longtext,
   `constants64` longtext,
@@ -130,11 +138,9 @@ DROP TABLE IF EXISTS `learners`;
 CREATE TABLE `learners` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `frozen_set_id` int(11) unsigned DEFAULT NULL,
-  `datarun_id` int(11) DEFAULT NULL,
+  `datarun_id` int(11) unsigned DEFAULT NULL,
   `dataname` varchar(100) NOT NULL DEFAULT '',
   `description` varchar(200) NOT NULL DEFAULT '',
-  `trainpath` varchar(300) DEFAULT NULL,
-  `testpath` varchar(300) DEFAULT NULL,
   `modelpath` varchar(300) DEFAULT NULL,
   `metricpath` varchar(300) DEFAULT NULL,
   `params64` mediumtext NOT NULL,

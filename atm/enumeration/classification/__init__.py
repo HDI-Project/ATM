@@ -1,24 +1,25 @@
 from atm.cpt import Choice, Combination
 from atm.enumeration import Enumerator
 
+# TODO: merge this with the definition in atm/constants
 class ClassifierEnumerator(Enumerator):
 
     LEARNTYPE = "classification"
 
-    SVC = "classify_svm"
-    KNN = "classify_knn"
-    GAUSSIAN_NAIVE_BAYES = "classify_gnb"
-    MULTINOMIAL_NAIVE_BAYES = "classify_mnb"
-    BERNOULLI_NAIVE_BAYES = "classify_bnb"
-    SGD = "classify_sgd"
-    DECISION_TREE = "classify_dt"
-    RANDOM_FOREST = "classify_rf"
-    DBN = "classify_dbn"
-    MLP = "classify_mlp"
-    EXTRA_TREES = "classify_et"
-    PASSIVE_AGGRESSIVE = "classify_pa"
-    LRC = "classify_logreg"
-    GPC = "classify_gp"
+    SVC = "svm"
+    KNN = "knn"
+    GAUSSIAN_NAIVE_BAYES = "gnb"
+    MULTINOMIAL_NAIVE_BAYES = "mnb"
+    BERNOULLI_NAIVE_BAYES = "bnb"
+    SGD = "sgd"
+    DECISION_TREE = "dt"
+    RANDOM_FOREST = "rf"
+    DBN = "dbn"
+    MLP = "mlp"
+    EXTRA_TREES = "et"
+    PASSIVE_AGGRESSIVE = "pa"
+    LRC = "logreg"
+    GPC = "gp"
 
     def __init__(self, hypers, categoricals):
         super(ClassifierEnumerator, self).__init__(hypers, categoricals)

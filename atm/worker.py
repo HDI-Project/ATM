@@ -1,5 +1,5 @@
 #!/usr/bin/python2.7
-from atm.config import Config
+from atm.constants import *
 from atm.utilities import *
 from atm.mapping import Mapping, create_wrapper
 from atm.model import Model
@@ -41,32 +41,50 @@ ensure_directory("logs")
 LOG_FILE = "logs/%s.txt" % socket.gethostname()
 # how long to wait between training learners (or attempting to)
 LOOP_WAIT = 1.
-SQL_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
-GRID_TUNERS = []
+parser = argparse.ArgumentParser(description='Add more learners to database')
+
+##  Config files  #############################################################
+###############################################################################
+parser.add_argument('--sql-config', help='path to yaml SQL config file')
+parser.add_argument('--aws-config', help='path to yaml AWS config file')
 
 
-# csv loading utility function
-def read_atm_csv(filepath):
-    """
-    read a csv and return a numpy array.
-    this works from the assumption the data has been preprocessed by atm:
-    no headers, numerical data only
-    """
-    num_cols = len(open(filepath).readline().split(','))
-    with open(filepath) as f:
-        for i, _ in enumerate(f):
-            pass
-    num_rows = i + 1
+##  Database arguments  ########################################################
+################################################################################
+# All of these arguments must start with --sql-, and must correspond to
+# keys present in the SQL config example file.
+parser.add_argument('--sql-dialect', choices=SQL_DIALECTS,
+                    default=Defaults.SQL_DIALECT, help='Dialect of SQL to use')
+parser.add_argument('--sql-database', default=Defaults.DATABASE,
+                    help='Name of, or path to, SQL database')
+parser.add_argument('--sql-username', help='Username for SQL database')
+parser.add_argument('--sql-password', help='Password for SQL database')
+parser.add_argument('--sql-host', help='Hostname for database machine')
+parser.add_argument('--sql-port', help='Port used to connect to database')
+parser.add_argument('--sql-query', help='Specify extra login details')
 
-    data = np.zeros((num_rows, num_cols))
 
-    with open(filepath) as f:
-        for i, line in enumerate(f):
-            for j, cell in enumerate(line.split(',')):
-                data[i, j] = float(cell)
+##  AWS arguments  #############################################################
+################################################################################
+parser.add_argument('--aws-access-key', help='API access key for AWS')
+parser.add_argument('--aws-secret-key', help='API secret key for AWS')
+parser.add_argument('--aws-s3-bucket', help='Amazon S3 bucket for data storage')
+parser.add_argument('--aws-s3-folder', help='Optional S3 folder')
 
-    return data
+
+##  Worker arguments  ##########################################################
+################################################################################
+parser.add_argument('--cloud-mode', action='store_true', default=False,
+                    help='Whether to run this worker in cloud mode')
+parser.add_argument('--datarun-id', help='Only train on datasets with this id')
+parser.add_argument('--time', help='Number of seconds to run worker', type=int)
+parser.add_argument('--choose-randomly', action='store_true',
+                    help='Choose dataruns to work on randomly (default = '
+                    'sequential order)')
+parser.add_argument('--no-save', dest='save_files', default=True,
+                    action='store_const', const=False,
+                    help="don't save models and metrics for later")
 
 
 def _log(msg, stdout=True):
@@ -77,31 +95,31 @@ def _log(msg, stdout=True):
 
 
 class Worker(object):
-    def __init__(self, config, datarun_id=None, save_files=False,
-                 tuner=None, selector=None, choose_randomly=True):
+    def __init__(self, sql_config, datarun_id=None, save_files=False,
+                 choose_randomly=True, cloud_mode=False, aws_config=None):
         """
-        config: Config object with all the info we need.
+        sql_config: dictionary of SQL configuration data
         datarun_id: id of datarun to work on, or None. If None, this worker will
             work on whatever incomplete dataruns it finds.
         save_files: if True, save model and metrics files to disk or cloud.
-        tuner: if set, use this class as a tuner regardless of config
-        selector: if set, use this class as a selector regardless of config
         choose_randomly: if True, choose a random datarun; if False, use the
             first one in id-order.
+        cloud_mode: if True, use cloud mode
+        aws_config: dictionary of amazon s3 data
         """
-        self.config = config
-        self.db = Database(config)
+        self.db = Database(**sql_config)
+
         self.datarun_id = datarun_id
         self.save_files = save_files
         self.choose_randomly = choose_randomly
-        self.tuner_class = tuner
-        self.selector_class = selector
+        self.cloud_mode = cloud_mode
+        if cloud_mode:
+            self.aws_key = aws_config['access_key']
+            self.aws_secret = aws_config['secret_key']
+            self.s3_bucket = aws_config['s3_bucket']
+            self.s3_folder = aws_config['s3_folder']
 
     def save_learner_cloud(self, local_model_path, local_metric_path):
-        aws_key = self.config.get(Config.AWS, Config.AWS_ACCESS_KEY)
-        aws_secret = self.config.get(Config.AWS, Config.AWS_SECRET_KEY)
-        aws_folder = self.config.get(Config.AWS, Config.AWS_S3_FOLDER)
-        s3_bucket = self.config.get(Config.AWS, Config.AWS_S3_BUCKET)
 
         conn = S3Connection(aws_key, aws_secret)
         bucket = conn.get_bucket(s3_bucket)
@@ -132,6 +150,22 @@ class Worker(object):
         _log('Deleting local copy of {}'.format(local_metric_path))
         os.remove(local_metric_path)
 
+    def download_file_s3(self, keyname):
+        print 'getting S3 connection...'
+        conn = S3Connection(self.aws_key, self.aws_secret)
+        bucket = conn.get_bucket(self.s3_bucket)
+
+        if self.s3_folder:
+            self.aws_keyname = os.path.join(self.s3_folder, keyname)
+        else:
+            self.aws_keyname = keyname
+
+        s3key = Key(bucket)
+        s3key.key = self.aws_keyname
+        s3key.get_contents_to_filename(keyname)
+
+        return keyname
+
     def insert_learner(self, datarun, frozen_set, performance, params, model,
                        started):
         """
@@ -142,7 +176,8 @@ class Worker(object):
         """
         # save model to local filesystem
         phash = hash_dict(params)
-        rhash = hash_string(datarun.name)
+        dataset = self.db.GetDataset(datarun.dataset_id)
+        rhash = hash_string(dataset.name)
 
         # whether to save things to local filesystem
         if self.save_files:
@@ -158,11 +193,8 @@ class Worker(object):
             save_metric(local_metric_path, object=metric_obj)
             _log("Saving metrics in: %s" % local_model_path)
 
-            # mode: cloud or local?
-            mode = self.config.get(Config.MODE, Config.MODE_RUNMODE)
-
             # if necessary, save model and metrics to Amazon S3 bucket
-            if mode == 'cloud':
+            if self.cloud_mode:
                 try:
                     self.save_learner_cloud(local_model_path, local_metric_path)
                 except Exception:
@@ -179,17 +211,15 @@ class Worker(object):
         seconds = (completed - started).total_seconds()
 
         # create learner ORM object, and insert learner into the database
-        # TODO: wrap this properly in a with session_context(): or the like
+        # TODO: wrap this properly in a 'with session_context():' or make it a
+        # method on Database
         session = self.db.get_session()
         learner = self.db.Learner(
             frozen_set_id=frozen_set.id,
             datarun_id=datarun.id,
-            dataname=datarun.name,
-            description=datarun.description,
-            trainpath=datarun.trainpath,
-            testpath=datarun.testpath,
-            modelpath=local_model_path,
-            metricpath=local_metric_path,
+            model_path=local_model_path,
+            metric_path=local_metric_path,
+            host=get_public_ip(),
             params=params,
             trainable_params=trainables,
             dimensions=model.algorithm.dimensions,
@@ -198,15 +228,12 @@ class Worker(object):
             test_judgment_metric=performance['test_judgment_metric'],
             started=started,
             completed=completed,
-            status=LearnerStatus.COMPLETE,
-            host=get_public_ip())
+            status=LearnerStatus.COMPLETE)
         session.add(learner)
 
         # update this session's frozen set entry
-        # TODO this should be a method on Database
-        frozen_set = session.query(self.db.FrozenSet).filter(self.db.FrozenSet.id == frozen_set.id).one()
+        frozen_set = session.query(self.db.FrozenSet).get(frozen_set.id)
         frozen_set.trained += 1
-        frozen_set.rewards += Decimal(performance[datarun.score_target])
         session.commit()
 
     def insert_error(self, datarun_id, frozen_set, params, error_msg):
@@ -231,40 +258,37 @@ class Worker(object):
             if session:
                 session.close()
 
-    def load_data(self, datarun):
+    def load_data(self, dataset):
         """
         Loads the data from HTTP (if necessary) and then from
         disk into memory.
         """
-        basepath = os.path.basename(datarun.local_trainpath)
+        basepath = os.path.basename(dataset.train_path)
 
         # if the data are not present locally, check the S3 bucket detailed in
         # the config for it.
-        if not os.path.isfile(datarun.local_trainpath):
+        if not os.path.isfile(dataset.train_path):
             ensure_directory("data/processed/")
-            if download_file_s3(self.config, datarun.local_trainpath) !=\
-                    datarun.local_trainpath:
+            if self.download_file_s3(dataset.train_path) !=\
+                    dataset.train_path:
                 raise Exception("Something about train dataset caching is wrong...")
 
         # load the data into matrix format
-        trainX = read_atm_csv(datarun.local_trainpath)
-        labelcol = datarun.labelcol
-        trainY = trainX[:, labelcol]
-        trainX = np.delete(trainX, labelcol, axis=1)
+        trainX = read_atm_csv(dataset.train_path)
+        trainY = trainX[:, dataset.label_column]
+        trainX = np.delete(trainX, dataset.label_column, axis=1)
 
-        basepath = os.path.basename(datarun.local_testpath)
-        if not os.path.isfile(datarun.local_testpath):
+        basepath = os.path.basename(dataset.test_path)
+        if not os.path.isfile(dataset.test_path):
             ensure_directory("data/processed/")
-            if download_file_s3(self.config, datarun.local_testpath) !=\
-                    datarun.local_testpath:
-                raise Exception("Something about test dataset caching is "
-                                "wrong...")
+            if self.download_file_s3(dataset.test_path) !=\
+                    dataset.test_path:
+                raise Exception("Something about test dataset caching is wrong...")
 
         # load the data into matrix format
-        testX = read_atm_csv(datarun.local_testpath)
-        labelcol = datarun.labelcol
-        testY = testX[:, labelcol]
-        testX = np.delete(testX, labelcol, axis=1)
+        testX = read_atm_csv(dataset.test_path)
+        testY = testX[:, dataset.label_column]
+        testX = np.delete(testX, dataset.label_column, axis=1)
 
         return trainX, testX, trainY, testY
 
@@ -278,12 +302,12 @@ class Worker(object):
             _log("No incomplete frozen sets for datarun present in database.")
 
         # load the class for selecting the frozen set
-        # frozen_selection will either be a key into SELECTORS_MAP or a path to
+        # selector will either be a key into SELECTORS_MAP or a path to
         # a file that defines a class called CustomSelector.
-        if datarun.frozen_selection in Mapping.SELECTORS_MAP:
-            Selector = Mapping.SELECTORS_MAP[datarun.frozen_selection]
+        if datarun.selector in Mapping.SELECTORS_MAP:
+            Selector = Mapping.SELECTORS_MAP[datarun.selector]
         else:
-            mod = imp.load_source('btb.selection.custom', datarun.frozen_selection)
+            mod = imp.load_source('btb.selection.custom', datarun.selector)
             Selector = mod.CustomSelector
         _log("Selector: %s" % Selector)
 
@@ -331,13 +355,13 @@ class Worker(object):
             return None
         return frozen_set
 
-    def select_parameters(self, datarun, frozen_set):
-        # sample_selection will either be a key into TUNERS_MAP or a path to
+    def tune_parameters(self, datarun, frozen_set):
+        # tuner will either be a key into TUNERS_MAP or a path to
         # a file that defines a class called CustomTuner.
-        if datarun.sample_selection in Mapping.TUNERS_MAP:
-            Tuner = Mapping.TUNERS_MAP[datarun.sample_selection]
+        if datarun.tuner in Mapping.TUNERS_MAP:
+            Tuner = Mapping.TUNERS_MAP[datarun.tuner]
         else:
-            mod = imp.load_source('btb.tuning.custom', datarun.sample_selection)
+            mod = imp.load_source('btb.tuning.custom', datarun.tuner)
             Tuner = mod.CustomTuner
         _log("Tuner: %s" % Tuner)
 
@@ -413,7 +437,7 @@ class Worker(object):
 
                 if budget_type == "learner":
                     n_completed = sum([f.trained for f in frozen_sets])
-                    if n_completed >= datarun.learner_budget:
+                    if n_completed >= datarun.budget:
                         endrun = True
                         _log("Learner budget has run out!")
 
@@ -440,20 +464,22 @@ class Worker(object):
 
                 # use the configured sample selector to choose a set of
                 # parameters within the frozen set
-                params = self.select_parameters(datarun, frozen_set)
+                params = self.tune_parameters(datarun, frozen_set)
                 if params is None:
-                    _log("Frozen set finished. No parameters chosen.")
+                    _log("No parameters chosen: frozen set %d is finished." %
+                         frozen_set.id)
                     continue
 
                 _log("Chose parameters for algorithm %s:" % frozen_set.algorithm)
                 for k, v in params.items():
                     _log("\t%s = %s" % (k, v))
 
-                _log("Testing learner...")
-                # train learner
                 params["function"] = frozen_set.algorithm
+
+                _log("Testing learner...")
                 wrapper = create_wrapper(params, datarun.metric)
-                trainX, testX, trainY, testY = self.load_data(datarun)
+                dataset = self.db.GetDataset(datarun.dataset_id)
+                trainX, testX, trainY, testY = self.load_data(dataset)
                 wrapper.load_data_from_objects(trainX, testX, trainY, testY)
                 performance = wrapper.start()
 
@@ -463,15 +489,17 @@ class Worker(object):
                       2 * performance["cv_judgment_metric_stdev"]))
 
                 _log("Saving learner...")
-                model = Model(algorithm=wrapper, data=datarun.wrapper)
+                model = Model(algorithm=wrapper, data=dataset.wrapper)
 
                 # insert learner into the database
                 self.insert_learner(datarun, frozen_set, performance,
                                     params, model, started)
 
-                _log("Best so far: %.3f +- %.3f" %
-                     self.db.get_best_so_far(datarun.id,
-                                             datarun.score_target))
+                _log("Best so far: %.3f" %
+                     self.db.GetMaximumY(datarun.id, datarun.score_target))
+                #_log("Best so far: %.3f +- %.3f" %
+                     #self.db.get_best_so_far(datarun.id,
+                                             #datarun.score_target))
 
             except Exception as e:
                 msg = traceback.format_exc()
@@ -491,22 +519,33 @@ class Worker(object):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Add more learners to database')
-    parser.add_argument('-c', '--configpath', help='Location of config file',
-                        default=os.getenv('ATM_CONFIG_FILE', 'config/atm.cnf'), required=False)
-    parser.add_argument('-d', '--datarun-id', help='Only train on datasets with this id', default=None, required=False)
-    parser.add_argument('-t', '--time', help='Number of seconds to run worker', default=None, required=False)
-
-    # a little confusingly named (seqorder populates choose_randomly?)
-    parser.add_argument('-l', '--seqorder', help='work on datasets in sequential order starting with smallest id number, but still max priority (default = random)',
-                        dest='choose_randomly', default=True, action='store_const', const=False)
-    parser.add_argument('--no-save', help="don't save models and metrics for later",
-                        dest='save_files', default=True, action='store_const', const=False)
     args = parser.parse_args()
-    config = Config(args.configpath)
 
-    worker = Worker(config=config, datarun_id=args.datarun_id,
+    sql_config = {}
+    sql_options = ['dialect', 'database', 'username', 'password', 'host',
+                   'port', 'query']
+    if args.sql_config:
+        with open(args.sql_config) as f:
+            sql_config = yaml.load(f)
+    else:
+        for opt in sql_options:
+            sql_config[opt] = getattr(args, 'sql_' + opt)
+
+    aws_config = None
+    aws_options = ['access_key', 'secret_key', 's3_bucket', 's3_folder']
+    if args.cloud_mode:
+        if args.aws_config:
+            with open(args.aws_config) as f:
+                aws_config = yaml.load(f)
+        else:
+            for opt in aws_options:
+                aws_config[opt] = getattr(args, 'aws_' + opt)
+
+    worker = Worker(sql_config=sql_config,
+                    datarun_id=args.datarun_id,
                     choose_randomly=args.choose_randomly,
-                    save_files=args.save_files)
+                    save_files=args.save_files,
+                    cloud_mode=args.cloud_mode,
+                    aws_config=aws_config)
     # lets go
     worker.work(total_time=args.time)

@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy import (create_engine, inspect, exists, Column, Unicode, String,
+                        Integer, Boolean, DateTime, Enum,
+                        MetaData, Numeric, Table, Text)
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.url import URL
@@ -13,14 +15,37 @@ from datetime import datetime
 import warnings
 import pdb
 
+from atm.constants import *
 from atm.utilities import object_to_base_64, base_64_to_object
-from atm.config import Config
 
 
 class LearnerStatus:
     STARTED = 'started'
     ERRORED = 'errored'
     COMPLETE = 'complete'
+
+class RunStatus:
+    PENDING = 'pending'
+    RUNNING = 'running'
+    COMPLETE = 'complete'
+
+#   ('code', 'Name', probability)
+ALGORITHM_ROWS = [
+	dict(id=1, code='svm', name='Support Vector Machine', probability=True),
+	dict(id=2, code='et', name='Extra Trees', probability=True),
+	dict(id=3, code='pa', name='Passive Aggressive', probability=False),
+	dict(id=4, code='sgd', name='Stochastic Gradient Descent', probability=True),
+	dict(id=5, code='rf', name='Random Forest', probability=True),
+	dict(id=6, code='mnb', name='Multinomial Naive Bayes', probability=True),
+	dict(id=7, code='bnb', name='Bernoulii Naive Bayes', probability=True),
+	dict(id=8, code='dbn', name='Deef Belief Network', probability=False),
+	dict(id=9, code='logreg', name='Logistic Regression', probability=True),
+	dict(id=10, code='gnb', name='Gaussian Naive Bayes', probability=True),
+	dict(id=11, code='dt', name='Decision Tree', probability=True),
+	dict(id=12, code='knn', name='K Nearest Neighbors', probability=True),
+	dict(id=13, code='mlp', name='Multi-Layer Perceptron', probability=True),
+	dict(id=14, code='gp', name='Gaussian Process', probability=True),
+]
 
 
 def try_with_session(default=lambda: None, commit=False):
@@ -61,65 +86,118 @@ def try_with_session(default=lambda: None, commit=False):
 
 
 class Database(object):
-    def __init__(self, config):
+    def __init__(self, dialect, database, username=None, password=None,
+                 host=None, port=None, query=None):
         """
-        Accepts a config (for database connection info), and defines SQLAlchemy
+        Accepts configuration for a database connection, and defines SQLAlchemy
         ORM objects for all the tables in the database.
         """
-        dialect = config.get(Config.DATAHUB, Config.DATAHUB_DIALECT)
-        database = config.get(Config.DATAHUB, Config.DATAHUB_DATABASE)
-        user = config.get(Config.DATAHUB, Config.DATAHUB_USERNAME) or None
-        password = config.get(Config.DATAHUB, Config.DATAHUB_PASSWORD) or None
-        host = config.get(Config.DATAHUB, Config.DATAHUB_HOST) or None
-        port = config.get(Config.DATAHUB, Config.DATAHUB_PORT) or None
-        query = config.get(Config.DATAHUB, Config.DATAHUB_QUERY) or None
-
-        db_url = URL(drivername=dialect, database=database, username=user,
+        db_url = URL(drivername=dialect, database=database, username=username,
                      password=password, host=host, port=port, query=query)
         self.engine = create_engine(db_url)
 
         self.get_session = sessionmaker(bind=self.engine,
                                         expire_on_commit=False)
         self.define_tables()
+        self.create_algorithms()
 
     def define_tables(self):
         metadata = MetaData(bind=self.engine)
         Base = declarative_base()
 
         class Algorithm(Base):
-            __table__ = Table('algorithms', metadata, autoload=True)
+            __tablename__ = 'algorithms'
+
+            id = Column(Integer, primary_key=True, autoincrement=True)
+            code = Column(String(15), nullable=False)
+            name = Column(String(30), nullable=False)
+            probability = Column(Boolean)
+
             def __repr__(self):
                 return "<%s>" % self.name
 
         self.Algorithm = Algorithm
 
-        class Datarun(Base):
-            __table__ = Table('dataruns', metadata, autoload=True)
+        class Dataset(Base):
+            __tablename__ = 'datasets'
+
+            id = Column(Integer, primary_key=True, autoincrement=True)
+
+            name = Column(String(100), nullable=False)
+            description = Column(String(1000))
+            train_path = Column(String(200), nullable=False)
+            test_path = Column(String(200))
+            wrapper64 = Column(String(200), nullable=False)
+
+            label_column = Column(Integer, nullable=False)
+            n_examples = Column(Integer, nullable=False)
+            k_classes = Column(Integer, nullable=False)
+            d_features = Column(Integer, nullable=False)
+            majority = Column(Numeric(precision=10, scale=9), nullable=False)
+            size_kb = Column(Integer, nullable=False)
 
             @property
             def wrapper(self):
-                return base_64_to_object(self.datawrapper)
+                return base_64_to_object(self.wrapper64)
 
             @wrapper.setter
             def wrapper(self, value):
-                self.datawrapper = object_to_base_64(value)
+                self.wrapper64 = object_to_base_64(value)
 
             def __repr__(self):
-                base = "<%s:, frozen: %s, sampling: %s, budget: %s, status: %s>"
-                status = ""
-                if self.started == None:
-                    status = "pending"
-                elif self.started != None and self.completed == None:
-                    status = "running"
-                elif self.started != None and self.completed != None:
-                    status = "done"
-                return base % (self.name, self.frozen_selection,
-                               self.sample_selection, self.budget, status)
+                base = "<%s: %s, %d classes, %d features, %d examples>"
+                return base % (self.name, self.description, self.k_classes,
+                               self.d_features, self.n_examples)
+
+        self.Dataset = Dataset
+
+        class Datarun(Base):
+            __tablename__ = 'dataruns'
+
+            id = Column(Integer, primary_key=True, autoincrement=True)
+            dataset_id = Column(Integer)
+
+            description = Column(String(200), nullable=False)
+            priority = Column(Integer)
+
+            selector = Column(Enum(*SELECTORS), nullable=False)
+            k_window = Column(Integer)
+            tuner = Column(Enum(*TUNERS), nullable=False)
+            gridding = Column(Integer, nullable=False)
+            r_min = Column(Integer)
+
+            budget_type = Column(Enum(*BUDGET_TYPES))
+            budget = Column(Integer)
+            deadline = Column(DateTime)
+
+            metric = Column(Enum(*METRICS))
+            score_target = Column(Enum(*[s + '_judgment_metric' for s in
+                                         SCORE_TARGETS]))
+
+            started = Column(DateTime)
+            completed = Column(DateTime)
+            status = Column(Enum(*DATARUN_STATUS), default=RunStatus.PENDING)
+
+            def __repr__(self):
+                base = "<%d: %s, budget: %s (%s), status: %s>"
+                return base % (self.id, self.description, self.budget_type,
+                               self.budget, self.status)
 
         self.Datarun = Datarun
 
         class FrozenSet(Base):
-            __table__ = Table('frozen_sets', metadata, autoload=True)
+            __tablename__ = 'frozen_sets'
+
+            id = Column(Integer, primary_key=True, autoincrement=True)
+            datarun_id = Column(Integer)
+            algorithm = Column(String(15), nullable=False)
+
+            trained = Column(Integer, default=0)
+            optimizables64 = Column(Text)
+            constants64 = Column(Text)
+            frozens64 = Column(Text)
+            frozen_hash = Column(String(32))
+            is_gridding_done = Column(Boolean, default=False)
 
             @property
             def optimizables(self):
@@ -146,12 +224,32 @@ class Database(object):
                 self.constants64 = object_to_base_64(value)
 
             def __repr__(self):
-                return "<%s: %s>" % (self.algorithm, self.frozen_hash)
+                return "<%s: %s>" % (self.algorithm, self.frozens)
 
         self.FrozenSet = FrozenSet
 
         class Learner(Base):
-            __table__ = Table('learners', metadata, autoload=True)
+            __tablename__ = 'learners'
+
+            id = Column(Integer, primary_key=True, autoincrement=True)
+            frozen_set_id = Column(Integer)
+            datarun_id = Column(Integer)
+
+            model_path = Column(String(300))
+            metric_path = Column(String(300))
+            host = Column(String(50))
+            params64 = Column(Text, nullable=False)
+            trainable_params64 = Column(Text)
+            dimensions = Column(Integer)
+
+            cv_judgment_metric = Column(Numeric(precision=20, scale=10))
+            cv_judgment_metric_stdev = Column(Numeric(precision=20, scale=10))
+            test_judgment_metric = Column(Numeric(precision=20, scale=10))
+
+            started = Column(DateTime)
+            completed = Column(DateTime)
+            status = Column(Enum(*LEARNER_STATUS), nullable=False)
+            error_msg = Column(Text)
 
             @property
             def params(self):
@@ -173,6 +271,18 @@ class Database(object):
                 return "<%s>" % self.params
 
         self.Learner = Learner
+
+        Base.metadata.create_all(bind=self.engine)
+
+    @try_with_session()
+    def create_algorithms(self, session):
+        """ Enter all the default algorithms into the database """
+        for r in ALGORITHM_ROWS:
+            if not session.query(self.Dataset).get(r['id']):
+                del r['id']
+                alg = self.Algorithm(**r)
+                session.add(alg)
+        session.commit()
 
     @try_with_session()
     def GetDatarun(self, session, datarun_id=None, ignore_completed=True,
@@ -208,6 +318,11 @@ class Database(object):
         if choose_randomly:
             return candidates[random.randint(0, len(candidates) - 1)]
         return candidates[0]
+
+    @try_with_session()
+    def GetDataset(self, session, dataset_id):
+        """ Returns a specific dataset. """
+        return session.query(self.Dataset).get(dataset_id)
 
     @try_with_session(default=lambda: True)
     def IsGriddingDoneForDatarun(self, session, datarun_id,
