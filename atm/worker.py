@@ -263,30 +263,29 @@ class Worker(object):
         Loads the data from HTTP (if necessary) and then from
         disk into memory.
         """
-        basepath = os.path.basename(dataset.train_path)
+        dw = dataset.wrapper
 
         # if the data are not present locally, check the S3 bucket detailed in
         # the config for it.
-        if not os.path.isfile(dataset.train_path):
-            ensure_directory("data/processed/")
-            if self.download_file_s3(dataset.train_path) !=\
-                    dataset.train_path:
+        if not os.path.isfile(dw.train_path):
+            ensure_directory(dw.outfolder)
+            if self.download_file_s3(dw.train_path) !=\
+                    dw.train_path:
                 raise Exception("Something about train dataset caching is wrong...")
 
         # load the data into matrix format
-        trainX = read_atm_csv(dataset.train_path)
+        trainX = read_atm_csv(dw.train_path)
         trainY = trainX[:, dataset.label_column]
         trainX = np.delete(trainX, dataset.label_column, axis=1)
 
-        basepath = os.path.basename(dataset.test_path)
-        if not os.path.isfile(dataset.test_path):
-            ensure_directory("data/processed/")
-            if self.download_file_s3(dataset.test_path) !=\
-                    dataset.test_path:
+        if not os.path.isfile(dw.test_path):
+            ensure_directory(dw.outfolder)
+            if self.download_file_s3(dw.test_path) !=\
+                    dw.test_path:
                 raise Exception("Something about test dataset caching is wrong...")
 
         # load the data into matrix format
-        testX = read_atm_csv(dataset.test_path)
+        testX = read_atm_csv(dw.test_path)
         testY = testX[:, dataset.label_column]
         testX = np.delete(testX, dataset.label_column, axis=1)
 

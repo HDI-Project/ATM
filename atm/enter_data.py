@@ -208,8 +208,8 @@ def create_dataset(db, args):
     session = db.get_session()
     dataset = db.Dataset(name=name,
                          description=args.data_description,
-                         train_path=local_train_path,
-                         test_path=local_test_path,
+                         train_path=args.train_path,
+                         test_path=args.test_path,
                          wrapper=dw,
                          label_column=int(stats['label_column']),
                          n_examples=int(stats['n_examples']),

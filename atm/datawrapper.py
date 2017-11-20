@@ -59,7 +59,7 @@ class DataWrapper(object):
             self.wrap_single_file()
         else:
             self.wrap_train_test()
-        return self.training_path, self.testing_path
+        return self.train_path, self.test_path
 
     def wrap_train_test(self):
         """
@@ -151,20 +151,20 @@ class DataWrapper(object):
         testing = data[-num_test_samples:,:]
 
         # training
-        self.training_path = os.path.join(self.outfolder,
+        self.train_path = os.path.join(self.outfolder,
                                           "%s_train.csv" % self.dataname)
         training_matrix = np.column_stack((np.array(training_discretized_labels),
                                            np.array(training)))
         print "training matrix:", training_matrix.shape
-        np.savetxt(self.training_path, training_matrix, delimiter=self.sep, fmt="%s")
+        np.savetxt(self.train_path, training_matrix, delimiter=self.sep, fmt="%s")
 
         # testing
-        self.testing_path = os.path.join(self.outfolder,
+        self.test_path = os.path.join(self.outfolder,
                                          "%s_test.csv" % self.dataname)
         testing_matrix = np.column_stack((np.array(testing_discretized_labels),
                                           np.array(testing)))
         print "testing matrix: ", testing_matrix.shape
-        np.savetxt(self.testing_path, testing_matrix, delimiter=self.sep, fmt="%s")
+        np.savetxt(self.test_path, testing_matrix, delimiter=self.sep, fmt="%s")
 
         # statistics
         self.statistics = {
@@ -183,8 +183,8 @@ class DataWrapper(object):
             "dummys" : dummies,
             "majority" : majority_percentage,
             "dataname" : self.dataname,
-            "training" : self.training_path,
-            "testing" : self.testing_path,
+            "training" : self.train_path,
+            "testing" : self.test_path,
             #"testing_ratio" : (float(testing_matrix.shape[0]) /
             #   float(training_matrix.shape[0] + testing_matrix.shape[0])),
         }
@@ -273,17 +273,17 @@ class DataWrapper(object):
         #testing = pd.DataFrame(data_test)
 
         # training
-        self.training_path = os.path.join(self.outfolder,
+        self.train_path = os.path.join(self.outfolder,
                                           "%s_train.csv" % self.dataname)
         training_matrix = np.column_stack((labels_train, data_train))
         print "training matrix:", training_matrix.shape
-        np.savetxt(self.training_path, training_matrix, delimiter=self.sep, fmt="%s")
+        np.savetxt(self.train_path, training_matrix, delimiter=self.sep, fmt="%s")
 
         # testing
-        self.testing_path = os.path.join(self.outfolder, "%s_test.csv" % self.dataname)
+        self.test_path = os.path.join(self.outfolder, "%s_test.csv" % self.dataname)
         testing_matrix = np.column_stack((labels_test, data_test))
         print "testing matrix: ", testing_matrix.shape
-        np.savetxt(self.testing_path, testing_matrix, delimiter=self.sep, fmt="%s")
+        np.savetxt(self.test_path, testing_matrix, delimiter=self.sep, fmt="%s")
 
         # statistics
         self.statistics = {
@@ -300,8 +300,8 @@ class DataWrapper(object):
             "dummys" : dummies,
             "majority" : majority_percentage,
             "dataname" : self.dataname,
-            "training" : self.training_path,
-            "testing" : self.testing_path,
+            "training" : self.train_path,
+            "testing" : self.test_path,
             "testing_ratio" : float(testing_matrix.shape[0]) /
                 float(training_matrix.shape[0] + testing_matrix.shape[0]),
         }
