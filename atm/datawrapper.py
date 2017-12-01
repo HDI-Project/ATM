@@ -269,12 +269,9 @@ class DataWrapper(object):
             train_test_split(data, discretized_labels,
                              test_size=self.testing_ratio)
 
-        #training = pd.DataFrame(data_train)
-        #testing = pd.DataFrame(data_test)
-
         # training
         self.train_path = os.path.join(self.outfolder,
-                                          "%s_train.csv" % self.dataname)
+                                      "%s_train.csv" % self.dataname)
         training_matrix = np.column_stack((labels_train, data_train))
         print "training matrix:", training_matrix.shape
         np.savetxt(self.train_path, training_matrix, delimiter=self.sep, fmt="%s")

@@ -15,9 +15,7 @@ from atm.database import Database
 
 warnings.filterwarnings("ignore")
 
-
 TIME_FMT = "%y-%m-%d_%H:%M"
-
 
 parser = argparse.ArgumentParser(description="""
 Creates a dataset (if necessary) and a datarun and adds them to the ModelHub.
@@ -131,7 +129,7 @@ parser.add_argument('--tuner', choices=TUNERS, default=Defaults.TUNER,
 # set of all hyperpartitions?
 # Options:
 #   uniform      - pick randomly
-#   ucb1         - vanilla multi-armed bandit
+#   ucb1         - UCB1 multi-armed bandit
 #   bestk        - MAB using only the best K runs in each frozen set
 #   bestkvel     - MAB with velocity of best K runs
 #   purebestkvel - always return frozen set with highest velocity
@@ -185,31 +183,47 @@ parser.add_argument('--score-target', choices=SCORE_TARGETS,
                     'test data (if available)')
 
 
-def create_dataset(db, args):
+# empty object for storing stuff on
+class Config(object):
+    pass
+
+
+def create_dataset(db, train_path, test_path=None, output_folder=None,
+                   label_column=None, data_description=None):
+    """
+    Create a dataset and add it to the ModelHub database.
+
+    db: initialized Database object
+    train_path: path to training data
+    test_path: path to test data
+    output_folder: folder where processed ('wrapped') data will be saved
+    label_column: name of csv column representing the label
+    data_description: description of the dataset (max 1000 chars)
+    """
     # create the name of the dataset from the path to the data
-    name = os.path.basename(args.train_path)
+    name = os.path.basename(train_path)
     name = name.replace("_train", "").replace(".csv", "")
 
     # parse data and create data wrapper for vectorization and label encoding
-    if args.train_path and args.test_path:
-        dw = DataWrapper(name, args.output_folder, args.label_column,
-                         trainfile=args.train_path, testfile=args.test_path)
-    elif args.train_path:
-        dw = DataWrapper(name, args.output_folder, args.label_column,
-                         traintestfile=args.train_path)
+    if train_path and test_path:
+        dw = DataWrapper(name, output_folder, label_column,
+                         trainfile=train_path, testfile=test_path)
+    elif train_path:
+        dw = DataWrapper(name, output_folder, label_column,
+                         traintestfile=train_path)
     else:
         raise Exception("No valid training or testing files!")
 
     # process the data into the form ATM needs and save it to disk
-    local_train_path, local_test_path = dw.wrap()
+    dw.wrap()
     stats = dw.get_statistics()
 
     # enter dataset into database
     session = db.get_session()
     dataset = db.Dataset(name=name,
-                         description=args.data_description,
-                         train_path=args.train_path,
-                         test_path=args.test_path,
+                         description=data_description,
+                         train_path=train_path,
+                         test_path=test_path,
                          wrapper=dw,
                          label_column=int(stats['label_column']),
                          n_examples=int(stats['n_examples']),
@@ -219,19 +233,22 @@ def create_dataset(db, args):
                          size_kb=int(stats['datasize_bytes']) / 1000)
     session.add(dataset)
     session.commit()
-
-    # if we need to upload the train/test data, do it now
-    if args.upload_data:
-        upload_data(local_train_path, local_test_path, args)
     return dataset
 
 
-def upload_data(train_path, test_path, args):
-    print 'Uploading train and test files to AWS S3 Bucket', s3_bucket
-    aws_key = args.aws_access_key
-    aws_secret = args.aws_secret_key
-    s3_bucket = args.aws_s3_bucket
-    s3_folder = args.aws_s3_folder
+def upload_data(train_path, test_path, access_key, secret_key, s3_bucket,
+                s3_folder=None):
+    """
+    Upload processed train/test data to an AWS bucket.
+
+    train_path: path to processed training data
+    test_path: path to processed test data
+    access_key: AWS API access key
+    secret_key: AWS secret API key
+    s3_bucket: path to s3 bucket where data will be saved
+    s3_folder: optional path within bucket where data will be saved
+    """
+    print 'Uploading train and test files to AWS S3 bucket', s3_bucket
 
     conn = S3Connection(aws_key, aws_secret)
     bucket = conn.get_bucket(s3_bucket)
@@ -251,65 +268,85 @@ def upload_data(train_path, test_path, args):
     ktest.set_contents_from_filename(test_path)
 
 
-def create_datarun(db, args):
+def create_datarun(db, dataset_id, tuner, selector, gridding, priority, k_window,
+                   r_min, budget_type, budget, deadline, score_target, metric):
     """
     Given a config, creates a set of dataruns for the config and enters them into
-    the database.
-    Returns the IDs of the created dataruns.
+    the database. Returns the ID of the created datarun.
+
+    db: initialized Database object
+    tuner:
+    selector:
+    gridding:
+    priority:
+    k_window:
+    r_min:
+    budget_type:
+    budget:
+    deadline:
+    score_target:
+    metric:
     """
     # describe the datarun by its tuner and selector
-    run_description =  '__'.join([args.tuner, args.selector])
+    run_description =  '__'.join([tuner, selector])
 
     # set the deadline, if applicable
     deadline = None
-    if args.deadline:
-        deadline = datetime.strptime(args.deadline, TIME_FMT)
-        args.budget_type = 'walltime'
-    elif args.budget_type == 'walltime':
-        budget = args.budget or Defaults.WALLTIME_BUDGET
+    if deadline:
+        deadline = datetime.strptime(deadline, TIME_FMT)
+        budget_type = 'walltime'
+    elif budget_type == 'walltime':
+        budget = budget or Defaults.WALLTIME_BUDGET
         deadline = datetime.now() + timedelta(minutes=budget)
     else:
-        budget = args.budget or Defaults.LEARNER_BUDGET
+        budget = budget or Defaults.LEARNER_BUDGET
 
-    target = args.score_target + '_judgment_metric'
+    target = score_target + '_judgment_metric'
 
     # create datarun
     session = db.get_session()
-    datarun = db.Datarun(dataset_id=args.dataset_id,
+    datarun = db.Datarun(dataset_id=dataset_id,
                          description=run_description,
-                         tuner=args.tuner,
-                         selector=args.selector,
-                         gridding=args.gridding,
-                         priority=args.priority,
-                         budget_type=args.budget_type,
+                         tuner=tuner,
+                         selector=selector,
+                         gridding=gridding,
+                         priority=priority,
+                         budget_type=budget_type,
                          budget=budget,
                          deadline=deadline,
-                         metric=args.metric,
+                         metric=metric,
                          score_target=target,
-                         k_window=args.k_window,
-                         r_min=args.r_min)
+                         k_window=k_window,
+                         r_min=r_min)
     session.add(datarun)
     session.commit()
     print datarun
     return datarun
 
 
-def create_frozen_sets(db, datarun):
-    # create all combinations necessary
-    frozen_sets = frozen_sets_from_algorithm_codes(args.algorithms)
+def create_frozen_sets(db, datarun, algorithms):
+    """
+    Create all frozen sets for a given datarun and store them in the ModelHub
+    database.
+    db: initialized Database object
+    datarun: initialized Datarun ORM object
+    algorithms: list of codes for the algorithms this datarun will use
+    """
+    # enumerate all combinations of categorical variables for these algorithms
+    frozen_sets = frozen_sets_from_algorithm_codes(algorithms)
 
     # create frozen sets
     session = db.get_session()
     session.autoflush = False
-    for algorithm, frozens in frozen_sets.iteritems():
-        for fsettings, others in frozens.iteritems():
+    for algorithm, sets in frozen_sets.iteritems():
+        for settings, others in sets.iteritems():
             optimizables, constants = others
-            fhash = hash_nested_tuple(fsettings)
+            fhash = hash_nested_tuple(settings)
             fset = db.FrozenSet(datarun_id=datarun.id,
                                 algorithm=algorithm,
                                 optimizables=optimizables,
                                 constants=constants,
-                                frozens=fsettings,
+                                frozens=settings,
                                 frozen_hash=fhash,
                                 is_gridding_done=False)
             session.add(fset)
@@ -317,42 +354,73 @@ def create_frozen_sets(db, datarun):
     session.close()
 
 
-if __name__ == '__main__':
-    args = parser.parse_args()
-
-    if args.sql_config:
-        with open(args.sql_config) as f:
+def load_config(sql_config=None, aws_config=None, run_config=None, config=None):
+    config = config or parser.parse_args()
+    if sql_config:
+        with open(sql_config) as f:
             sqlconf = yaml.load(f)
         for k, v in sqlconf.items():
-            args.__set__('sql_' + k, v)
+            setattr(config, 'sql_' + k, v)
 
-    if args.aws_config:
-        with open(args.aws_config) as f:
+    if aws_config:
+        with open(aws_config) as f:
             awsconf = yaml.load(f)
         for k, v in awsconf.items():
-            args.__set__('aws_' + k, v)
+            setattr(config, 'aws_' + k, v)
+
+    if run_config:
+        with open(run_config) as f:
+            runconf = yaml.load(f)
+        for k, v in runconf.items():
+            setattr(config, k, v)
+
+    return config
 
 
+def enter_data(config):
+    """
+    config: object with all of the attributes that we need on it. This could be
+    from argparse.parse_config(), or it could be created from config files and
+    called from another file.
+    """
     # connect to the database
-    db = Database(args.sql_dialect, args.sql_database, args.sql_username,
-                  args.sql_password, args.sql_host, args.sql_port,
-                  args.sql_query)
+    db = Database(config.sql_dialect, config.sql_database, config.sql_username,
+                  config.sql_password, config.sql_host, config.sql_port,
+                  config.sql_query)
 
     # if the user has provided a dataset id, use that. Otherwise, create a new
     # dataset based on the arguments we were passed.
-    if args.dataset_id is None:
+    if config.dataset_id is None:
         print 'creating dataset...'
-        dataset = create_dataset(db, args)
-        args.dataset_id = dataset.id
+        dataset = create_dataset(db, config.train_path, config.test_path,
+                                 config.output_folder, config.label_column,
+                                 config.data_description)
+        config.dataset_id = dataset.id
+
+        # if we need to upload the train/test data, do it now
+        if config.upload_data:
+            upload_data(dataset.wrapper.train_path, dataset.wrapper.test_path,
+                        config.aws_access_key, config.aws_secret_key, config.aws_s3_bucket,
+                        config.aws_s3_folder)
 
     # create and save datarun to database
     print 'creating datarun...'
-    datarun = create_datarun(db, args)
+    datarun = create_datarun(db, config.dataset_id, config.tuner,
+                             config.selector, config.gridding, config.priority,
+                             config.k_window, config.r_min, config.budget_type,
+                             config.budget, config.deadline,
+                             config.score_target, config.metric)
 
     # create frozen sets for the new datarun
     print 'creating frozen sets...'
-    create_frozen_sets(db, datarun)
+    create_frozen_sets(db, datarun, config.algorithms)
 
     print 'done!'
-    print 'Dataset ID:', dataset.id
+    print 'Dataset ID:', config.dataset_id
     print 'Datarun ID:', datarun.id
+
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+    config = load_config(args.sql_config, args.aws_config, args.run_config, args)
+    enter_data(config)

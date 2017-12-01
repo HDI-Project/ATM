@@ -1,9 +1,12 @@
+## Dataset arguments
 train-path: ./data/samples/pollution_1.csv
 # if test-path is not supplied, train-path is assumed to point to train/test data
-test-path:
-data-description:
-output-folder:
-label-column:
+test-path: 
+data-description: "Example dataset description"
+output-folder: ./models
+label-column: class
+
+## Datarun arguments
 algorithms: 
     - rf
     - logreg

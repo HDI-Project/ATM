@@ -200,3 +200,27 @@ def read_atm_csv(filepath):
                 data[i, j] = float(cell)
 
     return data
+
+
+def download_file_s3(keyname, aws_key, aws_secret, s3_bucket,
+                     s3_folder=None, outpath=None):
+    """ download a file from an S3 bucket and save it at keyname.  """
+    print 'getting S3 connection...'
+    conn = S3Connection(aws_key, aws_secret)
+    bucket = conn.get_bucket(s3_bucket)
+
+    if s3_folder:
+        aws_keyname = os.path.join(s3_folder, keyname)
+    else:
+        aws_keyname = keyname
+
+    if outpath:
+        path = os.path.join(outpath, keyname)
+    else:
+        path = keyname
+
+    s3key = Key(bucket)
+    s3key.key = aws_keyname
+    s3key.get_contents_to_filename(path)
+
+    return keyname

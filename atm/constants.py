@@ -10,6 +10,16 @@ SELECTORS = ['uniform', 'ucb1', 'bestk', 'bestkvel', 'purebestkvel', 'recentk',
 DATARUN_STATUS = ['pending', 'running', 'complete']
 LEARNER_STATUS = ['started', 'errored', 'complete']
 
+class LearnerStatus:
+    STARTED = 'started'
+    ERRORED = 'errored'
+    COMPLETE = 'complete'
+
+class RunStatus:
+    PENDING = 'pending'
+    RUNNING = 'running'
+    COMPLETE = 'complete'
+
 class Defaults:
     """ Default values for all required arguments """
     SQL_DIALECT = 'sqlite'
@@ -29,3 +39,4 @@ class Defaults:
     GRIDDING = 0        # no gridding
     METRIC = 'f1'
     SCORE_TARGET = 'cv'
+

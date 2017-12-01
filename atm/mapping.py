@@ -49,7 +49,8 @@ class Mapping:
         ClassifierEnumerator.GPC: GaussianProcessClassifier,
         ClassifierEnumerator.EXTRA_TREES: ExtraTreesClassifier,
         ClassifierEnumerator.PASSIVE_AGGRESSIVE: PassiveAggressiveClassifier,
-        ClassifierEnumerator.LRC: LogisticRegression}
+        ClassifierEnumerator.LRC: LogisticRegression
+    }
 
     ENUMERATOR_CODE_CLASS_MAP = {
         ClassifierEnumerator.SVC: EnumeratorSVC,
@@ -65,7 +66,8 @@ class Mapping:
         ClassifierEnumerator.GPC: EnumeratorGPC,
         ClassifierEnumerator.EXTRA_TREES: EnumeratorETC,
         ClassifierEnumerator.PASSIVE_AGGRESSIVE: EnumeratorPAC,
-        ClassifierEnumerator.LRC: EnumeratorLRC}
+        ClassifierEnumerator.LRC: EnumeratorLRC
+    }
 
     TUNERS_MAP = {
         Tuners.UNIFORM: UniformTuner,
@@ -83,7 +85,6 @@ class Mapping:
         Selectors.RECENT_K: RecentKReward,
         Selectors.RECENT_K_VEL: RecentKVelocity,
         Selectors.HIER_ALG: HierarchicalByAlgorithm,
-        #Selectors.HIER_RAND: HierarchicalRandom,
     }
 
 

@@ -95,10 +95,10 @@ def _log(msg, stdout=True):
 
 
 class Worker(object):
-    def __init__(self, sql_config, datarun_id=None, save_files=False,
+    def __init__(self, db, datarun_id=None, save_files=False,
                  choose_randomly=True, cloud_mode=False, aws_config=None):
         """
-        sql_config: dictionary of SQL configuration data
+        db: Database object with connection information
         datarun_id: id of datarun to work on, or None. If None, this worker will
             work on whatever incomplete dataruns it finds.
         save_files: if True, save model and metrics files to disk or cloud.
@@ -107,8 +107,7 @@ class Worker(object):
         cloud_mode: if True, use cloud mode
         aws_config: dictionary of amazon s3 data
         """
-        self.db = Database(**sql_config)
-
+        self.db = db
         self.datarun_id = datarun_id
         self.save_files = save_files
         self.choose_randomly = choose_randomly
@@ -150,22 +149,6 @@ class Worker(object):
         _log('Deleting local copy of {}'.format(local_metric_path))
         os.remove(local_metric_path)
 
-    def download_file_s3(self, keyname):
-        print 'getting S3 connection...'
-        conn = S3Connection(self.aws_key, self.aws_secret)
-        bucket = conn.get_bucket(self.s3_bucket)
-
-        if self.s3_folder:
-            self.aws_keyname = os.path.join(self.s3_folder, keyname)
-        else:
-            self.aws_keyname = keyname
-
-        s3key = Key(bucket)
-        s3key.key = self.aws_keyname
-        s3key.get_contents_to_filename(keyname)
-
-        return keyname
-
     def insert_learner(self, datarun, frozen_set, performance, params, model,
                        started):
         """
@@ -176,7 +159,7 @@ class Worker(object):
         """
         # save model to local filesystem
         phash = hash_dict(params)
-        dataset = self.db.GetDataset(datarun.dataset_id)
+        dataset = self.db.get_dataset(datarun.dataset_id)
         rhash = hash_string(dataset.name)
 
         # whether to save things to local filesystem
@@ -269,7 +252,10 @@ class Worker(object):
         # the config for it.
         if not os.path.isfile(dw.train_path):
             ensure_directory(dw.outfolder)
-            if self.download_file_s3(dw.train_path) !=\
+            if download_file_s3(dw.test_path, aws_key=self.aws_key,
+                                aws_secret=self.aws_secret,
+                                s3_bucket=self.s3_bucket,
+                                s3_folder=self.s3_folder) !=\
                     dw.train_path:
                 raise Exception("Something about train dataset caching is wrong...")
 
@@ -280,7 +266,10 @@ class Worker(object):
 
         if not os.path.isfile(dw.test_path):
             ensure_directory(dw.outfolder)
-            if self.download_file_s3(dw.test_path) !=\
+            if download_file_s3(dw.test_path, aws_key=self.aws_key,
+                                aws_secret=self.aws_secret,
+                                s3_bucket=self.s3_bucket,
+                                s3_folder=self.s3_folder) !=\
                     dw.test_path:
                 raise Exception("Something about test dataset caching is wrong...")
 
@@ -292,12 +281,11 @@ class Worker(object):
         return trainX, testX, trainY, testY
 
     def get_frozen_selector(self, datarun):
-        frozen_sets = self.db.GetIncompleteFrozenSets(datarun.id,
+        frozen_sets = self.db.get_incomplete_frozen_sets(datarun.id,
                                                       errors_to_exclude=20)
         if not frozen_sets:
-            if self.db.IsGriddingDoneForDatarun(datarun_id=datarun.id,
-                                                errors_to_exclude=20):
-                self.db.MarkDatarunGriddingDone(datarun_id=datarun.id)
+            if self.db.is_datarun_gridding_done(datarun_id=datarun.id):
+                self.db.mark_datarun_gridding_done(datarun_id=datarun.id)
             _log("No incomplete frozen sets for datarun present in database.")
 
         # load the class for selecting the frozen set
@@ -322,12 +310,11 @@ class Worker(object):
                                         by_algorithm=dict(fs_by_algorithm))
 
     def select_frozen_set(self, datarun):
-        frozen_sets = self.db.GetIncompleteFrozenSets(datarun.id,
+        frozen_sets = self.db.get_incomplete_frozen_sets(datarun.id,
                                                       errors_to_exclude=20)
         if not frozen_sets:
-            if self.db.IsGriddingDoneForDatarun(datarun_id=datarun.id,
-                                                errors_to_exclude=20):
-                self.db.MarkDatarunGriddingDone(datarun_id=datarun.id)
+            if self.db.is_datarun_gridding_done(datarun_id=datarun.id):
+                self.db.mark_datarun_gridding_done(datarun_id=datarun.id)
             _log("No incomplete frozen sets for datarun present in database.")
             return None
 
@@ -336,7 +323,7 @@ class Worker(object):
         # don't have any learners. That way the selector can choose frozen sets
         # that haven't been scored yet.
         frozen_set_scores = {fs.id: [] for fs in frozen_sets}
-        learners = self.db.GetCompleteLearners(datarun.id)
+        learners = self.db.get_complete_learners(datarun.id)
         for l in learners:
             # ignore frozen sets for which gridding is done
             if l.frozen_set_id not in frozen_set_scores:
@@ -347,7 +334,7 @@ class Worker(object):
             frozen_set_scores[l.frozen_set_id].append(score)
 
         frozen_set_id = self.frozen_selector.select(frozen_set_scores)
-        frozen_set = self.db.GetFrozenSet(frozen_set_id)
+        frozen_set = self.db.get_frozen_set(frozen_set_id)
 
         if not frozen_set:
             _log("Invalid frozen set id: %d" % frozen_set_id)
@@ -370,14 +357,14 @@ class Worker(object):
         # If there aren't any optimizables, only run this frozen set once
         if not len(optimizables):
             _log("No optimizables for frozen set %d" % frozen_set.id)
-            self.db.MarkFrozenSetGriddingDone(frozen_set.id)
+            self.db.mark_frozen_set_gridding_done(frozen_set.id)
             return vector_to_params(vector=[], optimizables=optimizables,
                                     frozens=frozen_set.frozens,
                                     constants=frozen_set.constants)
 
         # Get previously-used parameters
         # every learner should either be completed or have thrown an error
-        learners = [l for l in self.db.GetLearnersInFrozen(frozen_set.id)
+        learners = [l for l in self.db.get_learners_in_frozen(frozen_set.id)
                     if l.status == LearnerStatus.COMPLETE]
 
         # extract parameters and scores as numpy arrays from learners
@@ -393,7 +380,7 @@ class Worker(object):
         if vector is None:
             if datarun.gridding:
                 _log("Gridding done for frozen set %d" % frozen_set.id)
-                self.db.MarkFrozenSetGriddingDone(frozen_set.id)
+                self.db.mark_frozen_set_gridding_done(frozen_set.id)
             else:
                 _log("No sample selected for frozen set %d" % frozen_set.id)
             return None
@@ -413,9 +400,9 @@ class Worker(object):
                 # choose datarun to work on
                 _log("=" * 25)
                 started = datetime.datetime.now()
-                datarun = self.db.GetDatarun(datarun_id=self.datarun_id,
-                                             ignore_grid_complete=False,
-                                             choose_randomly=self.choose_randomly)
+                datarun = self.db.get_datarun(datarun_id=self.datarun_id,
+                                              ignore_grid_complete=False,
+                                              choose_randomly=self.choose_randomly)
 
                 if datarun is None:
                     # If desired, we can sleep here and wait for a new datarun
@@ -431,7 +418,7 @@ class Worker(object):
                 endrun = False
 
                 # check to see if we're over the datarun/time budget
-                frozen_sets = self.db.GetIncompleteFrozenSets(datarun.id,
+                frozen_sets = self.db.get_incomplete_frozen_sets(datarun.id,
                                                               errors_to_exclude=20)
 
                 if budget_type == "learner":
@@ -448,7 +435,7 @@ class Worker(object):
 
                 if endrun == True:
                     # marked the run as done successfully
-                    self.db.MarkDatarunDone(datarun.id)
+                    self.db.mark_datarun_done(datarun.id)
                     _log("This datarun has ended.")
                     time.sleep(2)
                     continue
@@ -477,7 +464,7 @@ class Worker(object):
 
                 _log("Testing learner...")
                 wrapper = create_wrapper(params, datarun.metric)
-                dataset = self.db.GetDataset(datarun.dataset_id)
+                dataset = self.db.get_dataset(datarun.dataset_id)
                 trainX, testX, trainY, testY = self.load_data(dataset)
                 wrapper.load_data_from_objects(trainX, testX, trainY, testY)
                 performance = wrapper.start()
@@ -494,8 +481,8 @@ class Worker(object):
                 self.insert_learner(datarun, frozen_set, performance,
                                     params, model, started)
 
-                _log("Best so far: %.3f" %
-                     self.db.GetMaximumY(datarun.id, datarun.score_target))
+                best_y = self.db.get_maximum_y(datarun.id, datarun.score_target)
+                _log("Best so far: %.3f" % (best_y or 0))
                 #_log("Best so far: %.3f +- %.3f" %
                      #self.db.get_best_so_far(datarun.id,
                                              #datarun.score_target))
@@ -529,6 +516,7 @@ if __name__ == '__main__':
     else:
         for opt in sql_options:
             sql_config[opt] = getattr(args, 'sql_' + opt)
+    db = Database(**sql_config)
 
     aws_config = None
     aws_options = ['access_key', 'secret_key', 's3_bucket', 's3_folder']
@@ -540,7 +528,7 @@ if __name__ == '__main__':
             for opt in aws_options:
                 aws_config[opt] = getattr(args, 'aws_' + opt)
 
-    worker = Worker(sql_config=sql_config,
+    worker = Worker(db=db,
                     datarun_id=args.datarun_id,
                     choose_randomly=args.choose_randomly,
                     save_files=args.save_files,
