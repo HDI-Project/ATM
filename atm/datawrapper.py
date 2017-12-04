@@ -32,18 +32,16 @@ class DataWrapper(object):
         assert traintestfile or (trainfile and testfile), \
             "You must either have a single file or a train AND a test file!"
 
-        self.traintestfile = None
-        self.trainfile = None
-        self.testfile = None
+        self.traintestfile = traintestfile
+        self.trainfile = trainfile
+        self.testfile = testfile
 
         if traintestfile:
-            self.traintestfile = traintestfile
+            print "train/test data:", self.traintestfile
         else:
-            self.trainfile = trainfile
-            self.testfile = testfile
+            print "training data:", self.trainfile
+            print "test data:", self.testfile
 
-        print "trainfile", self.trainfile
-        print "testing", self.testfile
 
     def load(self):
         """
@@ -59,7 +57,7 @@ class DataWrapper(object):
             self.wrap_single_file()
         else:
             self.wrap_train_test()
-        return self.train_path, self.test_path
+        return self.train_path_out, self.test_path_out
 
     def wrap_train_test(self):
         """
@@ -151,20 +149,20 @@ class DataWrapper(object):
         testing = data[-num_test_samples:,:]
 
         # training
-        self.train_path = os.path.join(self.outfolder,
+        self.train_path_out = os.path.join(self.outfolder,
                                           "%s_train.csv" % self.dataname)
         training_matrix = np.column_stack((np.array(training_discretized_labels),
                                            np.array(training)))
         print "training matrix:", training_matrix.shape
-        np.savetxt(self.train_path, training_matrix, delimiter=self.sep, fmt="%s")
+        np.savetxt(self.train_path_out, training_matrix, delimiter=self.sep, fmt="%s")
 
         # testing
-        self.test_path = os.path.join(self.outfolder,
-                                         "%s_test.csv" % self.dataname)
+        self.test_path_out = os.path.join(self.outfolder,
+                                          "%s_test.csv" % self.dataname)
         testing_matrix = np.column_stack((np.array(testing_discretized_labels),
                                           np.array(testing)))
         print "testing matrix: ", testing_matrix.shape
-        np.savetxt(self.test_path, testing_matrix, delimiter=self.sep, fmt="%s")
+        np.savetxt(self.test_path_out, testing_matrix, delimiter=self.sep, fmt="%s")
 
         # statistics
         self.statistics = {
@@ -183,8 +181,8 @@ class DataWrapper(object):
             "dummys" : dummies,
             "majority" : majority_percentage,
             "dataname" : self.dataname,
-            "training" : self.train_path,
-            "testing" : self.test_path,
+            "training" : self.train_path_out,
+            "testing" : self.test_path_out,
             #"testing_ratio" : (float(testing_matrix.shape[0]) /
             #   float(training_matrix.shape[0] + testing_matrix.shape[0])),
         }
@@ -270,17 +268,17 @@ class DataWrapper(object):
                              test_size=self.testing_ratio)
 
         # training
-        self.train_path = os.path.join(self.outfolder,
+        self.train_path_out = os.path.join(self.outfolder,
                                       "%s_train.csv" % self.dataname)
         training_matrix = np.column_stack((labels_train, data_train))
         print "training matrix:", training_matrix.shape
-        np.savetxt(self.train_path, training_matrix, delimiter=self.sep, fmt="%s")
+        np.savetxt(self.train_path_out, training_matrix, delimiter=self.sep, fmt="%s")
 
         # testing
-        self.test_path = os.path.join(self.outfolder, "%s_test.csv" % self.dataname)
+        self.test_path_out = os.path.join(self.outfolder, "%s_test.csv" % self.dataname)
         testing_matrix = np.column_stack((labels_test, data_test))
         print "testing matrix: ", testing_matrix.shape
-        np.savetxt(self.test_path, testing_matrix, delimiter=self.sep, fmt="%s")
+        np.savetxt(self.test_path_out, testing_matrix, delimiter=self.sep, fmt="%s")
 
         # statistics
         self.statistics = {
@@ -297,8 +295,8 @@ class DataWrapper(object):
             "dummys" : dummies,
             "majority" : majority_percentage,
             "dataname" : self.dataname,
-            "training" : self.train_path,
-            "testing" : self.test_path,
+            "training" : self.train_path_out,
+            "testing" : self.test_path_out,
             "testing_ratio" : float(testing_matrix.shape[0]) /
                 float(training_matrix.shape[0] + testing_matrix.shape[0]),
         }

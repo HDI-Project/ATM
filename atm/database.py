@@ -176,9 +176,9 @@ class Database(object):
             status = Column(Enum(*DATARUN_STATUS), default=RunStatus.PENDING)
 
             def __repr__(self):
-                base = "<%d: %s, budget: %s (%s), status: %s>"
-                return base % (self.id, self.description, self.budget_type,
-                               self.budget, self.status)
+                base = "<ID = %d, dataset ID = %s, strategy = %s, budget = %s (%s), status: %s>"
+                return base % (self.id, self.dataset_id, self.description,
+                               self.budget_type, self.budget, self.status)
 
         self.Datarun = Datarun
 
@@ -283,23 +283,52 @@ class Database(object):
         session.commit()
 
     @try_with_session()
-    def get_datarun(self, session, datarun_id=None, ignore_completed=True,
-                    ignore_grid_complete=False, choose_randomly=True):
+    def get_dataruns(self, session, ignore_pending=False, ignore_running=False,
+                     ignore_complete=True, include_ids=None, exclude_ids=None):
         """
-        Return a single datarun.
+        Return a list of all dataruns matching the chosen filters, sorted by
+        priority in descending order.
         Args:
-            datarun_id: return the datarun with this id
-            ignore_completed: if True, ignore completed dataruns
-            ignore_grid_complete: if True, ignore dataruns with is_gridding_done
-            choose_randomly: if True, choose one of the possible dataruns to
-                return randomly. If False, return the first datarun present in
-                the database (likely lowest id).
+            ignore_pending: if True, ignore dataruns that have not been started
+            ignore_running: if True, ignore dataruns that are already running
+            ignore_complete: if True, ignore completed dataruns
+            include_ids: only include ids from this list
+            exclude_ids: don't return any ids from this list
         """
         query = session.query(self.Datarun)
-        if ignore_completed:
-            query = query.filter(self.Datarun.completed == None)
-        if ignore_grid_complete:
-            query = query.filter(self.Datarun.is_gridding_done == 0)
+        if ignore_pending:
+            query = query.filter(self.Datarun.status != RunStatus.PENDING)
+        if ignore_running:
+            query = query.filter(self.Datarun.status != RunStatus.RUNNING)
+        if ignore_complete:
+            query = query.filter(self.Datarun.status != RunStatus.COMPLETE)
+        if include_ids:
+            exclude_ids = exclude_ids or []
+            ids = [i for i in include_ids if i not in exclude_ids]
+            query = query.filter(self.Datarun.id.in_(ids))
+        elif exclude_ids:
+            query = query.filter(self.Datarun.id.notin_(exclude_ids))
+
+        dataruns = query.all()
+
+        if not len(dataruns):
+            return None
+
+        return dataruns
+
+    @try_with_session()
+    def get_datarun(self, session, datarun_id=None, ignore_complete=True):
+        """
+        Return a single datarun. If no ID is supplied, return the first datarun
+        present in the database (likely lowest id).
+
+        Args:
+            datarun_id: return the datarun with this id
+            ignore_complete: if True, ignore completed dataruns
+        """
+        query = session.query(self.Datarun)
+        if ignore_complete:
+            query = query.filter(self.Datarun.status != RunStatus.COMPLETE)
         if datarun_id:
             query = query.filter(self.Datarun.id == datarun_id)
 
@@ -308,14 +337,9 @@ class Database(object):
         if not dataruns:
             return None
 
-        # select only those with max priority
+        # select first datarun with max priority
         max_priority = max([r.priority for r in dataruns])
-        candidates = [r for r in dataruns if r.priority == max_priority]
-
-        # choose a random candidate if necessary
-        if choose_randomly:
-            return candidates[random.randint(0, len(candidates) - 1)]
-        return candidates[0]
+        return next((r for r in dataruns if r.priority == max_priority), None)
 
     @try_with_session()
     def get_dataset(self, session, dataset_id):
@@ -410,7 +434,7 @@ class Database(object):
             return float(result)
         return None
 
-    @try_with_session(default=lambda: (0, 0))
+    @try_with_session(default=lambda: (None, 0, 0))
     def get_best_so_far(self, session, datarun_id, score_target):
         """
         Sort of like get_maximum_y, but retuns the score with the highest lower
@@ -419,29 +443,38 @@ class Database(object):
         """
         maximum = 0
         best_val, best_err = 0, 0
+        best_id = None
 
         if score_target == 'cv_judgment_metric':
-            result = session.query(self.Learner.cv_judgment_metric,
+            result = session.query(self.Learner.id,
+                                   self.Learner.cv_judgment_metric,
                                    self.Learner.cv_judgment_metric_stdev)\
                             .filter(self.Learner.datarun_id == datarun_id)\
                             .filter(self.Learner.status == LearnerStatus.COMPLETE)\
                             .all()
-            for val, std in result:
+            for idx, val, std in result:
                 if val is None or std is None:
                     continue
                 if val - 2 * std > maximum:
+                    best_id = idx
                     best_val, best_err = float(val), 2 * float(std)
                     maximum = float(val - 2 * std)
 
         elif score_target == 'test_judgment_metric':
-            result = session.query(func.max(self.Learner.test_judgment_metric))\
+            result = session.query(self.Learner.id,
+                                   self.Learner.test_judgment_metric)\
                             .filter(self.Learner.datarun_id == datarun_id)\
-                            .one()[0]
-            if result is not None and result > maximum:
-                best_val = float(result)
-                maximum = best_val
+                            .filter(self.Learner.status == LearnerStatus.COMPLETE)\
+                            .all()
+            for idx, val in result:
+                if val is None:
+                    continue
+                if val > maximum:
+                    best_id = idx
+                    best_val = float(val)
+                    maximum = best_val
 
-        return best_val, best_err
+        return best_id, best_val, best_err
 
     @try_with_session(commit=True)
     def mark_frozen_set_gridding_done(self, session, frozen_set_id):

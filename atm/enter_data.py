@@ -8,6 +8,7 @@ from boto.s3.connection import S3Connection, Key as S3Key
 
 from atm.datawrapper import DataWrapper
 from atm.constants import *
+from atm.config import *
 from atm.utilities import ensure_directory, hash_nested_tuple
 from atm.mapping import frozen_sets_from_algorithm_codes
 from atm.database import Database
@@ -15,7 +16,7 @@ from atm.database import Database
 
 warnings.filterwarnings("ignore")
 
-TIME_FMT = "%y-%m-%d_%H:%M"
+TIME_FMT = "%y-%m-%d %H:%M"
 
 parser = argparse.ArgumentParser(description="""
 Creates a dataset (if necessary) and a datarun and adds them to the ModelHub.
@@ -183,19 +184,14 @@ parser.add_argument('--score-target', choices=SCORE_TARGETS,
                     'test data (if available)')
 
 
-# empty object for storing stuff on
-class Config(object):
-    pass
-
-
 def create_dataset(db, train_path, test_path=None, output_folder=None,
                    label_column=None, data_description=None):
     """
     Create a dataset and add it to the ModelHub database.
 
     db: initialized Database object
-    train_path: path to training data
-    test_path: path to test data
+    train_path: path to raw training data
+    test_path: path to raw test data
     output_folder: folder where processed ('wrapped') data will be saved
     label_column: name of csv column representing the label
     data_description: description of the dataset (max 1000 chars)
@@ -275,22 +271,25 @@ def create_datarun(db, dataset_id, tuner, selector, gridding, priority, k_window
     the database. Returns the ID of the created datarun.
 
     db: initialized Database object
-    tuner:
-    selector:
-    gridding:
-    priority:
-    k_window:
-    r_min:
-    budget_type:
-    budget:
-    deadline:
-    score_target:
-    metric:
+    dataset_id: ID of the dataset this datarun will use
+    tuner: string, hyperparameter tuning method
+    selector: string, frozen set selection method
+    gridding: int or None,
+    priority: int, higher priority runs are computed first
+    k_window: int, `k` parameter for selection methods that need it
+    r_min: int, minimum number of prior examples for tuning to take effect
+    budget_type: string, either 'walltime' or 'learners'
+    budget: int, total budget for datarun in learners or minutes
+    deadline: string-formatted datetime, when the datarun must end by
+    score_target: either 'cv' or 'test', indicating which scores the run should
+        optimize for
+    metric: string, e.g. 'f1' or 'auc'. Metric the run will optimize for.
     """
     # describe the datarun by its tuner and selector
     run_description =  '__'.join([tuner, selector])
 
     # set the deadline, if applicable
+    # TODO
     deadline = None
     if deadline:
         deadline = datetime.strptime(deadline, TIME_FMT)
@@ -333,6 +332,7 @@ def create_frozen_sets(db, datarun, algorithms):
     algorithms: list of codes for the algorithms this datarun will use
     """
     # enumerate all combinations of categorical variables for these algorithms
+    print algorithms
     frozen_sets = frozen_sets_from_algorithm_codes(algorithms)
 
     # create frozen sets
@@ -354,73 +354,59 @@ def create_frozen_sets(db, datarun, algorithms):
     session.close()
 
 
-def load_config(sql_config=None, aws_config=None, run_config=None, config=None):
-    config = config or parser.parse_args()
-    if sql_config:
-        with open(sql_config) as f:
-            sqlconf = yaml.load(f)
-        for k, v in sqlconf.items():
-            setattr(config, 'sql_' + k, v)
-
-    if aws_config:
-        with open(aws_config) as f:
-            awsconf = yaml.load(f)
-        for k, v in awsconf.items():
-            setattr(config, 'aws_' + k, v)
-
-    if run_config:
-        with open(run_config) as f:
-            runconf = yaml.load(f)
-        for k, v in runconf.items():
-            setattr(config, k, v)
-
-    return config
-
-
-def enter_data(config):
+def enter_data(sql_config, aws_config, run_config, upload_data=False):
     """
-    config: object with all of the attributes that we need on it. This could be
-    from argparse.parse_config(), or it could be created from config files and
-    called from another file.
+    sql_config: Object with all attributes necessary to initialize a Database.
+    aws_config: all attributes necessary to connect to an S3 bucket.
+    run_config: all attributes necessary to initialize a Datarun, including
+        Dataset info if the dataset has not already been created.
+    upload_data: whether to store processed data in the cloud
+
+    Returns: ID of the generated datarun
     """
     # connect to the database
-    db = Database(config.sql_dialect, config.sql_database, config.sql_username,
-                  config.sql_password, config.sql_host, config.sql_port,
-                  config.sql_query)
+    db = Database(sql_config.dialect, sql_config.database, sql_config.username,
+                  sql_config.password, sql_config.host, sql_config.port,
+                  sql_config.query)
 
     # if the user has provided a dataset id, use that. Otherwise, create a new
     # dataset based on the arguments we were passed.
-    if config.dataset_id is None:
+    if run_config.dataset_id is None:
         print 'creating dataset...'
-        dataset = create_dataset(db, config.train_path, config.test_path,
-                                 config.output_folder, config.label_column,
-                                 config.data_description)
-        config.dataset_id = dataset.id
+        dataset = create_dataset(db, run_config.train_path, run_config.test_path,
+                                 run_config.output_folder, run_config.label_column,
+                                 run_config.data_description)
+        run_config.dataset_id = dataset.id
 
         # if we need to upload the train/test data, do it now
-        if config.upload_data:
-            upload_data(dataset.wrapper.train_path, dataset.wrapper.test_path,
-                        config.aws_access_key, config.aws_secret_key, config.aws_s3_bucket,
-                        config.aws_s3_folder)
+        if upload_data:
+            upload_data(dataset.wrapper.train_path_out,
+                        dataset.wrapper.test_path_out,
+                        s3_config.access_key, s3_config.secret_key,
+                        s3_config.bucket, s3_config.folder)
 
     # create and save datarun to database
     print 'creating datarun...'
-    datarun = create_datarun(db, config.dataset_id, config.tuner,
-                             config.selector, config.gridding, config.priority,
-                             config.k_window, config.r_min, config.budget_type,
-                             config.budget, config.deadline,
-                             config.score_target, config.metric)
+    datarun = create_datarun(db, run_config.dataset_id, run_config.tuner,
+                             run_config.selector, run_config.gridding,
+                             run_config.priority, run_config.k_window,
+                             run_config.r_min, run_config.budget_type,
+                             run_config.budget, run_config.deadline,
+                             run_config.score_target, run_config.metric)
 
     # create frozen sets for the new datarun
     print 'creating frozen sets...'
-    create_frozen_sets(db, datarun, config.algorithms)
+    create_frozen_sets(db, datarun, run_config.algorithms)
 
     print 'done!'
-    print 'Dataset ID:', config.dataset_id
+    print 'Dataset ID:', run_config.dataset_id
     print 'Datarun ID:', datarun.id
+    return datarun.id
 
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    config = load_config(args.sql_config, args.aws_config, args.run_config, args)
-    enter_data(config)
+    sql_config, aws_config, run_config = load_config(args.sql_config,
+                                                     args.aws_config,
+                                                     args.run_config, args)
+    enter_data(sql_config, aws_config, run_config, args.upload_data)

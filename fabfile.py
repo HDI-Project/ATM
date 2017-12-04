@@ -2,7 +2,7 @@ from fabric.api import *
 from fabric.colors import green as _green, yellow as _yellow
 import boto.ec2
 import time
-from atm.config import Config
+from atm.config import AWSConfig
 
 
 def check_instances_pending(instances):
