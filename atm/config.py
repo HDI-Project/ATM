@@ -22,6 +22,7 @@ class Defaults:
 
 
 class AWSConfig(object):
+    """ Stores configuration for AWS S3 and EC2 connections """
     def __init__(self, **kwargs):
         # universal config
         self.access_key = kwargs.get('access_key')
@@ -43,6 +44,7 @@ class AWSConfig(object):
 
 
 class SQLConfig(object):
+    """ Stores configuration for SQL database setup & connection """
     def __init__(self, **kwargs):
         self.dialect = kwargs.get('dialect')
         self.database = kwargs.get('database')
@@ -54,6 +56,7 @@ class SQLConfig(object):
 
 
 class RunConfig(object):
+    """ Stores configuration for Dataset and Datarun setup """
     def __init__(self, **kwargs):
         # dataset config
         self.train_path = kwargs.get('train_path')
@@ -63,6 +66,7 @@ class RunConfig(object):
         self.label_column = kwargs.get('label_column')
 
         # datarun config
+        self.dataset_id = kwargs.get('dataset_id')
         self.algorithms = kwargs.get('algorithms')
         self.models_dir = kwargs.get('models_dir')
         self.priority = kwargs.get('priority')

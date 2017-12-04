@@ -339,6 +339,7 @@ def create_frozen_sets(db, datarun, algorithms):
     session = db.get_session()
     session.autoflush = False
     for algorithm, sets in frozen_sets.iteritems():
+        print 'algorithm', algorithm, 'has', len(sets), 'frozen sets'
         for settings, others in sets.iteritems():
             optimizables, constants = others
             fhash = hash_nested_tuple(settings)
@@ -384,6 +385,8 @@ def enter_data(sql_config, aws_config, run_config, upload_data=False):
                         dataset.wrapper.test_path_out,
                         s3_config.access_key, s3_config.secret_key,
                         s3_config.bucket, s3_config.folder)
+    else:
+        dataset = db.get_dataset(dataset_id)
 
     # create and save datarun to database
     print 'creating datarun...'
@@ -397,10 +400,16 @@ def enter_data(sql_config, aws_config, run_config, upload_data=False):
     # create frozen sets for the new datarun
     print 'creating frozen sets...'
     create_frozen_sets(db, datarun, run_config.algorithms)
-
     print 'done!'
-    print 'Dataset ID:', run_config.dataset_id
+
+    print '========== Summary =========='
+    print 'Dataset ID:', dataset.id
+    print 'Training data:', dataset.train_path
+    print 'Test data:', (dataset.test_path or '<None>')
     print 'Datarun ID:', datarun.id
+    print 'Frozen set selection strategy:', datarun.selector
+    print 'Parameter tuning strategy:', datarun.tuner
+    print 'Budget: %d (%s)' % (datarun.budget, datarun.budget_type)
     return datarun.id
 
 

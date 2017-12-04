@@ -483,14 +483,24 @@ class Database(object):
         frozen_set.is_gridding_done = 1
 
     @try_with_session(commit=True)
-    def mark_datarun_gridding_done(self, session, datarun_id):
+    def mark_datarun_running(self, session, datarun_id):
+        """
+        Sets the status of the Datarun to RUNNING and sets the 'started' field
+        to the current datetime.
+        """
         datarun = session.query(self.Datarun)\
             .filter(self.Datarun.id == datarun_id).one()
-        datarun.is_gridding_done = 1
+        if datarun.status == RunStatus.PENDING:
+            datarun.status = RunStatus.RUNNING
+            datarun.started = datetime.now()
 
     @try_with_session(commit=True)
-    def mark_datarun_done(self, session, datarun_id):
-        """ Sets the completed field of the Datarun to the current datetime. """
+    def mark_datarun_complete(self, session, datarun_id):
+        """
+        Sets the status of the Datarun to COMPLETE and sets the 'completed'
+        field to the current datetime.
+        """
         datarun = session.query(self.Datarun)\
             .filter(self.Datarun.id == datarun_id).one()
+        datarun.status = RunStatus.COMPLETE
         datarun.completed = datetime.now()

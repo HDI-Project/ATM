@@ -78,7 +78,8 @@ parser.add_argument('--aws-s3-folder', help='Optional S3 folder')
 ################################################################################
 parser.add_argument('--cloud-mode', action='store_true', default=False,
                     help='Whether to run this worker in cloud mode')
-parser.add_argument('--datarun-id', help='Only train on datasets with this id')
+parser.add_argument('--dataruns', help='Only train on dataruns with these ids',
+                    nargs='+')
 parser.add_argument('--time', help='Number of seconds to run worker', type=int)
 parser.add_argument('--choose-randomly', action='store_true',
                     help='Choose dataruns to work on randomly (default = '
@@ -308,7 +309,7 @@ class Worker(object):
         frozen_set = session.query(self.db.FrozenSet).get(frozen_set.id)
         frozen_set.trained += 1
         session.commit()
-        _log('Saved as learner #%d.' % learner.id)
+        _log('Saved as learner %d.' % learner.id)
 
     def insert_error(self, frozen_set, params, error_msg):
         session = None
@@ -413,19 +414,21 @@ class Worker(object):
         """
         frozen_sets = self.db.get_incomplete_frozen_sets(self.datarun.id)
         if not frozen_sets:
-            self.db.mark_datarun_gridding_done(datarun_id=self.datarun.id)
+            self.db.mark_datarun_complete(self.datarun.id)
             _log("No incomplete frozen sets for datarun present in database.")
             return True
 
         if self.datarun.budget_type == "learner":
             n_completed = sum([f.trained for f in frozen_sets])
             if n_completed >= self.datarun.budget:
+                self.db.mark_datarun_complete(self.datarun.id)
                 _log("Learner budget has run out!")
                 return True
 
         elif self.datarun.budget_type == "walltime":
             deadline = self.datarun.deadline
             if datetime.datetime.now() > deadline:
+                self.db.mark_datarun_complete(self.datarun.id)
                 _log("Walltime budget has run out!")
                 return True
 
@@ -435,7 +438,7 @@ class Worker(object):
         """
         Given a set of fully-qualified hyperparameters, create and test a
         model.
-        Returns: Model object
+        Returns: Model object and performance dictionary
         """
         wrapper = create_wrapper(params, self.datarun.metric)
         wrapper.load_data_from_objects(*self.load_data())
@@ -449,11 +452,12 @@ class Worker(object):
         _log("Judgment metric (%s): %.3f +- %.3f" %
              (self.datarun.metric, new_val, new_err))
 
-        if (new_val - new_err) > (old_best[1] - old_best[2]):
-            _log("New best score! Previous best: (learner %s): %.3f +- %.3f" %
-                 old_best)
-        else:
-            _log("Best so far (learner %s): %.3f +- %.3f" % old_best)
+        if old_best[0] is not None:
+            if (new_val - new_err) > (old_best[1] - old_best[2]):
+                _log("New best score! Previous best (learner %s): %.3f +- %.3f" %
+                     old_best)
+            else:
+                _log("Best so far (learner %s): %.3f +- %.3f" % old_best)
 
         model = Model(algorithm=wrapper, data=self.dataset.wrapper)
         return model, performance
@@ -506,8 +510,6 @@ class Worker(object):
             self.insert_error(frozen_set, params, msg)
             raise LearnerError()
 
-        _log("Learner finished.")
-
 
 def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
          cloud_mode=False, aws_config=None, total_time=None):
@@ -532,14 +534,17 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         max_priority = max([r.priority for r in dataruns])
         priority_runs = [r for r in dataruns if r.priority == max_priority]
 
-        # either choose a run randomly, or take the lowest ID
+        # either choose a run randomly, or take the run with the lowest ID
         if choose_randomly:
             run = random.choice(priority_runs)
         else:
             run = sorted(dataruns, key=attrgetter('id'))[0]
 
-        # actual work happens here
+        # say we've started working on this datarun, if we haven't already
+        db.mark_datarun_running(run.id)
+
         _log("=" * 25)
+        # actual work happens here
         worker = Worker(db, run, save_files=save_files,
                         cloud_mode=cloud_mode, aws_config=aws_config)
         try:
