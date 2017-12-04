@@ -4,13 +4,13 @@ ATM - Auto Tune Models
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://hdi-project.github.io/ATM/)
 
 ## Quick start setup
-1. Clone project
+1. Clone project.
 ```
 $ git clone https://github.com/hdi-project/atm.git /path/to/atm
 $ cd /path/to/atm
 ```
 
-2. Install database
+2. Install database.
 - for SQLite (simpler):
 ```
 $ sudo apt install sqlite3
@@ -21,7 +21,7 @@ $ sudo apt install sqlite3
 $ sudo apt install mysql-server mysql-client
 ```
 
-3. Install python dependencies
+3. Install python dependencies.
 ```
 $ virtualenv venv
 $ . venv/bin/activate
@@ -33,31 +33,26 @@ repository.
 
 4. (Optional) Create copies of the sample configuration files, and edit them to
    add your settings. 
+
+Saving configuration as YAML files is an easy way to save complicated setups or
+share them with team members. However, if you want, you can skip this step and
+specify all configuration parameters on the command line later.
+
+If you do want to use YAML config files, you should start with the templates
+provided in `config/templates` and modify them to suit your own needs.
 ```
 $ cp config/templates/*.yaml config/
 $ vim config/*.yaml
 ```
-If you want, you can skip this step and specify all custom configurations on the
-command line later.
 
-In `run_config.yaml`, you will need to modify `train_path` to use a new dataset.
+`run_config.yaml` contains all the settings for a single Dataset and Datarun.
+You will need to modify `train_path` at the very least in order to use your own
+dataset.
 
-If you are using a MySQL database, you will need to change the configuration in
-`sql_config.yaml`; the default settings will create a new SQLite database called
-atm.db.
-
-For SQLite, the [datahub] config should specify 'dialect' and 'database', and
-leave everything else blank:
-
-    dialect: sqlite
-    database: atm.db
-    username:
-    password:
-    host:
-    port:
-    query:
-
-For MySQL, the config should look something like this: 
+`sql_config.yaml` contains the settings for the ModelHub SQL database. The
+default configuration will connect to (and create if necessary) a SQLite
+database called atm.db. If you are using a MySQL database, you will need to
+change it to something like this: 
 
     dialect: mysql
     database: atm
@@ -70,7 +65,7 @@ For MySQL, the config should look something like this:
 If you need to download data from an Amazon S3 bucket, you should update
 `aws_config.yaml` with your credentials.
 
-5. Create a datarun
+5. Create a datarun.
 ```
 $ python atm/enter_data.py --command --line --args
 ```
@@ -105,7 +100,7 @@ like this:
 The most important piece of information is the datarun ID.
 
 6. Start a worker, specifying your config files and the datarun(s) you'd like to
-   compute on:
+   compute on.
 ```
 $ python atm/worker.py --sql-config config/sql_config.yaml \
   --aws-config config/aws_config.yaml --dataruns 1
