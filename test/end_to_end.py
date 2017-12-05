@@ -43,13 +43,15 @@ Run a single end-to-end test with 10 sample datasets.
 The script will create a datarun for each dataset, then run a worker until the
 jobs are finished.
 ''')
+parser.add_argument('--sql-config', help='path to ModelHub SQL configuration',
+                    default=SQL_CONFIG)
 parser.add_argument('--aws-config', help='path to AWS configuration',
                     default=AWS_CONFIG)
 
 args = parser.parse_args()
 
 print 'creating dataruns...'
-sql_config, aws_config, run_config = load_config(sql_path=SQL_CONFIG,
+sql_config, aws_config, run_config = load_config(sql_path=args.sql_config,
                                                  aws_path=args.aws_config,
                                                  run_path=RUN_CONFIG)
 

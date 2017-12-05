@@ -19,8 +19,9 @@ import sys
 import time
 import traceback
 import warnings
-from decimal import Decimal
 from collections import defaultdict
+from decimal import Decimal
+from operator import attrgetter
 
 import numpy as np
 import pandas as pd
@@ -414,21 +415,18 @@ class Worker(object):
         """
         frozen_sets = self.db.get_incomplete_frozen_sets(self.datarun.id)
         if not frozen_sets:
-            self.db.mark_datarun_complete(self.datarun.id)
             _log("No incomplete frozen sets for datarun present in database.")
             return True
 
         if self.datarun.budget_type == "learner":
             n_completed = sum([f.trained for f in frozen_sets])
             if n_completed >= self.datarun.budget:
-                self.db.mark_datarun_complete(self.datarun.id)
                 _log("Learner budget has run out!")
                 return True
 
         elif self.datarun.budget_type == "walltime":
             deadline = self.datarun.deadline
             if datetime.datetime.now() > deadline:
-                self.db.mark_datarun_complete(self.datarun.id)
                 _log("Walltime budget has run out!")
                 return True
 
@@ -469,7 +467,7 @@ class Worker(object):
         # check to see if our work is done
         if self.is_datarun_finished():
             # marked the run as done successfully
-            self.db.mark_datarun_done(self.datarun.id)
+            self.db.mark_datarun_complete(self.datarun.id)
             _log("This datarun has ended. Returning...")
             return
 
@@ -525,7 +523,7 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         # get all pending and running dataruns, or all pending/running dataruns
         # from the list we were given
         dataruns = db.get_dataruns(include_ids=datarun_ids)
-        if not len(dataruns):
+        if dataruns is None or not len(dataruns):
             _log("No dataruns found. Sleeping %d seconds and trying again." %
                  LOOP_WAIT)
             time.sleep(LOOP_WAIT)
@@ -543,7 +541,8 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         # say we've started working on this datarun, if we haven't already
         db.mark_datarun_running(run.id)
 
-        _log("=" * 25)
+        _log('=' * 25)
+        _log('Computing on datarun %d' % run.id)
         # actual work happens here
         worker = Worker(db, run, save_files=save_files,
                         cloud_mode=cloud_mode, aws_config=aws_config)
@@ -570,7 +569,7 @@ if __name__ == '__main__':
     db = Database(**vars(sql_config))
 
     # lets go
-    work(db=db, datarun_ids=args.datarun_ids,
+    work(db=db, datarun_ids=args.dataruns,
          choose_randomly=args.choose_randomly,
          save_files=args.save_files,
          cloud_mode=args.cloud_mode,
