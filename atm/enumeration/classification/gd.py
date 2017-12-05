@@ -7,19 +7,6 @@ import numpy as np
 class EnumeratorSGDC(ClassifierEnumerator):
 
     DEFAULT_RANGES = {
-        "loss" : ('hinge', 'log', 'modified_huber', 'squared_hinge'),
-        "penalty" : ('l1', 'l2', 'elasticnet'),
-        "alpha" : (10**-5, 10**5),
-        "l1_ratio" : (0.0, 1.0),
-        "fit_intercept" : (0.0, 1.0),
-        "n_iter" : (10, 200),
-        "shuffle" : (True, True),
-        "epsilon" : (10**-5, 10**5),
-        "learning_rate": ("constant", "optimal"),
-        "eta0": (10**-5, 10**5),
-        "class_weight": (None, None),
-        "_scale_minmax" : (True, True),
-        "n_jobs" : (-1, -1),
     }
 
     DEFAULT_KEYS = {

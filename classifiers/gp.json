@@ -1,0 +1,40 @@
+{   
+    "name": "gpc",
+    "parameters": {
+        "kernel": {
+            "type": "string",
+            "categorical": true, 
+            "range": ["constant", "rbf", "matern", "rational_quadratic", "exp_sine_squared"]
+        },
+        "nu": {
+            "type": "string",
+            "categorical": true,
+            "range": ["l1", "l2", "elasticnet"]
+        },
+        "length_scale": {
+           "type": "float_exp",
+           "categorical": false,
+           "range": [10e-5, 10e5]
+        },
+        "alpha": {
+           "type": "float",
+           "categorical": false,
+           "range": [0.0, 1.0]
+        },
+        "periodicity": {
+           "type": "int",
+           "categorical": true,
+           "range": [0.0, 1.0]
+        }
+    },
+    "conditions": [
+        {
+            "parameter": "kernel",
+            "branches": {
+                "matern": ["nu"],
+                "rational_quadratic": ["length_scale", "alpha"],
+                "exp_sine_squared": ["length_scale", "periodicity"]
+            }
+        }
+    ]
+}

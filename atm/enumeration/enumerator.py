@@ -1,9 +1,17 @@
 class Enumerator(object):
-
-    def __init__(self, ranges, keys):
-        self.ranges = ranges
-        self.keys = keys
-        self.root = None
+    """
+    This class is initialized with a list of optimizable Hyperparameters, and
+    is used to generate frozen sets (possible combinations of categorical
+    hyperparameters).
+    """
+    def __init__(self, parameters, function):
+        """
+        parameters: dictionary mapping parameter name -> Hyperparameter
+        function: (string) name of the function for which this Enumerator
+            enumerates. Must be a value defined on ClassifierEnumerator.
+        """
+        self.parameters = parameters
+        self.function = function
 
     def combinations(self):
         if self.root:

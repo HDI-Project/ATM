@@ -2,17 +2,8 @@ import numpy as np
 import itertools
 
 
-class Node(object):
-    def __init__(self):
-        pass
-
-    def combinations(self, parent_choice={}):
-        raise NotImplementedError
-
-
-class Combination(Node):
+class Combination(object):
     def __init__(self, nodes):
-        Node.__init__(self)
         self.nodes = nodes
 
     def combinations(self):
@@ -35,9 +26,8 @@ class Combination(Node):
         return allchoices
 
 
-class Choice(Node):
+class Choice(object):
     def __init__(self, key, values):
-        Node.__init__(self)
         self.key = key
         self.values = values
         self.conditionals = {}
