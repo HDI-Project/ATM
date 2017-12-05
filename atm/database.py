@@ -343,7 +343,7 @@ class Database(object):
 
     @try_with_session()
     def get_dataset(self, session, dataset_id):
-        """ Returns a specific dataset. """
+        """ Return a specific dataset. """
         return session.query(self.Dataset).get(dataset_id)
 
     @try_with_session(default=lambda: True)
@@ -366,9 +366,9 @@ class Database(object):
 
     @try_with_session(default=list)
     def get_incomplete_frozen_sets(self, session, datarun_id,
-                                 errors_to_exclude=20):
+                                   errors_to_exclude=20):
         """
-        Returns all the incomplete frozen sets in a given datarun by id.
+        Return all the incomplete frozen sets in a given datarun by id.
         """
         frozen_sets = session.query(self.FrozenSet)\
             .filter(and_(self.FrozenSet.datarun_id == datarun_id,
@@ -389,7 +389,7 @@ class Database(object):
 
     @try_with_session()
     def get_frozen_set(self, session, frozen_set_id):
-        """ Returns a specific learner.  """
+        """ Return a specific learner.  """
         return session.query(self.FrozenSet).get(frozen_set_id)
 
     @try_with_session(default=int)

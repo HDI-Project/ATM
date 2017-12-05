@@ -2,6 +2,7 @@
 import argparse
 import os
 import yaml
+from multiprocessing import Process
 
 from atm.database import Database
 from atm.enter_data import load_config, enter_data
@@ -35,7 +36,7 @@ DATASETS_MAX_FIRST = ['wine_1.csv',
                       'monks-problems-2_1.csv']
 DATASETS_SIMPLE = []
 
-DATASETS = DATASETS_MAX_FIRST
+DATASETS = DATASETS_MAX_MIN
 
 
 parser = argparse.ArgumentParser(description='''
@@ -47,6 +48,8 @@ parser.add_argument('--sql-config', help='path to ModelHub SQL configuration',
                     default=SQL_CONFIG)
 parser.add_argument('--aws-config', help='path to AWS configuration',
                     default=AWS_CONFIG)
+parser.add_argument('--processes', help='number of processes to run concurrently',
+                    default=4)
 
 args = parser.parse_args()
 
@@ -68,5 +71,9 @@ for ds in DATASETS:
 print 'starting workers...'
 
 # TODO multicore
-work(Database(**vars(sql_config)), datarun_ids=datarun_ids, save_files=False,
-     choose_randomly=True, cloud_mode=False, aws_config=aws_config)
+kwargs = dict(db=Database(**vars(sql_config)), datarun_ids=datarun_ids,
+              save_files=False, choose_randomly=True, cloud_mode=False,
+              aws_config=aws_config)
+
+for i in range(args.processes):
+    Process(target=work, kwargs=kwargs).start()
