@@ -17,16 +17,6 @@ from atm.constants import *
 from atm.utilities import object_to_base_64, base_64_to_object
 
 
-class LearnerStatus:
-    STARTED = 'started'
-    ERRORED = 'errored'
-    COMPLETE = 'complete'
-
-class RunStatus:
-    PENDING = 'pending'
-    RUNNING = 'running'
-    COMPLETE = 'complete'
-
 ALGORITHM_ROWS = [
 	dict(id=1, code='svm', name='Support Vector Machine', probability=True),
 	dict(id=2, code='et', name='Extra Trees', probability=True),

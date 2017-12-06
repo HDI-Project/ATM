@@ -41,53 +41,8 @@ ensure_directory("logs")
 
 # name log file after the local hostname
 LOG_FILE = "logs/%s.txt" % socket.gethostname()
-# how long to wait between training learners (or attempting to)
-LOOP_WAIT = 1.
-
-parser = argparse.ArgumentParser(description='Add more learners to database')
-
-##  Config files  #############################################################
-###############################################################################
-parser.add_argument('--sql-config', help='path to yaml SQL config file')
-parser.add_argument('--aws-config', help='path to yaml AWS config file')
-
-
-##  Database arguments  ########################################################
-################################################################################
-# All of these arguments must start with --sql-, and must correspond to
-# keys present in the SQL config example file.
-parser.add_argument('--sql-dialect', choices=SQL_DIALECTS,
-                    default=Defaults.SQL_DIALECT, help='Dialect of SQL to use')
-parser.add_argument('--sql-database', default=Defaults.DATABASE,
-                    help='Name of, or path to, SQL database')
-parser.add_argument('--sql-username', help='Username for SQL database')
-parser.add_argument('--sql-password', help='Password for SQL database')
-parser.add_argument('--sql-host', help='Hostname for database machine')
-parser.add_argument('--sql-port', help='Port used to connect to database')
-parser.add_argument('--sql-query', help='Specify extra login details')
-
-
-##  AWS arguments  #############################################################
-################################################################################
-parser.add_argument('--aws-access-key', help='API access key for AWS')
-parser.add_argument('--aws-secret-key', help='API secret key for AWS')
-parser.add_argument('--aws-s3-bucket', help='Amazon S3 bucket for data storage')
-parser.add_argument('--aws-s3-folder', help='Optional S3 folder')
-
-
-##  Worker arguments  ##########################################################
-################################################################################
-parser.add_argument('--cloud-mode', action='store_true', default=False,
-                    help='Whether to run this worker in cloud mode')
-parser.add_argument('--dataruns', help='Only train on dataruns with these ids',
-                    nargs='+')
-parser.add_argument('--time', help='Number of seconds to run worker', type=int)
-parser.add_argument('--choose-randomly', action='store_true',
-                    help='Choose dataruns to work on randomly (default = '
-                    'sequential order)')
-parser.add_argument('--no-save', dest='save_files', default=True,
-                    action='store_const', const=False,
-                    help="don't save models and metrics for later")
+# how long to wait for new dataruns to be added
+LOOP_WAIT = 2
 
 
 def _log(msg, stdout=True):
@@ -468,7 +423,7 @@ class Worker(object):
         if self.is_datarun_finished():
             # marked the run as done successfully
             self.db.mark_datarun_complete(self.datarun.id)
-            _log("This datarun has ended. Returning...")
+            _log("Datarun %d has ended." % self.datarun.id)
             return
 
         learner_start = datetime.datetime.now()
@@ -561,8 +516,24 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
 
 
 if __name__ == '__main__':
-    args = parser.parse_args()
+    parser = argparse.ArgumentParser(description='Add more learners to database')
+    add_arguments_sql(parser)
+    add_arguments_aws_s3(parser)
 
+    # add worker-specific arguments
+    parser.add_argument('--cloud-mode', action='store_true', default=False,
+                        help='Whether to run this worker in cloud mode')
+    parser.add_argument('--dataruns', help='Only train on dataruns with these ids',
+                        nargs='+')
+    parser.add_argument('--time', help='Number of seconds to run worker', type=int)
+    parser.add_argument('--choose-randomly', action='store_true',
+                        help='Choose dataruns to work on randomly (default = sequential order)')
+    parser.add_argument('--no-save', dest='save_files', default=True,
+                        action='store_const', const=False,
+                        help="don't save models and metrics for later")
+
+    # parse arguments and load configuration
+    args = parser.parse_args()
     sql_config, aws_config, _ = load_config(sql_path=args.sql_config,
                                             aws_path=args.aws_config,
                                             args=args)

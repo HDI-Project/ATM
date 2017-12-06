@@ -186,7 +186,9 @@ class DataWrapper(object):
             #"testing_ratio" : (float(testing_matrix.shape[0]) /
             #   float(training_matrix.shape[0] + testing_matrix.shape[0])),
         }
-        print self.statistics
+        print 'dataset info:'
+        for i in self.statistics.items():
+            print '\t%s: %s' % i
 
     def wrap_single_file(self):
         """
@@ -300,7 +302,9 @@ class DataWrapper(object):
             "testing_ratio" : float(testing_matrix.shape[0]) /
                 float(training_matrix.shape[0] + testing_matrix.shape[0]),
         }
-        print self.statistics
+        print 'dataset info:'
+        for i in self.statistics.items():
+            print '\t%s: %s' % i
 
     def __repr__(self):
         return "<DataWrapper>"

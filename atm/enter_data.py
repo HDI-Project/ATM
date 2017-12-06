@@ -13,175 +13,7 @@ from atm.utilities import ensure_directory, hash_nested_tuple
 from atm.mapping import frozen_sets_from_algorithm_codes
 from atm.database import Database
 
-
 warnings.filterwarnings("ignore")
-
-TIME_FMT = "%y-%m-%d %H:%M"
-
-parser = argparse.ArgumentParser(description="""
-Creates a dataset (if necessary) and a datarun and adds them to the ModelHub.
-All required arguments have default values. Running this script with no
-arguments will create a new dataset with the file in data/pollution_1.csv and a
-new datarun with the default arguments listed below.
-
-You can pass yaml configuration files (--sql-config, --aws-config, --run-config)
-instead of passing individual arguments. Any arguments in the config files will
-override arguments passed on the command line. See the examples in the config/
-folder for more information. """)
-
-
-##  Config files  #############################################################
-###############################################################################
-parser.add_argument('--sql-config', help='path to yaml SQL config file')
-parser.add_argument('--aws-config', help='path to yaml AWS config file')
-parser.add_argument('--run-config', help='path to yaml datarun config file')
-
-
-##  Database Arguments  ########################################################
-################################################################################
-# All of these arguments must start with --sql-, and must correspond to
-# keys present in the SQL config example file.
-parser.add_argument('--sql-dialect', choices=SQL_DIALECTS,
-                    default=Defaults.SQL_DIALECT, help='Dialect of SQL to use')
-parser.add_argument('--sql-database', default=Defaults.DATABASE,
-                    help='Name of, or path to, SQL database')
-parser.add_argument('--sql-username', help='Username for SQL database')
-parser.add_argument('--sql-password', help='Password for SQL database')
-parser.add_argument('--sql-host', help='Hostname for database machine')
-parser.add_argument('--sql-port', help='Port used to connect to database')
-parser.add_argument('--sql-query', help='Specify extra login details')
-
-
-##  AWS Arguments  #############################################################
-################################################################################
-# All of these arguments must start with --aws-, and must correspond to
-# keys present in the AWS config example file.
-parser.add_argument('--aws-access-key', help='AWS access key')
-parser.add_argument('--aws-secret-key', help='AWS secret key')
-parser.add_argument('--aws-s3-bucket', help='AWS S3 bucket to store data')
-parser.add_argument('--aws-s3-folder', help='Folder in AWS S3 bucket in which to store data')
-
-
-##  Dataset Arguments  #########################################################
-################################################################################
-parser.add_argument('--dataset-id', type=int,
-                    help="ID of dataset, if it's already in the database")
-parser.add_argument('--train-path', default=Defaults.TRAIN_PATH,
-                    help='Path to raw training data')
-parser.add_argument('--test-path', help='Path to raw test data (if applicable)')
-parser.add_argument('--data-description', help='Description of dataset')
-parser.add_argument('--output-folder', default=Defaults.OUTPUT_FOLDER,
-                    help='Path where processed data will be saved')
-parser.add_argument('--label-column', default=Defaults.LABEL_COLUMN,
-                    help='Name of the label column in the input data')
-parser.add_argument('--upload-data', action='store_true',
-                    help='Whether to upload processed data to s3')
-
-
-##  Datarun Arguments  #########################################################
-################################################################################
-# Notes:
-# - Support vector machines (svm) can take a long time to train. It's not an
-#   error. It's justpart of what happens  when the algorithm happens to explore
-#   a crappy set of parameters on a powerful algo like this.
-# - Stochastic gradient descent (sgd) can sometimes fail on certain parameter
-#   settings as well. Don't worry, they train SUPER fast, and the worker.py will
-#   simply log the error and continue.
-#
-# Algorithm options:
-#   logreg - logistic regression
-#   svm    - support vector machine
-#   sgd    - linear classifier (SVM or logreg) using stochastic gradient descent
-#   dt     - decision tree
-#   et     - extra trees
-#   rf     - random forest
-#   gnb    - gaussian naive bayes
-#   mnb    - multinomial naive bayes
-#   bnb    - bernoulli naive bayes
-#   gp     - gaussian process
-#   pa     - passive aggressive
-#   knn    - K nearest neighbors
-#   dbn    - deep belief network
-#   mlp    - multi-layer perceptron
-parser.add_argument('--algorithms', nargs='+', choices=ALGORITHMS,
-                    default=list(Defaults.ALGORITHMS),
-                    help='list of algorithms which the datarun will use')
-parser.add_argument('--priority', type=int, default=Defaults.PRIORITY,
-                    help='Priority of the datarun (higher = more important')
-parser.add_argument('--budget-type', choices=BUDGET_TYPES,
-                    default=Defaults.BUDGET_TYPE, help='Type of budget to use')
-parser.add_argument('--budget', type=int,
-                    help='Value of the budget, either in learners or minutes')
-parser.add_argument('--deadline',
-                    help='Deadline for datarun completion. If provided, this '
-                    'overrides the walltime budget. Format: ' + TIME_FMT)
-
-# hyperparameter selection strategy
-# How should ATM sample hyperparameters from a given frozen set?
-#    uniform  - pick randomly! (baseline)
-#    gp       - vanilla Gaussian Process
-#    gp_ei    - Gaussian Process expected improvement criterion
-#    gp_eivel - Gaussian Process expected improvement, with randomness added in
-#              based on velocity of improvement
-parser.add_argument('--tuner', choices=TUNERS, default=Defaults.TUNER,
-                    help='type of BTB tuner to use')
-
-# How should ATM select a particular hyperpartition (frozen set) from the
-# set of all hyperpartitions?
-# Options:
-#   uniform      - pick randomly
-#   ucb1         - UCB1 multi-armed bandit
-#   bestk        - MAB using only the best K runs in each frozen set
-#   bestkvel     - MAB with velocity of best K runs
-#   purebestkvel - always return frozen set with highest velocity
-#   recentk      - MAB with most recent K runs
-#   recentkvel   - MAB with velocity of most recent K runs
-#   hieralg      - hierarchical MAB: choose a classifier first, then choose frozen
-parser.add_argument('--selector', choices=SELECTORS, default=Defaults.SELECTOR,
-                    help='type of BTB selector to use')
-
-# r_min is the number of random runs performed in each hyperpartition before
-# allowing bayesian opt to select parameters. Consult the thesis to understand
-# what those mean, but essentially:
-#
-#  if (num_learners_trained_in_hyperpartition >= r_min)
-#    # train using sample criteria
-#  else
-#    # train using uniform (baseline)
-parser.add_argument('--r-min',  type=int, default=Defaults.R_MIN,
-                    help='number of random runs to perform before tuning can occur')
-
-# k is number that xxx-k methods use. It is similar to r_min, except it is
-# called k_window and determines how much "history" ATM considers for certain
-# frozen selection logics.
-parser.add_argument('--k-window', type=int, default=Defaults.K_WINDOW,
-                    help='number of previous scores considered by -k selector methods')
-
-# gridding determines whether or not sample selection will happen on a grid.
-# If any positive integer, a grid with `gridding` points on each axis is
-# established, and hyperparameter vectors are sampled from this finite space.
-# If 0 (or blank), hyperparameters are sampled from continuous space, and there
-# is no limit to the number of hyperparameter vectors that may be tried.
-parser.add_argument('--gridding', type=int, default=Defaults.GRIDDING,
-                    help='gridding factor (0: no gridding)')
-
-# Which field to use for judgment of performance
-# options:
-#   f1        - F1 score (harmonic mean of precision and recall)
-#   roc_auc   - area under the Receiver Operating Characteristic curve
-#   accuracy  - percent correct
-#   mu_sigma  - one standard deviation below the average cross-validated F1
-#               score (mu - sigma)
-parser.add_argument('--metric', choices=METRICS, default=Defaults.METRIC,
-                    help='type of BTB selector to use')
-
-# Which data to use for computing judgment score
-#   cv   - cross-validated performance on training data
-#   test - performance on test data
-parser.add_argument('--score-target', choices=SCORE_TARGETS,
-                    default=Defaults.SCORE_TARGET,
-                    help='whether to compute metrics by cross-validation or on '
-                    'test data (if available)')
 
 
 def create_dataset(db, train_path, test_path=None, output_folder=None,
@@ -289,16 +121,13 @@ def create_datarun(db, dataset_id, tuner, selector, gridding, priority, k_window
     run_description =  '__'.join([tuner, selector])
 
     # set the deadline, if applicable
-    # TODO
-    deadline = None
     if deadline:
         deadline = datetime.strptime(deadline, TIME_FMT)
+        # this overrides the otherwise configured budget_type
+        # TODO: why not walltime and learner budget simultaneously?
         budget_type = 'walltime'
     elif budget_type == 'walltime':
-        budget = budget or Defaults.WALLTIME_BUDGET
         deadline = datetime.now() + timedelta(minutes=budget)
-    else:
-        budget = budget or Defaults.LEARNER_BUDGET
 
     target = score_target + '_judgment_metric'
 
@@ -332,7 +161,6 @@ def create_frozen_sets(db, datarun, algorithms):
     algorithms: list of codes for the algorithms this datarun will use
     """
     # enumerate all combinations of categorical variables for these algorithms
-    print algorithms
     frozen_sets = frozen_sets_from_algorithm_codes(algorithms)
 
     # create frozen sets
@@ -389,6 +217,7 @@ def enter_data(sql_config, aws_config, run_config, upload_data=False):
         dataset = db.get_dataset(dataset_id)
 
     # create and save datarun to database
+    print
     print 'creating datarun...'
     datarun = create_datarun(db, run_config.dataset_id, run_config.tuner,
                              run_config.selector, run_config.gridding,
@@ -398,10 +227,10 @@ def enter_data(sql_config, aws_config, run_config, upload_data=False):
                              run_config.score_target, run_config.metric)
 
     # create frozen sets for the new datarun
+    print
     print 'creating frozen sets...'
     create_frozen_sets(db, datarun, run_config.algorithms)
-    print 'done!'
-
+    print
     print '========== Summary =========='
     print 'Dataset ID:', dataset.id
     print 'Training data:', dataset.train_path
@@ -414,8 +243,30 @@ def enter_data(sql_config, aws_config, run_config, upload_data=False):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="""
+Creates a dataset (if necessary) and a datarun and adds them to the ModelHub.
+All required arguments have default values. Running this script with no
+arguments will create a new dataset with the file in data/pollution_1.csv and a
+new datarun with the default arguments listed below.
+
+You can pass yaml configuration files (--sql-config, --aws-config, --run-config)
+instead of passing individual arguments. Any arguments in the config files will
+override arguments passed on the command line. See the examples in the config/
+folder for more information. """)
+    # Add argparse arguments for aws, sql, and datarun config
+    add_arguments_aws_s3(parser)
+    add_arguments_sql(parser)
+    add_arguments_datarun(parser)
+
+    # add our own argument, which determines whether to upload data
+    parser.add_argument('--upload-data', action='store_true',
+                        help='Whether to upload processed data to s3')
+
     args = parser.parse_args()
+
+    # create config objects from the config files and/or command line args
     sql_config, aws_config, run_config = load_config(args.sql_config,
                                                      args.aws_config,
                                                      args.run_config, args)
+    # create and save the dataset and datarun
     enter_data(sql_config, aws_config, run_config, args.upload_data)

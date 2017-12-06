@@ -1,3 +1,4 @@
+# TODO: figure out how to handle these better
 SQL_DIALECTS = ['sqlite', 'mysql']
 METRICS = ['f1', 'roc_auc', 'accuracy', 'mu_sigma']
 SCORE_TARGETS = ['cv', 'test']
@@ -9,6 +10,8 @@ SELECTORS = ['uniform', 'ucb1', 'bestk', 'bestkvel', 'purebestkvel', 'recentk',
              'recentkvel', 'hieralg']
 DATARUN_STATUS = ['pending', 'running', 'complete']
 LEARNER_STATUS = ['started', 'errored', 'complete']
+
+TIME_FMT = "%y-%m-%d %H:%M"
 
 class LearnerStatus:
     STARTED = 'started'
