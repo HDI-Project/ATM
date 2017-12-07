@@ -5,6 +5,19 @@ from atm.constants import *
 
 
 class Config(object):
+    """
+    Class which stores configuration for one aspect of ATM. Subclasses of
+    Config should define, in PARAMETERS and DEFAULTS, respectively, the list of
+    all configurable parameters and any default values for those parameters
+    other than None. The object can be initialized with any number of keyword
+    arguments; only kwargs that are in PARAMETERS will be used. This means you
+    can (relatively) safely do things like
+        args = parser.parse_args()
+        conf = Config(**vars(args))
+    and only relevant parameters will be set.
+
+    Subclasses do not need to define __init__ or any other methods.
+    """
     # list of all parameters which may be set on this config object
     PARAMETERS = []
     # default values for all required parameters
@@ -13,6 +26,13 @@ class Config(object):
     def __init__(self, **kwargs):
         for key in self.PARAMETERS:
             value = kwargs.get(key)
+
+            # Here, if a keyword argument is set to None, it will be overridden
+            # by the default value. AFAIK, this is the only way to deal with
+            # keyword args passed in from argparse that weren't set on the
+            # command line. That means you shouldn't define any PARAMETERS for
+            # which None is a meaningful value; if you do, make sure None is
+            # also the default.
             if key in self.DEFAULTS and value is None:
                 value = self.DEFAULTS[key]
 
@@ -23,12 +43,21 @@ class AWSConfig(Config):
     """ Stores configuration for AWS S3 and EC2 connections """
     PARAMETERS = [
         # universal config
-        'access_key', 'secret_key',
+        'access_key',
+        'secret_key',
+
         # s3 config
-        's3_bucket', 's3_folder',
+        's3_bucket',
+        's3_folder',
+
         # ec2 config
-        'ec2_region', 'ec2_amis', 'ec2_key_pair', 'ec2_keyfile',
-        'ec2_instance_type', 'ec2_username', 'num_instances',
+        'ec2_region',
+        'ec2_amis',
+        'ec2_key_pair',
+        'ec2_keyfile',
+        'ec2_instance_type',
+        'ec2_username',
+        'num_instances',
         'num_workers_per_instance'
     ]
 
@@ -38,7 +67,13 @@ class AWSConfig(Config):
 class SQLConfig(Config):
     """ Stores configuration for SQL database setup & connection """
     PARAMETERS = [
-        'dialect', 'database', 'username', 'password', 'host', 'port', 'query'
+        'dialect',
+        'database',
+        'username',
+        'password',
+        'host',
+        'port',
+        'query'
     ]
 
     DEFAULTS = {
@@ -51,13 +86,27 @@ class RunConfig(Config):
     """ Stores configuration for Dataset and Datarun setup """
     PARAMETERS = [
         # dataset config
-        'train_path', 'test_path', 'data_description', 'output_folder',
+        'train_path',
+        'test_path',
+        'data_description',
+        'output_folder',
         'label_column',
 
         # datarun config
-        'dataset_id', 'algorithms', 'models_dir', 'priority', 'budget_type',
-        'budget', 'deadline', 'tuner', 'r_min', 'gridding', 'selector',
-        'k_window', 'metric', 'score_target'
+        'dataset_id',
+        'algorithms',
+        'models_dir',
+        'priority',
+        'budget_type',
+        'budget',
+        'deadline',
+        'tuner',
+        'r_min',
+        'gridding',
+        'selector',
+        'k_window',
+        'metric',
+        'score_target'
     ]
 
     DEFAULTS = {
@@ -332,7 +381,7 @@ def load_config(sql_path=None, aws_path=None, run_path=None, args=None):
                          if 'aws_' in k and v is not None})
         run_args.update({k: v for k, v in vars(args).items()
                          if 'sql_' not in k and 'aws_' not in k
-                         and v is not None})
+                             and v is not None})
 
     # It's ok if there are some extra arguments that get passed in here; only
     # kwargs that correspond to real config values will be stored on the config

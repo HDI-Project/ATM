@@ -34,6 +34,8 @@ ALGORITHM_ROWS = [
 	dict(id=14, code='gp', name='Gaussian Process', probability=True),
 ]
 
+MAX_FROZEN_SET_ERRORS = 3
+
 
 def try_with_session(default=lambda: None, commit=False):
     """
@@ -176,15 +178,16 @@ class Database(object):
             __tablename__ = 'frozen_sets'
 
             id = Column(Integer, primary_key=True, autoincrement=True)
-            datarun_id = Column(Integer)
+            datarun_id = Column(Integer, nullable=False)
             algorithm = Column(String(15), nullable=False)
 
-            trained = Column(Integer, default=0)
+            learners = Column(Integer, default=0)
             optimizables64 = Column(Text)
             constants64 = Column(Text)
             frozens64 = Column(Text)
             frozen_hash = Column(String(32))
-            is_gridding_done = Column(Boolean, default=False)
+            status = Column(Enum(*FROZEN_STATUS),
+                            default=FrozenStatus.INCOMPLETE)
 
             @property
             def optimizables(self):
@@ -219,8 +222,8 @@ class Database(object):
             __tablename__ = 'learners'
 
             id = Column(Integer, primary_key=True, autoincrement=True)
-            frozen_set_id = Column(Integer)
-            datarun_id = Column(Integer)
+            frozen_set_id = Column(Integer, nullable=False)
+            datarun_id = Column(Integer, nullable=False)
 
             model_path = Column(String(300))
             metric_path = Column(String(300))
@@ -337,45 +340,37 @@ class Database(object):
         return session.query(self.Dataset).get(dataset_id)
 
     @try_with_session(default=lambda: True)
-    def is_datatun_gridding_done(self, session, datarun_id, errors_to_exclude=20):
+    def is_datatun_gridding_done(self, session, datarun_id):
         """
         Check whether gridding is done for the entire datarun.
-        errors_to_exclude = 0 indicates we don't care about errors.
         """
-        is_done = True
         frozen_sets = session.query(self.FrozenSet)\
             .filter(self.FrozenSet.datarun_id == datarun_id).all()
 
+        is_done = True
         for frozen_set in frozen_sets:
-            if not frozen_set.is_gridding_done:
-                num_errors = self.get_number_of_frozen_set_errors(frozen_set.id)
-                if errors_to_exclude == 0 or num_errors < errors_to_exclude:
-                    is_done = False
+            # If any frozen set has not finished gridding or errored out, we are
+            # not done.
+            if frozen_set.status == FrozenStatus.INCOMPLETE:
+                is_done = False
 
         return is_done
 
     @try_with_session(default=list)
-    def get_incomplete_frozen_sets(self, session, datarun_id,
-                                   errors_to_exclude=20):
+    def get_frozen_sets(self, session, datarun_id, ignore_gridding_done=True,
+                        ignore_errored=True):
         """
-        Return all the incomplete frozen sets in a given datarun by id.
+        Return all the frozen sets in a given datarun by id.
+        By default, only returns incomplete frozen sets.
         """
-        frozen_sets = session.query(self.FrozenSet)\
-            .filter(and_(self.FrozenSet.datarun_id == datarun_id,
-                         self.FrozenSet.is_gridding_done == 0)).all()
+        query = session.query(self.FrozenSet)\
+            .filter(self.FrozenSet.datarun_id == datarun_id)
+        if ignore_gridding_done:
+            query = query.filter(self.FrozenSet.status != FrozenStatus.GRIDDING_DONE)
+        if ignore_errored:
+            query = query.filter(self.FrozenSet.status != FrozenStatus.ERRORED)
 
-        if not errors_to_exclude:
-            return frozen_sets
-
-        old_list = frozen_sets
-        frozen_sets = []
-
-        for frozen_set in old_list:
-            if (self.get_number_of_frozen_set_errors(frozen_set.id) <
-                    errors_to_exclude):
-                frozen_sets.append(frozen_set)
-
-        return frozen_sets
+        return query.all()
 
     @try_with_session()
     def get_frozen_set(self, session, frozen_set_id):
@@ -388,6 +383,20 @@ class Database(object):
             .filter(and_(self.Learner.frozen_set_id == frozen_set_id,
                          self.Learner.status == LearnerStatus.ERRORED)).all()
         return len(learners)
+
+    @try_with_session(default=list)
+    def get_algorithms_in_datarun(self, session, datarun_id):
+        """ Get all algorithms used in a particular datarun. """
+        frozen_sets = self.get_frozen_sets(datarun_id)
+        algorithms = set(f.algorithm for f in frozen_sets)
+        return list(algorithms)
+
+    @try_with_session(default=list)
+    def get_frozens_by_algorithm(self, session, datarun_id, algorithm):
+        """ Get all frozen sets for a particular algorithm and datarun. """
+        return session.query(self.FrozenSet)\
+            .filter(self.FrozenSet.datarun_id == datarun_id)\
+            .filter(self.FrozenSet.algorithm == algorithm).all()
 
     @try_with_session(default=list)
     def get_learners_in_frozen(self, session, frozen_set_id):
@@ -425,7 +434,7 @@ class Database(object):
         return None
 
     @try_with_session(default=lambda: (None, 0, 0))
-    def get_best_so_far(self, session, datarun_id, score_target):
+    def get_best_so_far(self, session, datarun_id, score_target, frozen_set_id=None):
         """
         Sort of like get_maximum_y, but retuns the score with the highest lower
         error bound. In other words, what is the highest value of (score.mean -
@@ -436,12 +445,15 @@ class Database(object):
         best_id = None
 
         if score_target == 'cv_judgment_metric':
-            result = session.query(self.Learner.id,
-                                   self.Learner.cv_judgment_metric,
-                                   self.Learner.cv_judgment_metric_stdev)\
+            query = session.query(self.Learner.id,
+                                  self.Learner.cv_judgment_metric,
+                                  self.Learner.cv_judgment_metric_stdev)\
                             .filter(self.Learner.datarun_id == datarun_id)\
-                            .filter(self.Learner.status == LearnerStatus.COMPLETE)\
-                            .all()
+                            .filter(self.Learner.status == LearnerStatus.COMPLETE)
+            if frozen_set_id is not None:
+                query = query.filter(self.Learner.frozen_set_id == frozen_set_id)
+            result = query.all()
+
             for idx, val, std in result:
                 if val is None or std is None:
                     continue
@@ -451,11 +463,14 @@ class Database(object):
                     maximum = float(val - 2 * std)
 
         elif score_target == 'test_judgment_metric':
-            result = session.query(self.Learner.id,
-                                   self.Learner.test_judgment_metric)\
+            query = session.query(self.Learner.id,
+                                  self.Learner.test_judgment_metric)\
                             .filter(self.Learner.datarun_id == datarun_id)\
-                            .filter(self.Learner.status == LearnerStatus.COMPLETE)\
-                            .all()
+                            .filter(self.Learner.status == LearnerStatus.COMPLETE)
+            if frozen_set_id is not None:
+                query = query.filter(self.Learner.frozen_set_id == frozen_set_id)
+            result = query.all()
+
             for idx, val in result:
                 if val is None:
                     continue
@@ -467,16 +482,82 @@ class Database(object):
         return best_id, best_val, best_err
 
     @try_with_session(commit=True)
+    def create_learner(self, session, frozen_set_id, datarun_id, host, params):
+        """
+        Save a new, fully qualified learner object to the database.
+
+        Returns: the ID of the newly-created learner
+        """
+        learner = self.Learner(frozen_set_id=frozen_set_id,
+                               datarun_id=datarun_id,
+                               host=host,
+                               params=params,
+                               started=datetime.now(),
+                               status=LearnerStatus.RUNNING)
+        session.add(learner)
+        frozen_set = session.query(self.FrozenSet).get(frozen_set_id)
+        frozen_set.learners += 1
+
+        return learner.id
+
+    @try_with_session(commit=True)
+    def mark_learner_errored(self, session, learner_id, error_msg):
+        """
+        Mark an existing learner as having errored, and set the error message.
+        """
+        learner = session.query(self.Learner).get(learner_id)
+        learner.status = LearnerStatus.ERRORED
+        learner.error_msg = error_msg
+        if self.get_number_of_frozen_set_errors(learner.frozen_set_id) > \
+                MAX_FROZEN_SET_ERRORS:
+            self.mark_frozen_set_errored(learner.frozen_set_id)
+
+    @try_with_session(commit=True)
+    def complete_learner(self, session, learner_id, trainable_params,
+                         dimensions, model_path, metric_path,
+                         cv_score, cv_stdev, test_score):
+        """
+        Set all the parameters on a learner that haven't yet been set, and mark
+        it as complete.
+        """
+        learner = session.query(self.Learner).get(learner_id)
+
+        learner.trainable_params = trainable_params
+        learner.dimensions = dimensions
+        learner.model_path = model_path
+        learner.metric_path = metric_path
+        learner.cv_judgment_metric = cv_score
+        learner.cv_judgment_metric_stdev = cv_stdev
+        learner.test_judgment_metric = test_score
+
+        learner.completed = datetime.now()
+        learner.status = LearnerStatus.COMPLETE
+
+    @try_with_session(commit=True)
     def mark_frozen_set_gridding_done(self, session, frozen_set_id):
+        """
+        Mark a frozen set as having all of its possible grid points explored.
+        """
         frozen_set = session.query(self.FrozenSet)\
             .filter(self.FrozenSet.id == frozen_set_id).one()
-        frozen_set.is_gridding_done = 1
+        frozen_set.status = FrozenStatus.GRIDDING_DONE
+
+    @try_with_session(commit=True)
+    def mark_frozen_set_errored(self, session, frozen_set_id):
+        """
+        Mark a frozen set as having had too many learner errors. This will
+        prevent more learners from being trained on this frozen set in the
+        future.
+        """
+        frozen_set = session.query(self.FrozenSet)\
+            .filter(self.FrozenSet.id == frozen_set_id).one()
+        frozen_set.status = FrozenStatus.ERRORED
 
     @try_with_session(commit=True)
     def mark_datarun_running(self, session, datarun_id):
         """
-        Sets the status of the Datarun to RUNNING and sets the 'started' field
-        to the current datetime.
+        Set the status of the Datarun to RUNNING and set the 'started' field to
+        the current datetime.
         """
         datarun = session.query(self.Datarun)\
             .filter(self.Datarun.id == datarun_id).one()
@@ -487,8 +568,8 @@ class Database(object):
     @try_with_session(commit=True)
     def mark_datarun_complete(self, session, datarun_id):
         """
-        Sets the status of the Datarun to COMPLETE and sets the 'completed'
-        field to the current datetime.
+        Set the status of the Datarun to COMPLETE and set the 'completed' field
+        to the current datetime.
         """
         datarun = session.query(self.Datarun)\
             .filter(self.Datarun.id == datarun_id).one()

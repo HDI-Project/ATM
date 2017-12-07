@@ -177,18 +177,46 @@ def create_frozen_sets(db, datarun, algorithms):
                                 constants=constants,
                                 frozens=settings,
                                 frozen_hash=fhash,
-                                is_gridding_done=False)
+                                status=FrozenStatus.INCOMPLETE)
             session.add(fset)
     session.commit()
     session.close()
 
-
-def enter_data(sql_config, aws_config, run_config, upload_data=False):
+def enter_dataset(db, run_config, aws_config=None, upload_data=False):
     """
-    sql_config: Object with all attributes necessary to initialize a Database.
+    Generate a dataset, and update run_config with the dataset ID.
+
+    db: Database object with active connection to ModelHub
+    run_config: all attributes necessary to initialize a Datarun, including
+        Dataset info
     aws_config: all attributes necessary to connect to an S3 bucket.
+    upload_data: whether to store processed data in the cloud
+
+    Returns: the generated dataset object
+    """
+    print 'creating dataset...'
+    dataset = create_dataset(db, run_config.train_path, run_config.test_path,
+                             run_config.output_folder, run_config.label_column,
+                             run_config.data_description)
+    run_config.dataset_id = dataset.id
+
+    # if we need to upload the train/test data, do it now
+    if upload_data:
+        upload_data(dataset.wrapper.train_path_out,
+                    dataset.wrapper.test_path_out,
+                    s3_config.access_key, s3_config.secret_key,
+                    s3_config.bucket, s3_config.folder)
+
+    return dataset
+
+def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False):
+    """
+    Generate a datarun, including a dataset if necessary.
+
+    sql_config: Object with all attributes necessary to initialize a Database.
     run_config: all attributes necessary to initialize a Datarun, including
         Dataset info if the dataset has not already been created.
+    aws_config: all attributes necessary to connect to an S3 bucket.
     upload_data: whether to store processed data in the cloud
 
     Returns: ID of the generated datarun
@@ -201,20 +229,10 @@ def enter_data(sql_config, aws_config, run_config, upload_data=False):
     # if the user has provided a dataset id, use that. Otherwise, create a new
     # dataset based on the arguments we were passed.
     if run_config.dataset_id is None:
-        print 'creating dataset...'
-        dataset = create_dataset(db, run_config.train_path, run_config.test_path,
-                                 run_config.output_folder, run_config.label_column,
-                                 run_config.data_description)
-        run_config.dataset_id = dataset.id
-
-        # if we need to upload the train/test data, do it now
-        if upload_data:
-            upload_data(dataset.wrapper.train_path_out,
-                        dataset.wrapper.test_path_out,
-                        s3_config.access_key, s3_config.secret_key,
-                        s3_config.bucket, s3_config.folder)
+        dataset = enter_dataset(db, run_config, aws_config=aws_config,
+                                upload_data=upload_data)
     else:
-        dataset = db.get_dataset(dataset_id)
+        dataset = db.get_dataset(run_config.dataset_id)
 
     # create and save datarun to database
     print
@@ -269,4 +287,4 @@ folder for more information. """)
                                                      args.aws_config,
                                                      args.run_config, args)
     # create and save the dataset and datarun
-    enter_data(sql_config, aws_config, run_config, args.upload_data)
+    enter_datarun(sql_config, run_config, aws_config, args.upload_data)
