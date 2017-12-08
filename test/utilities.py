@@ -15,7 +15,7 @@ def graph_best_so_far(db, datarun_ids=None, n_learners=100):
     for r in dataruns:
         # generate a list of the "best so far" score after each learner was
         # computed (in chronological order)
-        learners = db.get_learners_in_datarun(r.id)[:n_learners]
+        learners = db.get_learners(datarun_id=r.id)[:n_learners]
         print 'run %s: %d learners' % (r, len(learners))
         x = range(len(learners))
         y = []
@@ -32,56 +32,45 @@ def graph_best_so_far(db, datarun_ids=None, n_learners=100):
     plt.show()
 
 def print_summary(db, rid):
-    run = db.get_datarun(rid, ignore_complete=False)
+    run = db.get_datarun(rid)
     ds = db.get_dataset(run.dataset_id)
     print
     print 'Dataset %s' % ds
     print 'Datarun %s' % run
 
-    learners = db.get_learners_in_datarun(rid)
+    learners = db.get_learners(datarun_id=rid)
     print 'Learners: %d total' % len(learners)
 
-    lid, score, std = db.get_best_so_far(run.id, run.score_target)
-    print 'Best result overall: learner %d, %s = %.3f +- %.3f' % (lid,
-                                                                  run.metric,
-                                                                  score, std)
-    dd = defaultdict(lambda: defaultdict(list))
+    best = db.get_best_learner(datarun_id=run.id)
+    if best is not None:
+        score = best.cv_judgment_metric
+        err = 2 * best.cv_judgment_metric_stdev
+        print 'Best result overall: learner %d, %s = %.3f +- %.3f' % (best.id,
+                                                                      run.metric,
+                                                                      score, err)
+
+    # maps algorithms to sets of frozen sets, and frozen sets to lists of
+    # learners
+    alg_map = {a: defaultdict(list) for a in db.get_algorithms(datarun_id=rid)}
 
     for l in learners:
         fs = db.get_frozen_set(l.frozen_set_id)
-        dd[fs.algorithm][fs.id].append(l)
+        alg_map[fs.algorithm][fs.id].append(l)
 
-    for alg, fs_map in dd.items():
+    for alg, fs_map in alg_map.items():
         print
         print 'algorithm %s:' % alg
-        alg_running = 0
-        alg_errored = 0
-        alg_complete = 0
-        alg_score = 0
-        alg_err = 0
-        alg_lid = None
 
-        for fsid, fs_learners in fs_map.items():
-            fs = db.get_frozen_set(fsid)
-            running = len([l for l in fs_learners if l.status == LearnerStatus.RUNNING])
-            errored = len([l for l in fs_learners if l.status == LearnerStatus.ERRORED])
-            complete = len([l for l in fs_learners if l.status == LearnerStatus.COMPLETE])
-            print '\tfrozen set %s:' % fs.id
-            print '\t\t%d running, %d errored, %d complete' % (running, errored, complete)
-            lid, score, err = db.get_best_so_far(run.id, run.score_target, fsid)
-            print '\t\tBest: learner %s, %s = %.3f +- %.3f' % (lid, run.metric,
-                                                               score, err)
+        learners = sum(fs_map.values(), [])
+        errored = len([l for l in learners if l.status ==
+                       LearnerStatus.ERRORED])
+        complete = len([l for l in learners if l.status ==
+                        LearnerStatus.COMPLETE])
+        print '\t%d errored, %d complete' % (errored, complete)
 
-            alg_running += running
-            alg_errored += errored
-            alg_complete += complete
-            if alg_score - alg_err < score - err:
-                alg_score = score
-                alg_err = err
-                alg_lid = lid
-
-        print 'totals:'
-        print '%d running, %d errored, %d complete' % (alg_running, alg_errored,
-                                                       alg_complete)
-        print 'Best: learner %s, %s = %.3f +- %.3f' % (alg_lid, run.metric,
-                                                       alg_score, alg_err)
+        best = db.get_best_learner(datarun_id=run.id, algorithm=alg)
+        if best is not None:
+            score = best.cv_judgment_metric
+            err = 2 * best.cv_judgment_metric_stdev
+            print '\tBest: learner %s, %s = %.3f +- %.3f' % (best, run.metric,
+                                                           score, err)

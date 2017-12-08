@@ -1,6 +1,6 @@
 from sqlalchemy import (create_engine, inspect, exists, Column, Unicode, String,
-                        Integer, Boolean, DateTime, Enum,
-                        MetaData, Numeric, Table, Text)
+                        ForeignKey, Integer, Boolean, DateTime, Enum, MetaData,
+                        Numeric, Table, Text)
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.url import URL
@@ -9,9 +9,10 @@ from sqlalchemy import func, and_
 import traceback
 import random, sys
 import os
-from datetime import datetime
 import warnings
 import pdb
+from datetime import datetime
+from operator import attrgetter
 
 from atm.constants import *
 from atm.utilities import object_to_base_64, base_64_to_object
@@ -91,6 +92,16 @@ class Database(object):
         self.create_algorithms()
 
     def define_tables(self):
+        """
+        Define the SQLAlchemy ORM class for each table in the ModelHub database.
+
+        These must be defined after the Database class is initialized so that
+        the database metadata is available (at runtime).
+        If the database does not already exist, it will be created. If it does
+        exist, it will not be updated with new schema -- after schema changes,
+        the database must be destroyed and reinialized.
+        """
+
         metadata = MetaData(bind=self.engine)
         Base = declarative_base()
 
@@ -144,7 +155,7 @@ class Database(object):
             __tablename__ = 'dataruns'
 
             id = Column(Integer, primary_key=True, autoincrement=True)
-            dataset_id = Column(Integer)
+            dataset_id = Column(Integer, ForeignKey('datasets.id'))
 
             description = Column(String(200), nullable=False)
             priority = Column(Integer)
@@ -178,8 +189,8 @@ class Database(object):
             __tablename__ = 'frozen_sets'
 
             id = Column(Integer, primary_key=True, autoincrement=True)
-            datarun_id = Column(Integer, nullable=False)
-            algorithm = Column(String(15), nullable=False)
+            datarun_id = Column(Integer, ForeignKey('dataruns.id'))
+            algorithm = Column(String(15))
 
             learners = Column(Integer, default=0)
             optimizables64 = Column(Text)
@@ -222,8 +233,8 @@ class Database(object):
             __tablename__ = 'learners'
 
             id = Column(Integer, primary_key=True, autoincrement=True)
-            frozen_set_id = Column(Integer, nullable=False)
-            datarun_id = Column(Integer, nullable=False)
+            frozen_set_id = Column(Integer, ForeignKey('frozen_sets.id'))
+            datarun_id = Column(Integer, ForeignKey('dataruns.id'))
 
             model_path = Column(String(300))
             metric_path = Column(String(300))
@@ -258,7 +269,8 @@ class Database(object):
                 self.trainable_params64 = object_to_base_64(value)
 
             def __repr__(self):
-                return "<%s>" % self.params
+                params = ', '.join(['%s: %s' % i for i in self.params.items()])
+                return "<id=%d, params=(%s)>" % (self.id, params)
 
         self.Learner = Learner
 
@@ -266,7 +278,7 @@ class Database(object):
 
     @try_with_session()
     def create_algorithms(self, session):
-        """ Enter all the default algorithms into the database """
+        """ Enter all the default algorithms into the database. """
         for r in ALGORITHM_ROWS:
             if not session.query(self.Dataset).get(r['id']):
                 args = dict(r)
@@ -275,18 +287,35 @@ class Database(object):
                 session.add(alg)
         session.commit()
 
+    ###########################################################################
+    ##  Standard query methods  ###############################################
+    ###########################################################################
+
+    @try_with_session()
+    def get_dataset(self, session, dataset_id):
+        """ Get a specific dataset. """
+        return session.query(self.Dataset).get(dataset_id)
+
+    @try_with_session()
+    def get_datarun(self, session, datarun_id):
+        """ Get a specific datarun. """
+        return session.query(self.Datarun).get(datarun_id)
+
     @try_with_session()
     def get_dataruns(self, session, ignore_pending=False, ignore_running=False,
-                     ignore_complete=True, include_ids=None, exclude_ids=None):
+                     ignore_complete=True, include_ids=None, exclude_ids=None,
+                     max_priority=True):
         """
-        Return a list of all dataruns matching the chosen filters, sorted by
-        priority in descending order.
+        Get a list of all dataruns matching the chosen filters.
+
         Args:
             ignore_pending: if True, ignore dataruns that have not been started
             ignore_running: if True, ignore dataruns that are already running
             ignore_complete: if True, ignore completed dataruns
             include_ids: only include ids from this list
             exclude_ids: don't return any ids from this list
+            max_priority: only return dataruns which have the highest priority
+                of any in the filtered set
         """
         query = session.query(self.Datarun)
         if ignore_pending:
@@ -307,37 +336,68 @@ class Database(object):
         if not len(dataruns):
             return None
 
+        if max_priority:
+            mp = max(dataruns, key=attrgetter('priority')).priority
+            dataruns = [d for d in dataruns if d.priority == mp]
+
         return dataruns
 
     @try_with_session()
-    def get_datarun(self, session, datarun_id=None, ignore_complete=True):
+    def get_frozen_set(self, session, frozen_set_id):
+        """ Get a specific learner.  """
+        return session.query(self.FrozenSet).get(frozen_set_id)
+
+    @try_with_session(default=list)
+    def get_frozen_sets(self, session, dataset_id=None, datarun_id=None,
+                        algorithm=None, ignore_gridding_done=True,
+                        ignore_errored=True):
         """
-        Return a single datarun. If no ID is supplied, return the first datarun
-        present in the database (likely lowest id).
-
-        Args:
-            datarun_id: return the datarun with this id
-            ignore_complete: if True, ignore completed dataruns
+        Return all the frozen sets in a given datarun by id.
+        By default, only returns incomplete frozen sets.
         """
-        query = session.query(self.Datarun)
-        if ignore_complete:
-            query = query.filter(self.Datarun.status != RunStatus.COMPLETE)
-        if datarun_id:
-            query = query.filter(self.Datarun.id == datarun_id)
+        query = session.query(self.FrozenSet)
+        if dataset_id is not None:
+            query = query.join(self.Datarun)\
+                .filter(self.Datarun.dataset_id == dataset_id)
+        if datarun_id is not None:
+            query = query.filter(self.FrozenSet.datarun_id == datarun_id)
+        if algorithm is not None:
+            query = query.filter(self.FrozenSet.algorithm == algorithm)
+        if ignore_gridding_done:
+            query = query.filter(self.FrozenSet.status != FrozenStatus.GRIDDING_DONE)
+        if ignore_errored:
+            query = query.filter(self.FrozenSet.status != FrozenStatus.ERRORED)
 
-        dataruns = query.all()
-
-        if not dataruns:
-            return None
-
-        # select first datarun with max priority
-        max_priority = max([r.priority for r in dataruns])
-        return next((r for r in dataruns if r.priority == max_priority), None)
+        return query.all()
 
     @try_with_session()
-    def get_dataset(self, session, dataset_id):
-        """ Return a specific dataset. """
-        return session.query(self.Dataset).get(dataset_id)
+    def get_learner(self, session, learner_id):
+        """ Get a specific learner. """
+        return session.query(self.Learner).get(learner_id)
+
+    @try_with_session()
+    def get_learners(self, session, dataset_id=None, datarun_id=None,
+                     algorithm=None, frozen_set_id=None, status=None):
+        """ Get a set of learners, filtered by the passed-in arguments. """
+        query = session.query(self.Learner)
+        if dataset_id is not None:
+            query = query.join(self.Datarun)\
+                .filter(self.Datarun.dataset_id == dataset_id)
+        if datarun_id is not None:
+            query = query.filter(self.Learner.datarun_id == datarun_id)
+        if algorithm is not None:
+            query = query.join(self.FrozenSet)\
+                .filter(self.FrozenSet.algorithm == algorithm)
+        if frozen_set_id is not None:
+            query = query.filter(self.Learner.frozen_set_id == frozen_set_id)
+        if status is not None:
+            query = query.filter(self.Learner.status == status)
+
+        return query.all()
+
+    ###########################################################################
+    ##  Special-purpose queries  ##############################################
+    ###########################################################################
 
     @try_with_session(default=lambda: True)
     def is_datatun_gridding_done(self, session, datarun_id):
@@ -356,130 +416,68 @@ class Database(object):
 
         return is_done
 
-    @try_with_session(default=list)
-    def get_frozen_sets(self, session, datarun_id, ignore_gridding_done=True,
-                        ignore_errored=True):
-        """
-        Return all the frozen sets in a given datarun by id.
-        By default, only returns incomplete frozen sets.
-        """
-        query = session.query(self.FrozenSet)\
-            .filter(self.FrozenSet.datarun_id == datarun_id)
-        if ignore_gridding_done:
-            query = query.filter(self.FrozenSet.status != FrozenStatus.GRIDDING_DONE)
-        if ignore_errored:
-            query = query.filter(self.FrozenSet.status != FrozenStatus.ERRORED)
-
-        return query.all()
-
-    @try_with_session()
-    def get_frozen_set(self, session, frozen_set_id):
-        """ Return a specific learner.  """
-        return session.query(self.FrozenSet).get(frozen_set_id)
-
     @try_with_session(default=int)
     def get_number_of_frozen_set_errors(self, session, frozen_set_id):
+        """
+        Get the number of learners that have errored using a specified frozen
+        set.
+        """
         learners = session.query(self.Learner)\
             .filter(and_(self.Learner.frozen_set_id == frozen_set_id,
                          self.Learner.status == LearnerStatus.ERRORED)).all()
         return len(learners)
 
     @try_with_session(default=list)
-    def get_algorithms_in_datarun(self, session, datarun_id):
+    def get_algorithms(self, session, dataset_id=None, datarun_id=None,
+                       ignore_errored=False, ignore_gridding_done=False):
         """ Get all algorithms used in a particular datarun. """
-        frozen_sets = self.get_frozen_sets(datarun_id)
+        frozen_sets = self.get_frozen_sets(dataset_id=dataset_id,
+                                           datarun_id=datarun_id,
+                                           ignore_gridding_done=False,
+                                           ignore_errored=False)
         algorithms = set(f.algorithm for f in frozen_sets)
         return list(algorithms)
 
-    @try_with_session(default=list)
-    def get_frozens_by_algorithm(self, session, datarun_id, algorithm):
-        """ Get all frozen sets for a particular algorithm and datarun. """
-        return session.query(self.FrozenSet)\
-            .filter(self.FrozenSet.datarun_id == datarun_id)\
-            .filter(self.FrozenSet.algorithm == algorithm).all()
-
-    @try_with_session(default=list)
-    def get_learners_in_frozen(self, session, frozen_set_id):
-        """ Returns all learners in a frozen set. """
-        return session.query(self.Learner)\
-            .filter(self.Learner.frozen_set_id == frozen_set_id).all()
-
-    @try_with_session(default=list)
-    def get_learners_in_datarun(self, session, datarun_id):
-        """ Returns all learners in a datarun.  """
-        return session.query(self.Learner)\
-            .filter(self.Learner.datarun_id == datarun_id)\
-            .order_by(self.Learner.started).all()
-
-    @try_with_session(default=list)
-    def get_complete_learners(self, session, datarun_id):
-        """ Returns all complete learners in a datarun.  """
-        return session.query(self.Learner)\
-            .filter(self.Learner.datarun_id == datarun_id)\
-            .filter(self.Learner.status == LearnerStatus.COMPLETE)\
-            .order_by(self.Learner.started).all()
-
-    @try_with_session()
-    def get_learner(self, session, learner_id):
-        """ Returns a specific learner.  """
-        return session.query(self.Learner).get(learner_id)
-
     @try_with_session()
     def get_maximum_y(self, session, datarun_id, score_target):
-        """ Returns the maximum value of a numeric column by name, or None. """
+        """ Get the maximum value of a numeric column by name, or None. """
         result = session.query(func.max(getattr(self.Learner, score_target)))\
             .filter(self.Learner.datarun_id == datarun_id).one()[0]
         if result:
             return float(result)
         return None
 
-    @try_with_session(default=lambda: (None, 0, 0))
-    def get_best_so_far(self, session, datarun_id, score_target, frozen_set_id=None):
+    @try_with_session()
+    def get_best_learner(self, session, score_target='mu_sigma',
+                         dataset_id=None, datarun_id=None,
+                         algorithm=None, frozen_set_id=None):
         """
-        Sort of like get_maximum_y, but retuns the score with the highest lower
-        error bound. In other words, what is the highest value of (score.mean -
-        2 * score.std) for any learner?
+        Get the learner with the highest lower error bound. In other words, what
+        learner has the highest value of (score.mean - 2 * score.std)?
+
+        score_target: indicates the metric by which to judge the best learner.
+            One of ['mu_sigma', 'cv_judgment_metric', 'test_judgment_metric'].
         """
-        maximum = 0
-        best_val, best_err = 0, 0
-        best_id = None
+        if score_target == 'mu_sigma':
+            func = lambda l: l.cv_judgment_metric - 2 * l.cv_judgment_metric_stdev
+        else:
+            func = attrgetter(score_target)
 
-        if score_target == 'cv_judgment_metric':
-            query = session.query(self.Learner.id,
-                                  self.Learner.cv_judgment_metric,
-                                  self.Learner.cv_judgment_metric_stdev)\
-                            .filter(self.Learner.datarun_id == datarun_id)\
-                            .filter(self.Learner.status == LearnerStatus.COMPLETE)
-            if frozen_set_id is not None:
-                query = query.filter(self.Learner.frozen_set_id == frozen_set_id)
-            result = query.all()
+        learners = self.get_learners(dataset_id=dataset_id,
+                                     datarun_id=datarun_id,
+                                     algorithm=algorithm,
+                                     frozen_set_id=frozen_set_id,
+                                     status=LearnerStatus.COMPLETE)
 
-            for idx, val, std in result:
-                if val is None or std is None:
-                    continue
-                if val - 2 * std > maximum:
-                    best_id = idx
-                    best_val, best_err = float(val), 2 * float(std)
-                    maximum = float(val - 2 * std)
+        if not learners:
+            return None
 
-        elif score_target == 'test_judgment_metric':
-            query = session.query(self.Learner.id,
-                                  self.Learner.test_judgment_metric)\
-                            .filter(self.Learner.datarun_id == datarun_id)\
-                            .filter(self.Learner.status == LearnerStatus.COMPLETE)
-            if frozen_set_id is not None:
-                query = query.filter(self.Learner.frozen_set_id == frozen_set_id)
-            result = query.all()
+        best = max(learners, key=func)
+        return best
 
-            for idx, val in result:
-                if val is None:
-                    continue
-                if val > maximum:
-                    best_id = idx
-                    best_val = float(val)
-                    maximum = best_val
-
-        return best_id, best_val, best_err
+    ###########################################################################
+    ##  Methods to update the database  #######################################
+    ###########################################################################
 
     @try_with_session(commit=True)
     def create_learner(self, session, frozen_set_id, datarun_id, host, params):
@@ -501,18 +499,6 @@ class Database(object):
         return learner.id
 
     @try_with_session(commit=True)
-    def mark_learner_errored(self, session, learner_id, error_msg):
-        """
-        Mark an existing learner as having errored, and set the error message.
-        """
-        learner = session.query(self.Learner).get(learner_id)
-        learner.status = LearnerStatus.ERRORED
-        learner.error_msg = error_msg
-        if self.get_number_of_frozen_set_errors(learner.frozen_set_id) > \
-                MAX_FROZEN_SET_ERRORS:
-            self.mark_frozen_set_errored(learner.frozen_set_id)
-
-    @try_with_session(commit=True)
     def complete_learner(self, session, learner_id, trainable_params,
                          dimensions, model_path, metric_path,
                          cv_score, cv_stdev, test_score):
@@ -532,6 +518,21 @@ class Database(object):
 
         learner.completed = datetime.now()
         learner.status = LearnerStatus.COMPLETE
+
+    @try_with_session(commit=True)
+    def mark_learner_errored(self, session, learner_id, error_msg):
+        """
+        Mark an existing learner as having errored and set the error message. If
+        the learner's frozen set has produced too many erring learners, mark it
+        as errored as well.
+        """
+        learner = session.query(self.Learner).get(learner_id)
+        learner.error_msg = error_msg
+        learner.status = LearnerStatus.ERRORED
+        learner.completed = datetime.now()
+        if self.get_number_of_frozen_set_errors(learner.frozen_set_id) > \
+                MAX_FROZEN_SET_ERRORS:
+            self.mark_frozen_set_errored(learner.frozen_set_id)
 
     @try_with_session(commit=True)
     def mark_frozen_set_gridding_done(self, session, frozen_set_id):

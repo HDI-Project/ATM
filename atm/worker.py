@@ -269,7 +269,8 @@ class Worker(object):
         # don't have any learners. That way the selector can choose frozen sets
         # that haven't been scored yet.
         frozen_set_scores = {fs.id: [] for fs in frozen_sets}
-        learners = self.db.get_complete_learners(self.datarun.id)
+        learners = self.db.get_learners(datarun_id=self.datarun.id,
+                                        status=LearnerStatus.COMPLETE)
         for l in learners:
             # ignore frozen sets for which gridding is done
             if l.frozen_set_id not in frozen_set_scores:
@@ -302,7 +303,7 @@ class Worker(object):
 
         # Get previously-used parameters: every learner should either be
         # completed or have thrown an error
-        learners = [l for l in self.db.get_learners_in_frozen(frozen_set.id)
+        learners = [l for l in self.db.get_learners(frozen_set_id=frozen_set.id)
                     if l.status == LearnerStatus.COMPLETE]
 
         # Extract parameters and scores as numpy arrays from learners
@@ -364,20 +365,24 @@ class Worker(object):
         wrapper.load_data_from_objects(*self.load_data())
         performance = wrapper.start()
 
-        old_best = self.db.get_best_so_far(self.datarun.id,
-                                           self.datarun.score_target)
+        old_best = self.db.get_best_learner(datarun_id=self.datarun.id)
+        if old_best is not None:
+            old_val = old_best.cv_judgment_metric
+            old_err = 2 * old_best.cv_judgment_metric_stdev
+
         new_val = performance["cv_judgment_metric"]
         new_err = 2 * performance["cv_judgment_metric_stdev"]
 
         _log("Judgment metric (%s): %.3f +- %.3f" %
              (self.datarun.metric, new_val, new_err))
 
-        if old_best[0] is not None:
-            if (new_val - new_err) > (old_best[1] - old_best[2]):
+        if old_best is not None:
+            if (new_val - new_err) > ():
                 _log("New best score! Previous best (learner %s): %.3f +- %.3f" %
-                     old_best)
+                     (old_best.id, old_val, old_err))
             else:
-                _log("Best so far (learner %s): %.3f +- %.3f" % old_best)
+                _log("Best so far (learner %s): %.3f +- %.3f" %
+                     (old_best.id, old_val, old_err))
 
         model = Model(algorithm=wrapper, data=self.dataset.wrapper)
         return model, performance
