@@ -3,7 +3,6 @@ import argparse
 import os
 import yaml
 from collections import defaultdict
-from multiprocessing import Process
 from os.path import join
 
 from atm.config import *
@@ -76,21 +75,8 @@ for ds in DATASETS:
     dataset = enter_dataset(db, run_config, aws_config)
     datarun_ids.append(enter_datarun(sql_config, run_config, aws_config))
 
-print 'starting workers...'
-kwargs = dict(db=db, datarun_ids=datarun_ids, save_files=False,
-              choose_randomly=True, cloud_mode=False,
-              aws_config=aws_config, wait=False)
-
-# spawn a set of worker processes to work on the dataruns
-procs = []
-for i in range(args.processes):
-    p = Process(target=work, kwargs=kwargs)
-    p.start()
-    procs.append(p)
-
-# wait for them to finish
-for p in procs:
-    p.join()
+work_parallel(db=db, datarun_ids=datarun_ids, aws_config=aws_config,
+              n_procs=args.processes)
 
 print 'workers finished.'
 

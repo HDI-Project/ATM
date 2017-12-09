@@ -3,8 +3,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from collections import defaultdict
+from multiprocessing import Process
 
 from atm.config import *
+from atm.worker import work
 
 def get_best_so_far(db, datarun_id):
     """
@@ -87,3 +89,20 @@ def print_summary(db, rid):
             err = 2 * best.cv_judgment_metric_stdev
             print '\tBest: learner %s, %s = %.3f +- %.3f' % (best, run.metric,
                                                            score, err)
+
+def work_parallel(db, datarun_ids=None, aws_config=None, n_procs=4):
+    print 'starting workers...'
+    kwargs = dict(db=db, datarun_ids=datarun_ids, save_files=False,
+                  choose_randomly=True, cloud_mode=False,
+                  aws_config=aws_config, wait=False)
+
+    # spawn a set of worker processes to work on the dataruns
+    procs = []
+    for i in range(n_procs):
+        p = Process(target=work, kwargs=kwargs)
+        p.start()
+        procs.append(p)
+
+    # wait for them to finish
+    for p in procs:
+        p.join()
