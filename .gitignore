@@ -1,13 +1,14 @@
 *.pyc
 *.pem
 *.csv
+*.yaml
 logs/*
+# ignore raw data except for samples
 data/*
 !data/samples/*.csv
 models/*
 metrics/*
 # ignore configuration files except templates
-config/*
 !config/templates/*.yaml
 .DS_Store
 .idea/*

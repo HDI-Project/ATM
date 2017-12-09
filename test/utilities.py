@@ -20,11 +20,12 @@ def get_best_so_far(db, datarun_id):
         y.append(best_so_far)
     return y
 
-def graph_series(length, **series):
+def graph_series(length, title, **series):
     """
     Graph series of performance metrics against one another.
 
     length: all series will be truncated to this length
+    title: what to title the graph
     **series: mapping of labels to series of performance data
     """
     lines = []
@@ -39,6 +40,7 @@ def graph_series(length, **series):
 
     plt.xlabel('learners')
     plt.ylabel('performance')
+    plt.title(title)
     plt.legend(handles=lines)
     plt.show()
 
