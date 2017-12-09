@@ -41,53 +41,8 @@ ensure_directory("logs")
 
 # name log file after the local hostname
 LOG_FILE = "logs/%s.txt" % socket.gethostname()
-# how long to wait between training learners (or attempting to)
-LOOP_WAIT = 1.
-
-parser = argparse.ArgumentParser(description='Add more learners to database')
-
-##  Config files  #############################################################
-###############################################################################
-parser.add_argument('--sql-config', help='path to yaml SQL config file')
-parser.add_argument('--aws-config', help='path to yaml AWS config file')
-
-
-##  Database arguments  ########################################################
-################################################################################
-# All of these arguments must start with --sql-, and must correspond to
-# keys present in the SQL config example file.
-parser.add_argument('--sql-dialect', choices=SQL_DIALECTS,
-                    default=Defaults.SQL_DIALECT, help='Dialect of SQL to use')
-parser.add_argument('--sql-database', default=Defaults.DATABASE,
-                    help='Name of, or path to, SQL database')
-parser.add_argument('--sql-username', help='Username for SQL database')
-parser.add_argument('--sql-password', help='Password for SQL database')
-parser.add_argument('--sql-host', help='Hostname for database machine')
-parser.add_argument('--sql-port', help='Port used to connect to database')
-parser.add_argument('--sql-query', help='Specify extra login details')
-
-
-##  AWS arguments  #############################################################
-################################################################################
-parser.add_argument('--aws-access-key', help='API access key for AWS')
-parser.add_argument('--aws-secret-key', help='API secret key for AWS')
-parser.add_argument('--aws-s3-bucket', help='Amazon S3 bucket for data storage')
-parser.add_argument('--aws-s3-folder', help='Optional S3 folder')
-
-
-##  Worker arguments  ##########################################################
-################################################################################
-parser.add_argument('--cloud-mode', action='store_true', default=False,
-                    help='Whether to run this worker in cloud mode')
-parser.add_argument('--dataruns', help='Only train on dataruns with these ids',
-                    nargs='+')
-parser.add_argument('--time', help='Number of seconds to run worker', type=int)
-parser.add_argument('--choose-randomly', action='store_true',
-                    help='Choose dataruns to work on randomly (default = '
-                    'sequential order)')
-parser.add_argument('--no-save', dest='save_files', default=True,
-                    action='store_const', const=False,
-                    help="don't save models and metrics for later")
+# how long to wait for new dataruns to be added
+LOOP_WAIT = 0
 
 
 def _log(msg, stdout=True):
@@ -127,7 +82,10 @@ class Worker(object):
         self.load_tuner()
 
     def load_selector(self):
-        # load the class for selecting the frozen set
+        """
+        Load and initialize the BTB class which will be responsible for
+        selecting frozen sets.
+        """
         # selector will either be a key into SELECTORS_MAP or a path to
         # a file that defines a class called CustomSelector.
         if self.datarun.selector in Mapping.SELECTORS_MAP:
@@ -138,7 +96,7 @@ class Worker(object):
         _log("Selector: %s" % Selector)
 
         # generate the arguments we need to initialize the selector
-        frozen_sets = self.db.get_incomplete_frozen_sets(self.datarun.id)
+        frozen_sets = self.db.get_frozen_sets(self.datarun.id)
         fs_by_algorithm = defaultdict(list)
         for s in frozen_sets:
             fs_by_algorithm[s.algorithm].append(s.id)
@@ -150,6 +108,12 @@ class Worker(object):
                                  by_algorithm=dict(fs_by_algorithm))
 
     def load_tuner(self):
+        """
+        Load, but don't initialize, the BTB class which will be responsible for
+        choosing non-frozen set hyperparameter values (a subclass of Tuner). The
+        tuner must be initialized with information about the frozen set, so it
+        cannot be created until later.
+        """
         # tuner will either be a key into TUNERS_MAP or a path to
         # a file that defines a class called CustomTuner.
         if self.datarun.tuner in Mapping.TUNERS_MAP:
@@ -161,12 +125,12 @@ class Worker(object):
 
     def load_data(self):
         """
-        Downloads a set of train/test data from AWS (if necessary) and then
-        loads it from disk into memory.
+        Download a set of train/test data from AWS (if necessary) and then load
+        it from disk into memory.
 
         Returns: train/test data in the structures consumed by
-            wrapper.load_data_from_objects().
-            i.e. (trainX, testX, trainY, testY)
+            wrapper.load_data_from_objects(), i.e. (trainX, testX, trainY,
+            testY)
         """
         dw = self.dataset.wrapper
 
@@ -238,20 +202,19 @@ class Worker(object):
         os.remove(local_model_path)
         os.remove(local_metric_path)
 
-    def insert_learner(self, frozen_set, performance, params, model, started):
+    def save_learner(self, learner_id, model, performance):
         """
-        Inserts a learner and also updates the frozen_sets table.
+        Update a learner with performance and model information and mark it as
+        "complete"
 
-        frozen_set: frozen set that was used by the learner
-        performance: dictionary containing detailed performance data, as
-            generated by the Wrapper object that actually tests the learner.
-        params: full set of hyperparameters used to generate this model
+        learner_id: ID of the learner to save
         model: Model object containing a serializable representation of the
             final model generated by this learner
-        started: DateTime at which work was started on this learner.
+        performance: dictionary containing detailed performance data, as
+            generated by the Wrapper object that actually tests the learner.
         """
-        # save model to local filesystem
-        phash = hash_dict(params)
+        learner = self.db.get_learner(learner_id)
+        phash = hash_dict(learner.params)
         rhash = hash_string(self.dataset.name)
 
         # whether to save model and performance data to the filesystem
@@ -275,64 +238,23 @@ class Worker(object):
                 except Exception:
                     msg = traceback.format_exc()
                     _log("Error in save_learner_cloud()")
-                    self.insert_error(frozen_set, params, msg)
+                    self.db.mark_learner_errored(learner_id, error_msg=msg)
         else:
             local_model_path = None
             local_metric_path = None
 
-        # compile fields
-        trainables = model.algorithm.performance()['trainable_params']
-        completed = datetime.datetime.now()
-        seconds = (completed - started).total_seconds()
-
-        # create learner ORM object, and insert learner into the database
-        # TODO: wrap this properly in a 'with session_context():' or make it a
-        # method on Database
-        session = self.db.get_session()
-        learner = self.db.Learner(
-            frozen_set_id=frozen_set.id,
-            datarun_id=self.datarun.id,
-            model_path=local_model_path,
-            metric_path=local_metric_path,
-            host=get_public_ip(),
-            params=params,
-            trainable_params=trainables,
-            dimensions=model.algorithm.dimensions,
-            cv_judgment_metric=performance['cv_judgment_metric'],
-            cv_judgment_metric_stdev=performance['cv_judgment_metric_stdev'],
-            test_judgment_metric=performance['test_judgment_metric'],
-            started=started,
-            completed=completed,
-            status=LearnerStatus.COMPLETE)
-        session.add(learner)
+        # update the learner in the database
+        self.db.complete_learner(learner_id=learner_id,
+                                 trainable_params=model.algorithm.trainable_params,
+                                 dimensions=model.algorithm.dimensions,
+                                 model_path=local_model_path,
+                                 metric_path=local_metric_path,
+                                 cv_score=performance['cv_judgment_metric'],
+                                 cv_stdev=performance['cv_judgment_metric_stdev'],
+                                 test_score=performance['test_judgment_metric'])
 
         # update this session's frozen set entry
-        frozen_set = session.query(self.db.FrozenSet).get(frozen_set.id)
-        frozen_set.trained += 1
-        session.commit()
-        _log('Saved as learner %d.' % learner.id)
-
-    def insert_error(self, frozen_set, params, error_msg):
-        session = None
-        try:
-            session = self.db.get_session()
-            session.autoflush = False
-            learner = self.db.Learner(datarun_id=self.datarun.id,
-                                      frozen_set_id=frozen_set.id,
-                                      params=params,
-                                      status=LearnerStatus.ERRORED,
-                                      error_msg=error_msg)
-
-            session.add(learner)
-            session.commit()
-            _log("Successfully reported error")
-
-        except Exception:
-            _log("insert_error(): Error saving learner error in db...")
-            _log(traceback.format_exc())
-        finally:
-            if session:
-                session.close()
+        _log('Saved learner %d.' % learner_id)
 
     def select_frozen_set(self):
         """
@@ -340,14 +262,15 @@ class Worker(object):
         frozen set of hyperparameters from the ModelHub. Only consider frozen
         sets for which gridding is not complete.
         """
-        frozen_sets = self.db.get_incomplete_frozen_sets(self.datarun.id)
+        frozen_sets = self.db.get_frozen_sets(self.datarun.id)
 
         # load learners and build scores lists
         # make sure all frozen sets are present in the dict, even ones that
         # don't have any learners. That way the selector can choose frozen sets
         # that haven't been scored yet.
         frozen_set_scores = {fs.id: [] for fs in frozen_sets}
-        learners = self.db.get_complete_learners(self.datarun.id)
+        learners = self.db.get_learners(datarun_id=self.datarun.id,
+                                        status=LearnerStatus.COMPLETE)
         for l in learners:
             # ignore frozen sets for which gridding is done
             if l.frozen_set_id not in frozen_set_scores:
@@ -380,7 +303,7 @@ class Worker(object):
 
         # Get previously-used parameters: every learner should either be
         # completed or have thrown an error
-        learners = [l for l in self.db.get_learners_in_frozen(frozen_set.id)
+        learners = [l for l in self.db.get_learners(frozen_set_id=frozen_set.id)
                     if l.status == LearnerStatus.COMPLETE]
 
         # Extract parameters and scores as numpy arrays from learners
@@ -413,13 +336,13 @@ class Worker(object):
         Check to see whether the datarun is finished. This could be due to the
         budget being exhausted or due to hyperparameter gridding being done.
         """
-        frozen_sets = self.db.get_incomplete_frozen_sets(self.datarun.id)
+        frozen_sets = self.db.get_frozen_sets(self.datarun.id)
         if not frozen_sets:
             _log("No incomplete frozen sets for datarun present in database.")
             return True
 
         if self.datarun.budget_type == "learner":
-            n_completed = sum([f.trained for f in frozen_sets])
+            n_completed = sum([f.learners for f in frozen_sets])
             if n_completed >= self.datarun.budget:
                 _log("Learner budget has run out!")
                 return True
@@ -432,7 +355,7 @@ class Worker(object):
 
         return False
 
-    def test_learner(self, params):
+    def test_learner(self, learner_id, params):
         """
         Given a set of fully-qualified hyperparameters, create and test a
         model.
@@ -442,20 +365,24 @@ class Worker(object):
         wrapper.load_data_from_objects(*self.load_data())
         performance = wrapper.start()
 
-        old_best = self.db.get_best_so_far(self.datarun.id,
-                                           self.datarun.score_target)
+        old_best = self.db.get_best_learner(datarun_id=self.datarun.id)
+        if old_best is not None:
+            old_val = old_best.cv_judgment_metric
+            old_err = 2 * old_best.cv_judgment_metric_stdev
+
         new_val = performance["cv_judgment_metric"]
         new_err = 2 * performance["cv_judgment_metric_stdev"]
 
         _log("Judgment metric (%s): %.3f +- %.3f" %
              (self.datarun.metric, new_val, new_err))
 
-        if old_best[0] is not None:
-            if (new_val - new_err) > (old_best[1] - old_best[2]):
+        if old_best is not None:
+            if (new_val - new_err) > ():
                 _log("New best score! Previous best (learner %s): %.3f +- %.3f" %
-                     old_best)
+                     (old_best.id, old_val, old_err))
             else:
-                _log("Best so far (learner %s): %.3f +- %.3f" % old_best)
+                _log("Best so far (learner %s): %.3f +- %.3f" %
+                     (old_best.id, old_val, old_err))
 
         model = Model(algorithm=wrapper, data=self.dataset.wrapper)
         return model, performance
@@ -468,10 +395,9 @@ class Worker(object):
         if self.is_datarun_finished():
             # marked the run as done successfully
             self.db.mark_datarun_complete(self.datarun.id)
-            _log("This datarun has ended. Returning...")
+            _log("Datarun %d has ended." % self.datarun.id)
             return
 
-        learner_start = datetime.datetime.now()
         try:
             _log("Choosing hyperparameters...")
             # use the multi-arm bandit to choose which frozen set to use next
@@ -481,7 +407,7 @@ class Worker(object):
         except Exception as e:
             _log("Error choosing hyperparameters: datarun=%s" % str(self.datarun))
             _log(traceback.format_exc())
-            raise LearnerError
+            raise LearnerError()
 
         if params is None:
             _log("No parameters chosen: frozen set %d is finished." %
@@ -495,26 +421,47 @@ class Worker(object):
         # TODO: this doesn't belong here
         params["function"] = frozen_set.algorithm
 
+        _log("Creating learner...")
+        learner_id = self.db.create_learner(frozen_set_id=frozen_set.id,
+                                            datarun_id=self.datarun.id,
+                                            host=get_public_ip(),
+                                            params=params)
+
         try:
             _log("Testing learner...")
-            model, performance = self.test_learner(params)
+            model, performance = self.test_learner(learner_id, params)
             _log("Saving learner...")
-            self.insert_learner(frozen_set, performance, params, model,
-                                learner_start)
+            self.save_learner(learner_id, model, performance)
         except Exception as e:
             msg = traceback.format_exc()
             _log("Error testing learner: datarun=%s" % str(self.datarun))
             _log(msg)
-            self.insert_error(frozen_set, params, msg)
+            self.db.mark_learner_errored(learner_id, error_msg=msg)
             raise LearnerError()
 
 
 def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
-         cloud_mode=False, aws_config=None, total_time=None):
+         cloud_mode=False, aws_config=None, total_time=None, wait=True):
     """
     Check the ModelHub database for unfinished dataruns, and spawn workers to
     work on them as they are added. This process will continue to run until it
     exceeds total_time or is broken with ctrl-C.
+
+    db: Database instance with which we can make queries to ModelHub
+    datarun_ids (optional): list of IDs of dataruns to compute on. If None,
+        this will work on all unfinished dataruns in the database.
+    choose_randomly: if True, work on all highest-priority dataruns in random
+        order. If False, work on them in sequential order (by ID)
+    cloud_mode: if True, save processed datasets to AWS. If this option is set,
+        aws_config must be supplied.
+    aws_config (optional): if cloud_mode is set, this myst be an AWSConfig
+        object with connection details for an S3 bucket.
+    total_time (optional): if set to an integer, this worker will only work for
+        total_time seconds. Otherwise, it will continue working until all
+        dataruns are complete (or indefinitely).
+    wait: if True, once all dataruns in the database are complete, keep spinning
+        and wait for new runs to be added. If False, exit once all dataruns are
+        complete.
     """
     start_time = datetime.datetime.now()
 
@@ -523,11 +470,14 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         # get all pending and running dataruns, or all pending/running dataruns
         # from the list we were given
         dataruns = db.get_dataruns(include_ids=datarun_ids)
-        if dataruns is None or not len(dataruns):
-            _log("No dataruns found. Sleeping %d seconds and trying again." %
-                 LOOP_WAIT)
-            time.sleep(LOOP_WAIT)
-            continue
+        if not dataruns:
+            if wait:
+                _log("No dataruns found. Sleeping %d seconds and trying again." %
+                     LOOP_WAIT)
+                time.sleep(LOOP_WAIT)
+                continue
+            else:
+                break
 
         max_priority = max([r.priority for r in dataruns])
         priority_runs = [r for r in dataruns if r.priority == max_priority]
@@ -561,15 +511,29 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Add more learners to database')
+    add_arguments_sql(parser)
+    add_arguments_aws_s3(parser)
+
+    # add worker-specific arguments
+    parser.add_argument('--cloud-mode', action='store_true', default=False,
+                        help='Whether to run this worker in cloud mode')
+    parser.add_argument('--dataruns', help='Only train on dataruns with these ids',
+                        nargs='+')
+    parser.add_argument('--time', help='Number of seconds to run worker', type=int)
+    parser.add_argument('--choose-randomly', action='store_true',
+                        help='Choose dataruns to work on randomly (default = sequential order)')
+    parser.add_argument('--no-save', dest='save_files', default=True,
+                        action='store_const', const=False,
+                        help="don't save models and metrics for later")
+
+    # parse arguments and load configuration
     args = parser.parse_args()
+    sql_config, _, aws_config = load_config(args=args)
 
-    sql_config, aws_config, _ = load_config(sql_path=args.sql_config,
-                                            aws_path=args.aws_config,
-                                            args=args)
-    db = Database(**vars(sql_config))
-
-    # lets go
-    work(db=db, datarun_ids=args.dataruns,
+    # let's go
+    work(db=Database(**vars(sql_config)),
+         datarun_ids=args.dataruns,
          choose_randomly=args.choose_randomly,
          save_files=args.save_files,
          cloud_mode=args.cloud_mode,

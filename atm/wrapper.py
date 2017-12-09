@@ -67,15 +67,9 @@ class Wrapper(object):
         self.scores = []
         self.avg_score = -1
 
-    def start(self):
-        self.make_pipeline()
-        self.cross_validate()
-        self.train_final_model()
-        self.prepare_model()
-        return self.performance()
-
+    @property
     def performance(self):
-        self.perf = {
+        return {
             # judgment metrics (what GP uses to decide next parameter values)
             "cv_judgment_metric":           self.cv_scores['judgment_metric'],
             "cv_judgment_metric_stdev":     self.cv_scores['judgment_metric_std'],
@@ -90,7 +84,12 @@ class Wrapper(object):
             "trainable_params":             self.trainable_params
         }
 
-        return self.perf
+    def start(self):
+        self.make_pipeline()
+        self.cross_validate()
+        self.train_final_model()
+        self.prepare_model()
+        return self.performance
 
     def load_data_from_objects(self, trainX, testX, trainY, testY):
         self.testX = testX
@@ -369,7 +368,7 @@ class Wrapper(object):
         learner_params = {k: v for k, v in self.params.iteritems() if k not in
                           Wrapper.ATM_KEYS}
 
-        # do special converstions
+        # do special conversions
         learner_params = self.special_conversions(learner_params)
         self.trainable_params = learner_params
         #print "Training: %s" % learner_params

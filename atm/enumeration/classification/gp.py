@@ -5,7 +5,10 @@ from btb import HyperParameter, ParamTypes
 import numpy as np
 
 class EnumeratorGPC(ClassifierEnumerator):
-
+    """
+    TODO: these values are out of sync with sklearn (versions 0.18+)
+    http://scikit-learn.org/0.18/modules/generated/sklearn.gaussian_process.GaussianProcessClassifier.html
+    """
     DEFAULT_RANGES = {
         "kernel" : ('constant', 'rbf', 'matern', 'rational_quadratic', 'exp_sine_squared'),
         "nu" : (0.5, 1.5, 2.5),

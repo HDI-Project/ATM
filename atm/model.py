@@ -30,9 +30,7 @@ class Model(object):
         Output:
             np.array of predicted values
         """
-
         if input_type == Model.INPUT_CSV:
-
             if probability:
                 vectorized_examples = self.data.vectorize_examples(examples)
                 probs = self.algorithm.predict(vectorized_examples,
@@ -47,9 +45,8 @@ class Model(object):
                 return labels
 
         elif input_type == Model.INPUT_VECT:
-
             if probability:
-            	##### HCK FOR BINARY CLASSES, TODO: support multiclass
+            	# hack for binary classes. TODO: support multiclass
                 probs = self.algorithm.predict(examples,
                                                probability=probability)
                 labels = probs[:, 0]
@@ -63,7 +60,6 @@ class Model(object):
             raise Exception("Input dictionary type not supported yet.")
 
         elif input_type == Model.INPUT_FILE:
-
             if probability:
                 vectorized_examples = self.data.vectorize_file(examples)
                 probs = self.algorithm.predict(vectorized_examples,
