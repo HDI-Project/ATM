@@ -6,28 +6,39 @@ from collections import defaultdict
 
 from atm.config import *
 
+def get_best_so_far(db, datarun_id):
+    """
+    Get a series representing best-so-far performance for datarun_id.
+    """
+    # generate a list of the "best so far" score after each learner was
+    # computed (in chronological order)
+    learners = db.get_learners(datarun_id=datarun_id)
+    print 'run %s: %d learners' % (datarun_id, len(learners))
+    y = []
+    for l in learners:
+        best_so_far = max(y + [l.cv_judgment_metric])
+        y.append(best_so_far)
+    return y
 
-def graph_best_so_far(db, datarun_ids=None, n_learners=100):
+def graph_series(length, **series):
+    """
+    Graph series of performance metrics against one another.
+
+    length: all series will be truncated to this length
+    **series: mapping of labels to series of performance data
+    """
     lines = []
-    dataruns = db.get_dataruns(ignore_pending=True, ignore_complete=False,
-                               include_ids=datarun_ids)
+    for label, data in series.items():
+        # copy up to `length` of the values in `series` into y.
+        y = data[:length]
+        x = range(len(y))
 
-    for r in dataruns:
-        # generate a list of the "best so far" score after each learner was
-        # computed (in chronological order)
-        learners = db.get_learners(datarun_id=r.id)[:n_learners]
-        print 'run %s: %d learners' % (r, len(learners))
-        x = range(len(learners))
-        y = []
-        for l in learners:
-            best_so_far = max(y + [l.cv_judgment_metric])
-            y.append(best_so_far)
-
-        line, = plt.plot(x, y, '-', label=str(r.id))
+        # plot y against x
+        line, = plt.plot(x, y, '-', label=label)
         lines.append(line)
 
     plt.xlabel('learners')
-    plt.ylabel(r.metric)
+    plt.ylabel('performance')
     plt.legend(handles=lines)
     plt.show()
 

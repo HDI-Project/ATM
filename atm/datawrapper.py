@@ -60,8 +60,6 @@ class DataWrapper(object):
         return self.train_path_out, self.test_path_out
 
     def wrap_train_test(self):
-        """
-        """
         # get headings from first line in file
         headings = []
         with open(self.trainfile, "rb") as df:
@@ -172,7 +170,7 @@ class DataWrapper(object):
             "k_classes" : k,
             # this is 0 because the processed version of the data file store the
             # label class at column 0
-            # TODO do something about there being both label_col and labelcol
+            # TODO do something about there being both label_column and labelcol
             # and them sometimes but not always meaning the same thing
             "label_column" : 0,
             "datasize_bytes" : np.array(data).nbytes,
@@ -191,8 +189,6 @@ class DataWrapper(object):
             print '\t%s: %s' % i
 
     def wrap_single_file(self):
-        """
-        """
         with open(self.traintestfile, "rb") as df:
             for line in df:
                 self.headings = [x.strip() for x in line.split(self.sep)]
@@ -346,29 +342,9 @@ class DataWrapper(object):
 
         return self.vectorizer.transform(ready)
 
-    def encode_labels(self, labels):
-        """
-        labels : list of strings
-            Discretizes each value and returns as vector.
-        """
-        return self.encoder.transform(labels)
-
-    def devectorize_examples(self, examples):
-        """
-        examples: list of numerics
-            Converts the list of numerics into the original representation
-        """
-        return self.vectorizer.inverse_transform(examples)
-
     def decode_labels(self, labels):
         """
         labels: list of numerics
             Converts the list back into the original labels
         """
         return self.encoder.inverse_transform(labels)
-
-    def feature_names(self):
-        return self.vectorizer.feature_names_
-
-    def get_statistics(self):
-        return self.statistics

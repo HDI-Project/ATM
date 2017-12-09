@@ -18,8 +18,8 @@ from utilities import *
 CONF_DIR = 'config/test/end_to_end/'
 DATA_DIR = 'data/test/'
 RUN_CONFIG = join(CONF_DIR, 'run.yaml')
-SQL_CONFIG = join(CONF_DIR, 'run.yaml')
-AWS_CONFIG = join(CONF_DIR, 'run.yaml')
+SQL_CONFIG = join(CONF_DIR, 'sql.yaml')
+AWS_CONFIG = join(CONF_DIR, 'aws.yaml')
 
 DATASETS_MAX_MIN = [
     'wholesale-customers_1.csv',
@@ -64,9 +64,9 @@ parser.add_argument('--processes', help='number of processes to run concurrently
                     type=int, default=4)
 
 args = parser.parse_args()
-sql_config, aws_config, run_config = load_config(sql_path=SQL_CONFIG,
-                                                 aws_path=AWS_CONFIG,
-                                                 run_path=RUN_CONFIG)
+sql_config, run_config, aws_config = load_config(sql_path=SQL_CONFIG,
+                                                 run_path=RUN_CONFIG,
+                                                 aws_path=AWS_CONFIG)
 db = Database(**vars(sql_config))
 
 print 'creating dataruns...'

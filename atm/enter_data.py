@@ -44,7 +44,7 @@ def create_dataset(db, train_path, test_path=None, output_folder=None,
 
     # process the data into the form ATM needs and save it to disk
     dw.wrap()
-    stats = dw.get_statistics()
+    stats = dw.statistics
 
     # enter dataset into database
     session = db.get_session()
@@ -252,7 +252,7 @@ def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False):
     print '========== Summary =========='
     print 'Dataset ID:', dataset.id
     print 'Training data:', dataset.train_path
-    print 'Test data:', (dataset.test_path or '<None>')
+    print 'Test data:', (dataset.test_path or '(None)')
     print 'Datarun ID:', datarun.id
     print 'Frozen set selection strategy:', datarun.selector
     print 'Parameter tuning strategy:', datarun.tuner
@@ -283,8 +283,9 @@ folder for more information. """)
     args = parser.parse_args()
 
     # create config objects from the config files and/or command line args
-    sql_config, aws_config, run_config = load_config(args.sql_config,
-                                                     args.aws_config,
-                                                     args.run_config, args)
+    sql_config, run_config, aws_config = load_config(sql_path=args.sql_config,
+                                                     run_path=args.run_config,
+                                                     aws_path=args.aws_config,
+                                                     args=args)
     # create and save the dataset and datarun
-    enter_datarun(sql_config, run_config, aws_config, args.upload_data)
+    enter_datarun(sql_config, run_config, aws_config, upload_data=args.upload_data)

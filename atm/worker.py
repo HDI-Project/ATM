@@ -529,13 +529,11 @@ if __name__ == '__main__':
 
     # parse arguments and load configuration
     args = parser.parse_args()
-    sql_config, aws_config, _ = load_config(sql_path=args.sql_config,
-                                            aws_path=args.aws_config,
-                                            args=args)
-    db = Database(**vars(sql_config))
+    sql_config, _, aws_config = load_config(args=args)
 
-    # lets go
-    work(db=db, datarun_ids=args.dataruns,
+    # let's go
+    work(db=Database(**vars(sql_config)),
+         datarun_ids=args.dataruns,
          choose_randomly=args.choose_randomly,
          save_files=args.save_files,
          cloud_mode=args.cloud_mode,

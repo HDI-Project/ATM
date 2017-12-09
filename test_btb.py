@@ -2,7 +2,7 @@
 import argparse
 import os
 
-from atm.enter_data import enter_data
+from atm.enter_data import enter_datarun
 from atm.worker import Worker
 from atm.utilities import download_file_s3
 
@@ -42,7 +42,7 @@ if __name__ == '__main__':
     download_file_s3(config, data_file)
 
     print 'creating datarun...'
-    datarun_id = enter_data(config)[0]
+    datarun_id = enter_datarun(config)[0]
 
     print 'starting worker...'
     worker = Worker(config=config, datarun_id=datarun_id, save_files=False)
