@@ -5,37 +5,30 @@
     "parameters": {
         "C": {
            "type": "float_exp",
-           "categorical": false,
-           "range": [10**-5, 10**5]
+           "range": [10e-5, 10e5]
         },
         "fit_intercept": {
-           "type": "int",
-           "categorical": true,
-           "range": [0.0, 1.0]
+           "type": "int_cat",
+           "range": [0, 1]
         },
         "n_iter": {
            "type": "int",
-           "categorical": false,
            "range": [10, 200]
         },
         "shuffle": {
            "type": "bool",
-           "categorical": true,
            "range": [true]
         },
         "loss": {
             "type": "string",
-            "categorical": true, 
             "range": ["hinge", "squared_hinge"]
         },
         "_scale": {
            "type": "bool",
-           "categorical": true,
            "range": [true]
         },
         "n_jobs": {
-           "type": "int",
-           "categorical": true,
+           "type": "int_cat",
            "range": [-1]
         }
     },

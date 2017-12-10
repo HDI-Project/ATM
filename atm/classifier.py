@@ -2,7 +2,9 @@ import json
 from importlib import import_module
 from os.path import join
 
-config_path = 'classifiers'
+from btb import HyperParameter
+
+CONFIG_PATH = 'classifiers'
 
 
 class FrozenSet(object):
@@ -30,15 +32,24 @@ class Classifier(object):
         config: JSON dictionary containing all the information needed to specify
             this enumerator
         """
+        print "loading file", config
         with open(join(CONFIG_PATH, config)) as f:
             config = json.load(f)
 
         self.name = config['name']
-        self.learner_class = import_module(config['class'])
-        self.parameters = {k: HyperParameter(**v) for k, v in
-                           config['parameters'].items()}
         self.conditions = config['conditions']
         self.root_params = config['root_parameters']
+
+        # import the classifier's python class
+        path = config['class'].split('.')
+        mod_str, cls_str = '.'.join(path[:-1]), path[-1]
+        mod = import_module(mod_str)
+        self.learner_class = getattr(mod, cls_str)
+
+        # create hyperparameters from the parameter config
+        self.parameters = {k: HyperParameter(**v) for k, v in
+                           config['parameters'].items()}
+
 
     def get_frozen_sets(self):
         """
@@ -49,12 +60,12 @@ class Classifier(object):
                      if len(self.parameters[p].range) == 1]
         categoricals = [p for p in self.root_params if
                         self.parameters[p].is_categorical]
-        tunables = [p for p in self.root_params if not
-                    self.parameters[p].is_categorical]
+        tunables = [(p, self.parameters[p]) for p in self.root_params
+                    if not self.parameters[p].is_categorical]
 
-        frozen_sets = self._enumerate([], constants, categoricals, tunables)
+        return self._enumerate([], constants, categoricals, tunables)
 
-    def _enumerate(frozens, constants, categoricals, tunables):
+    def _enumerate(self, frozens, constants, categoricals, tunables):
         """
         Some things are fixed. Make a choice from the things that aren't fixed
         and see where that leaves us. Recurse.
@@ -89,7 +100,7 @@ class Classifier(object):
 
             # check if choosing this value opens up new parts of the conditional
             # parameter tree.
-            if cat in self.conditions:
+            if cat in self.conditions and val in self.conditions[cat]:
                 conditionals = self.conditions[cat][val]
 
                 # categorize the conditional variables which are now in play
@@ -98,8 +109,8 @@ class Classifier(object):
                     if len(self.parameters[p].range) == 1]
                 new_categoricals += [p for p in conditionals if
                                      self.parameters[p].is_categorical]
-                new_tunables += [p for p in conditionals if not
-                                 self.parameters[p].is_categorical]
+                new_tunables += [(p, self.parameters[p]) for p in conditionals
+                                 if not self.parameters[p].is_categorical]
 
             # recurse with the newly qualified categorical as a constant
             fsets.extend(self._enumerate(frozens=new_frozens,

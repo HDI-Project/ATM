@@ -5,37 +5,30 @@
     "parameters": {
         "C": {
            "type": "float_exp",
-           "categorical": false,
            "range": [10e-5, 10e5]
         },
         "tol": {
            "type": "float_exp",
-           "categorical": false,
            "range": [10e-5, 10e5]
         },
         "penalty": {
            "type": "string",
-           "categorical": true,
            "range": ["l1", "l2"]
         },
         "dual": {
            "type": "bool",
-           "categorical": true,
            "range": [true, false]
         },
         "fit_intercept": {
             "type": "bool",
-            "categorical": true, 
             "range": [true, false]
         },
         "class_weight": {
            "type": "string",
-           "categorical": true,
            "range": ["auto"]
         },
         "_scale": {
-           "type": "string",
-           "categorical": true,
+           "type": "bool",
            "range": [true]
         }
     },

@@ -168,7 +168,7 @@ def create_frozen_sets(db, datarun, algorithms):
         # enumerate all combinations of categorical variables for this algorithm
         clf = Classifier(ALGORITHMS_MAP[alg])
         frozen_sets = clf.get_frozen_sets()
-        print 'algorithm', alg, 'has', len(sets), 'frozen sets'
+        print 'algorithm', alg, 'has', len(frozen_sets), 'frozen sets'
 
         for fs in frozen_sets:
             fset = db.FrozenSet(datarun_id=datarun.id,
@@ -179,6 +179,7 @@ def create_frozen_sets(db, datarun, algorithms):
                                 frozen_hash=hash_nested_tuple(fs.frozens),
                                 status=FrozenStatus.INCOMPLETE)
             session.add(fset)
+            print fset.optimizables
 
     session.commit()
     session.close()

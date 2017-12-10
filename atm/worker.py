@@ -41,8 +41,8 @@ ensure_directory("logs")
 
 # name log file after the local hostname
 LOG_FILE = "logs/%s.txt" % socket.gethostname()
-# how long to wait for new dataruns to be added
-LOOP_WAIT = 0
+# how long to sleep between loops while waiting for new dataruns to be added
+LOOP_WAIT = 1
 
 
 def _log(msg, stdout=True):
@@ -297,7 +297,8 @@ class Worker(object):
         if not len(optimizables):
             _log("No optimizables for frozen set %d" % frozen_set.id)
             self.db.mark_frozen_set_gridding_done(frozen_set.id)
-            return vector_to_params(vector=[], optimizables=optimizables,
+            return vector_to_params(vector=[],
+                                    optimizables=optimizables,
                                     frozens=frozen_set.frozens,
                                     constants=frozen_set.constants)
 
@@ -314,7 +315,7 @@ class Worker(object):
         # Initialize the tuner and propose a new set of parameters
         # this has to be initialized with information from the frozen set, so we
         # need to do it fresh for each learner (not in load_tuner)
-        tuner = self.Tuner(optimizables,
+        tuner = self.Tuner(optimizables=optimizables,
                            gridding=self.datarun.gridding,
                            r_min=self.datarun.r_min)
         tuner.fit(X, y)
@@ -327,7 +328,8 @@ class Worker(object):
 
         # Convert the numpy array of parameters to a form that can be
         # interpreted by ATM, then return.
-        return vector_to_params(vector=vector, optimizables=optimizables,
+        return vector_to_params(vector=vector,
+                                optimizables=optimizables,
                                 frozens=frozen_set.frozens,
                                 constants=frozen_set.constants)
 

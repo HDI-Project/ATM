@@ -5,67 +5,54 @@
     "parameters": {
         "loss": {
             "type": "string",
-            "categorical": true, 
             "range": ["hinge", "log", "modified_huber", "squared_hinge"]
         },
         "penalty": {
             "type": "string",
-            "categorical": true,
             "range": ["l1", "l2", "elasticnet"]
         },
         "alpha": {
            "type": "float_exp",
-           "categorical": false,
-           "range": [10**-5, 10**5]
+           "range": [10e-5, 10e5]
         },
         "l1_ratio": {
            "type": "float",
-           "categorical": false,
            "range": [0.0, 1.0]
         },
         "fit_intercept": {
-           "type": "int",
-           "categorical": true,
-           "range": [0.0, 1.0]
+           "type": "int_cat",
+           "range": [0, 1]
         },
         "n_iter": {
            "type": "int",
-           "categorical": false,
            "range": [10, 200]
         },
         "shuffle": {
            "type": "bool",
-           "categorical": true,
            "range": [true]
         },
         "epsilon": {
            "type": "float_exp",
-           "categorical": false,
-           "range": [10**-5, 10**5]
+           "range": [10e-5, 10e5]
         },
         "learning_rate": {
            "type": "string",
-           "categorical": true,
            "range": ["constant", "optimal"]
         },
         "eta0": {
            "type": "float_exp",
-           "categorical": false,
-           "range": [10**-5, 10**5]
+           "range": [10e-5, 10e5]
         },
         "class_weight": {
            "type": "string",
-           "categorical": true,
            "range": [null]
         },
         "_scale_minmax": {
            "type": "bool",
-           "categorical": true,
            "range": [true]
         },
         "n_jobs": {
-           "type": "int",
-           "categorical": true,
+           "type": "int_cat",
            "range": [-1]
         }
     },

@@ -5,7 +5,10 @@ import numpy as np
 import os
 import base64
 import re
+
 from boto.s3.connection import S3Connection, Key
+
+from btb import ParamTypes
 
 # global variable storing this machine's public IP address
 # (so we only have to fetch it once)
@@ -86,20 +89,19 @@ def vector_to_params(vector, optimizables, frozens, constants):
     Examples of the format for SVM sigmoid frozen set below:
 
         optimizables = [
-            ('C', 		KeyStruct(range=(1e-05, 100000), 	type='FLOAT_EXP', 	is_categorical=False)),
-            ('degree', 	KeyStruct(range=(2, 4), 			type='INT', 		is_categorical=False)),
-            ('coef0', 	KeyStruct(range=(0, 1), 			type='INT', 		is_categorical=False)),
-            ('gamma', 	KeyStruct(range=(1e-05, 100000),	type='FLOAT_EXP', 	is_categorical=False))
+            ('C', HyperParameter(type='float_exp', range=(1e-05, 1e5))),
+            ('degree', HyperParameter(type='int', range=(2, 4))),
+            ('gamma', HyperParameter(type='float_exp', range=(1e-05, 1e5))),
         ]
 
         frozens = (
-            ('kernel', 'poly'), ('probability', True),
-            ('_scale', True), ('shrinking', True),
-            ('class_weight', 'auto')
+            ('kernel', 'poly'),
+            ('probability', True),
+            ('_scale', True)
         )
 
         constants = [
-            ('cache_size', KeyStruct(range=(15000, 15000), type='INT', is_categorical=False))
+            ('cache_size', 15000)
         ]
 
     """
@@ -108,26 +110,16 @@ def vector_to_params(vector, optimizables, frozens, constants):
     # add the optimizables
     for i, elt in enumerate(vector):
         key, struct = optimizables[i]
-        if struct.type == 'INT':
+        if struct.type in [ParamTypes.INT, ParamTypes.INT_EXP]:
             params[key] = int(elt)
-        elif struct.type == 'INT_EXP':
-            params[key] = int(elt)
-        elif struct.type == 'FLOAT':
+        elif struct.type in [ParamTypes.FLOAT, ParamTypes.FLOAT_EXP]:
             params[key] = float(elt)
-        elif struct.type == 'FLOAT_EXP':
-            params[key] = float(elt)
-        elif struct.type == 'BOOL':
-            params[key] = bool(elt)
         else:
             raise ValueError('Unknown data type: {}'.format(struct.type))
 
-    # add the frozen categorical settings
-    for key, value in frozens:
+    # add the frozen categorical settings and fixed constant values
+    for key, value in frozens + constants:
         params[key] = value
-
-    # and finally the constant values
-    for constant_key, struct in constants:
-        params[constant_key] = struct.range[0]
 
     return params
 
@@ -144,10 +136,9 @@ def params_to_vectors(params, optimizables):
             the optimizable hyperparameters that should be in each vector. e.g.
 
         optimizables = [
-            ('C',  HyperParameter(range=(1e-5, 1e5), type='FLOAT_EXP', is_categorical=False)),
-            ('degree',  HyperParameter((2, 4), 'INT', False)),
-            ('coef0',  HyperParameter((0, 1), 'INT', False)),
-            ('gamma',  HyperParameter((1e-05, 100000), 'FLOAT_EXP', False))
+            ('C',  HyperParameter(type='float_exp', range=(1e-5, 1e5))),
+            ('degree',  HyperParameter('int', (2, 4))),
+            ('gamma',  HyperParameter('float_exp', (1e-05, 1e5)))
         ]
 
     Returns:

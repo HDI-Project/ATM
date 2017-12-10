@@ -364,9 +364,10 @@ def load_config(sql_path=None, run_path=None, aws_path=None, args=None):
 
     # check the args object for config paths
     if args is not None:
-        sql_path = sql_path or args.sql_config
-        run_path = run_path or args.run_config
-        aws_path = aws_path or args.aws_config
+        arg_vars = vars(args)
+        sql_path = sql_path or arg_vars.get('sql_config')
+        run_path = run_path or arg_vars.get('run_config')
+        aws_path = aws_path or arg_vars.get('aws_config')
 
     # load any yaml config files for which paths were provided
     if sql_path:
@@ -385,13 +386,12 @@ def load_config(sql_path=None, run_path=None, aws_path=None, args=None):
     # Any unspecified argparse arguments will be None, so ignore those. We only
     # care about arguments explicitly specified by the user.
     if args is not None:
-        sql_args.update({k.replace('sql_', ''): v for k, v in vars(args).items()
+        sql_args.update({k.replace('sql_', ''): v for k, v in arg_vars.items()
                          if 'sql_' in k and v is not None})
-        aws_args.update({k.replace('aws_', ''): v for k, v in vars(args).items()
+        aws_args.update({k.replace('aws_', ''): v for k, v in arg_vars.items()
                          if 'aws_' in k and v is not None})
-        run_args.update({k: v for k, v in vars(args).items()
-                         if 'sql_' not in k and 'aws_' not in k
-                             and v is not None})
+        run_args.update({k: v for k, v in arg_vars.items() if 'sql_' not in k
+                         and 'aws_' not in k and v is not None})
 
     # It's ok if there are some extra arguments that get passed in here; only
     # kwargs that correspond to real config values will be stored on the config

@@ -5,37 +5,30 @@
     "parameters": {
         "criterion": {
             "type": "string",
-            "categorical": true, 
             "range": ["entropy", "gini"]
         },
         "max_features": {
             "type": "float",
-            "categorical": false,
             "range": [0.1, 1.0]
         },
         "max_depth": {
            "type": "int",
-           "categorical": false,
            "range": [2, 10]
         },
         "min_samples_split": {
            "type": "int",
-           "categorical": false,
            "range": [2, 3]
         },
         "min_samples_leaf": {
            "type": "int",
-           "categorical": false,
            "range": [1, 2]
         },
         "n_estimators": {
-           "type": "int",
-           "categorical": true,
+           "type": "int_cat",
            "range": [100]
         },
         "n_jobs": {
            "type": "int",
-           "categorical": false,
            "range": [-1]
         }
     },

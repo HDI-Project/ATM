@@ -5,76 +5,63 @@
     "parameters": {
         "batch_size": {
            "type": "string",
-           "categorical": true,
            "range": ["auto"]
         },
         "solver": {
            "type": "string",
-           "categorical": true,
            "range": ["lbfgs", "sgd", "adam"]
         },
         "alpha": {
            "type": "float",
-           "categorical": false,
            "range": [0.0001, 0.009]
         },
         "num_hidden_layers": {
-           "type": "int",
-           "categorical": true,
-           "range": [1, 3]
+           "type": "int_cat",
+           "range": [1, 2, 3]
         },
         "hidden_size_layer1": {
             "type": "int",
-            "categorical": false, 
             "range": [2, 300]
         },
         "hidden_size_layer2": {
             "type": "int",
-            "categorical": false, 
             "range": [2, 300]
         },
         "hidden_size_layer3": {
             "type": "int",
-            "categorical": false, 
             "range": [2, 300]
         },
         "learning_rate_init": {
            "type": "float",
-           "categorical": false,
            "range": [0.001, 0.99]
         },
         "beta_1": {
            "type": "float",
-           "categorical": false,
            "range": [0.8, 0.9999]
         },
         "beta_2": {
            "type": "float",
-           "categorical": false,
            "range": [0.8, 0.9999]
         },
         "learning_rate": {
            "type": "string",
-           "categorical": true,
            "range": ["constant", "invscaling", "adaptive"]
         },
         "activation": {
            "type": "string",
-           "categorical": true,
            "range": ["relu", "logistic", "identity", "tanh"]
         },
         "_scale": {
            "type": "string",
-           "categorical": true,
            "range": [true]
         }
     },
     "root_parameters": ["batch_size", "solver", "alpha", "activation", "num_hidden_layers", "_scale"],
     "conditions": {
         "num_hidden_layers": {
-            1: ["hidden_size_layer1"],
-            2: ["hidden_size_layer1", "hidden_size_layer2"],
-            3: ["hidden_size_layer1", "hidden_size_layer2", "hidden_size_layer3"]
+            "1": ["hidden_size_layer1"],
+            "2": ["hidden_size_layer1", "hidden_size_layer2"],
+            "3": ["hidden_size_layer1", "hidden_size_layer2", "hidden_size_layer3"]
         },
         "solver": {
             "sgd": ["learning_rate_init", "learning_rate"],
