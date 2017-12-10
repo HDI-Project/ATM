@@ -1,5 +1,7 @@
 {   
-    "name": "sgdc",
+    "name": "sgd",
+    "class": "sklearn.linear_model.SGDClassifier",
+    "version": "0.18.2",
     "parameters": {
         "loss": {
             "type": "string",
@@ -66,5 +68,6 @@
            "categorical": true,
            "range": [-1, -1]
         }
-    }
+    },
+    "conditions": []
 }

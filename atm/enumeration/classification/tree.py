@@ -72,7 +72,6 @@ class EnumeratorRFC(ClassifierEnumerator):
         self.create_cpt()
 
     def create_cpt(self):
-
         # dt
         criterion = Choice("criterion", self.ranges["criterion"])
         max_features = Choice("max_features", self.ranges["max_features"])
@@ -91,7 +90,6 @@ class EnumeratorRFC(ClassifierEnumerator):
 
 
 class EnumeratorETC(ClassifierEnumerator):
-
     DEFAULT_RANGES = {
         "criterion": ("entropy", "gini"),
         "max_features": (0.1, 1.0),
@@ -120,7 +118,6 @@ class EnumeratorETC(ClassifierEnumerator):
         self.create_cpt()
 
     def create_cpt(self):
-
         # dt
         criterion = Choice("criterion", self.ranges["criterion"])
         max_features = Choice("max_features", self.ranges["max_features"])

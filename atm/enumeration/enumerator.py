@@ -1,45 +1,86 @@
+from importlib import import_module
+
+
+class FrozenSet(object):
+    def __init__(self, constants, tunables):
+        """
+        constants: the values for this frozen set which are fixed
+        tunables: the free variables which must be tuned
+        """
+        self.constants = constants
+        self.tunables = tunables
+
+
 class Enumerator(object):
     """
     This class is initialized with a list of optimizable Hyperparameters, and
     is used to generate frozen sets (possible combinations of categorical
     hyperparameters).
     """
-    def __init__(self, parameters, function):
+    def __init__(self, config):
         """
-        parameters: dictionary mapping parameter name -> Hyperparameter
-        function: (string) name of the function for which this Enumerator
-            enumerates. Must be a value defined on ClassifierEnumerator.
+        config: JSON dictionary containing all the information needed to specify
+            this enumerator
         """
-        self.parameters = parameters
-        self.function = function
+        self.name = config.name
+        self.sklearn_class = import_module(config.class)
+        self.parameters = {k: HyperParameter(config.parameters)
+        self.conditions = config.conditions
+        self.root_params = config.root_parameters
 
-    def combinations(self):
-        if self.root:
-            return self.root.combinations()
-        return None
+    def get_frozen_sets(self):
+        """
+        Traverse the CPT and enumerate all possible frozen sets of parameters
+        for this algorithm
+        """
+        constants = [k for k in self.root_params if
+                     len(self.parameters[k].range) == 1]
+        categoricals = [k for k in self.root_params if
+                        self.parameters[k].is_categorical]
+        tunables = [k for k in self.root_params if not
+                    self.parameters[k].is_categorical]
 
-    def get_categorical_keys(self, no_constants=False):
-    	categoricals = []
-    	for key, struct in self.keys.iteritems():
-    		if struct.is_categorical:
-    			if no_constants and len(set(struct.range)) == 1:
-    				continue
-    			categoricals.append(key)
-    	return categoricals
+        frozen_sets = self._enumerate(constants, categoricals, tunables)
 
-    def get_optimizable_keys(self):
-    	optimizables = []
-    	for key, struct in self.keys.iteritems():
-    		if not struct.is_categorical:
-    			if len(set(struct.range)) == 1:
-    				continue
-    			optimizables.append(key)
-    	return optimizables
+    def _enumerate(constants, categoricals, tunables):
+        """
+        Some things are fixed. Make a choice from the things that aren't fixed and
+        see where that leaves us. Recurse.
 
-    def get_constant_optimizable_keys(self):
-    	constants = []
-    	for key, struct in self.keys.iteritems():
-    		if not struct.is_categorical:
-    			if len(set(struct.range)) == 1:
-    				constants.append(key)
-    	return constants
+        constants: a list of (name, value) tuples of fixed constants
+        categoricals: a list of names of free categorical variables
+        tunables: a list of names of free tunable parameters
+        """
+        # if there are no more free variables, we have a new FrozenSet. We've
+        # reached the bottom of the recursion, so return.
+        if not categoricals:
+            return [FrozenSet(constants, tunables)]
+
+        frozens = []
+
+        # fix a single categorical parameter and see where that takes us
+        cat = categoricals.pop(0)
+
+        for val in self.parameters[cat].range:
+            # add this fixed value to the list of constants
+            new_constants = constants + [(cat, val)]
+
+            # check if choosing this value opens up new parts of the conditional
+            # parameter tree.
+            new_categoricals = categoricals[:]
+            new_tunables = tunables[:]
+            if cat in self.conditions:
+                conditionals = self.conditions[cat][val]
+                new_constants += [p for p in conditionals if
+                                  len(self.parameters[p].range) == 1]
+                new_categoricals += [p for p in conditionals if
+                                     self.parameters[p].is_categorical]
+                new_tunables += [p for p in conditionals if not
+                                 self.parameters[p].is_categorical]
+
+            # recurse with the newly qualified categorical as a constant
+            frozens.extend(self._enumerate(constants=new_constants,
+                                           categoricals=new_categoricals,
+                                           tunables=new_tunables))
+
+        return frozens

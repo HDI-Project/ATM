@@ -1,5 +1,7 @@
 {   
-    "name": "gpc",
+    "name": "gp",
+    "class": "sklearn.gaussian_process.GaussianProcessClassifier",
+    "version": "0.18.2",
     "parameters": {
         "kernel": {
             "type": "string",
@@ -27,14 +29,12 @@
            "range": [0.0, 1.0]
         }
     },
-    "conditions": [
-        {
-            "parameter": "kernel",
-            "branches": {
-                "matern": ["nu"],
-                "rational_quadratic": ["length_scale", "alpha"],
-                "exp_sine_squared": ["length_scale", "periodicity"]
-            }
+    "root_parameters": ["kernel"],
+    "conditions": {
+        "kernel": {
+            "matern": ["nu"],
+            "rational_quadratic": ["length_scale", "alpha"],
+            "exp_sine_squared": ["length_scale", "periodicity"]
         }
-    ]
+    }
 }
