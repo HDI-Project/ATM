@@ -36,7 +36,7 @@
         "shuffle": {
            "type": "bool",
            "categorical": true,
-           "range": [true, true]
+           "range": [true]
         },
         "epsilon": {
            "type": "float_exp",
@@ -56,18 +56,19 @@
         "class_weight": {
            "type": "string",
            "categorical": true,
-           "range": [null, null]
+           "range": [null]
         },
         "_scale_minmax": {
            "type": "bool",
            "categorical": true,
-           "range": [true, true]
+           "range": [true]
         },
         "n_jobs": {
            "type": "int",
            "categorical": true,
-           "range": [-1, -1]
+           "range": [-1]
         }
     },
-    "conditions": []
+    "root_parameters": ["loss", "penalty", "alpha", "l1_ratio", "fit_intercept", "n_iter", "shuffle", "epsilon", "learning_rate", "eta0", "class_weight", "_scale_minmax", "n_jobs"],
+    "conditions": {}
 }

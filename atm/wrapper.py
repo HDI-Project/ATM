@@ -16,6 +16,12 @@ import numpy as np
 import time
 
 
+def create_wrapper(params, judgment_metric):
+    learner_config = LEARNERS_MAP[params["function"]]
+    learner_class = Enumerator(learner_config).learner_class
+    return Wrapper(params["function"], judgment_metric, params, learner_class)
+
+
 class Wrapper(object):
     # these are special keys that are used for general purpose
     # things like scaling, normalization, PCA, etc
@@ -27,8 +33,7 @@ class Wrapper(object):
     PCA_DIMS = "_pca_dimensions"
 
     # list of all such keys
-    ATM_KEYS = [
-        SCALE, PCA, WHITEN, MINMAX, PCA_DIMS]
+    ATM_KEYS = [SCALE, PCA, WHITEN, MINMAX, PCA_DIMS]
 
     # number of folds for cross-validation (arbitrary, for speed)
     CV_COUNT = 5
@@ -37,7 +42,7 @@ class Wrapper(object):
                  compute_metrics=False):
         """
         Arguments
-            code: not sure
+            code: the short algorithm code (as defined in constants.py)
             judgment_metric: string that has a mapping in
                 metrics.JUDGMENT_METRICS and indicates which metric should be
                 optimized for.

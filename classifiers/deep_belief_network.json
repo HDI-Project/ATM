@@ -1,0 +1,80 @@
+{   
+    "name": "dbn",
+    "class": "nolearn.dbn.DBN",
+    "version": "0.5.1",
+    "parameters": {
+        "inlayer_size": {
+           "type": "int",
+           "categorical": true,
+           "range": [-1]
+        },
+        "outlayer_size": {
+           "type": "int",
+           "categorical": true,
+           "range": [-1]
+        },
+        "minibatch_size": {
+           "type": "int",
+           "categorical": true,
+           "range": [30]
+        },
+        "num_hidden_layers": {
+           "type": "int",
+           "categorical": true,
+           "range": [1, 3]
+        },
+        "hidden_size_layer1": {
+            "type": "int",
+            "categorical": false, 
+            "range": [2, 300]
+        },
+        "hidden_size_layer2": {
+            "type": "int",
+            "categorical": false, 
+            "range": [2, 300]
+        },
+        "hidden_size_layer3": {
+            "type": "int",
+            "categorical": false, 
+            "range": [2, 300]
+        },
+        "learn_rates": {
+           "type": "float",
+           "categorical": false,
+           "range": [0.001, 0.99]
+        },
+        "learn_rate_decays": {
+           "type": "float",
+           "categorical": false,
+           "range": [0.001, 0.99]
+        },
+        "learn_rates_pretrain": {
+           "type": "float",
+           "categorical": false,
+           "range": [0.001, 0.99]
+        },
+        "epochs": {
+           "type": "int",
+           "categorical": false,
+           "range": [5, 100]
+        },
+        "output_act_funct": {
+           "type": "string",
+           "categorical": true,
+           "range": ["Softmax", "Sigmoid", "Linear", "tanh"]
+        },
+        "_scale": {
+           "type": "string",
+           "categorical": true,
+           "range": [true]
+        }
+    },
+    "root_parameters": ["inlayer_size", "outlayer_size", "minibatch_size", "num_hidden_layers", "learn_rates", "learn_rate_decays", "learn_rates_pretrain", "epochs", "output_act_funct", "_scale"],
+    "conditions": {
+        "num_hidden_layers": {
+            1: ["hidden_size_layer1"],
+            2: ["hidden_size_layer1", "hidden_size_layer2"],
+            3: ["hidden_size_layer1", "hidden_size_layer2", "hidden_size_layer3"]
+        }
+    }
+}

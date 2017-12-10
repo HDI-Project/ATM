@@ -156,29 +156,30 @@ def create_frozen_sets(db, datarun, algorithms):
     """
     Create all frozen sets for a given datarun and store them in the ModelHub
     database.
+
     db: initialized Database object
     datarun: initialized Datarun ORM object
     algorithms: list of codes for the algorithms this datarun will use
     """
-    # enumerate all combinations of categorical variables for these algorithms
-    frozen_sets = frozen_sets_from_algorithm_codes(algorithms)
-
-    # create frozen sets
     session = db.get_session()
     session.autoflush = False
-    for algorithm, sets in frozen_sets.iteritems():
-        print 'algorithm', algorithm, 'has', len(sets), 'frozen sets'
-        for settings, others in sets.iteritems():
-            optimizables, constants = others
-            fhash = hash_nested_tuple(settings)
+
+    for alg in algorithms:
+        # enumerate all combinations of categorical variables for this algorithm
+        enum = Enumerator(ALGORITHMS_MAP[alg])
+        frozen_sets = enum.get_frozen_sets()
+        print 'algorithm', alg, 'has', len(sets), 'frozen sets'
+
+        for fs in frozen_sets:
             fset = db.FrozenSet(datarun_id=datarun.id,
-                                algorithm=algorithm,
-                                optimizables=optimizables,
-                                constants=constants,
-                                frozens=settings,
-                                frozen_hash=fhash,
+                                algorithm=alg,
+                                optimizables=fs.tunables,
+                                constants=fs.constants,
+                                frozens=fs.frozens,
+                                frozen_hash=hash_nested_tuple(fs.frozens),
                                 status=FrozenStatus.INCOMPLETE)
             session.add(fset)
+
     session.commit()
     session.close()
 

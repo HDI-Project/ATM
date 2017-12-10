@@ -1,0 +1,44 @@
+{   
+    "name": "pa",
+    "class": "sklearn.linear_model.PassiveAggressiveClassifier",
+    "version": "0.18.2",
+    "parameters": {
+        "C": {
+           "type": "float_exp",
+           "categorical": false,
+           "range": [10**-5, 10**5]
+        },
+        "fit_intercept": {
+           "type": "int",
+           "categorical": true,
+           "range": [0.0, 1.0]
+        },
+        "n_iter": {
+           "type": "int",
+           "categorical": false,
+           "range": [10, 200]
+        },
+        "shuffle": {
+           "type": "bool",
+           "categorical": true,
+           "range": [true]
+        },
+        "loss": {
+            "type": "string",
+            "categorical": true, 
+            "range": ["hinge", "squared_hinge"]
+        },
+        "_scale": {
+           "type": "bool",
+           "categorical": true,
+           "range": [true]
+        },
+        "n_jobs": {
+           "type": "int",
+           "categorical": true,
+           "range": [-1]
+        }
+    },
+    "root_parameters": ["C", "fit_intercept", "n_iter", "shuffle", "loss", "_scale", "n_jobs"],
+    "conditions": {}
+}
