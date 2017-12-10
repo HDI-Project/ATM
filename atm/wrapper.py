@@ -3,22 +3,25 @@
    :synopsis: Wrapper around classification algorithm.
 
 """
+import numpy as np
+import time
 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn import decomposition
 from gdbn.activationFunctions import Softmax, Sigmoid, Linear, Tanh
-from sklearn.gaussian_process.kernels import ConstantKernel, RBF, Matern, ExpSineSquared, RationalQuadratic
+from sklearn.gaussian_process.kernels import ConstantKernel, RBF, Matern, \
+                                             ExpSineSquared, RationalQuadratic
+
+from atm.classifier import Classifier
 from atm.metrics import Metrics, JUDGMENT_METRICS
 from atm.metrics import get_metrics_binary, get_metrics_small_multiclass, \
                         get_metrics_large_multiclass, atm_cross_val
-import numpy as np
-import time
 
 
 def create_wrapper(params, judgment_metric):
     learner_config = LEARNERS_MAP[params["function"]]
-    learner_class = Enumerator(learner_config).learner_class
+    learner_class = Classifier(learner_config).learner_class
     return Wrapper(params["function"], judgment_metric, params, learner_class)
 
 

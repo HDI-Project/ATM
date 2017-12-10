@@ -6,11 +6,12 @@ import yaml
 from datetime import datetime, timedelta
 from boto.s3.connection import S3Connection, Key as S3Key
 
-from atm.datawrapper import DataWrapper
-from atm.constants import *
+from atm.classifier import Classifier
 from atm.config import *
-from atm.utilities import ensure_directory, hash_nested_tuple
+from atm.constants import *
 from atm.database import Database
+from atm.datawrapper import DataWrapper
+from atm.utilities import ensure_directory, hash_nested_tuple
 
 warnings.filterwarnings("ignore")
 
@@ -165,8 +166,8 @@ def create_frozen_sets(db, datarun, algorithms):
 
     for alg in algorithms:
         # enumerate all combinations of categorical variables for this algorithm
-        enum = Enumerator(ALGORITHMS_MAP[alg])
-        frozen_sets = enum.get_frozen_sets()
+        clf = Classifier(ALGORITHMS_MAP[alg])
+        frozen_sets = clf.get_frozen_sets()
         print 'algorithm', alg, 'has', len(sets), 'frozen sets'
 
         for fs in frozen_sets:
