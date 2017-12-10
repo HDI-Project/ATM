@@ -2,9 +2,9 @@
 from atm.config import *
 from atm.constants import *
 from atm.utilities import *
-from atm.mapping import Mapping, create_wrapper
 from atm.model import Model
 from atm.database import Database, LearnerStatus
+from atm.wrapper import create_wrapper
 from btb.tuning.constants import Tuners
 
 import argparse
@@ -88,8 +88,8 @@ class Worker(object):
         """
         # selector will either be a key into SELECTORS_MAP or a path to
         # a file that defines a class called CustomSelector.
-        if self.datarun.selector in Mapping.SELECTORS_MAP:
-            Selector = Mapping.SELECTORS_MAP[self.datarun.selector]
+        if self.datarun.selector in SELECTORS_MAP:
+            Selector = SELECTORS_MAP[self.datarun.selector]
         else:
             mod = imp.load_source('btb.selection.custom', self.datarun.selector)
             Selector = mod.CustomSelector
@@ -116,8 +116,8 @@ class Worker(object):
         """
         # tuner will either be a key into TUNERS_MAP or a path to
         # a file that defines a class called CustomTuner.
-        if self.datarun.tuner in Mapping.TUNERS_MAP:
-            self.Tuner = Mapping.TUNERS_MAP[self.datarun.tuner]
+        if self.datarun.tuner in TUNERS_MAP:
+            self.Tuner = TUNERS_MAP[self.datarun.tuner]
         else:
             mod = imp.load_source('btb.tuning.custom', self.datarun.tuner)
             self.Tuner = mod.CustomTuner

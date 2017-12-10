@@ -10,7 +10,6 @@ from atm.datawrapper import DataWrapper
 from atm.constants import *
 from atm.config import *
 from atm.utilities import ensure_directory, hash_nested_tuple
-from atm.mapping import frozen_sets_from_algorithm_codes
 from atm.database import Database
 
 warnings.filterwarnings("ignore")
