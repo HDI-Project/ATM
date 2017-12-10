@@ -1,0 +1,65 @@
+{   
+    "name": "svm",
+    "class": "sklearn.svm.SVC",
+    "version": "0.18.2",
+    "parameters": {
+        "C": {
+           "type": "float_exp",
+           "categorical": false,
+           "range": [10e-5, 10e5]
+        },
+        "gamma": {
+           "type": "float_exp",
+           "categorical": false,
+           "range": [10e-5, 10e5]
+        },
+        "kernel": {
+           "type": "string",
+           "categorical": true,
+           "range": ["rbf", "poly", "linear", "sigmoid"]
+        },
+        "degree": {
+           "type": "int",
+           "categorical": false,
+           "range": [2, 5]
+        },
+        "coef0": {
+            "type": "int",
+            "categorical": false, 
+            "range": [-10e3, 10e3]
+        },
+        "probability": {
+            "type": "bool",
+            "categorical": true, 
+            "range": [true]
+        },
+        "shrinking": {
+            "type": "bool",
+            "categorical": true, 
+            "range": [true]
+        },
+        "cache_size": {
+           "type": "int",
+           "categorical": false,
+           "range": [15000]
+        },
+        "class_weight": {
+           "type": "string",
+           "categorical": true,
+           "range": ["auto"]
+        },
+        "_scale": {
+           "type": "bool",
+           "categorical": true,
+           "range": [true]
+        }
+    },
+    "root_parameters": ["C", "kernel", "probability", "shrinking", "cache_size", "class_weight", "_scale"],
+    "conditions": {
+        "kernel": {
+            "rbf": ["gamma"],
+            "sigmoid": ["gamma", "coef0"],
+            "poly": ["degree", "gamma", "coef0"]
+        }
+    }
+}
