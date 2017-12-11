@@ -13,7 +13,7 @@ SQL_DIALECTS = ['sqlite', 'mysql']
 METRICS = ['f1', 'roc_auc', 'accuracy', 'mu_sigma']
 SCORE_TARGETS = ['cv', 'test']
 BUDGET_TYPES = ['none', 'classifier', 'walltime']
-ALGORITHMS = ['logreg', 'svm', 'sgd', 'dt', 'et', 'rf', 'gnb', 'mnb', 'bnb',
+METHODS = ['logreg', 'svm', 'sgd', 'dt', 'et', 'rf', 'gnb', 'mnb', 'bnb',
               'gp', 'pa', 'knn', 'dbn', 'mlp']
 TUNERS = ['uniform', 'gp', 'gp_ei', 'gp_eivel']
 SELECTORS = ['uniform', 'ucb1', 'bestk', 'bestkvel', 'purebestkvel', 'recentk',
@@ -42,7 +42,7 @@ SELECTORS_MAP = {
     'hieralg': HierarchicalByAlgorithm,
 }
 
-ALGORITHMS_MAP = {
+METHODS_MAP = {
     'logreg': 'logistic_regression.json',
     'svm': 'support_vector_machine.json',
     'sgd': 'stochastic_gradient_descent.json',

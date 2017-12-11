@@ -12,12 +12,12 @@ def get_best_so_far(db, datarun_id):
     """
     Get a series representing best-so-far performance for datarun_id.
     """
-    # generate a list of the "best so far" score after each learner was
+    # generate a list of the "best so far" score after each classifier was
     # computed (in chronological order)
-    learners = db.get_learners(datarun_id=datarun_id)
-    print 'run %s: %d learners' % (datarun_id, len(learners))
+    classifiers = db.get_classifiers(datarun_id=datarun_id)
+    print 'run %s: %d classifiers' % (datarun_id, len(classifiers))
     y = []
-    for l in learners:
+    for l in classifiers:
         best_so_far = max(y + [l.cv_judgment_metric])
         y.append(best_so_far)
     return y
@@ -40,7 +40,7 @@ def graph_series(length, title, **series):
         line, = plt.plot(x, y, '-', label=label)
         lines.append(line)
 
-    plt.xlabel('learners')
+    plt.xlabel('classifiers')
     plt.ylabel('performance')
     plt.title(title)
     plt.legend(handles=lines)
@@ -53,42 +53,42 @@ def print_summary(db, rid):
     print 'Dataset %s' % ds
     print 'Datarun %s' % run
 
-    learners = db.get_learners(datarun_id=rid)
-    print 'Learners: %d total' % len(learners)
+    classifiers = db.get_classifiers(datarun_id=rid)
+    print 'Classifierss: %d total' % len(classifiers)
 
-    best = db.get_best_learner(datarun_id=run.id)
+    best = db.get_best_classifier(datarun_id=run.id)
     if best is not None:
         score = best.cv_judgment_metric
         err = 2 * best.cv_judgment_metric_stdev
-        print 'Best result overall: learner %d, %s = %.3f +- %.3f' % (best.id,
+        print 'Best result overall: classifier %d, %s = %.3f +- %.3f' % (best.id,
                                                                       run.metric,
                                                                       score, err)
 
-    # maps algorithms to sets of frozen sets, and frozen sets to lists of
-    # learners
-    alg_map = {a: defaultdict(list) for a in db.get_algorithms(datarun_id=rid)}
+    # maps methods to sets of hyperpartitions, and hyperpartitions to lists of
+    # classifiers
+    alg_map = {a: defaultdict(list) for a in db.get_methods(datarun_id=rid)}
 
-    for l in learners:
-        fs = db.get_frozen_set(l.frozen_set_id)
-        alg_map[fs.algorithm][fs.id].append(l)
+    for l in classifiers:
+        hp = db.get_hyperpartition(l.hyperpartition_id)
+        alg_map[hp.method][hp.id].append(l)
 
-    for alg, fs_map in alg_map.items():
+    for alg, hp_map in alg_map.items():
         print
-        print 'algorithm %s:' % alg
+        print 'method %s:' % alg
 
-        learners = sum(fs_map.values(), [])
-        errored = len([l for l in learners if l.status ==
-                       LearnerStatus.ERRORED])
-        complete = len([l for l in learners if l.status ==
-                        LearnerStatus.COMPLETE])
+        classifiers = sum(hp_map.values(), [])
+        errored = len([l for l in classifiers if l.status ==
+                       ClassifierStatus.ERRORED])
+        complete = len([l for l in classifiers if l.status ==
+                        ClassifierStatus.COMPLETE])
         print '\t%d errored, %d complete' % (errored, complete)
 
-        best = db.get_best_learner(datarun_id=run.id, algorithm=alg)
+        best = db.get_best_classifier(datarun_id=run.id, method=alg)
         if best is not None:
             score = best.cv_judgment_metric
             err = 2 * best.cv_judgment_metric_stdev
-            print '\tBest: learner %s, %s = %.3f +- %.3f' % (best, run.metric,
-                                                           score, err)
+            print '\tBest: classifier %s, %s = %.3f +- %.3f' % (best, run.metric,
+                                                                score, err)
 
 def work_parallel(db, datarun_ids=None, aws_config=None, n_procs=4):
     print 'starting workers...'

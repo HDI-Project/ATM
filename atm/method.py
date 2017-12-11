@@ -35,7 +35,6 @@ class Method(object):
         config: JSON dictionary containing all the information needed to specify
             this enumerator
         """
-        print "loading file", config
         with open(join(CONFIG_PATH, config)) as f:
             config = json.load(f)
 

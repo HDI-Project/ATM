@@ -8,7 +8,7 @@ label_column: class
 
 ## Datarun arguments
 dataset_id: 
-algorithms: 
+methods: 
     - rf
     - logreg
     - dt
@@ -16,9 +16,9 @@ algorithms:
 models_dir: models/
 # priority (higher number is more important)
 priority: 1
-# Should there be a learner or walltime budget?
-budget_type: learner
-# If budget_type is learner, how many learners to try?
+# Should there be a classifier or walltime budget?
+budget_type: classifier
+# If budget_type is classifier, how many classifiers to try?
 budget: 100
 # How should ATM sample hyperparameters from a given frozen set?
 tuner: gp
