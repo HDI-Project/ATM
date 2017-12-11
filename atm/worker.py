@@ -98,15 +98,15 @@ class Worker(object):
 
         # generate the arguments we need to initialize the selector
         hyperpartitions = self.db.get_hyperpartitions(self.datarun.id)
-        fs_by_algorithm = defaultdict(list)
-        for s in hyperpartitions:
-            fs_by_algorithm[s.algorithm].append(s.id)
-        hyperpartition_ids = [s.id for s in hyperpartitions]
+        hp_by_method = defaultdict(list)
+        for hp in hyperpartitions:
+            hp_by_method[hp.method].append(hp.id)
+        hyperpartition_ids = [hp.id for hp in hyperpartitions]
 
         # Selector classes support passing in redundant arguments
         self.selector = Selector(choices=hyperpartition_ids,
                                  k=self.datarun.k_window,
-                                 by_algorithm=dict(fs_by_algorithm))
+                                 by_algorithm=dict(hp_by_method))
 
     def load_tuner(self):
         """
@@ -417,12 +417,12 @@ class Worker(object):
                  hyperpartition.id)
             return
 
-        _log("Chose parameters for algorithm %s:" % hyperpartition.algorithm)
+        _log("Chose parameters for method %s:" % hyperpartition.method)
         for k, v in params.items():
             _log("\t%s = %s" % (k, v))
 
         # TODO: this doesn't belong here
-        params["function"] = hyperpartition.algorithm
+        params["function"] = hyperpartition.method
 
         _log("Creating classifier...")
         classifier_id = self.db.create_classifier(hyperpartition_id=hyperpartition.id,

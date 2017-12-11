@@ -1,6 +1,6 @@
 """
-.. module:: algorithm
-   :synopsis: Wrapper around classification algorithm.
+.. module:: wrapper
+   :synopsis: Wrapper around classification method.
 
 """
 import numpy as np
@@ -13,7 +13,7 @@ from gdbn.activationFunctions import Softmax, Sigmoid, Linear, Tanh
 from sklearn.gaussian_process.kernels import ConstantKernel, RBF, Matern, \
                                              ExpSineSquared, RationalQuadratic
 
-from atm.constants import ALGORITHMS_MAP
+from atm.constants import METHODS_MAP
 from atm.method import Method
 from atm.metrics import Metrics, JUDGMENT_METRICS
 from atm.metrics import get_metrics_binary, get_metrics_small_multiclass, \
@@ -21,7 +21,7 @@ from atm.metrics import get_metrics_binary, get_metrics_small_multiclass, \
 
 
 def create_wrapper(params, judgment_metric):
-    config = ALGORITHMS_MAP[params["function"]]
+    config = METHODS_MAP[params["function"]]
     class_ = Method(config).class_
     return Wrapper(params["function"], judgment_metric, params, class_)
 
@@ -46,7 +46,7 @@ class Wrapper(object):
                  compute_metrics=False):
         """
         Arguments
-            code: the short algorithm code (as defined in constants.py)
+            code: the short method code (as defined in constants.py)
             judgment_metric: string that has a mapping in
                 metrics.JUDGMENT_METRICS and indicates which metric should be
                 optimized for.

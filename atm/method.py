@@ -98,7 +98,7 @@ class Method(object):
 
             # these lists are copied for now
             new_constants = constants[:]
-            new_free_cats = categoricals[:]
+            new_free_cats = free_cats[:]
             new_tunables = tunables[:]
 
             # check if choosing this value opens up new parts of the conditional

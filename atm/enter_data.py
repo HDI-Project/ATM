@@ -152,27 +152,27 @@ def create_datarun(db, dataset_id, tuner, selector, gridding, priority, k_window
     return datarun
 
 
-def create_hyperpartitions(db, datarun, algorithms):
+def create_hyperpartitions(db, datarun, methods):
     """
     Create all hyperpartitions for a given datarun and store them in the ModelHub
     database.
 
     db: initialized Database object
     datarun: initialized Datarun ORM object
-    algorithms: list of codes for the algorithms this datarun will use
+    methods: list of codes for the methods this datarun will use
     """
     session = db.get_session()
     session.autoflush = False
 
-    for alg in algorithms:
-        # enumerate all combinations of categorical variables for this algorithm
-        method = Method(ALGORITHMS_MAP[alg])
+    for m in methods:
+        # enumerate all combinations of categorical variables for this method
+        method = Method(METHODS_MAP[m])
         parts = method.get_hyperpartitions()
-        print 'algorithm', alg, 'has', len(parts), 'hyperpartitions'
+        print 'method', m, 'has', len(parts), 'hyperpartitions'
 
         for part in parts:
             part = db.Hyperpartition(datarun_id=datarun.id,
-                                     algorithm=alg,
+                                     method=m,
                                      tunables=part.tunables,
                                      constants=part.constants,
                                      categoricals=part.categoricals,
@@ -247,7 +247,7 @@ def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False):
     # create hyperpartitions for the new datarun
     print
     print 'creating hyperpartitions...'
-    create_hyperpartitions(db, datarun, run_config.algorithms)
+    create_hyperpartitions(db, datarun, run_config.methods)
     print
     print '========== Summary =========='
     print 'Dataset ID:', dataset.id

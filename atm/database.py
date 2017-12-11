@@ -18,7 +18,7 @@ from atm.constants import *
 from atm.utilities import object_to_base_64, base_64_to_object
 
 
-ALGORITHM_ROWS = [
+METHOD_ROWS = [
 	dict(id=1, code='svm', name='Support Vector Machine', probability=True),
 	dict(id=2, code='et', name='Extra Trees', probability=True),
 	dict(id=3, code='pa', name='Passive Aggressive', probability=False),
@@ -89,7 +89,7 @@ class Database(object):
         self.get_session = sessionmaker(bind=self.engine,
                                         expire_on_commit=False)
         self.define_tables()
-        self.create_algorithms()
+        self.create_methods()
 
     def define_tables(self):
         """
@@ -234,7 +234,7 @@ class Database(object):
                 self.constants64 = object_to_base_64(value)
 
             def __repr__(self):
-                return "<%s: %s>" % (self.algorithm, self.categoricals)
+                return "<%s: %s>" % (self.method, self.categoricals)
 
         self.Hyperpartition = Hyperpartition
 
@@ -287,14 +287,14 @@ class Database(object):
         Base.metadata.create_all(bind=self.engine)
 
     @try_with_session()
-    def create_algorithms(self, session):
-        """ Enter all the default algorithms into the database. """
-        for r in ALGORITHM_ROWS:
+    def create_methods(self, session):
+        """ Enter all the default methods into the database. """
+        for r in METHOD_ROWS:
             if not session.query(self.Dataset).get(r['id']):
                 args = dict(r)
                 del args['id']
-                alg = self.MethodCode(**args)
-                session.add(alg)
+                m = self.Method(**args)
+                session.add(m)
         session.commit()
 
     ###########################################################################
@@ -359,7 +359,7 @@ class Database(object):
 
     @try_with_session(default=list)
     def get_hyperpartitions(self, session, dataset_id=None, datarun_id=None,
-                        algorithm=None, ignore_gridding_done=True,
+                        method=None, ignore_gridding_done=True,
                         ignore_errored=True):
         """
         Return all the hyperpartitions in a given datarun by id.
@@ -371,12 +371,14 @@ class Database(object):
                 .filter(self.Datarun.dataset_id == dataset_id)
         if datarun_id is not None:
             query = query.filter(self.Hyperpartition.datarun_id == datarun_id)
-        if algorithm is not None:
-            query = query.filter(self.Hyperpartition.algorithm == algorithm)
+        if method is not None:
+            query = query.filter(self.Hyperpartition.method == method)
         if ignore_gridding_done:
-            query = query.filter(self.Hyperpartition.status != PartitionStatus.GRIDDING_DONE)
+            query = query.filter(self.Hyperpartition.status !=
+                                 PartitionStatus.GRIDDING_DONE)
         if ignore_errored:
-            query = query.filter(self.Hyperpartition.status != PartitionStatus.ERRORED)
+            query = query.filter(self.Hyperpartition.status !=
+                                 PartitionStatus.ERRORED)
 
         return query.all()
 
@@ -387,7 +389,7 @@ class Database(object):
 
     @try_with_session()
     def get_classifiers(self, session, dataset_id=None, datarun_id=None,
-                     algorithm=None, hyperpartition_id=None, status=None):
+                     method=None, hyperpartition_id=None, status=None):
         """ Get a set of classifiers, filtered by the passed-in arguments. """
         query = session.query(self.Classifier)
         if dataset_id is not None:
@@ -395,9 +397,9 @@ class Database(object):
                 .filter(self.Datarun.dataset_id == dataset_id)
         if datarun_id is not None:
             query = query.filter(self.Classifier.datarun_id == datarun_id)
-        if algorithm is not None:
+        if method is not None:
             query = query.join(self.Hyperpartition)\
-                .filter(self.Hyperpartition.algorithm == algorithm)
+                .filter(self.Hyperpartition.method == method)
         if hyperpartition_id is not None:
             query = query.filter(self.Classifier.hyperpartition_id == hyperpartition_id)
         if status is not None:
@@ -438,15 +440,15 @@ class Database(object):
         return len(classifiers)
 
     @try_with_session(default=list)
-    def get_algorithms(self, session, dataset_id=None, datarun_id=None,
+    def get_methods(self, session, dataset_id=None, datarun_id=None,
                        ignore_errored=False, ignore_gridding_done=False):
-        """ Get all algorithms used in a particular datarun. """
+        """ Get all methods used in a particular datarun. """
         hyperpartitions = self.get_hyperpartitions(dataset_id=dataset_id,
-                                           datarun_id=datarun_id,
-                                           ignore_gridding_done=False,
-                                           ignore_errored=False)
-        algorithms = set(f.algorithm for f in hyperpartitions)
-        return list(algorithms)
+                                                   datarun_id=datarun_id,
+                                                   ignore_gridding_done=False,
+                                                   ignore_errored=False)
+        methods = set(f.method for f in hyperpartitions)
+        return list(methods)
 
     @try_with_session()
     def get_maximum_y(self, session, datarun_id, score_target):
@@ -460,7 +462,7 @@ class Database(object):
     @try_with_session()
     def get_best_classifier(self, session, score_target='mu_sigma',
                          dataset_id=None, datarun_id=None,
-                         algorithm=None, hyperpartition_id=None):
+                         method=None, hyperpartition_id=None):
         """
         Get the classifier with the highest lower error bound. In other words, what
         classifier has the highest value of (score.mean - 2 * score.std)?
@@ -474,10 +476,10 @@ class Database(object):
             func = attrgetter(score_target)
 
         classifiers = self.get_classifiers(dataset_id=dataset_id,
-                                     datarun_id=datarun_id,
-                                     algorithm=algorithm,
-                                     hyperpartition_id=hyperpartition_id,
-                                     status=ClassifierStatus.COMPLETE)
+                                           datarun_id=datarun_id,
+                                           method=method,
+                                           hyperpartition_id=hyperpartition_id,
+                                           status=ClassifierStatus.COMPLETE)
 
         if not classifiers:
             return None

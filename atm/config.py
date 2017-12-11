@@ -94,7 +94,7 @@ class RunConfig(Config):
 
         # datarun config
         'dataset_id',
-        'algorithms',
+        'methods',
         'models_dir',
         'priority',
         'budget_type',
@@ -113,7 +113,7 @@ class RunConfig(Config):
         'train_path': 'data/test/pollution_1.csv',
         'output_folder': 'data/processed/',
         'label_column': 'class',
-        'algorithms': ['logreg', 'dt', 'knn'],
+        'methods': ['logreg', 'dt', 'knn'],
         'priority': 1,
         'budget_type': 'classifier',
         'budget': 100,
@@ -240,13 +240,13 @@ def add_arguments_datarun(parser):
     ################################################################################
     # Notes:
     # - Support vector machines (svm) can take a long time to train. It's not an
-    #   error. It's justpart of what happens  when the algorithm happens to explore
+    #   error, it's just part of what happens when the method happens to explore
     #   a crappy set of parameters on a powerful algo like this.
     # - Stochastic gradient descent (sgd) can sometimes fail on certain parameter
     #   settings as well. Don't worry, they train SUPER fast, and the worker.py will
     #   simply log the error and continue.
     #
-    # Algorithm options:
+    # Method options:
     #   logreg - logistic regression
     #   svm    - support vector machine
     #   sgd    - linear classifier (SVM or logreg) using stochastic gradient descent
@@ -261,8 +261,8 @@ def add_arguments_datarun(parser):
     #   knn    - K nearest neighbors
     #   dbn    - deep belief network
     #   mlp    - multi-layer perceptron
-    parser.add_argument('--algorithms', nargs='+', choices=ALGORITHMS,
-                        help='list of algorithms which the datarun will use')
+    parser.add_argument('--methods', nargs='+', choices=METHODS,
+                        help='list of methods which the datarun will use')
     parser.add_argument('--priority', type=int,
                         help='Priority of the datarun (higher = more important')
     parser.add_argument('--budget-type', choices=BUDGET_TYPES,
