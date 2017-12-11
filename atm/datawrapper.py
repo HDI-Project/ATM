@@ -11,15 +11,16 @@ from atm.utilities import ensure_directory
 
 
 class DataWrapper(object):
-    def __init__(self, dataname, outfolder, labelcol, testing_ratio=0.3,
-                 traintestfile=None, trainfile=None, testfile=None,
-                 dropvals=None, sep=None):
+    def __init__(self, dataname, output_folder, label_column, train_file,
+                 test_file=None, testing_ratio=0.3, dropvals=None, sep=None):
         self.dataname = dataname
-        self.outfolder = outfolder
-        self.labelcol = labelcol
+        self.output_folder = output_folder
+        self.label_column = label_column
+        self.train_file = train_file
+        self.test_file = test_file
+        self.testing_ratio = testing_ratio
         self.dropvals = dropvals
         self.sep = sep or ","
-        self.testing_ratio = testing_ratio
 
         # special objects
         self.categoricalcols = [] # names of columns that are categorical
@@ -28,165 +29,118 @@ class DataWrapper(object):
         self.encoder = None # discretizes labels
         self.vectorizer = None # discretizes examples (after categoricals vectorized)
 
-        # can do either
-        assert traintestfile or (trainfile and testfile), \
-            "You must either have a single file or a train AND a test file!"
-
-        self.traintestfile = traintestfile
-        self.trainfile = trainfile
-        self.testfile = testfile
-
-        if traintestfile:
-            print "train/test data:", self.traintestfile
+        if test_file is None:
+            print "train/test data:", self.train_file
         else:
-            print "training data:", self.trainfile
-            print "test data:", self.testfile
+            print "training data:", self.train_file
+            print "test data:", self.test_file
 
+    @property
+    def train_path_out(self):
+        return os.path.join(self.output_folder, "%s_train.csv" % self.dataname)
 
-    def load(self):
-        """
-        Loads data from disk into trainable vector form.
-        """
-        pass
+    @property
+    def test_path_out(self):
+        return os.path.join(self.output_folder, "%s_test.csv" % self.dataname)
 
-    def wrap(self):
-        """
-        Wraps data allowing for loading and vectorizing.
-        """
-        if self.traintestfile:
-            self.wrap_single_file()
-        else:
-            self.wrap_train_test()
-        return self.train_path_out, self.test_path_out
-
-    def wrap_train_test(self):
-        # get headings from first line in file
-        headings = []
-        with open(self.trainfile, "rb") as df:
-            for line in df:
-                headings = [x.strip() for x in line.split(self.sep)]
-                break
-
-        with open(self.testfile, "rb") as df:
-            for line in df:
-                assert headings == [x.strip() for x in line.split(self.sep)], \
-                    "The heading in your testing file does not match that of your training file!"
-                self.headings = headings
-                break
-
-        # now load both files and stack together
+    def load_data(self, path):
         data = pd.read_csv(self.trainfile, skipinitialspace=True,
                            na_values=self.dropvals, sep=self.sep)
+
+        # drop rows with any NA values
         data = data.dropna(how='any')
-        train_labels = np.array(data[[self.labelcol]]) # gets data frame instead of series
-        self.encoder = LabelEncoder()
-        training_discretized_labels = self.encoder.fit_transform(train_labels)
-        num_train_samples = data.shape[0]
 
-        # combine training and testing
-        tempdata = pd.read_csv(self.testfile, skipinitialspace=True,
-                               na_values=self.dropvals, sep=self.sep)
-        tempdata = tempdata.dropna(how='any')
-        test_labels = np.array(tempdata[[self.labelcol]]) # gets data frame instead of series
-        testing_discretized_labels = self.encoder.transform(test_labels)
-        num_test_samples = tempdata.shape[0]
-        data = data.append(tempdata, ignore_index=True)
+        # save the names and order of the columns for later
+        self.columns = data.columns.values
+        self.columns.remove(self.label_column)
 
-        # remove labels, get majority percentage
-        counts = data[self.labelcol].value_counts()
-        majority_percentage = float(max(counts)) / float(sum(counts))
-        data = data.drop([self.labelcol], axis=1) # drop column
+        return data
 
-        # get stats for database
-        n, d = data.shape
-        unique_classes = np.unique(train_labels)
-        k = len(unique_classes)
+    def train_encoders(self, data, labels):
+        cat_cols = []
+        # encode categorical columns, leave ordinal values alone
+        for column in self.columns:
+            if data[column].dtype == 'object':
+                # save the indices of categorical columns for one-hot encoding
+                cat_cols.append(data.columns.get_loc(column))
 
-        # get types of variables
-        categorical = 0
-        ordinal = 0
-        dummies = 0
-        for column in data.columns.values:
-            dtype = data[column].dtype
-            if dtype == "object":
-                self.categoricalcols.append(column)
-                self.categoricalcolsidxs.append(data.columns.get_loc(column))
-                nvalues = len(np.unique(np.array(data[column].values)))
-                if nvalues > 2:
-                    dummies += nvalues
+                # encode each feature as an integer in range(unique_vals)
+                le = LabelEncoder()
+                data[column] = le.fit_transform(data[column])
+                self.col_encoders[column] = le
+
+        # One-hot encode the whole feature matrix.
+        # Set sparse to False so that we can test for NaNs in the output
+        self.vectorizer = OneHotEncoder(categorical_features=cat_cols,
+                                        sparse=False)
+        self.vectorizer.fit(data)
+
+        # Train an encoder for the label as well
+        labels = np.array(data[[self.label_column]])
+        self.label_encoder = LabelEncoder()
+        self.label_encoder.fit(labels)
+
+    def encode_data(self, data):
+        """
+        Convert a DataFrame of labeled data to a feature matrix in the form
+        that ATM can use.
+        """
+        # pull labels into a separate series and transform them to integers
+        labels = np.array(data[[self.label_column]])
+        y = self.label_encoder.transform(labels)
+
+        # drop the label column and transform the remaining features
+        features = data.drop([self.label_column], axis=1)
+
+        # encode each categorical feature as an integer
+        for column, encoder in self.col_encoders.items():
+            data[column] = encoder.transform(data[column])
+
+        # one-hot encode the categorical features
+        X = self.vectorizer.transform(features)
+
+        return np.column_stack((y, X))
+
+    def decode_data(self, data):
+        """
+        Convert a DataFrame of labeled data to a feature matrix in the form
+        that ATM can use.
+        """
+
+    def verify_data(self, data):
+        """ Make sure everything looks good after processing """
+        for column in self.columns:
+            if data[column].dtype == 'object'
+                # keep track of everything for verification etc.
+                dummies += len(np.unique(data[column]))
                 categorical += 1
             else:
                 ordinal += 1
 
-        for column in self.categoricalcols:
-            le = LabelEncoder()
-            le.fit(data[column])
-            data[column] = le.transform(data[column])
-            self.categoricalcolsvectorizers.append(le)
+    def wrap(self):
+        """ Process data into a form that ATM can use. """
+        if self.test_file is not None:
+            # load raw train and test data
+            train_data = self.load_data(self.train_file)
+            test_data = self.load_data(self.test_file)
+            all_data = train_data.append(test_data, ignore_index=True)
+        else:
+            # load raw data and split it into train and test sets
+            all_data = self.load_data(self.train_file)
+            train_data, test_data = train_test_split(all_data,
+                                                     test_size=self.testing_ratio)
 
-        # don't use sparse because then can't test for NaNs
-        self.vectorizer = OneHotEncoder(categorical_features=self.categoricalcolsidxs,
-                                        sparse=False)
-        self.vectorizer.fit(data)
-        data = self.vectorizer.transform(data)
-        newd = d - categorical + dummies
+        # train label encoder and one-hot encoders for categorical features
+        self.train_encoders(all_data)
 
-        # ensure data integrity
-        assert newd == data.shape[1], "One hot encoding failed"
-        assert np.sum(np.isnan(data)) == 0, \
-            "Cannot have NaN values in the cleaned data!"
-        assert np.sum(np.isnan(np.array(training_discretized_labels))) == 0, \
-            "Cannot have NaN values for labels!"
-        assert np.sum(np.isnan(np.array(testing_discretized_labels))) == 0, \
-            "Cannot have NaN values for labels!"
+        # process data into encoded numpy arrays
+        train_matrix = self.encode_data(train_data)
+        test_matrix = self.encode_data(test_data)
 
-        # now save training and testing as separate files
-        ensure_directory(self.outfolder)
-
-        training = data[:num_train_samples,:]
-        testing = data[-num_test_samples:,:]
-
-        # training
-        self.train_path_out = os.path.join(self.outfolder,
-                                          "%s_train.csv" % self.dataname)
-        training_matrix = np.column_stack((np.array(training_discretized_labels),
-                                           np.array(training)))
-        print "training matrix:", training_matrix.shape
-        np.savetxt(self.train_path_out, training_matrix, delimiter=self.sep, fmt="%s")
-
-        # testing
-        self.test_path_out = os.path.join(self.outfolder,
-                                          "%s_test.csv" % self.dataname)
-        testing_matrix = np.column_stack((np.array(testing_discretized_labels),
-                                          np.array(testing)))
-        print "testing matrix: ", testing_matrix.shape
-        np.savetxt(self.test_path_out, testing_matrix, delimiter=self.sep, fmt="%s")
-
-        # statistics
-        self.statistics = {
-            "unique_classes" : list(unique_classes),
-            "n_examples" : n,
-            "d_features" : newd,
-            "k_classes" : k,
-            # this is 0 because the processed version of the data file store the
-            # label class at column 0
-            # TODO do something about there being both label_column and labelcol
-            # and them sometimes but not always meaning the same thing
-            "label_column" : 0,
-            "datasize_bytes" : np.array(data).nbytes,
-            "categorical" : categorical,
-            "ordinal" : ordinal,
-            "dummys" : dummies,
-            "majority" : majority_percentage,
-            "dataname" : self.dataname,
-            "training" : self.train_path_out,
-            "testing" : self.test_path_out,
-            #"testing_ratio" : (float(testing_matrix.shape[0]) /
-            #   float(training_matrix.shape[0] + testing_matrix.shape[0])),
-        }
-        print 'dataset info:'
-        for i in self.statistics.items():
-            print '\t%s: %s' % i
+        # save transformed data to disk
+        ensure_directory(self.output_folder)
+        np.savetxt(self.train_path_out, train_matrix, fmt="%s")
+        np.savetxt(self.test_path_out, test_matrix, fmt="%s")
 
     def wrap_single_file(self):
         with open(self.traintestfile, "rb") as df:
@@ -197,24 +151,25 @@ class DataWrapper(object):
         # now load both files and stack together
         data = pd.read_csv(self.traintestfile, skipinitialspace=True,
                            na_values=self.dropvals, sep=self.sep)
-        data = data.dropna(how='any') # drop rows with any NA values
+        # drop rows with any NA values
+        data = data.dropna(how='any')
 
         # Get labels and encode into numerical values
-        labels = np.array(data[[self.labelcol]]) # gets data frame instead of series
+        labels = np.array(data[[self.label_column]]) # gets data frame instead of series
         self.encoder = LabelEncoder()
         discretized_labels = self.encoder.fit_transform(labels)
 
         # remove labels, get majority percentage
-        counts = data[self.labelcol].value_counts()
+        counts = data[self.label_column].value_counts()
         majority_percentage = float(max(counts)) / float(sum(counts))
-        data = data.drop([self.labelcol], axis=1) # drop column
+        data = data.drop([self.label_column], axis=1) # drop column
 
         # get stats for database
         n, d = data.shape
         unique_classes = np.unique(labels)
         k = len(unique_classes)
 
-        # get types of variables
+        # count types of variables
         categorical = 0
         ordinal = 0
         dummies = 0
@@ -258,7 +213,7 @@ class DataWrapper(object):
             "Cannot have NaN values for labels!"
 
         # now save training and testing as separate files
-        ensure_directory(self.outfolder)
+        ensure_directory(self.output_folder)
 
         # now split the data
         data_train, data_test, labels_train, labels_test = \
@@ -266,14 +221,11 @@ class DataWrapper(object):
                              test_size=self.testing_ratio)
 
         # training
-        self.train_path_out = os.path.join(self.outfolder,
-                                      "%s_train.csv" % self.dataname)
         training_matrix = np.column_stack((labels_train, data_train))
         print "training matrix:", training_matrix.shape
         np.savetxt(self.train_path_out, training_matrix, delimiter=self.sep, fmt="%s")
 
         # testing
-        self.test_path_out = os.path.join(self.outfolder, "%s_test.csv" % self.dataname)
         testing_matrix = np.column_stack((labels_test, data_test))
         print "testing matrix: ", testing_matrix.shape
         np.savetxt(self.test_path_out, testing_matrix, delimiter=self.sep, fmt="%s")
@@ -303,7 +255,8 @@ class DataWrapper(object):
             print '\t%s: %s' % i
 
     def __repr__(self):
-        return "<DataWrapper>"
+        return "<DataWrapper: train=%r, test=%r>" % (self.train_file,
+                                                     self.test_file)
 
     def vectorize_file(self, path):
         data = pd.read_csv(path, skipinitialspace=True,
@@ -323,7 +276,7 @@ class DataWrapper(object):
 
     def vectorize_examples(self, examples):
         """
-        examples : list of csv strings
+        examples: list of csv strings
             Each should be a value in the feature vector in correct order.
         """
         ready = []
