@@ -6,11 +6,11 @@ import yaml
 from datetime import datetime, timedelta
 from boto.s3.connection import S3Connection, Key as S3Key
 
-from atm.classifier import Classifier
 from atm.config import *
 from atm.constants import *
 from atm.database import Database
 from atm.datawrapper import DataWrapper
+from atm.method import Method
 from atm.utilities import ensure_directory, hash_nested_tuple
 
 warnings.filterwarnings("ignore")
@@ -105,13 +105,13 @@ def create_datarun(db, dataset_id, tuner, selector, gridding, priority, k_window
     db: initialized Database object
     dataset_id: ID of the dataset this datarun will use
     tuner: string, hyperparameter tuning method
-    selector: string, frozen set selection method
+    selector: string, hyperpartition selection method
     gridding: int or None,
     priority: int, higher priority runs are computed first
     k_window: int, `k` parameter for selection methods that need it
     r_min: int, minimum number of prior examples for tuning to take effect
-    budget_type: string, either 'walltime' or 'learners'
-    budget: int, total budget for datarun in learners or minutes
+    budget_type: string, either 'walltime' or 'classifiers'
+    budget: int, total budget for datarun in classifiers or minutes
     deadline: string-formatted datetime, when the datarun must end by
     score_target: either 'cv' or 'test', indicating which scores the run should
         optimize for
@@ -124,7 +124,7 @@ def create_datarun(db, dataset_id, tuner, selector, gridding, priority, k_window
     if deadline:
         deadline = datetime.strptime(deadline, TIME_FMT)
         # this overrides the otherwise configured budget_type
-        # TODO: why not walltime and learner budget simultaneously?
+        # TODO: why not walltime and classifiers budget simultaneously?
         budget_type = 'walltime'
     elif budget_type == 'walltime':
         deadline = datetime.now() + timedelta(minutes=budget)
@@ -152,9 +152,9 @@ def create_datarun(db, dataset_id, tuner, selector, gridding, priority, k_window
     return datarun
 
 
-def create_frozen_sets(db, datarun, algorithms):
+def create_hyperpartitions(db, datarun, algorithms):
     """
-    Create all frozen sets for a given datarun and store them in the ModelHub
+    Create all hyperpartitions for a given datarun and store them in the ModelHub
     database.
 
     db: initialized Database object
@@ -166,19 +166,18 @@ def create_frozen_sets(db, datarun, algorithms):
 
     for alg in algorithms:
         # enumerate all combinations of categorical variables for this algorithm
-        clf = Classifier(ALGORITHMS_MAP[alg])
-        frozen_sets = clf.get_frozen_sets()
-        print 'algorithm', alg, 'has', len(frozen_sets), 'frozen sets'
+        method = Method(ALGORITHMS_MAP[alg])
+        parts = method.get_hyperpartitions()
+        print 'algorithm', alg, 'has', len(parts), 'hyperpartitions'
 
-        for fs in frozen_sets:
-            fset = db.FrozenSet(datarun_id=datarun.id,
-                                algorithm=alg,
-                                optimizables=fs.tunables,
-                                constants=fs.constants,
-                                frozens=fs.frozens,
-                                frozen_hash=hash_nested_tuple(fs.frozens),
-                                status=FrozenStatus.INCOMPLETE)
-            session.add(fset)
+        for part in parts:
+            part = db.Hyperpartition(datarun_id=datarun.id,
+                                     algorithm=alg,
+                                     tunables=part.tunables,
+                                     constants=part.constants,
+                                     categoricals=part.categoricals,
+                                     status=PartitionStatus.INCOMPLETE)
+            session.add(part)
 
     session.commit()
     session.close()
@@ -245,17 +244,17 @@ def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False):
                              run_config.budget, run_config.deadline,
                              run_config.score_target, run_config.metric)
 
-    # create frozen sets for the new datarun
+    # create hyperpartitions for the new datarun
     print
-    print 'creating frozen sets...'
-    create_frozen_sets(db, datarun, run_config.algorithms)
+    print 'creating hyperpartitions...'
+    create_hyperpartitions(db, datarun, run_config.algorithms)
     print
     print '========== Summary =========='
     print 'Dataset ID:', dataset.id
     print 'Training data:', dataset.train_path
     print 'Test data:', (dataset.test_path or '(None)')
     print 'Datarun ID:', datarun.id
-    print 'Frozen set selection strategy:', datarun.selector
+    print 'Hyperpartition selection strategy:', datarun.selector
     print 'Parameter tuning strategy:', datarun.tuner
     print 'Budget: %d (%s)' % (datarun.budget, datarun.budget_type)
     return datarun.id

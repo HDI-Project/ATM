@@ -115,7 +115,7 @@ class RunConfig(Config):
         'label_column': 'class',
         'algorithms': ['logreg', 'dt', 'knn'],
         'priority': 1,
-        'budget_type': 'learner',
+        'budget_type': 'classifier',
         'budget': 100,
         'tuner': 'uniform',
         'selector': 'uniform',
@@ -268,13 +268,13 @@ def add_arguments_datarun(parser):
     parser.add_argument('--budget-type', choices=BUDGET_TYPES,
                         help='Type of budget to use')
     parser.add_argument('--budget', type=int,
-                        help='Value of the budget, either in learners or minutes')
+                        help='Value of the budget, either in classifiers or minutes')
     parser.add_argument('--deadline',
                         help='Deadline for datarun completion. If provided, this '
                         'overrides the walltime budget. Format: ' + TIME_FMT)
 
     # hyperparameter selection strategy
-    # How should ATM sample hyperparameters from a given frozen set?
+    # How should ATM sample hyperparameters from a given hyperpartition?
     #    uniform  - pick randomly! (baseline)
     #    gp       - vanilla Gaussian Process
     #    gp_ei    - Gaussian Process expected improvement criterion
@@ -283,17 +283,18 @@ def add_arguments_datarun(parser):
     parser.add_argument('--tuner', choices=TUNERS,
                         help='type of BTB tuner to use')
 
-    # How should ATM select a particular hyperpartition (frozen set) from the
-    # set of all hyperpartitions?
+    # How should ATM select a particular hyperpartition from the set of all
+    # possible hyperpartitions?
     # Options:
     #   uniform      - pick randomly
     #   ucb1         - UCB1 multi-armed bandit
-    #   bestk        - MAB using only the best K runs in each frozen set
+    #   bestk        - MAB using only the best K runs in each hyperpartition
     #   bestkvel     - MAB with velocity of best K runs
-    #   purebestkvel - always return frozen set with highest velocity
+    #   purebestkvel - always return hyperpartition with highest velocity
     #   recentk      - MAB with most recent K runs
     #   recentkvel   - MAB with velocity of most recent K runs
-    #   hieralg      - hierarchical MAB: choose a classifier first, then choose frozen
+    #   hieralg      - hierarchical MAB: choose a classifier first, then choose
+    #                  a partition
     parser.add_argument('--selector', choices=SELECTORS,
                         help='type of BTB selector to use')
 
@@ -301,7 +302,7 @@ def add_arguments_datarun(parser):
     # allowing bayesian opt to select parameters. Consult the thesis to understand
     # what those mean, but essentially:
     #
-    #  if (num_learners_trained_in_hyperpartition >= r_min)
+    #  if (num_classifiers_trained_in_hyperpartition >= r_min)
     #    # train using sample criteria
     #  else
     #    # train using uniform (baseline)
@@ -310,7 +311,7 @@ def add_arguments_datarun(parser):
 
     # k is number that xxx-k methods use. It is similar to r_min, except it is
     # called k_window and determines how much "history" ATM considers for certain
-    # frozen selection logics.
+    # partition selection logics.
     parser.add_argument('--k-window', type=int,
                         help='number of previous scores considered by -k selector methods')
 

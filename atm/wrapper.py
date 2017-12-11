@@ -13,17 +13,17 @@ from gdbn.activationFunctions import Softmax, Sigmoid, Linear, Tanh
 from sklearn.gaussian_process.kernels import ConstantKernel, RBF, Matern, \
                                              ExpSineSquared, RationalQuadratic
 
-from atm.classifier import Classifier
 from atm.constants import ALGORITHMS_MAP
+from atm.method import Method
 from atm.metrics import Metrics, JUDGMENT_METRICS
 from atm.metrics import get_metrics_binary, get_metrics_small_multiclass, \
                         get_metrics_large_multiclass, atm_cross_val
 
 
 def create_wrapper(params, judgment_metric):
-    learner_config = ALGORITHMS_MAP[params["function"]]
-    learner_class = Classifier(learner_config).learner_class
-    return Wrapper(params["function"], judgment_metric, params, learner_class)
+    config = ALGORITHMS_MAP[params["function"]]
+    class_ = Method(config).class_
+    return Wrapper(params["function"], judgment_metric, params, class_)
 
 
 class Wrapper(object):
@@ -42,7 +42,7 @@ class Wrapper(object):
     # number of folds for cross-validation (arbitrary, for speed)
     CV_COUNT = 5
 
-    def __init__(self, code, judgment_metric, params, learner_class,
+    def __init__(self, code, judgment_metric, params, class_,
                  compute_metrics=False):
         """
         Arguments
@@ -51,7 +51,7 @@ class Wrapper(object):
                 metrics.JUDGMENT_METRICS and indicates which metric should be
                 optimized for.
             params: parameters passed to the sklearn classifier constructor
-            learner_class: sklearn classifier class
+            class_: sklearn classifier class
             compute_metrics: bool indicating whether all metrics should be
                 computed (True) or just the judgment metric (False)
         """
@@ -59,7 +59,7 @@ class Wrapper(object):
         self.code = code
         self.judgment_metric = JUDGMENT_METRICS[judgment_metric]
         self.params = params
-        self.learner_class = learner_class
+        self.class_ = class_
 
         # data related
         self.datapath = None
@@ -239,7 +239,7 @@ class Wrapper(object):
         del self.testX, self.testY
         del self.datapath
 
-    def special_conversions(self, learner_params):
+    def special_conversions(self, classifier_params):
         """
             TODO: Make this logic into subclasses
 
@@ -248,140 +248,139 @@ class Wrapper(object):
 
             @staticmethod
             def ParamsTransformation(params_dict):
-                # does learner-specific changes
+                # does classifier-specific changes
                 return params_dict
 
         """
         # do special converstions
 
         ### RF ###
-        if "n_jobs" in learner_params:
-            learner_params["n_jobs"] = int(learner_params["n_jobs"])
-        if "n_estimators" in learner_params:
-            learner_params["n_estimators"] = int(learner_params["n_estimators"])
+        if "n_jobs" in classifier_params:
+            classifier_params["n_jobs"] = int(classifier_params["n_jobs"])
+        if "n_estimators" in classifier_params:
+            classifier_params["n_estimators"] = int(classifier_params["n_estimators"])
 
         ### PCA ###
-        if "_pca" in learner_params:
-            del learner_params["_pca"]
-            del learner_params["_pca_dimensions"]
+        if "_pca" in classifier_params:
+            del classifier_params["_pca"]
+            del classifier_params["_pca_dimensions"]
 
         ### GPC ###
-        if learner_params["function"] == "classify_gp":
-            if learner_params["kernel"] == "constant":
-                learner_params["kernel"] = ConstantKernel()
-            elif learner_params["kernel"] == "rbf":
-                learner_params["kernel"] = RBF()
-            elif learner_params["kernel"] == "matern":
-                learner_params["kernel"] = Matern(nu=learner_params["nu"])
-                del learner_params["nu"]
-            elif learner_params["kernel"] == "rational_quadratic":
-                learner_params["kernel"] = RationalQuadratic(length_scale=learner_params["length_scale"],
-                                                             alpha=learner_params["alpha"])
-                del learner_params["length_scale"]
-                del learner_params["alpha"]
-            elif learner_params["kernel"] == "exp_sine_squared":
-                learner_params["kernel"] = ExpSineSquared(length_scale=learner_params["length_scale"],
-                                                          periodicity=learner_params["periodicity"])
-                del learner_params["length_scale"]
-                del learner_params["periodicity"]
+        if classifier_params["function"] == "classify_gp":
+            if classifier_params["kernel"] == "constant":
+                classifier_params["kernel"] = ConstantKernel()
+            elif classifier_params["kernel"] == "rbf":
+                classifier_params["kernel"] = RBF()
+            elif classifier_params["kernel"] == "matern":
+                classifier_params["kernel"] = Matern(nu=classifier_params["nu"])
+                del classifier_params["nu"]
+            elif classifier_params["kernel"] == "rational_quadratic":
+                classifier_params["kernel"] = RationalQuadratic(length_scale=classifier_params["length_scale"],
+                                                             alpha=classifier_params["alpha"])
+                del classifier_params["length_scale"]
+                del classifier_params["alpha"]
+            elif classifier_params["kernel"] == "exp_sine_squared":
+                classifier_params["kernel"] = ExpSineSquared(length_scale=classifier_params["length_scale"],
+                                                          periodicity=classifier_params["periodicity"])
+                del classifier_params["length_scale"]
+                del classifier_params["periodicity"]
 
         ### MLP ###
-        if learner_params["function"] == "classify_mlp":
+        if classifier_params["function"] == "classify_mlp":
 
-            learner_params["hidden_layer_sizes"] = []
+            classifier_params["hidden_layer_sizes"] = []
 
             # set layer topology
-            if int(learner_params["num_hidden_layers"]) == 1:
-                learner_params["hidden_layer_sizes"].append(learner_params["hidden_size_layer1"])
-                del learner_params["hidden_size_layer1"]
+            if int(classifier_params["num_hidden_layers"]) == 1:
+                classifier_params["hidden_layer_sizes"].append(classifier_params["hidden_size_layer1"])
+                del classifier_params["hidden_size_layer1"]
 
-            elif int(learner_params["num_hidden_layers"]) == 2:
-                learner_params["hidden_layer_sizes"].append(learner_params["hidden_size_layer1"])
-                learner_params["hidden_layer_sizes"].append(learner_params["hidden_size_layer2"])
-                del learner_params["hidden_size_layer1"]
-                del learner_params["hidden_size_layer2"]
+            elif int(classifier_params["num_hidden_layers"]) == 2:
+                classifier_params["hidden_layer_sizes"].append(classifier_params["hidden_size_layer1"])
+                classifier_params["hidden_layer_sizes"].append(classifier_params["hidden_size_layer2"])
+                del classifier_params["hidden_size_layer1"]
+                del classifier_params["hidden_size_layer2"]
 
-            elif int(learner_params["num_hidden_layers"]) == 3:
-                learner_params["hidden_layer_sizes"].append(learner_params["hidden_size_layer1"])
-                learner_params["hidden_layer_sizes"].append(learner_params["hidden_size_layer2"])
-                learner_params["hidden_layer_sizes"].append(learner_params["hidden_size_layer3"])
-                del learner_params["hidden_size_layer1"]
-                del learner_params["hidden_size_layer2"]
-                del learner_params["hidden_size_layer3"]
+            elif int(classifier_params["num_hidden_layers"]) == 3:
+                classifier_params["hidden_layer_sizes"].append(classifier_params["hidden_size_layer1"])
+                classifier_params["hidden_layer_sizes"].append(classifier_params["hidden_size_layer2"])
+                classifier_params["hidden_layer_sizes"].append(classifier_params["hidden_size_layer3"])
+                del classifier_params["hidden_size_layer1"]
+                del classifier_params["hidden_size_layer2"]
+                del classifier_params["hidden_size_layer3"]
 
-            learner_params["hidden_layer_sizes"] = [int(x) for x in
-                                                    learner_params["hidden_layer_sizes"]]  # convert to ints
+            classifier_params["hidden_layer_sizes"] = [int(x) for x in
+                                                    classifier_params["hidden_layer_sizes"]]  # convert to ints
 
             # delete our fabricated keys
-            del learner_params["num_hidden_layers"]
+            del classifier_params["num_hidden_layers"]
 
-        # print "Added stuff for DBNs! %s" % learner_params
+        # print "Added stuff for DBNs! %s" % classifier_params
         ### DBN ###
-        if learner_params["function"] == "classify_dbn":
+        if classifier_params["function"] == "classify_dbn":
 
-            # print "Adding stuff for DBNs! %s" % learner_params
-            learner_params["layer_sizes"] = [learner_params["inlayer_size"]]
+            # print "Adding stuff for DBNs! %s" % classifier_params
+            classifier_params["layer_sizes"] = [classifier_params["inlayer_size"]]
 
             # set layer topology
-            if int(learner_params["num_hidden_layers"]) == 1:
-                learner_params["layer_sizes"].append(learner_params["hidden_size_layer1"])
-                del learner_params["hidden_size_layer1"]
+            if int(classifier_params["num_hidden_layers"]) == 1:
+                classifier_params["layer_sizes"].append(classifier_params["hidden_size_layer1"])
+                del classifier_params["hidden_size_layer1"]
 
-            elif int(learner_params["num_hidden_layers"]) == 2:
-                learner_params["layer_sizes"].append(learner_params["hidden_size_layer1"])
-                learner_params["layer_sizes"].append(learner_params["hidden_size_layer2"])
-                del learner_params["hidden_size_layer1"]
-                del learner_params["hidden_size_layer2"]
+            elif int(classifier_params["num_hidden_layers"]) == 2:
+                classifier_params["layer_sizes"].append(classifier_params["hidden_size_layer1"])
+                classifier_params["layer_sizes"].append(classifier_params["hidden_size_layer2"])
+                del classifier_params["hidden_size_layer1"]
+                del classifier_params["hidden_size_layer2"]
 
-            elif int(learner_params["num_hidden_layers"]) == 3:
-                learner_params["layer_sizes"].append(learner_params["hidden_size_layer1"])
-                learner_params["layer_sizes"].append(learner_params["hidden_size_layer2"])
-                learner_params["layer_sizes"].append(learner_params["hidden_size_layer3"])
-                del learner_params["hidden_size_layer1"]
-                del learner_params["hidden_size_layer2"]
-                del learner_params["hidden_size_layer3"]
+            elif int(classifier_params["num_hidden_layers"]) == 3:
+                classifier_params["layer_sizes"].append(classifier_params["hidden_size_layer1"])
+                classifier_params["layer_sizes"].append(classifier_params["hidden_size_layer2"])
+                classifier_params["layer_sizes"].append(classifier_params["hidden_size_layer3"])
+                del classifier_params["hidden_size_layer1"]
+                del classifier_params["hidden_size_layer2"]
+                del classifier_params["hidden_size_layer3"]
 
-            learner_params["layer_sizes"].append(learner_params["outlayer_size"])
-            learner_params["layer_sizes"] = [int(x) for x in learner_params["layer_sizes"]]  # convert to ints
+            classifier_params["layer_sizes"].append(classifier_params["outlayer_size"])
+            classifier_params["layer_sizes"] = [int(x) for x in classifier_params["layer_sizes"]]  # convert to ints
 
             # set activation function
-            if learner_params["output_act_funct"] == "Linear":
-                learner_params["output_act_funct"] = Linear()
-            elif learner_params["output_act_funct"] == "Sigmoid":
-                learner_params["output_act_funct"] = Sigmoid()
-            elif learner_params["output_act_funct"] == "Softmax":
-                learner_params["output_act_funct"] = Softmax()
-            elif learner_params["output_act_funct"] == "tanh":
-                learner_params["output_act_funct"] = Tanh()
+            if classifier_params["output_act_funct"] == "Linear":
+                classifier_params["output_act_funct"] = Linear()
+            elif classifier_params["output_act_funct"] == "Sigmoid":
+                classifier_params["output_act_funct"] = Sigmoid()
+            elif classifier_params["output_act_funct"] == "Softmax":
+                classifier_params["output_act_funct"] = Softmax()
+            elif classifier_params["output_act_funct"] == "tanh":
+                classifier_params["output_act_funct"] = Tanh()
 
-            learner_params["epochs"] = int(learner_params["epochs"])
+            classifier_params["epochs"] = int(classifier_params["epochs"])
 
             # delete our fabricated keys
-            del learner_params["num_hidden_layers"]
-            del learner_params["inlayer_size"]
-            del learner_params["outlayer_size"]
+            del classifier_params["num_hidden_layers"]
+            del classifier_params["inlayer_size"]
+            del classifier_params["outlayer_size"]
 
         # remove function key and return
-        del learner_params["function"]
-        return learner_params
+        del classifier_params["function"]
+        return classifier_params
 
     def make_pipeline(self):
         """
-            Makes the classifier as well as scaling or
-            dimension reduction steps.
+        Makes the classifier as well as scaling or dimension reduction steps.
         """
         # create a list of steps
         steps = []
 
-        # create a learner with specified parameters
-        learner_params = {k: v for k, v in self.params.iteritems() if k not in
-                          Wrapper.ATM_KEYS}
+        # create a classifier with specified parameters
+        classifier_params = {k: v for k, v in self.params.iteritems() if k not in
+                             Wrapper.ATM_KEYS}
 
         # do special conversions
-        learner_params = self.special_conversions(learner_params)
-        self.trainable_params = learner_params
-        #print "Training: %s" % learner_params
-        learner = self.learner_class(**learner_params)
+        classifier_params = self.special_conversions(classifier_params)
+        self.trainable_params = classifier_params
+        #print "Training: %s" % classifier_params
+        classifier = self.class_(**classifier_params)
 
         dimensions = None
         if Wrapper.PCA in self.params and self.params[Wrapper.PCA]:
@@ -409,6 +408,6 @@ class Wrapper(object):
         elif Wrapper.MINMAX in self.params and self.params[Wrapper.MINMAX]:
             steps.append(('minmax_scale', MinMaxScaler()))
 
-        # add the learner as the final step in the pipeline
-        steps.append((self.code, learner))
+        # add the classifier as the final step in the pipeline
+        steps.append((self.code, classifier))
         self.pipeline = Pipeline(steps)

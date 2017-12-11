@@ -35,7 +35,7 @@ ALGORITHM_ROWS = [
 	dict(id=14, code='gp', name='Gaussian Process', probability=True),
 ]
 
-MAX_FROZEN_SET_ERRORS = 3
+MAX_HYPERPARTITION_ERRORS = 3
 
 
 def try_with_session(default=lambda: None, commit=False):
@@ -105,8 +105,8 @@ class Database(object):
         metadata = MetaData(bind=self.engine)
         Base = declarative_base()
 
-        class Algorithm(Base):
-            __tablename__ = 'algorithms'
+        class Method(Base):
+            __tablename__ = 'methods'
 
             id = Column(Integer, primary_key=True, autoincrement=True)
             code = Column(String(15), nullable=False)
@@ -114,9 +114,9 @@ class Database(object):
             probability = Column(Boolean)
 
             def __repr__(self):
-                return "<%s>" % self.name
+                return "<%s (%s)>" % (self.name, self.code)
 
-        self.Algorithm = Algorithm
+        self.Method = Method
 
         class Dataset(Base):
             __tablename__ = 'datasets'
@@ -185,45 +185,45 @@ class Database(object):
 
         self.Datarun = Datarun
 
-        class FrozenSet(Base):
-            __tablename__ = 'frozen_sets'
+        class Hyperpartition(Base):
+            __tablename__ = 'hyperpartitions'
 
             id = Column(Integer, primary_key=True, autoincrement=True)
             datarun_id = Column(Integer, ForeignKey('dataruns.id'))
-            algorithm = Column(String(15))
+            method = Column(String(15))
 
-            learners = Column(Integer, default=0)
-            optimizables64 = Column(Text)
+            categoricals64 = Column(Text)
+            tunables64 = Column(Text)
             constants64 = Column(Text)
-            frozens64 = Column(Text)
-            frozen_hash = Column(String(32))
-            status = Column(Enum(*FROZEN_STATUS),
-                            default=FrozenStatus.INCOMPLETE)
+
+            classifiers = Column(Integer, default=0)
+            status = Column(Enum(*PARTITION_STATUS),
+                            default=PartitionStatus.INCOMPLETE)
 
             @property
-            def optimizables(self):
+            def categoricals(self):
+                """
+                A list of categorical variables along with the fixed values
+                which define the hyperpartition.
+                Each element is a ('name', HyperParameter) tuple.
+                """
+                return base_64_to_object(self.categoricals64)
+
+            @categoricals.setter
+            def categoricals(self, value):
+                self.categoricals64 = object_to_base_64(value)
+
+            @property
+            def tunables(self):
                 """
                 A list of parameters which are unspecified and must be selected
                 with a Tuner. Each element is a ('name', HyperParameter) tuple.
                 """
-                return base_64_to_object(self.optimizables64)
+                return base_64_to_object(self.tunables64)
 
-            @optimizables.setter
-            def optimizables(self, value):
-                self.optimizables64 = object_to_base_64(value)
-
-            @property
-            def frozens(self):
-                """
-                A list of categorical variables along with the fixed values
-                which define the frozen set.
-                Each element is a ('name', HyperParameter) tuple.
-                """
-                return base_64_to_object(self.frozens64)
-
-            @frozens.setter
-            def frozens(self, value):
-                self.frozens64 = object_to_base_64(value)
+            @tunables.setter
+            def tunables(self, value):
+                self.tunables64 = object_to_base_64(value)
 
             @property
             def constants(self):
@@ -234,22 +234,23 @@ class Database(object):
                 self.constants64 = object_to_base_64(value)
 
             def __repr__(self):
-                return "<%s: %s>" % (self.algorithm, self.frozens)
+                return "<%s: %s>" % (self.algorithm, self.categoricals)
 
-        self.FrozenSet = FrozenSet
+        self.Hyperpartition = Hyperpartition
 
-        class Learner(Base):
-            __tablename__ = 'learners'
+        class Classifier(Base):
+            __tablename__ = 'classifiers'
 
             id = Column(Integer, primary_key=True, autoincrement=True)
-            frozen_set_id = Column(Integer, ForeignKey('frozen_sets.id'))
             datarun_id = Column(Integer, ForeignKey('dataruns.id'))
+            hyperpartition_id = Column(Integer, ForeignKey('hyperpartitions.id'))
 
             model_path = Column(String(300))
             metric_path = Column(String(300))
-            host = Column(String(50))
             params64 = Column(Text, nullable=False)
+
             trainable_params64 = Column(Text)
+            host = Column(String(50))
             dimensions = Column(Integer)
 
             cv_judgment_metric = Column(Numeric(precision=20, scale=10))
@@ -258,7 +259,7 @@ class Database(object):
 
             started = Column(DateTime)
             completed = Column(DateTime)
-            status = Column(Enum(*LEARNER_STATUS), nullable=False)
+            status = Column(Enum(*CLASSIFIER_STATUS), nullable=False)
             error_msg = Column(Text)
 
             @property
@@ -281,7 +282,7 @@ class Database(object):
                 params = ', '.join(['%s: %s' % i for i in self.params.items()])
                 return "<id=%d, params=(%s)>" % (self.id, params)
 
-        self.Learner = Learner
+        self.Classifier = Classifier
 
         Base.metadata.create_all(bind=self.engine)
 
@@ -292,7 +293,7 @@ class Database(object):
             if not session.query(self.Dataset).get(r['id']):
                 args = dict(r)
                 del args['id']
-                alg = self.Algorithm(**args)
+                alg = self.MethodCode(**args)
                 session.add(alg)
         session.commit()
 
@@ -352,55 +353,55 @@ class Database(object):
         return dataruns
 
     @try_with_session()
-    def get_frozen_set(self, session, frozen_set_id):
-        """ Get a specific learner.  """
-        return session.query(self.FrozenSet).get(frozen_set_id)
+    def get_hyperpartition(self, session, hyperpartition_id):
+        """ Get a specific classifier.  """
+        return session.query(self.Hyperpartition).get(hyperpartition_id)
 
     @try_with_session(default=list)
-    def get_frozen_sets(self, session, dataset_id=None, datarun_id=None,
+    def get_hyperpartitions(self, session, dataset_id=None, datarun_id=None,
                         algorithm=None, ignore_gridding_done=True,
                         ignore_errored=True):
         """
-        Return all the frozen sets in a given datarun by id.
-        By default, only returns incomplete frozen sets.
+        Return all the hyperpartitions in a given datarun by id.
+        By default, only returns incomplete hyperpartitions.
         """
-        query = session.query(self.FrozenSet)
+        query = session.query(self.Hyperpartition)
         if dataset_id is not None:
             query = query.join(self.Datarun)\
                 .filter(self.Datarun.dataset_id == dataset_id)
         if datarun_id is not None:
-            query = query.filter(self.FrozenSet.datarun_id == datarun_id)
+            query = query.filter(self.Hyperpartition.datarun_id == datarun_id)
         if algorithm is not None:
-            query = query.filter(self.FrozenSet.algorithm == algorithm)
+            query = query.filter(self.Hyperpartition.algorithm == algorithm)
         if ignore_gridding_done:
-            query = query.filter(self.FrozenSet.status != FrozenStatus.GRIDDING_DONE)
+            query = query.filter(self.Hyperpartition.status != PartitionStatus.GRIDDING_DONE)
         if ignore_errored:
-            query = query.filter(self.FrozenSet.status != FrozenStatus.ERRORED)
+            query = query.filter(self.Hyperpartition.status != PartitionStatus.ERRORED)
 
         return query.all()
 
     @try_with_session()
-    def get_learner(self, session, learner_id):
-        """ Get a specific learner. """
-        return session.query(self.Learner).get(learner_id)
+    def get_classifier(self, session, classifier_id):
+        """ Get a specific classifier. """
+        return session.query(self.Classifier).get(classifier_id)
 
     @try_with_session()
-    def get_learners(self, session, dataset_id=None, datarun_id=None,
-                     algorithm=None, frozen_set_id=None, status=None):
-        """ Get a set of learners, filtered by the passed-in arguments. """
-        query = session.query(self.Learner)
+    def get_classifiers(self, session, dataset_id=None, datarun_id=None,
+                     algorithm=None, hyperpartition_id=None, status=None):
+        """ Get a set of classifiers, filtered by the passed-in arguments. """
+        query = session.query(self.Classifier)
         if dataset_id is not None:
             query = query.join(self.Datarun)\
                 .filter(self.Datarun.dataset_id == dataset_id)
         if datarun_id is not None:
-            query = query.filter(self.Learner.datarun_id == datarun_id)
+            query = query.filter(self.Classifier.datarun_id == datarun_id)
         if algorithm is not None:
-            query = query.join(self.FrozenSet)\
-                .filter(self.FrozenSet.algorithm == algorithm)
-        if frozen_set_id is not None:
-            query = query.filter(self.Learner.frozen_set_id == frozen_set_id)
+            query = query.join(self.Hyperpartition)\
+                .filter(self.Hyperpartition.algorithm == algorithm)
+        if hyperpartition_id is not None:
+            query = query.filter(self.Classifier.hyperpartition_id == hyperpartition_id)
         if status is not None:
-            query = query.filter(self.Learner.status == status)
+            query = query.filter(self.Classifier.status == status)
 
         return query.all()
 
@@ -413,58 +414,58 @@ class Database(object):
         """
         Check whether gridding is done for the entire datarun.
         """
-        frozen_sets = session.query(self.FrozenSet)\
-            .filter(self.FrozenSet.datarun_id == datarun_id).all()
+        hyperpartitions = session.query(self.Hyperpartition)\
+            .filter(self.Hyperpartition.datarun_id == datarun_id).all()
 
         is_done = True
-        for frozen_set in frozen_sets:
-            # If any frozen set has not finished gridding or errored out, we are
+        for hyperpartition in hyperpartitions:
+            # If any hyperpartiton has not finished gridding or errored out, we are
             # not done.
-            if frozen_set.status == FrozenStatus.INCOMPLETE:
+            if hyperpartition.status == PartitionStatus.INCOMPLETE:
                 is_done = False
 
         return is_done
 
     @try_with_session(default=int)
-    def get_number_of_frozen_set_errors(self, session, frozen_set_id):
+    def get_number_of_hyperpartition_errors(self, session, hyperpartition_id):
         """
-        Get the number of learners that have errored using a specified frozen
-        set.
+        Get the number of classifiers that have errored using a specified
+        hyperpartition.
         """
-        learners = session.query(self.Learner)\
-            .filter(and_(self.Learner.frozen_set_id == frozen_set_id,
-                         self.Learner.status == LearnerStatus.ERRORED)).all()
-        return len(learners)
+        classifiers = session.query(self.Classifier)\
+            .filter(and_(self.Classifier.hyperpartition_id == hyperpartition_id,
+                         self.Classifier.status == ClassifierStatus.ERRORED)).all()
+        return len(classifiers)
 
     @try_with_session(default=list)
     def get_algorithms(self, session, dataset_id=None, datarun_id=None,
                        ignore_errored=False, ignore_gridding_done=False):
         """ Get all algorithms used in a particular datarun. """
-        frozen_sets = self.get_frozen_sets(dataset_id=dataset_id,
+        hyperpartitions = self.get_hyperpartitions(dataset_id=dataset_id,
                                            datarun_id=datarun_id,
                                            ignore_gridding_done=False,
                                            ignore_errored=False)
-        algorithms = set(f.algorithm for f in frozen_sets)
+        algorithms = set(f.algorithm for f in hyperpartitions)
         return list(algorithms)
 
     @try_with_session()
     def get_maximum_y(self, session, datarun_id, score_target):
         """ Get the maximum value of a numeric column by name, or None. """
-        result = session.query(func.max(getattr(self.Learner, score_target)))\
-            .filter(self.Learner.datarun_id == datarun_id).one()[0]
+        result = session.query(func.max(getattr(self.Classifier, score_target)))\
+            .filter(self.Classifier.datarun_id == datarun_id).one()[0]
         if result:
             return float(result)
         return None
 
     @try_with_session()
-    def get_best_learner(self, session, score_target='mu_sigma',
+    def get_best_classifier(self, session, score_target='mu_sigma',
                          dataset_id=None, datarun_id=None,
-                         algorithm=None, frozen_set_id=None):
+                         algorithm=None, hyperpartition_id=None):
         """
-        Get the learner with the highest lower error bound. In other words, what
-        learner has the highest value of (score.mean - 2 * score.std)?
+        Get the classifier with the highest lower error bound. In other words, what
+        classifier has the highest value of (score.mean - 2 * score.std)?
 
-        score_target: indicates the metric by which to judge the best learner.
+        score_target: indicates the metric by which to judge the best classifier.
             One of ['mu_sigma', 'cv_judgment_metric', 'test_judgment_metric'].
         """
         if score_target == 'mu_sigma':
@@ -472,16 +473,16 @@ class Database(object):
         else:
             func = attrgetter(score_target)
 
-        learners = self.get_learners(dataset_id=dataset_id,
+        classifiers = self.get_classifiers(dataset_id=dataset_id,
                                      datarun_id=datarun_id,
                                      algorithm=algorithm,
-                                     frozen_set_id=frozen_set_id,
-                                     status=LearnerStatus.COMPLETE)
+                                     hyperpartition_id=hyperpartition_id,
+                                     status=ClassifierStatus.COMPLETE)
 
-        if not learners:
+        if not classifiers:
             return None
 
-        best = max(learners, key=func)
+        best = max(classifiers, key=func)
         return best
 
     ###########################################################################
@@ -489,79 +490,79 @@ class Database(object):
     ###########################################################################
 
     @try_with_session(commit=True)
-    def create_learner(self, session, frozen_set_id, datarun_id, host, params):
+    def create_classifier(self, session, hyperpartition_id, datarun_id, host, params):
         """
-        Save a new, fully qualified learner object to the database.
+        Save a new, fully qualified classifier object to the database.
 
-        Returns: the ID of the newly-created learner
+        Returns: the ID of the newly-created classifier
         """
-        learner = self.Learner(frozen_set_id=frozen_set_id,
+        classifier = self.Classifier(hyperpartition_id=hyperpartition_id,
                                datarun_id=datarun_id,
                                host=host,
                                params=params,
                                started=datetime.now(),
-                               status=LearnerStatus.RUNNING)
-        session.add(learner)
-        frozen_set = session.query(self.FrozenSet).get(frozen_set_id)
-        frozen_set.learners += 1
+                               status=ClassifierStatus.RUNNING)
+        session.add(classifier)
+        hyperpartition = session.query(self.Hyperpartition).get(hyperpartition_id)
+        hyperpartition.classifiers += 1
 
-        return learner.id
+        return classifier.id
 
     @try_with_session(commit=True)
-    def complete_learner(self, session, learner_id, trainable_params,
+    def complete_classifier(self, session, classifier_id, trainable_params,
                          dimensions, model_path, metric_path,
                          cv_score, cv_stdev, test_score):
         """
-        Set all the parameters on a learner that haven't yet been set, and mark
+        Set all the parameters on a classifier that haven't yet been set, and mark
         it as complete.
         """
-        learner = session.query(self.Learner).get(learner_id)
+        classifier = session.query(self.Classifier).get(classifier_id)
 
-        learner.trainable_params = trainable_params
-        learner.dimensions = dimensions
-        learner.model_path = model_path
-        learner.metric_path = metric_path
-        learner.cv_judgment_metric = cv_score
-        learner.cv_judgment_metric_stdev = cv_stdev
-        learner.test_judgment_metric = test_score
+        classifier.trainable_params = trainable_params
+        classifier.dimensions = dimensions
+        classifier.model_path = model_path
+        classifier.metric_path = metric_path
+        classifier.cv_judgment_metric = cv_score
+        classifier.cv_judgment_metric_stdev = cv_stdev
+        classifier.test_judgment_metric = test_score
 
-        learner.completed = datetime.now()
-        learner.status = LearnerStatus.COMPLETE
+        classifier.completed = datetime.now()
+        classifier.status = ClassifierStatus.COMPLETE
 
     @try_with_session(commit=True)
-    def mark_learner_errored(self, session, learner_id, error_msg):
+    def mark_classifier_errored(self, session, classifier_id, error_msg):
         """
-        Mark an existing learner as having errored and set the error message. If
-        the learner's frozen set has produced too many erring learners, mark it
+        Mark an existing classifier as having errored and set the error message. If
+        the classifier's hyperpartiton has produced too many erring classifiers, mark it
         as errored as well.
         """
-        learner = session.query(self.Learner).get(learner_id)
-        learner.error_msg = error_msg
-        learner.status = LearnerStatus.ERRORED
-        learner.completed = datetime.now()
-        if self.get_number_of_frozen_set_errors(learner.frozen_set_id) > \
-                MAX_FROZEN_SET_ERRORS:
-            self.mark_frozen_set_errored(learner.frozen_set_id)
+        classifier = session.query(self.Classifier).get(classifier_id)
+        classifier.error_msg = error_msg
+        classifier.status = ClassifierStatus.ERRORED
+        classifier.completed = datetime.now()
+        if self.get_number_of_hyperpartition_errors(classifier.hyperpartition_id) > \
+                MAX_HYPERPARTITION_ERRORS:
+            self.mark_hyperpartition_errored(classifier.hyperpartition_id)
 
     @try_with_session(commit=True)
-    def mark_frozen_set_gridding_done(self, session, frozen_set_id):
+    def mark_hyperpartition_gridding_done(self, session, hyperpartition_id):
         """
-        Mark a frozen set as having all of its possible grid points explored.
+        Mark a hyperpartiton as having all of its possible grid points explored.
         """
-        frozen_set = session.query(self.FrozenSet)\
-            .filter(self.FrozenSet.id == frozen_set_id).one()
-        frozen_set.status = FrozenStatus.GRIDDING_DONE
+        hyperpartition = session.query(self.Hyperpartition)\
+            .filter(self.Hyperpartition.id == hyperpartition_id).one()
+        hyperpartition.status = PartitionStatus.GRIDDING_DONE
 
     @try_with_session(commit=True)
-    def mark_frozen_set_errored(self, session, frozen_set_id):
+    def mark_hyperpartition_errored(self, session, hyperpartition_id):
         """
-        Mark a frozen set as having had too many learner errors. This will
-        prevent more learners from being trained on this frozen set in the
+        Mark a hyperpartiton as having had too many classifier errors. This will
+        prevent more classifiers from being trained on this hyperpartiton in the
         future.
         """
-        frozen_set = session.query(self.FrozenSet)\
-            .filter(self.FrozenSet.id == frozen_set_id).one()
-        frozen_set.status = FrozenStatus.ERRORED
+        hyperpartition = session.query(self.Hyperpartition)\
+            .filter(self.Hyperpartition.id == hyperpartition_id).one()
+        hyperpartition.status = PartitionStatus.ERRORED
 
     @try_with_session(commit=True)
     def mark_datarun_running(self, session, datarun_id):

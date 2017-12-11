@@ -1,5 +1,5 @@
 """An AutoML framework.
 """
 
-import classifier, config, constants, database, datawrapper, enter_data,\
-    utilities, worker, wrapper
+import config, constants, database, datawrapper, enter_data, method, utilities,\
+    worker, wrapper

@@ -1,6 +1,6 @@
 # sample tuning
 from btb.tuning import Uniform as UniformTuner, GP, GPEi, GPEiVelocity
-# frozen set selectors
+# hyperpartition selectors
 from btb.selection import Uniform as UniformSelector, UCB1,\
                                      BestKReward, BestKVelocity,\
                                      RecentKReward, RecentKVelocity,\
@@ -12,15 +12,15 @@ from btb.selection import Uniform as UniformSelector, UCB1,\
 SQL_DIALECTS = ['sqlite', 'mysql']
 METRICS = ['f1', 'roc_auc', 'accuracy', 'mu_sigma']
 SCORE_TARGETS = ['cv', 'test']
-BUDGET_TYPES = ['none', 'learner', 'walltime']
+BUDGET_TYPES = ['none', 'classifier', 'walltime']
 ALGORITHMS = ['logreg', 'svm', 'sgd', 'dt', 'et', 'rf', 'gnb', 'mnb', 'bnb',
               'gp', 'pa', 'knn', 'dbn', 'mlp']
 TUNERS = ['uniform', 'gp', 'gp_ei', 'gp_eivel']
 SELECTORS = ['uniform', 'ucb1', 'bestk', 'bestkvel', 'purebestkvel', 'recentk',
              'recentkvel', 'hieralg']
 DATARUN_STATUS = ['pending', 'running', 'complete']
-LEARNER_STATUS = ['running', 'errored', 'complete']
-FROZEN_STATUS = ['incomplete', 'errored', 'gridding_done']
+CLASSIFIER_STATUS = ['running', 'errored', 'complete']
+PARTITION_STATUS = ['incomplete', 'errored', 'gridding_done']
 
 TIME_FMT = "%y-%m-%d %H:%M"
 
@@ -59,7 +59,7 @@ ALGORITHMS_MAP = {
     'mlp': 'multi_layer_perceptron.json',
 }
 
-class LearnerStatus:
+class ClassifierStatus:
     RUNNING = 'running'
     ERRORED = 'errored'
     COMPLETE = 'complete'
@@ -69,7 +69,7 @@ class RunStatus:
     RUNNING = 'running'
     COMPLETE = 'complete'
 
-class FrozenStatus:
+class PartitionStatus:
     INCOMPLETE = 'incomplete'
     GRIDDING_DONE = 'gridding_done'
     ERRORED = 'errored'

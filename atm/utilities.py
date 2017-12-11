@@ -86,22 +86,22 @@ def obj_has_method(obj, method):
     return hasattr(obj, method) and callable(getattr(obj, method))
 
 
-def vector_to_params(vector, optimizables, frozens, constants):
+def vector_to_params(vector, tunables, categoricals, constants):
     """
     Converts a numpy vector to a dictionary mapping keys to named parameters.
 
     `vector` is single example to convert
-    `optimizables` keys back from vector format to dictionaries.
+    `tunables` keys back from vector format to dictionaries.
 
-    Examples of the format for SVM sigmoid frozen set below:
+    Examples of the format for SVM sigmoid hyperpartition below:
 
-        optimizables = [
+        tunables = [
             ('C', HyperParameter(type='float_exp', range=(1e-05, 1e5))),
             ('degree', HyperParameter(type='int', range=(2, 4))),
             ('gamma', HyperParameter(type='float_exp', range=(1e-05, 1e5))),
         ]
 
-        frozens = (
+        categoricals = (
             ('kernel', 'poly'),
             ('probability', True),
             ('_scale', True)
@@ -114,9 +114,9 @@ def vector_to_params(vector, optimizables, frozens, constants):
     """
     params = {}
 
-    # add the optimizables
+    # add the tunables
     for i, elt in enumerate(vector):
-        key, struct = optimizables[i]
+        key, struct = tunables[i]
         if struct.type in [ParamTypes.INT, ParamTypes.INT_EXP]:
             params[key] = int(elt)
         elif struct.type in [ParamTypes.FLOAT, ParamTypes.FLOAT_EXP]:
@@ -124,14 +124,14 @@ def vector_to_params(vector, optimizables, frozens, constants):
         else:
             raise ValueError('Unknown data type: {}'.format(struct.type))
 
-    # add the frozen categorical settings and fixed constant values
-    for key, value in frozens + constants:
+    # add the fixed categorical settings and fixed constant values
+    for key, value in categoricals + constants:
         params[key] = value
 
     return params
 
 
-def params_to_vectors(params, optimizables):
+def params_to_vectors(params, tunables):
     """
     Converts a list of parameter vectors (with metadata) into a numpy array
     ready for BTB tuning.
@@ -139,10 +139,10 @@ def params_to_vectors(params, optimizables):
     Args:
         params: list of hyperparameter vectors. Each vector is a dict mapping
             the names of parameters to those parameters' values.
-        optimizables: list of HyperParameter metadata structures describing all
+        tunables: list of HyperParameter metadata structures describing all
             the optimizable hyperparameters that should be in each vector. e.g.
 
-        optimizables = [
+        tunables = [
             ('C',  HyperParameter(type='float_exp', range=(1e-5, 1e5))),
             ('degree',  HyperParameter('int', (2, 4))),
             ('gamma',  HyperParameter('float_exp', (1e-05, 1e5)))
@@ -151,13 +151,13 @@ def params_to_vectors(params, optimizables):
     Returns:
         vectors: np.array of parameter vectors ready to be optimized by a
             Gaussian Process (or what have you).
-            vectors.shape = (len(params), len(optimizables))
+            vectors.shape = (len(params), len(tunables))
     """
     # make sure params is iterable
     if not isinstance(params, (list, np.ndarray)):
         params = [params]
 
-    keys = [k[0] for k in optimizables]
+    keys = [k[0] for k in tunables]
     vectors = np.zeros((len(params), len(keys)))
     for i, p in enumerate(params):
         for j, k in enumerate(keys):
