@@ -237,7 +237,7 @@ def get_metrics_large_multiclass(y_true, y_pred, y_pred_probs, rank):
     #for i in range(n_classes):
         #mean_tpr += interp(all_fpr, fpr[i], tpr[i])
 
-    ## Finally average it and compute AUC
+    ## Finally, average it and compute AUC
     #mean_tpr /= n_classes
     #roc_curve_auc_macro = auc(all_fpr, mean_tpr)
 

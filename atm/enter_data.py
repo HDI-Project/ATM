@@ -30,7 +30,7 @@ def create_dataset(db, train_path, test_path=None, output_folder=None,
     """
     # create the name of the dataset from the path to the data
     name = os.path.basename(train_path)
-    name = name.replace("_train", "").replace(".csv", "")
+    name = name.replace("_train.csv", "").replace(".csv", "")
 
     # parse data and create data wrapper for vectorization and label encoding
     if train_path and test_path:

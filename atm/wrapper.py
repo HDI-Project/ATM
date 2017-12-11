@@ -367,8 +367,7 @@ class Wrapper(object):
 
     def make_pipeline(self):
         """
-            Makes the classifier as well as scaling or
-            dimension reduction steps.
+        Makes the classifier as well as scaling or dimension reduction steps.
         """
         # create a list of steps
         steps = []
