@@ -1,7 +1,6 @@
 {   
     "name": "rf",
     "class": "sklearn.ensemble.RandomForestClassifier",
-    "version": "0.18.2",
     "parameters": {
         "criterion": {
             "type": "string",

@@ -1,7 +1,6 @@
 {   
     "name": "bnb",
     "class": "sklearn.naive_bayes.BernoulliNB",
-    "version": "0.18.2",
     "parameters": {
         "alpha": {
             "type": "float",

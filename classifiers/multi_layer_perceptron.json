@@ -1,7 +1,6 @@
 {   
     "name": "mlp",
     "class": "sklearn.neural_network.MLPClassifier",
-    "version": "0.18.2",
     "parameters": {
         "batch_size": {
            "type": "string",

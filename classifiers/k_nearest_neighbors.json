@@ -1,7 +1,6 @@
 {   
     "name": "knn",
     "class": "sklearn.neighbors.KNeighborsClassifier",
-    "version": "0.18.2",
     "parameters": {
         "n_neighbors": {
            "type": "int",

@@ -1,7 +1,6 @@
 {   
     "name": "dbn",
     "class": "nolearn.dbn.DBN",
-    "version": "0.5.1",
     "parameters": {
         "inlayer_size": {
            "type": "int_cat",

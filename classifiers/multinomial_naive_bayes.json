@@ -1,7 +1,6 @@
 {   
     "name": "mnb",
     "class": "sklearn.naive_bayes.MultinomialNB",
-    "version": "0.18.2",
     "parameters": {
         "alpha": {
             "type": "float",

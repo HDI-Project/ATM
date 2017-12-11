@@ -6,7 +6,9 @@ from btb.selection import Uniform as UniformSelector, UCB1,\
                                      RecentKReward, RecentKVelocity,\
                                      HierarchicalByAlgorithm, PureBestKVelocity
 
-# TODO: figure out how to handle these better
+# A bunch of constants which are used throughout the project, mostly for config.
+# TODO: convert these lists and classes to something more elegant, like enums
+# perhaps?
 SQL_DIALECTS = ['sqlite', 'mysql']
 METRICS = ['f1', 'roc_auc', 'accuracy', 'mu_sigma']
 SCORE_TARGETS = ['cv', 'test']

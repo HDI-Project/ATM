@@ -1,7 +1,6 @@
 {   
     "name": "gp",
     "class": "sklearn.gaussian_process.GaussianProcessClassifier",
-    "version": "0.18.2",
     "parameters": {
         "kernel": {
             "type": "string",

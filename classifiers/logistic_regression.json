@@ -1,7 +1,6 @@
 {   
     "name": "logreg",
     "class": "sklearn.linear_model.LogisticRegression",
-    "version": "0.18.2",
     "parameters": {
         "C": {
            "type": "float_exp",

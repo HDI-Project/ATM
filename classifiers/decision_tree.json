@@ -1,7 +1,6 @@
 {   
     "name": "dt",
     "class": "sklearn.tree.DecisionTreeClassifier",
-    "version": "0.18.2",
     "parameters": {
         "criterion": {
             "type": "string",

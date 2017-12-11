@@ -1,7 +1,6 @@
 {   
     "name": "et",
     "class": "sklearn.ensemble.ExtraTreesClassifier",
-    "version": "0.18.2",
     "parameters": {
         "criterion": {
             "type": "string",

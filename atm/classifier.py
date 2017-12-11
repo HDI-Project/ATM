@@ -8,6 +8,13 @@ CONFIG_PATH = 'classifiers'
 
 
 class FrozenSet(object):
+    """
+    Class which describes a FrozenSet. This is different from the FrozenSet
+    defined in Database because it's not tied to a particular datarun, and it
+    lacks other metadata that would be in the modelhub. 'tunables' here is
+    the same as 'optimizables' there. Otherwise, this contains the
+    information necessary to generate a FrozenSet in the database.
+    """
     def __init__(self, frozens, constants, tunables):
         """
         constants: the values for this frozen set which have been fixed, thus
@@ -58,8 +65,8 @@ class Classifier(object):
         """
         constants = [(p, self.parameters[p].range[0]) for p in self.root_params
                      if len(self.parameters[p].range) == 1]
-        categoricals = [p for p in self.root_params if
-                        self.parameters[p].is_categorical]
+        categoricals = [p for p in self.root_params
+                        if self.parameters[p].is_categorical]
         tunables = [(p, self.parameters[p]) for p in self.root_params
                     if not self.parameters[p].is_categorical]
 

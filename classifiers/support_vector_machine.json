@@ -1,7 +1,6 @@
 {   
     "name": "svm",
     "class": "sklearn.svm.SVC",
-    "version": "0.18.2",
     "parameters": {
         "C": {
            "type": "float_exp",

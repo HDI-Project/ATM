@@ -45,6 +45,7 @@ LOG_FILE = "logs/%s.txt" % socket.gethostname()
 LOOP_WAIT = 1
 
 
+# TODO: use python's logging module instead of this
 def _log(msg, stdout=True):
     with open(LOG_FILE, "a") as lf:
         lf.write(msg + "\n")

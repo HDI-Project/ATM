@@ -179,7 +179,6 @@ def create_frozen_sets(db, datarun, algorithms):
                                 frozen_hash=hash_nested_tuple(fs.frozens),
                                 status=FrozenStatus.INCOMPLETE)
             session.add(fset)
-            print fset.optimizables
 
     session.commit()
     session.close()
