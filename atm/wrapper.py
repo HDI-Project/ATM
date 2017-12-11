@@ -3,17 +3,27 @@
    :synopsis: Wrapper around classification algorithm.
 
 """
+import numpy as np
+import time
 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn import decomposition
 from gdbn.activationFunctions import Softmax, Sigmoid, Linear, Tanh
-from sklearn.gaussian_process.kernels import ConstantKernel, RBF, Matern, ExpSineSquared, RationalQuadratic
+from sklearn.gaussian_process.kernels import ConstantKernel, RBF, Matern, \
+                                             ExpSineSquared, RationalQuadratic
+
+from atm.classifier import Classifier
+from atm.constants import ALGORITHMS_MAP
 from atm.metrics import Metrics, JUDGMENT_METRICS
 from atm.metrics import get_metrics_binary, get_metrics_small_multiclass, \
                         get_metrics_large_multiclass, atm_cross_val
-import numpy as np
-import time
+
+
+def create_wrapper(params, judgment_metric):
+    learner_config = ALGORITHMS_MAP[params["function"]]
+    learner_class = Classifier(learner_config).learner_class
+    return Wrapper(params["function"], judgment_metric, params, learner_class)
 
 
 class Wrapper(object):
@@ -27,8 +37,7 @@ class Wrapper(object):
     PCA_DIMS = "_pca_dimensions"
 
     # list of all such keys
-    ATM_KEYS = [
-        SCALE, PCA, WHITEN, MINMAX, PCA_DIMS]
+    ATM_KEYS = [SCALE, PCA, WHITEN, MINMAX, PCA_DIMS]
 
     # number of folds for cross-validation (arbitrary, for speed)
     CV_COUNT = 5
@@ -37,7 +46,7 @@ class Wrapper(object):
                  compute_metrics=False):
         """
         Arguments
-            code: not sure
+            code: the short algorithm code (as defined in constants.py)
             judgment_metric: string that has a mapping in
                 metrics.JUDGMENT_METRICS and indicates which metric should be
                 optimized for.

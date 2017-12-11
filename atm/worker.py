@@ -2,9 +2,9 @@
 from atm.config import *
 from atm.constants import *
 from atm.utilities import *
-from atm.mapping import Mapping, create_wrapper
 from atm.model import Model
 from atm.database import Database, LearnerStatus
+from atm.wrapper import create_wrapper
 from btb.tuning.constants import Tuners
 
 import argparse
@@ -41,10 +41,11 @@ ensure_directory("logs")
 
 # name log file after the local hostname
 LOG_FILE = "logs/%s.txt" % socket.gethostname()
-# how long to wait for new dataruns to be added
-LOOP_WAIT = 0
+# how long to sleep between loops while waiting for new dataruns to be added
+LOOP_WAIT = 1
 
 
+# TODO: use python's logging module instead of this
 def _log(msg, stdout=True):
     with open(LOG_FILE, "a") as lf:
         lf.write(msg + "\n")
@@ -88,8 +89,8 @@ class Worker(object):
         """
         # selector will either be a key into SELECTORS_MAP or a path to
         # a file that defines a class called CustomSelector.
-        if self.datarun.selector in Mapping.SELECTORS_MAP:
-            Selector = Mapping.SELECTORS_MAP[self.datarun.selector]
+        if self.datarun.selector in SELECTORS_MAP:
+            Selector = SELECTORS_MAP[self.datarun.selector]
         else:
             mod = imp.load_source('btb.selection.custom', self.datarun.selector)
             Selector = mod.CustomSelector
@@ -116,8 +117,8 @@ class Worker(object):
         """
         # tuner will either be a key into TUNERS_MAP or a path to
         # a file that defines a class called CustomTuner.
-        if self.datarun.tuner in Mapping.TUNERS_MAP:
-            self.Tuner = Mapping.TUNERS_MAP[self.datarun.tuner]
+        if self.datarun.tuner in TUNERS_MAP:
+            self.Tuner = TUNERS_MAP[self.datarun.tuner]
         else:
             mod = imp.load_source('btb.tuning.custom', self.datarun.tuner)
             self.Tuner = mod.CustomTuner
@@ -297,7 +298,8 @@ class Worker(object):
         if not len(optimizables):
             _log("No optimizables for frozen set %d" % frozen_set.id)
             self.db.mark_frozen_set_gridding_done(frozen_set.id)
-            return vector_to_params(vector=[], optimizables=optimizables,
+            return vector_to_params(vector=[],
+                                    optimizables=optimizables,
                                     frozens=frozen_set.frozens,
                                     constants=frozen_set.constants)
 
@@ -314,7 +316,7 @@ class Worker(object):
         # Initialize the tuner and propose a new set of parameters
         # this has to be initialized with information from the frozen set, so we
         # need to do it fresh for each learner (not in load_tuner)
-        tuner = self.Tuner(optimizables,
+        tuner = self.Tuner(optimizables=optimizables,
                            gridding=self.datarun.gridding,
                            r_min=self.datarun.r_min)
         tuner.fit(X, y)
@@ -327,7 +329,8 @@ class Worker(object):
 
         # Convert the numpy array of parameters to a form that can be
         # interpreted by ATM, then return.
-        return vector_to_params(vector=vector, optimizables=optimizables,
+        return vector_to_params(vector=vector,
+                                optimizables=optimizables,
                                 frozens=frozen_set.frozens,
                                 constants=frozen_set.constants)
 

@@ -1,0 +1,28 @@
+{   
+    "name": "bnb",
+    "class": "sklearn.naive_bayes.BernoulliNB",
+    "parameters": {
+        "alpha": {
+            "type": "float",
+            "range": [0.0, 1.0]
+        },
+        "binarize": {
+            "type": "float",
+            "range": [0.0, 1.0]
+        },
+        "fit_prior": {
+           "type": "int",
+           "range": [0, 1]
+        },
+        "class_prior": {
+           "type": "string",
+           "range": [null]
+        },
+        "_scale": {
+           "type": "bool",
+           "range": [true]
+        }
+    },
+    "root_parameters": ["alpha", "binarize", "fit_prior", "class_prior", "_scale"],
+    "conditions": {}
+}

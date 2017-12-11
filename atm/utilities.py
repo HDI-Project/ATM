@@ -5,46 +5,61 @@ import numpy as np
 import os
 import base64
 import re
+
 from boto.s3.connection import S3Connection, Key
+
+from btb import ParamTypes
 
 # global variable storing this machine's public IP address
 # (so we only have to fetch it once)
 public_ip = None
+
+# URL which should give us our public-facing IP address
 PUBLIC_IP_URL = "http://ip.42.pl/raw"
 
 
-def hash_dict(dictionary, ignored_keys=[]):
+def hash_dict(dictionary, ignored_keys=None):
     """
+    Hash a python dictionary to a hexadecimal string.
     http://stackoverflow.com/questions/5884066/hashing-a-python-dictionary
     """
     dictionary = dict(dictionary)  # copy dictionary
-    for key in ignored_keys:
+    for key in (ignored_keys or []):
         del dictionary[key]
     return hashlib.md5(repr(sorted(dictionary.items()))).hexdigest()
 
 
 def hash_nested_tuple(tup):
+    """ Hash a nested tuple to hexadecimal """
     return hashlib.md5(repr(sorted(tup))).hexdigest()
 
 
 def hash_string(s):
+    """ Hash a string to hexadecimal """
     return hashlib.md5(str(s)).hexdigest()
 
 
 def ensure_directory(directory):
+    """ Create directory if it doesn't exist. """
     if not os.path.exists(directory):
         os.makedirs(directory)
 
 
 def get_public_ip():
+    """
+    Get the public IP address of this machine. If the request times out,
+    return "localhost".
+    """
     global public_ip
     if public_ip is None:
         try:
-            response = urllib2.urlopen(PUBLIC_IP_URL).read().strip()
-            match = re.search('\d+\.\d+\.\d+\.\d+', response)
+            response = urllib2.urlopen(PUBLIC_IP_URL, timeout=2)
+            data = response.read().strip()
+            # pull an ip-looking set of numbers from the response
+            match = re.search('\d+\.\d+\.\d+\.\d+', data)
             if match:
                 public_ip = match.group()
-        except Exception as e:  # any exception, doesn't matter
+        except Exception as e:  # any exception, doesn't matter what
             print 'could not get public IP:', e
             public_ip = 'localhost'
 
@@ -52,20 +67,15 @@ def get_public_ip():
 
 
 def object_to_base_64(obj):
-    """
-        Takes object in memory, then pickles and
-        base64 encodes it.
-    """
+    """ Pickle and base64-encode an object. """
     pickled = pickle.dumps(obj)
     return base64.b64encode(pickled)
 
 
 def base_64_to_object(b64str):
     """
-        Inverse of ObjectToBase64.
-
-        Decodes base64 encoded string and
-        then de-pickles it.
+    Inverse of ObjectToBase64.
+    Decode base64-encoded string and then de-pickle it.
     """
     decoded = base64.b64decode(b64str)
     return pickle.loads(decoded)
@@ -86,20 +96,19 @@ def vector_to_params(vector, optimizables, frozens, constants):
     Examples of the format for SVM sigmoid frozen set below:
 
         optimizables = [
-            ('C', 		KeyStruct(range=(1e-05, 100000), 	type='FLOAT_EXP', 	is_categorical=False)),
-            ('degree', 	KeyStruct(range=(2, 4), 			type='INT', 		is_categorical=False)),
-            ('coef0', 	KeyStruct(range=(0, 1), 			type='INT', 		is_categorical=False)),
-            ('gamma', 	KeyStruct(range=(1e-05, 100000),	type='FLOAT_EXP', 	is_categorical=False))
+            ('C', HyperParameter(type='float_exp', range=(1e-05, 1e5))),
+            ('degree', HyperParameter(type='int', range=(2, 4))),
+            ('gamma', HyperParameter(type='float_exp', range=(1e-05, 1e5))),
         ]
 
         frozens = (
-            ('kernel', 'poly'), ('probability', True),
-            ('_scale', True), ('shrinking', True),
-            ('class_weight', 'auto')
+            ('kernel', 'poly'),
+            ('probability', True),
+            ('_scale', True)
         )
 
         constants = [
-            ('cache_size', KeyStruct(range=(15000, 15000), type='INT', is_categorical=False))
+            ('cache_size', 15000)
         ]
 
     """
@@ -108,26 +117,16 @@ def vector_to_params(vector, optimizables, frozens, constants):
     # add the optimizables
     for i, elt in enumerate(vector):
         key, struct = optimizables[i]
-        if struct.type == 'INT':
+        if struct.type in [ParamTypes.INT, ParamTypes.INT_EXP]:
             params[key] = int(elt)
-        elif struct.type == 'INT_EXP':
-            params[key] = int(elt)
-        elif struct.type == 'FLOAT':
+        elif struct.type in [ParamTypes.FLOAT, ParamTypes.FLOAT_EXP]:
             params[key] = float(elt)
-        elif struct.type == 'FLOAT_EXP':
-            params[key] = float(elt)
-        elif struct.type == 'BOOL':
-            params[key] = bool(elt)
         else:
             raise ValueError('Unknown data type: {}'.format(struct.type))
 
-    # add the frozen categorical settings
-    for key, value in frozens:
+    # add the frozen categorical settings and fixed constant values
+    for key, value in frozens + constants:
         params[key] = value
-
-    # and finally the constant values
-    for constant_key, struct in constants:
-        params[constant_key] = struct.range[0]
 
     return params
 
@@ -144,10 +143,9 @@ def params_to_vectors(params, optimizables):
             the optimizable hyperparameters that should be in each vector. e.g.
 
         optimizables = [
-            ('C',  HyperParameter(range=(1e-5, 1e5), type='FLOAT_EXP', is_categorical=False)),
-            ('degree',  HyperParameter((2, 4), 'INT', False)),
-            ('coef0',  HyperParameter((0, 1), 'INT', False)),
-            ('gamma',  HyperParameter((1e-05, 100000), 'FLOAT_EXP', False))
+            ('C',  HyperParameter(type='float_exp', range=(1e-5, 1e5))),
+            ('degree',  HyperParameter('int', (2, 4))),
+            ('gamma',  HyperParameter('float_exp', (1e-05, 1e5)))
         ]
 
     Returns:
@@ -168,11 +166,13 @@ def params_to_vectors(params, optimizables):
 
 
 def make_model_path(model_dir, params_hash, run_hash, desc):
-    return os.path.join(model_dir, "%s-%s-%s.model" % (run_hash, params_hash, desc))
+    filename = "%s-%s-%s.model" % (run_hash, params_hash, desc)
+    return os.path.join(model_dir, filename)
 
 
-def make_metric_path(model_dir, params_hash, run_hash, desc):
-    return os.path.join(model_dir, "%s-%s-%s.metric" % (run_hash, params_hash, desc))
+def make_metric_path(metric_dir, params_hash, run_hash, desc):
+    filename = "%s-%s-%s.metric" % (run_hash, params_hash, desc)
+    return os.path.join(metric_dir, filename)
 
 
 def save_metric(metric_path, object):
@@ -182,8 +182,8 @@ def save_metric(metric_path, object):
 
 def read_atm_csv(filepath):
     """
-    read a csv and return a numpy array.
-    this works from the assumption the data has been preprocessed by atm:
+    Read a csv and return a numpy array.
+    This works from the assumption the data has been preprocessed by atm:
     no headers, numerical data only
     """
     num_cols = len(open(filepath).readline().split(','))
@@ -204,7 +204,7 @@ def read_atm_csv(filepath):
 
 def download_file_s3(keyname, aws_key, aws_secret, s3_bucket,
                      s3_folder=None, local_folder=None):
-    """ download a file from an S3 bucket and save it at keyname.  """
+    """ Download a file from an S3 bucket and save it at keyname.  """
     if local_folder:
         path = os.path.join(local_folder, keyname)
     else:

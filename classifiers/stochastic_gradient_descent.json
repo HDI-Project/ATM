@@ -1,0 +1,60 @@
+{   
+    "name": "sgd",
+    "class": "sklearn.linear_model.SGDClassifier",
+    "parameters": {
+        "loss": {
+            "type": "string",
+            "range": ["hinge", "log", "modified_huber", "squared_hinge"]
+        },
+        "penalty": {
+            "type": "string",
+            "range": ["l1", "l2", "elasticnet"]
+        },
+        "alpha": {
+           "type": "float_exp",
+           "range": [10e-5, 10e5]
+        },
+        "l1_ratio": {
+           "type": "float",
+           "range": [0.0, 1.0]
+        },
+        "fit_intercept": {
+           "type": "int_cat",
+           "range": [0, 1]
+        },
+        "n_iter": {
+           "type": "int",
+           "range": [10, 200]
+        },
+        "shuffle": {
+           "type": "bool",
+           "range": [true]
+        },
+        "epsilon": {
+           "type": "float_exp",
+           "range": [10e-5, 10e5]
+        },
+        "learning_rate": {
+           "type": "string",
+           "range": ["constant", "optimal"]
+        },
+        "eta0": {
+           "type": "float_exp",
+           "range": [10e-5, 10e5]
+        },
+        "class_weight": {
+           "type": "string",
+           "range": [null]
+        },
+        "_scale_minmax": {
+           "type": "bool",
+           "range": [true]
+        },
+        "n_jobs": {
+           "type": "int_cat",
+           "range": [-1]
+        }
+    },
+    "root_parameters": ["loss", "penalty", "alpha", "l1_ratio", "fit_intercept", "n_iter", "shuffle", "epsilon", "learning_rate", "eta0", "class_weight", "_scale_minmax", "n_jobs"],
+    "conditions": {}
+}

@@ -202,6 +202,10 @@ class Database(object):
 
             @property
             def optimizables(self):
+                """
+                A list of parameters which are unspecified and must be selected
+                with a Tuner. Each element is a ('name', HyperParameter) tuple.
+                """
                 return base_64_to_object(self.optimizables64)
 
             @optimizables.setter
@@ -210,6 +214,11 @@ class Database(object):
 
             @property
             def frozens(self):
+                """
+                A list of categorical variables along with the fixed values
+                which define the frozen set.
+                Each element is a ('name', HyperParameter) tuple.
+                """
                 return base_64_to_object(self.frozens64)
 
             @frozens.setter

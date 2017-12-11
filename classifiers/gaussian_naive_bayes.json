@@ -1,0 +1,12 @@
+{   
+    "name": "gnb",
+    "class": "sklearn.naive_bayes.GaussianNB",
+    "parameters": {
+        "_scale_minmax": {
+            "type": "bool",
+            "range": [true]
+        }
+    },
+    "root_parameters": ["_scale_minmax"],
+    "conditions": {}
+}

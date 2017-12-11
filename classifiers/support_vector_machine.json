@@ -1,0 +1,54 @@
+{   
+    "name": "svm",
+    "class": "sklearn.svm.SVC",
+    "parameters": {
+        "C": {
+           "type": "float_exp",
+           "range": [10e-5, 10e5]
+        },
+        "gamma": {
+           "type": "float_exp",
+           "range": [10e-5, 10e5]
+        },
+        "kernel": {
+           "type": "string",
+           "range": ["rbf", "poly", "linear", "sigmoid"]
+        },
+        "degree": {
+           "type": "int",
+           "range": [2, 5]
+        },
+        "coef0": {
+            "type": "int",
+            "range": [-10e3, 10e3]
+        },
+        "probability": {
+            "type": "bool",
+            "range": [true]
+        },
+        "shrinking": {
+            "type": "bool",
+            "range": [true]
+        },
+        "cache_size": {
+           "type": "int",
+           "range": [15000]
+        },
+        "class_weight": {
+           "type": "string",
+           "range": ["auto"]
+        },
+        "_scale": {
+           "type": "bool",
+           "range": [true]
+        }
+    },
+    "root_parameters": ["C", "kernel", "probability", "shrinking", "cache_size", "class_weight", "_scale"],
+    "conditions": {
+        "kernel": {
+            "rbf": ["gamma"],
+            "sigmoid": ["gamma", "coef0"],
+            "poly": ["degree", "gamma", "coef0"]
+        }
+    }
+}
