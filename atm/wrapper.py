@@ -131,7 +131,7 @@ class Wrapper(object):
 
         if self.num_classes == 2:
             last_step = self.pipeline.steps[-1]
-            if last_step[0] == 'classify_sgd' or last_step[0] == 'classify_pa':
+            if last_step[0] == 'sgd' or last_step[0] == 'pa':
                 class_1_distance = self.pipeline.decision_function(self.testX)
                 class_0_distance = -class_1_distance
 
@@ -161,7 +161,7 @@ class Wrapper(object):
 
         elif self.num_classes <= 5:
             last_step = self.pipeline.steps[-1]
-            if last_step[0] == 'classify_sgd' or last_step[0] == 'classify_pa':
+            if last_step[0] == 'sgd' or last_step[0] == 'pa':
                 # this isn't a probability
                 y_pred_probs = self.pipeline.decision_function(self.testX)
 
@@ -193,7 +193,7 @@ class Wrapper(object):
 
         else:
             last_step = self.pipeline.steps[-1]
-            if last_step[0] == 'classify_sgd' or last_step[0] == 'classify_pa':
+            if last_step[0] == 'sgd' or last_step[0] == 'pa':
                 # this isn't a probability
                 y_pred_probs = self.pipeline.decision_function(self.testX)
 
@@ -266,7 +266,7 @@ class Wrapper(object):
             del classifier_params["_pca_dimensions"]
 
         ### GPC ###
-        if classifier_params["function"] == "classify_gp":
+        if classifier_params["function"] == "gp":
             if classifier_params["kernel"] == "constant":
                 classifier_params["kernel"] = ConstantKernel()
             elif classifier_params["kernel"] == "rbf":
@@ -286,7 +286,7 @@ class Wrapper(object):
                 del classifier_params["periodicity"]
 
         ### MLP ###
-        if classifier_params["function"] == "classify_mlp":
+        if classifier_params["function"] == "mlp":
 
             classifier_params["hidden_layer_sizes"] = []
 
@@ -317,7 +317,7 @@ class Wrapper(object):
 
         # print "Added stuff for DBNs! %s" % classifier_params
         ### DBN ###
-        if classifier_params["function"] == "classify_dbn":
+        if classifier_params["function"] == "dbn":
 
             # print "Adding stuff for DBNs! %s" % classifier_params
             classifier_params["layer_sizes"] = [classifier_params["inlayer_size"]]
