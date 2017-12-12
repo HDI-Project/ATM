@@ -49,8 +49,8 @@ class Method(object):
         self.class_ = getattr(mod, cls_str)
 
         # create hyperparameters from the parameter config
-        self.parameters = {k: HyperParameter(**v) for k, v in
-                           config['parameters'].items()}
+        self.parameters = {k: HyperParameter(typ=v['type'], rang=v['range'])
+                           for k, v in config['parameters'].items()}
 
 
     def get_hyperpartitions(self):

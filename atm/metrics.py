@@ -281,13 +281,11 @@ def atm_cross_val_binary(pipeline, X, y, judgment_metric, cv=10):
         y_pred = pipeline.predict(X_test)
 
         last_step = pipeline.steps[-1]
-        if last_step[0] == 'classify_sgd' or last_step[0] == 'classify_pa':
+        if last_step[0] == 'sgd' or last_step[0] == 'pa':
             class_1_distance = pipeline.decision_function(X_test)
             class_0_distance = -class_1_distance
-
             # this isn't a probability
             y_pred_probs = np.column_stack((class_0_distance, class_1_distance))
-
         else:
             y_pred_probs = pipeline.predict_proba(X_test)
 
@@ -371,10 +369,9 @@ def atm_cross_val_small_multiclass(pipeline, X, y, judgment_metric, cv=10):
         y_pred = pipeline.predict(X_test)
 
         last_step = pipeline.steps[-1]
-        if last_step[0] == 'classify_sgd' or last_step[0] == 'classify_pa':
+        if last_step[0] == 'sgd' or last_step[0] == 'pa':
             # this isn't a probability
             y_pred_probs = pipeline.decision_function(X_test)
-
         else:
             y_pred_probs = pipeline.predict_proba(X_test)
 
@@ -477,10 +474,9 @@ def atm_cross_val_large_multiclass(pipeline, X, y, judgment_metric, cv=10, rank=
         y_pred = pipeline.predict(X_test)
 
         last_step = pipeline.steps[-1]
-        if last_step[0] == 'classify_sgd' or last_step[0] == 'classify_pa':
+        if last_step[0] == 'sgd' or last_step[0] == 'pa':
             # this isn't a probability
             y_pred_probs = pipeline.decision_function(X_test)
-
         else:
             y_pred_probs = pipeline.predict_proba(X_test)
 
