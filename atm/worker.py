@@ -272,15 +272,15 @@ class Worker(object):
         hyperpartition_scores = {fs.id: [] for fs in hyperpartitions}
         classifiers = self.db.get_classifiers(datarun_id=self.datarun.id,
                                         status=ClassifierStatus.COMPLETE)
-        for l in classifiers:
+        for c in classifiers:
             # ignore hyperpartitions for which gridding is done
-            if l.hyperpartition_id not in hyperpartition_scores:
+            if c.hyperpartition_id not in hyperpartition_scores:
                 continue
 
             # the cast to float is necessary because the score is a Decimal;
             # doing Decimal-float arithmetic throws errors later on.
-            score = float(getattr(l, self.datarun.score_target))
-            hyperpartition_scores[l.hyperpartition_id].append(score)
+            score = float(getattr(c, self.datarun.score_target))
+            hyperpartition_scores[c.hyperpartition_id].append(score)
 
         hyperpartition_id = self.selector.select(hyperpartition_scores)
         return self.db.get_hyperpartition(hyperpartition_id)
