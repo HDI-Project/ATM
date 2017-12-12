@@ -106,9 +106,11 @@ class Method(object):
 
             # check if choosing this value opens up new parts of the conditional
             # parameter tree.
-            if cat in self.conditions and val in self.conditions[cat]:
+            # we need to check conditions for str(val) because all keys in json
+            # must be strings.
+            if cat in self.conditions and str(val) in self.conditions[cat]:
                 # categorize the conditional variables which are now in play
-                for p in self.conditions[cat][val]:
+                for p in self.conditions[cat][str(val)]:
                     if len(self.parameters[p].range) == 1:
                         new_constants.append((p, self.parameters[p].range[0]))
                     elif self.parameters[p].is_categorical:
