@@ -96,91 +96,46 @@ def upload_data(train_path, test_path, access_key, secret_key, s3_bucket,
     ktest.set_contents_from_filename(test_path)
 
 
-def create_datarun(db, dataset_id, tuner, selector, gridding, priority, k_window,
-                   r_min, budget_type, budget, deadline, score_target, metric):
+def create_datarun(db, session, dataset, run_config):
     """
     Given a config, creates a set of dataruns for the config and enters them into
     the database. Returns the ID of the created datarun.
 
     db: initialized Database object
-    dataset_id: ID of the dataset this datarun will use
-    tuner: string, hyperparameter tuning method
-    selector: string, hyperpartition selection method
-    gridding: int or None,
-    priority: int, higher priority runs are computed first
-    k_window: int, `k` parameter for selection methods that need it
-    r_min: int, minimum number of prior examples for tuning to take effect
-    budget_type: string, either 'walltime' or 'classifiers'
-    budget: int, total budget for datarun in classifiers or minutes
-    deadline: string-formatted datetime, when the datarun must end by
-    score_target: either 'cv' or 'test', indicating which scores the run should
-        optimize for
-    metric: string, e.g. 'f1' or 'auc'. Metric the run will optimize for.
+    session: active SQLAlchemy session
+    dataset: Dataset SQLAlchemy ORM object
+    run_config: configuration describing the datarun to create
     """
     # describe the datarun by its tuner and selector
-    run_description =  '__'.join([tuner, selector])
+    run_description =  '__'.join([run_config.tuner, run_config.selector])
 
     # set the deadline, if applicable
+    deadline = run_config.deadline
     if deadline:
         deadline = datetime.strptime(deadline, TIME_FMT)
         # this overrides the otherwise configured budget_type
         # TODO: why not walltime and classifiers budget simultaneously?
-        budget_type = 'walltime'
-    elif budget_type == 'walltime':
+        run_config.budget_type = 'walltime'
+    elif run_config.budget_type == 'walltime':
         deadline = datetime.now() + timedelta(minutes=budget)
 
-    target = score_target + '_judgment_metric'
-
-    # create datarun
-    session = db.get_session()
-    datarun = db.Datarun(dataset_id=dataset_id,
+    target = run_config.score_target + '_judgment_metric'
+    datarun = db.Datarun(dataset_id=dataset.id,
                          description=run_description,
-                         tuner=tuner,
-                         selector=selector,
-                         gridding=gridding,
-                         priority=priority,
-                         budget_type=budget_type,
-                         budget=budget,
+                         tuner=run_config.tuner,
+                         selector=run_config.selector,
+                         gridding=run_config.gridding,
+                         priority=run_config.priority,
+                         budget_type=run_config.budget_type,
+                         budget=run_config.budget,
                          deadline=deadline,
-                         metric=metric,
+                         metric=run_config.metric,
                          score_target=target,
-                         k_window=k_window,
-                         r_min=r_min)
+                         k_window=run_config.k_window,
+                         r_min=run_config.r_min)
     session.add(datarun)
-    session.commit()
-    print datarun
     return datarun
 
-
-def create_hyperpartitions(db, datarun, methods):
-    """
-    Create all hyperpartitions for a given datarun and store them in the ModelHub
-    database.
-
-    db: initialized Database object
-    datarun: initialized Datarun ORM object
-    methods: list of codes for the methods this datarun will use
-    """
-    session = db.get_session()
-    session.autoflush = False
-
-    for m in methods:
-        # enumerate all combinations of categorical variables for this method
-        method = Method(METHODS_MAP[m])
-        parts = method.get_hyperpartitions()
-        print 'method', m, 'has', len(parts), 'hyperpartitions'
-
-        for part in parts:
-            part = db.Hyperpartition(datarun_id=datarun.id,
-                                     method=m,
-                                     tunables=part.tunables,
-                                     constants=part.constants,
-                                     categoricals=part.categoricals,
-                                     status=PartitionStatus.INCOMPLETE)
-            session.add(part)
-
-    session.commit()
-    session.close()
 
 def enter_dataset(db, run_config, aws_config=None, upload_data=False):
     """
@@ -209,7 +164,9 @@ def enter_dataset(db, run_config, aws_config=None, upload_data=False):
 
     return dataset
 
-def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False):
+
+def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False,
+                  run_per_partition=False):
     """
     Generate a datarun, including a dataset if necessary.
 
@@ -234,30 +191,62 @@ def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False):
     else:
         dataset = db.get_dataset(run_config.dataset_id)
 
-    # create and save datarun to database
-    print
-    print 'creating datarun...'
-    datarun = create_datarun(db, run_config.dataset_id, run_config.tuner,
-                             run_config.selector, run_config.gridding,
-                             run_config.priority, run_config.k_window,
-                             run_config.r_min, run_config.budget_type,
-                             run_config.budget, run_config.deadline,
-                             run_config.score_target, run_config.metric)
 
     # create hyperpartitions for the new datarun
     print
     print 'creating hyperpartitions...'
-    create_hyperpartitions(db, datarun, run_config.methods)
+    session = db.get_session()
+
+    parts = []
+    for m in run_config.methods:
+        # enumerate all combinations of categorical variables for this method
+        method = Method(METHODS_MAP[m])
+        parts.extend(method.get_hyperpartitions())
+        print 'method', m, 'has', len(parts), 'hyperpartitions'
+
+    # create and save datarun to database
+    print
+    print 'creating datarun...'
+
+    # create hyperpartitions and datarun(s)
+    run_ids = []
+    if not run_per_partition:
+        datarun = create_datarun(db, session, dataset, run_config)
+        session.commit()
+
+    for part in parts:
+        # if necessary, create a new datarun for each hyperpartition.
+        # This setting is useful for debugging.
+        if run_per_partition:
+            datarun = create_datarun(db, session, dataset, run_config)
+            session.commit()
+            run_ids.append(datarun.id)
+
+        hp = db.Hyperpartition(datarun_id=datarun.id,
+                               method=m,
+                               tunables=part.tunables,
+                               constants=part.constants,
+                               categoricals=part.categoricals,
+                               status=PartitionStatus.INCOMPLETE)
+        session.add(hp)
+        session.commit()
+
+
     print
     print '========== Summary =========='
     print 'Dataset ID:', dataset.id
     print 'Training data:', dataset.train_path
     print 'Test data:', (dataset.test_path or '(None)')
-    print 'Datarun ID:', datarun.id
+    if run_per_partition:
+        print 'Datarun IDs:', ', '.join(map(str, run_ids))
+    else:
+        print 'Datarun ID:', datarun.id
     print 'Hyperpartition selection strategy:', datarun.selector
     print 'Parameter tuning strategy:', datarun.tuner
     print 'Budget: %d (%s)' % (datarun.budget, datarun.budget_type)
-    return datarun.id
+    print
+
+    return run_ids or datarun.id
 
 
 if __name__ == '__main__':

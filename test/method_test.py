@@ -48,12 +48,14 @@ for ds in DATASETS:
     run_config.train_path = join(DATA_DIR, ds)
     run_config.methods = [args.method]
     dataset = enter_dataset(db, run_config, aws_config)
-    datarun_ids.append(enter_datarun(sql_config, run_config, aws_config))
+    datarun_ids.extend(enter_datarun(sql_config, run_config, aws_config,
+                                     run_per_partition=True))
 
+print 'computing on dataruns', datarun_ids
 work_parallel(db=db, datarun_ids=datarun_ids, aws_config=aws_config,
               n_procs=args.processes)
 
 print 'workers finished.'
 
 for rid in datarun_ids:
-    print_summary(db, rid)
+    print_hp_summary(db, rid)

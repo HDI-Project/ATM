@@ -60,14 +60,17 @@ def print_summary(db, rid):
     if best is not None:
         score = best.cv_judgment_metric
         err = 2 * best.cv_judgment_metric_stdev
-        print 'Best result overall: classifier %d, %s = %.3f +- %.3f' % (best.id,
-                                                                      run.metric,
-                                                                      score, err)
+        print 'Best result overall: classifier %d, %s = %.3f +- %.3f' %\
+            (best.id, run.metric, score, err)
 
+
+def print_method_summary(db, rid):
     # maps methods to sets of hyperpartitions, and hyperpartitions to lists of
     # classifiers
     alg_map = {a: defaultdict(list) for a in db.get_methods(datarun_id=rid)}
 
+    run = db.get_datarun(rid)
+    classifiers = db.get_classifiers(datarun_id=rid)
     for l in classifiers:
         hp = db.get_hyperpartition(l.hyperpartition_id)
         alg_map[hp.method][hp.id].append(l)
@@ -83,7 +86,34 @@ def print_summary(db, rid):
                         ClassifierStatus.COMPLETE])
         print '\t%d errored, %d complete' % (errored, complete)
 
-        best = db.get_best_classifier(datarun_id=run.id, method=alg)
+        best = db.get_best_classifier(datarun_id=rid, method=alg)
+        if best is not None:
+            score = best.cv_judgment_metric
+            err = 2 * best.cv_judgment_metric_stdev
+            print '\tBest: classifier %s, %s = %.3f +- %.3f' % (best, run.metric,
+                                                                score, err)
+
+def print_hp_summary(db, rid):
+    run = db.get_datarun(rid)
+    classifiers = db.get_classifiers(datarun_id=rid)
+
+    part_map = defaultdict(list)
+    for c in classifiers:
+        hp = c.hyperpartition_id
+        part_map[hp].append(c)
+
+    for hp, classifiers in part_map.items():
+        print
+        print 'hyperpartition', hp
+        print db.get_hyperpartition(hp)
+
+        errored = len([c for c in classifiers if c.status ==
+                       ClassifierStatus.ERRORED])
+        complete = len([c for c in classifiers if c.status ==
+                        ClassifierStatus.COMPLETE])
+        print '\t%d errored, %d complete' % (errored, complete)
+
+        best = db.get_best_classifier(datarun_id=rid, hyperpartition_id=hp)
         if best is not None:
             score = best.cv_judgment_metric
             err = 2 * best.cv_judgment_metric_stdev

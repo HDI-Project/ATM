@@ -389,7 +389,7 @@ class Database(object):
 
     @try_with_session()
     def get_classifiers(self, session, dataset_id=None, datarun_id=None,
-                     method=None, hyperpartition_id=None, status=None):
+                        method=None, hyperpartition_id=None, status=None):
         """ Get a set of classifiers, filtered by the passed-in arguments. """
         query = session.query(self.Classifier)
         if dataset_id is not None:
@@ -401,7 +401,8 @@ class Database(object):
             query = query.join(self.Hyperpartition)\
                 .filter(self.Hyperpartition.method == method)
         if hyperpartition_id is not None:
-            query = query.filter(self.Classifier.hyperpartition_id == hyperpartition_id)
+            query = query.filter(self.Classifier.hyperpartition_id ==
+                                 hyperpartition_id)
         if status is not None:
             query = query.filter(self.Classifier.status == status)
 
@@ -461,8 +462,8 @@ class Database(object):
 
     @try_with_session()
     def get_best_classifier(self, session, score_target='mu_sigma',
-                         dataset_id=None, datarun_id=None,
-                         method=None, hyperpartition_id=None):
+                            dataset_id=None, datarun_id=None,
+                            method=None, hyperpartition_id=None):
         """
         Get the classifier with the highest lower error bound. In other words, what
         classifier has the highest value of (score.mean - 2 * score.std)?
@@ -495,16 +496,16 @@ class Database(object):
     def create_classifier(self, session, hyperpartition_id, datarun_id, host, params):
         """
         Save a new, fully qualified classifier object to the database.
-
         Returns: the ID of the newly-created classifier
         """
         classifier = self.Classifier(hyperpartition_id=hyperpartition_id,
-                               datarun_id=datarun_id,
-                               host=host,
-                               params=params,
-                               started=datetime.now(),
-                               status=ClassifierStatus.RUNNING)
+                                     datarun_id=datarun_id,
+                                     host=host,
+                                     params=params,
+                                     started=datetime.now(),
+                                     status=ClassifierStatus.RUNNING)
         session.add(classifier)
+
         hyperpartition = session.query(self.Hyperpartition).get(hyperpartition_id)
         hyperpartition.classifiers += 1
 
@@ -512,8 +513,8 @@ class Database(object):
 
     @try_with_session(commit=True)
     def complete_classifier(self, session, classifier_id, trainable_params,
-                         dimensions, model_path, metric_path,
-                         cv_score, cv_stdev, test_score):
+                            dimensions, model_path, metric_path,
+                            cv_score, cv_stdev, test_score):
         """
         Set all the parameters on a classifier that haven't yet been set, and mark
         it as complete.

@@ -42,7 +42,7 @@ ensure_directory("logs")
 # name log file after the local hostname
 LOG_FILE = "logs/%s.txt" % socket.gethostname()
 # how long to sleep between loops while waiting for new dataruns to be added
-LOOP_WAIT = 1
+LOOP_WAIT = 0
 
 
 # TODO: use python's logging module instead of this
@@ -97,7 +97,7 @@ class Worker(object):
         _log("Selector: %s" % Selector)
 
         # generate the arguments we need to initialize the selector
-        hyperpartitions = self.db.get_hyperpartitions(self.datarun.id)
+        hyperpartitions = self.db.get_hyperpartitions(datarun_id=self.datarun.id)
         hp_by_method = defaultdict(list)
         for hp in hyperpartitions:
             hp_by_method[hp.method].append(hp.id)
@@ -263,15 +263,15 @@ class Worker(object):
         hyperpartition of hyperparameters from the ModelHub. Only consider
         partitions for which gridding is not complete.
         """
-        hyperpartitions = self.db.get_hyperpartitions(self.datarun.id)
+        hyperpartitions = self.db.get_hyperpartitions(datarun_id=self.datarun.id)
 
         # load classifiers and build scores lists
         # make sure all hyperpartitions are present in the dict, even ones that
         # don't have any classifiers. That way the selector can choose hyperpartitions
         # that haven't been scored yet.
         hyperpartition_scores = {fs.id: [] for fs in hyperpartitions}
-        classifiers = self.db.get_classifiers(datarun_id=self.datarun.id,
-                                        status=ClassifierStatus.COMPLETE)
+        classifiers = self.db.get_classifiers(datarun_id=self.datarun.id)
+                                              #status=ClassifierStatus.COMPLETE)
         for c in classifiers:
             # ignore hyperpartitions for which gridding is done
             if c.hyperpartition_id not in hyperpartition_scores:
@@ -279,7 +279,7 @@ class Worker(object):
 
             # the cast to float is necessary because the score is a Decimal;
             # doing Decimal-float arithmetic throws errors later on.
-            score = float(getattr(c, self.datarun.score_target))
+            score = float(getattr(c, self.datarun.score_target) or 0)
             hyperpartition_scores[c.hyperpartition_id].append(score)
 
         hyperpartition_id = self.selector.select(hyperpartition_scores)
@@ -306,7 +306,7 @@ class Worker(object):
         # Get previously-used parameters: every classifier should either be
         # completed or have thrown an error
         classifiers = [l for l in self.db.get_classifiers(hyperpartition_id=hyperpartition.id)
-                    if l.status == ClassifierStatus.COMPLETE]
+                       if l.status == ClassifierStatus.COMPLETE]
 
         # Extract parameters and scores as numpy arrays from classifiers
         X = params_to_vectors([l.params for l in classifiers], tunables)
@@ -339,13 +339,16 @@ class Worker(object):
         Check to see whether the datarun is finished. This could be due to the
         budget being exhausted or due to hyperparameter gridding being done.
         """
-        hyperpartitions = self.db.get_hyperpartitions(self.datarun.id)
+        hyperpartitions = self.db.get_hyperpartitions(datarun_id=self.datarun.id)
         if not hyperpartitions:
-            _log("No incomplete hyperpartitions for datarun present in database.")
+            _log("No incomplete hyperpartitions for datarun %d present in database."
+                 % self.datarun.id)
             return True
 
         if self.datarun.budget_type == "classifier":
-            n_completed = sum([f.classifiers for f in hyperpartitions])
+            # hyperpartition classifier counts are updated whenever a classifier
+            # is created, so this will count running, errored, and complete.
+            n_completed = sum([p.classifiers for p in hyperpartitions])
             if n_completed >= self.datarun.budget:
                 _log("Classifier budget has run out!")
                 return True

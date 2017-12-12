@@ -58,12 +58,16 @@ class Method(object):
         Traverse the CPT and enumerate all possible hyperpartitions of parameters
         for this method
         """
-        constants = [(p, self.parameters[p].range[0]) for p in self.root_params
-                     if len(self.parameters[p].range) == 1]
-        categoricals = [p for p in self.root_params
-                        if self.parameters[p].is_categorical]
-        tunables = [(p, self.parameters[p]) for p in self.root_params
-                    if not self.parameters[p].is_categorical]
+        constants = []
+        categoricals = []
+        tunables = []
+        for p in self.root_params:
+            if len(self.parameters[p].range) == 1:
+                constants.append((p, self.parameters[p].range[0]))
+            elif self.parameters[p].is_categorical:
+                categoricals.append(p)
+            else:
+                tunables.append((p, self.parameters[p]))
 
         return self._enumerate([], constants, categoricals, tunables)
 
@@ -103,16 +107,14 @@ class Method(object):
             # check if choosing this value opens up new parts of the conditional
             # parameter tree.
             if cat in self.conditions and val in self.conditions[cat]:
-                conditionals = self.conditions[cat][val]
-
                 # categorize the conditional variables which are now in play
-                new_constants += [
-                    (p, self.parameters[p].range[0]) for p in conditionals
-                    if len(self.parameters[p].range) == 1]
-                new_free_cats += [p for p in conditionals
-                                  if self.parameters[p].is_categorical]
-                new_tunables += [(p, self.parameters[p]) for p in conditionals
-                                 if not self.parameters[p].is_categorical]
+                for p in self.conditions[cat][val]:
+                    if len(self.parameters[p].range) == 1:
+                        new_constants.append((p, self.parameters[p].range[0]))
+                    elif self.parameters[p].is_categorical:
+                        new_free_cats.append(p)
+                    else:
+                        new_tunables.append((p, self.parameters[p]))
 
             # recurse with the newly qualified categorical as a constant
             parts.extend(self._enumerate(fixed_cats=new_fixed_cats,
