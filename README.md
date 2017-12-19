@@ -5,25 +5,7 @@ ATM is an open source software library under ["The human data interaction projec
 ## Current status
 **atm** and the accompanying library **btb** are under active development (transitioning from an older system to new). In the next couple of weeks we intend to update its documentation, its testing infrastructure, provide apis and establish a framework for the community to contribute. Stay tuned for updates. Meanwhile, if you have any questions, or if would like to receive updates: **please email to dailabmit@gmail.com. **
 
-## Quick start setup
-Below we will give a quick tutorial of how to run atm on your desktop. We will use a featurized dataset, already saved in ``data/test/pollution_1.csv``. This is one of the datasets available on openl.org. More details can be found [here](https://www.openml.org/d/542). In this problem the goal is predict ``mortality`` using the metrics associated with the air pollution. Below we show a snapshot of the ``csv`` file.  The data has 15 features and the last column is the ``class`` label. 
-
-  |PREC | JANT |  JULT |  OVR65 |	POPN|	EDUC|	HOUS| DENS|	NONW|	WWDRK	|POOR| HC	| NOX |	SO@	| HUMID |	class|
-  |:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
-   |35	|   23	|   72	|   11.1	|   3.14	|  11	|  78.8	|   4281	|  3.5	|50.7	|14.4	|8	|   10	|   39	|   57	|      1|
-   |44	|   29	|   74	|   10.4|	   3.21	 | 9.8	|  81.6	|   4260	|  0.8|	39.4|	12.4	|6	|   6	 |  33	|   54	|      1|
-   |47	|   45	|   79	|   6.5	 |  3.41	| 11.1	|77.5	 |  3125	|  27.1	|50.2|	20.6|	18	 |  8	 |  24|	   56	 |     1|
-   |43	|   35|	   77	 |  7.6	 |  3.44	|  9.6	|  84.6	|   6441	|  24.4	|43.7	|14.3	|43	|   38|	   206|	55	|      1|
-   |53	|   45	|   80	|   7.7	|   3.45|	  10.2|	66.8	|   3325|	  38.5	|43.1|	25.5|	30	|   32|	   72	 |  54	|      1|
-  | 43	|   30	|   74	|   10.9|	   3.23	|  12.1|	83.9|	   4679|	  3.5	|49.2	|11.3	|21	|   32|	   62	|   56	|      0|
-   |45	|   30	|   73	|   9.3	|   3.29	|  10.6	|86	 |    2140	|  5.3|	40.4	|10.5|	6	|   4	|   4	|   56|	      0|
-  | ..	|   ..	|   ..	|   ...	|   ....|	  ....	|...	|     ....	|  .. |	....|	....|	..	|   ..|    ..	|   ..|	      .|
- |  ..	|   ..|	   ..	|   ...	|   ....	|  ....	|...|	     ....	 | .. 	|....	|....|	..|	   .. |   ..|	   ..	 |     .|
-  |..|	   ..	|   ..	|   ...|	   ....|	  ....|	...	|     ....	|  ..| 	....|	....|	..	|   .. |   ..|	   ..	 |     .|
-  | 37	|   31|	   75	 |  8	 |    3.26|	11.9	|78.4	 |    4259|	  13.1	|49.6|	13.9|	23	|   9	|   15|	   58	 |    1|
-  | 35	|   46|	   85	 |  7.1	 |  3.22|	  11.8	|79.9	|   1441	|  14.8	|51.2	|16.1|	1	|   1	 |  1	|   54	|      0|
-
-
+## Setup/Installation 
 1. **Clone project**.
    ```
       $ git clone https://github.com/hdi-project/atm.git /path/to/atm
@@ -50,8 +32,27 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
    This will also install [btb](https://github.com/hdi-project/btb), another
    project in development at DAI Lab, as an egg which will track changes to the git
    repository.
+
+## Quick Usage
+Below we will give a quick tutorial of how to run atm on your desktop. We will use a featurized dataset, already saved in ``data/test/pollution_1.csv``. This is one of the datasets available on openl.org. More details can be found [here](https://www.openml.org/d/542). In this problem the goal is predict ``mortality`` using the metrics associated with the air pollution. Below we show a snapshot of the ``csv`` file.  The data has 15 features and the last column is the ``class`` label. 
+
+  |PREC | JANT |  JULT |  OVR65 |	POPN|	EDUC|	HOUS| DENS|	NONW|	WWDRK	|POOR| HC	| NOX |	SO@	| HUMID |	class|
+  |:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
+   |35	|   23	|   72	|   11.1	|   3.14	|  11	|  78.8	|   4281	|  3.5	|50.7	|14.4	|8	|   10	|   39	|   57	|      1|
+   |44	|   29	|   74	|   10.4|	   3.21	 | 9.8	|  81.6	|   4260	|  0.8|	39.4|	12.4	|6	|   6	 |  33	|   54	|      1|
+   |47	|   45	|   79	|   6.5	 |  3.41	| 11.1	|77.5	 |  3125	|  27.1	|50.2|	20.6|	18	 |  8	 |  24|	   56	 |     1|
+   |43	|   35|	   77	 |  7.6	 |  3.44	|  9.6	|  84.6	|   6441	|  24.4	|43.7	|14.3	|43	|   38|	   206|	55	|      1|
+   |53	|   45	|   80	|   7.7	|   3.45|	  10.2|	66.8	|   3325|	  38.5	|43.1|	25.5|	30	|   32|	   72	 |  54	|      1|
+  | 43	|   30	|   74	|   10.9|	   3.23	|  12.1|	83.9|	   4679|	  3.5	|49.2	|11.3	|21	|   32|	   62	|   56	|      0|
+   |45	|   30	|   73	|   9.3	|   3.29	|  10.6	|86	 |    2140	|  5.3|	40.4	|10.5|	6	|   4	|   4	|   56|	      0|
+  | ..	|   ..	|   ..	|   ...	|   ....|	  ....	|...	|     ....	|  .. |	....|	....|	..	|   ..|    ..	|   ..|	      .|
+ |  ..	|   ..|	   ..	|   ...	|   ....	|  ....	|...|	     ....	 | .. 	|....	|....|	..|	   .. |   ..|	   ..	 |     .|
+  |..|	   ..	|   ..	|   ...|	   ....|	  ....|	...	|     ....	|  ..| 	....|	....|	..	|   .. |   ..|	   ..	 |     .|
+  | 37	|   31|	   75	 |  8	 |    3.26|	11.9	|78.4	 |    4259|	  13.1	|49.6|	13.9|	23	|   9	|   15|	   58	 |    1|
+  | 35	|   46|	   85	 |  7.1	 |  3.22|	  11.8	|79.9	|   1441	|  14.8	|51.2	|16.1|	1	|   1	 |  1	|   54	|      0|
+
    
-4. **Create a datarun** 
+1. **Create a datarun** 
     ```
       $ python atm/enter_data.py
     ```
@@ -77,7 +78,7 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
    The most important piece of information is the datarun ID.
  
  
-5. **Start a worker**
+2. **Start a worker**
      ```
         $ python atm/worker.py 
      ```
