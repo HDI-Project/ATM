@@ -139,7 +139,8 @@ class Worker(object):
         # the config for it.
         if not os.path.isfile(dw.train_path_out):
             ensure_directory(dw.outfolder)
-            if download_file_s3(dw.train_path_out, aws_key=self.aws_config.access_key,
+            if download_file_s3(dw.train_path_out,
+                                aws_key=self.aws_config.access_key,
                                 aws_secret=self.aws_config.access_key,
                                 s3_bucket=self.aws_config.s3_bucket,
                                 s3_folder=self.aws_config.s3_folder) != dw.train_path_out:
@@ -152,10 +153,11 @@ class Worker(object):
 
         if not os.path.isfile(dw.test_path_out):
             ensure_directory(dw.outfolder)
-            if download_file_s3(dw.test_path_out, aws_key=self.aws_key,
-                                aws_secret=self.aws_secret,
-                                s3_bucket=self.s3_bucket,
-                                s3_folder=self.s3_folder) != dw.test_path_out:
+            if download_file_s3(dw.test_path_out,
+                                aws_key=self.aws_config.aws_key,
+                                aws_secret=self.aws_config.aws_secret,
+                                s3_bucket=self.aws_config.s3_bucket,
+                                s3_folder=self.aws_config.s3_folder) != dw.test_path_out:
                 raise Exception("Something about test dataset caching is wrong...")
 
         # load the data into matrix format

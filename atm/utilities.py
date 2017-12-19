@@ -202,10 +202,33 @@ def read_atm_csv(filepath):
     return data
 
 
+def download_file_url(url, local_folder=None):
+    """ Download a file from an S3 bucket and save it at keyname.  """
+    filename = url.split('/')[-1]
+    if local_folder is not None:
+        ensure_directory(local_folder)
+        path = os.path.join(local_folder, filename)
+    else:
+        path = filename
+
+    if os.path.isfile(path):
+        print 'file %s already exists!' % path
+        return path
+
+    print 'downloading data from %s...' % url
+    f = urllib2.urlopen(url)
+    data = f.read()
+    with open(path, "wb") as outfile:
+        outfile.write(data)
+
+    return path
+
+
 def download_file_s3(keyname, aws_key, aws_secret, s3_bucket,
                      s3_folder=None, local_folder=None):
     """ Download a file from an S3 bucket and save it at keyname.  """
-    if local_folder:
+    if local_folder is not None:
+        ensure_directory(local_folder)
         path = os.path.join(local_folder, keyname)
     else:
         path = keyname
