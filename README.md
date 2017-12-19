@@ -1,48 +1,51 @@
 ATM - Auto Tune Models
 ====
 
-# Quick start setup
+**Current status**: 
 
-### 1. Clone project.
+## Quick start setup
+
+1. **Clone project**.
 ```
 $ git clone https://github.com/hdi-project/atm.git /path/to/atm
 $ cd /path/to/atm
 ```
 
-2. Install database.
+2. **Install database**.
 - for SQLite (simpler):
 ```
 $ sudo apt install sqlite3
 ```
 
 - for MySQL: 
-```
-$ sudo apt install mysql-server mysql-client
-```
+   ```
+      $ sudo apt install mysql-server mysql-client
+   ```
 
-3. Install python dependencies.
-```
-$ virtualenv venv
-$ . venv/bin/activate
-$ pip install -r requirements.txt
-```
-This will also install [btb](https://github.com/hdi-project/btb), another
-project in development at DAI Lab, as an egg which will track changes to the git
-repository.
+3. **Install python dependencies.**
+   ```
+      $ virtualenv venv
+      $ . venv/bin/activate
+      $ pip install -r requirements.txt
+   ```
+   This will also install [btb](https://github.com/hdi-project/btb), another
+   project in development at DAI Lab, as an egg which will track changes to the git
+   repository.
+
 
 4. (Optional) Create copies of the sample configuration files, and edit them to
    add your settings. 
 
-Saving configuration as YAML files is an easy way to save complicated setups or
-share them with team members. However, if you want, you can skip this step and
-specify all configuration parameters on the command line later.
+   Saving configuration as YAML files is an easy way to save complicated setups or
+   share them with team members. However, if you want, you can skip this step and
+   specify all configuration parameters on the command line later.
 
-If you do want to use YAML config files, you should start with the templates
-provided in `config/templates` and modify them to suit your own needs.
-```
-$ cp config/templates/*.yaml config/
-$ vim config/*.yaml
-```
+   If you do want to use YAML config files, you should start with the templates
+   provided in `config/templates` and modify them to suit your own needs.
+   ```
+      $ cp config/templates/*.yaml config/
+      $ vim config/*.yaml
+   ```
 
 `run_config.yaml` contains all the settings for a single Dataset and Datarun.
 You will need to modify `train_path` at the very least in order to use your own
