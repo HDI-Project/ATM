@@ -7,9 +7,11 @@ ATM is an open source software library under ["The human data interaction projec
 
 ## Quick start setup
 Below we will give a quick tutorial of how to run atm on your desktop. We will use a featurized dataset, already saved in ``data/test/pollution_1.csv``. Below we show a snapshot of the data.  
-```
-  PREC  JANT  JULT  OVR65	   POPN	  EDUC	HOUS	   DENS	  NONW	WWDRK	POOR	HC	   NOX	SO@	HUMID	class
-   35	   23	   72	   11.1	   3.14	  11	  78.8	   4281	  3.5	50.7	14.4	8	   10	   39	   57	      1
+
+  |PREC | JANT |  JULT |  OVR65 |	POPN|	EDUC|	HOUS| DENS|	NONW|	WWDRK	|POOR| HC	| NOX |	SO@	| HUMID |	class|
+  |:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
+   |35	|   23	|   72	|   11.1	|   3.14	|  11	|  78.8	|   4281	|  3.5	|50.7	|14.4	|8	|   10	|   39	|   57	|      1|
+   ```
    44	   29	   74	   10.4	   3.21	  9.8	  81.6	   4260	  0.8	39.4	12.4	6	   6	   33	   54	      1
    47	   45	   79	   6.5	   3.41	  11.1	77.5	   3125	  27.1	50.2	20.6	18	   8	   24	   56	      1
    43	   35	   77	   7.6	   3.44	  9.6	  84.6	   6441	  24.4	43.7	14.3	43	   38	   206	55	      1
