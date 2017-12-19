@@ -98,9 +98,7 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
     Judgment metric (f1): 0.536 +- 0.067
     Best so far (learner 21): 0.716 +- 0.035
    ```
-   And that's it! You can break out of the worker with Ctrl+C and restart it with
-   the same command; it will pick up right where it left off. You can also start
-   multiple workers at the same time in different terminals to parallelize the
+   Occassionally the worker will throw an error when it can't learn a classifier due to erroneous settings. The errors are logged in the    database. The worker however moves on to the next task.  And that's it! You can break out of the worker with Ctrl+C and restart it      with the same command; it will pick up right where it left off. You can also start multiple workers at the same time in different   terminals to parallelize the
    work - by simply calling the above command again. When all 100 learners in your budget have been computed, all workers will
    exit gracefully.
  
