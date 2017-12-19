@@ -12,7 +12,7 @@ ATM - Auto Tune Models
       $ cd /path/to/atm
    ```
 
-2. **Install database**.
+2. **Install database.**
    - for SQLite (simpler):
    ```
       $ sudo apt install sqlite3
@@ -34,8 +34,8 @@ ATM - Auto Tune Models
    repository.
 
 
-4. (Optional) Create copies of the sample configuration files, and edit them to
-   add your settings. 
+4. **(Optional) Create copies of the sample configuration files, and edit them to
+   add your settings.** 
 
       Saving configuration as YAML files is an easy way to save complicated setups or
       share them with team members. However, if you want, you can skip this step and
@@ -91,20 +91,20 @@ ATM - Auto Tune Models
    The command should produce a lot of output, the end of which looks something
    like this:
    ```
-   ========== Summary ==========
-   Training data: data/test/pollution_1.csv
-   Test data: <None>
-   Dataset ID: 1
-   Frozen set selection strategy: uniform
-   Parameter tuning strategy: gp_ei
-   Budget: 100 (learner)
-   Datarun ID: 1
+      ========== Summary ==========
+      Training data: data/test/pollution_1.csv
+      Test data: <None>
+      Dataset ID: 1
+      Frozen set selection strategy: uniform
+      Parameter tuning strategy: gp_ei
+      Budget: 100 (learner)
+      Datarun ID: 1
    ```
 
    The most important piece of information is the datarun ID.
 
-6. Start a worker, specifying your config files and the datarun(s) you'd like to
-   compute on.
+6. **Start a worker, specifying your config files and the datarun(s) you'd like to
+   compute on.**
    ```
       $ python atm/worker.py --sql-config config/sql_config.yaml \
       --aws-config config/aws_config.yaml --dataruns 1
@@ -117,7 +117,7 @@ ATM - Auto Tune Models
    dataruns, and compute learners for any it finds in order of priority.  The
    output should show which hyperparameters are being tested and the performance of
    each learner (the "judgment metric"), plus the best overall performance so far.
-
+   ```
     Classifier type: classify_logreg
     Params chosen:
             C = 8904.06127554
@@ -130,7 +130,7 @@ ATM - Auto Tune Models
 
     Judgment metric (f1): 0.536 +- 0.067
     Best so far (learner 21): 0.716 +- 0.035
-
+   ```
    And that's it! You can break out of the worker with Ctrl+C and restart it with
    the same command; it will pick up right where it left off. You can also start
    multiple workers at the same time in different terminals to parallelize the
