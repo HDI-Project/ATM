@@ -90,7 +90,7 @@ ATM - Auto Tune Models
 
    The command should produce a lot of output, the end of which looks something
    like this:
-
+   ```
    ========== Summary ==========
    Training data: data/test/pollution_1.csv
    Test data: <None>
@@ -99,6 +99,7 @@ ATM - Auto Tune Models
    Parameter tuning strategy: gp_ei
    Budget: 100 (learner)
    Datarun ID: 1
+   ```
 
    The most important piece of information is the datarun ID.
 
