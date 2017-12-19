@@ -136,11 +136,10 @@ class Worker(object):
             wrapper.load_data_from_objects(), i.e. (trainX, testX, trainY,
             testY)
         """
-        dw = self.dataset.wrapper
-
+        # TODO TODO
         # if the data are not present locally, check the S3 bucket detailed in
         # the config for it.
-        if not os.path.isfile(dw.train_path_out):
+        if not os.path.isfile(self.dataset.train_path):
             ensure_directory(dw.outfolder)
             if download_file_s3(dw.train_path_out, aws_key=self.aws_config.access_key,
                                 aws_secret=self.aws_config.access_key,
@@ -364,15 +363,15 @@ class Worker(object):
 
         return False
 
-    def test_classifier(self, classifier_id, params):
+    def test_classifier(self, classifier, params):
         """
         Given a set of fully-qualified hyperparameters, create and test a
         classification model.
         Returns: Model object and performance dictionary
         """
-        wrapper = create_wrapper(params, self.datarun.metric)
-        wrapper.load_data_from_objects(*self.load_data())
-        performance = wrapper.start()
+        model = Model(classifier.code, params, self.datarun.metric)
+        performance = model.train_test(self.dataset.train_path,
+                                       self.dataset.test_path)
 
         old_best = self.db.get_best_classifier(datarun_id=self.datarun.id)
         if old_best is not None:

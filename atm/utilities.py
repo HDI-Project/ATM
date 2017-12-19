@@ -170,28 +170,6 @@ def save_metric(metric_path, object):
         pickle.dump(object, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def read_atm_csv(filepath):
-    """
-    Read a csv and return a numpy array.
-    This works from the assumption the data has been preprocessed by atm:
-    no headers, numerical data only
-    """
-    num_cols = len(open(filepath).readline().split(','))
-    with open(filepath) as f:
-        for i, _ in enumerate(f):
-            pass
-    num_rows = i + 1
-
-    data = np.zeros((num_rows, num_cols))
-
-    with open(filepath) as f:
-        for i, line in enumerate(f):
-            for j, cell in enumerate(line.split(',')):
-                data[i, j] = float(cell)
-
-    return data
-
-
 def download_file_s3(keyname, aws_key, aws_secret, s3_bucket,
                      s3_folder=None, local_folder=None):
     """ Download a file from an S3 bucket and save it at keyname.  """

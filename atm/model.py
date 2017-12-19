@@ -42,7 +42,7 @@ class Model(object):
     # number of folds for cross-validation (arbitrary, for speed)
     N_FOLDS = 5
 
-    def __init__(self, code, judgment_metric, params, compute_metrics=False):
+    def __init__(self, code, params, judgment_metric, compute_metrics=False):
         """
         Arguments
             code: the short method code (as defined in constants.py)
@@ -162,7 +162,7 @@ class Model(object):
         self.num_features = metadata.d_features
 
         # if necessary, generate permanent train/test split
-        if test_path:
+        if test_path is not None:
             test_data = self.load_data(test_path)
         else:
             train_data, test_data = train_test_split(all_data,
