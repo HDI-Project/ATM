@@ -6,7 +6,7 @@ ATM is an open source software library under ["The human data interaction projec
 **atm** and the accompanying library **btb** are under active development (transitioning from an older system to new). In the next couple of weeks we intend to update its documentation, its testing infrastructure, provide apis and establish a framework for the community to contribute. Stay tuned for updates. Meanwhile, if you have any questions, or if would like to receive updates: **please email to dailabmit@gmail.com. **
 
 ## Quick start setup
-Below we will give a quick tutorial of how to run atm on your desktop. We will use a featurized dataset, already saved in. Below we show a snapshot of the data.  
+Below we will give a quick tutorial of how to run atm on your desktop. We will use a featurized dataset, already saved in ``data/test/pollution_1.csv``. Below we show a snapshot of the data.  
 ```
    PREC	JANT	JULT	OVR65	POPN	EDUC	HOUS	DENS	NONW	WWDRK	POOR	HC	   NOX	SO@	HUMID	class
    36	   27	   71	   8.1	3.34	11.4	81.5	3243	8.8	42.6	11.7	21	   15	   59	   59	   0
