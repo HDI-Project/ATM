@@ -56,7 +56,7 @@ ATM - Auto Tune Models
    default configuration will connect to (and create if necessary) a SQLite
    database called atm.db. If you are using a MySQL database, you will need to
    change it to something like this: 
-
+   ```
       dialect: mysql
       database: atm
       username: username
@@ -64,6 +64,7 @@ ATM - Auto Tune Models
       host: localhost
       port: 3306
       query:
+    ```
 
    If you need to download data from an Amazon S3 bucket, you should update
    `aws_config.yaml` with your credentials.
