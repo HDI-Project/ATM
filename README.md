@@ -104,7 +104,14 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
  
 ## Customizing config settings, and running on your own data 
 
-3. **Running for your own dataset** 
+ATM has the following features:
+* It allows users to simulataneously run the system for multiple datasets 
+* Users can run on AWS or a cluster compute 
+* It makes use of a variety of AutoML approaches for tuning and selection available in the accompanying library [btb]()
+* It stores models, metrics and cross validated accuracy information about each classifier it learnt. 
+There are a number of ways user can use the system and most of it is controlled through the three yaml files in ``conig/templates/``. Our documentation will cover all these scenarios and settings. 
+
+1. **Running for your own dataset** 
    If you want to use the system for your own dataset, create a csv file similar to the example shown above. The format is:
    * Each column is a feature 
    * Each row is a training example 
@@ -112,7 +119,7 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
    * The first row is the header row. 
    
     
-4. **Create copies of the sample configuration files, and edit them to
+2. **Create copies of the sample configuration files, and edit them to
    add your settings.** 
 
       Saving configuration as YAML files is an easy way to save complicated setups or
@@ -146,7 +153,7 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
       If you need to download data from an Amazon S3 bucket, you should update
       `aws_config.yaml` with your credentials.
 
-5. **Create a datarun.**
+3. **Create a datarun.**
    ```
       $ python atm/enter_data.py --command --line --args
    ```
@@ -168,7 +175,7 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
 
   
 
-6. **Start a worker, specifying your config files and the datarun(s) you'd like to
+4. **Start a worker, specifying your config files and the datarun(s) you'd like to
    compute on.**
    ```
       $ python atm/worker.py --sql-config config/sql_config.yaml \
