@@ -1,13 +1,11 @@
 import json
-from importlib import import_module
 from os.path import join
-
 from btb import HyperParameter
 
 CONFIG_PATH = 'methods'
 
 
-class Hyperpartition(object):
+class HyperPartition(object):
     """
     Class which holds the hyperparameter settings that define a hyperpartition.
     """
@@ -41,12 +39,7 @@ class Method(object):
         self.name = config['name']
         self.conditions = config['conditions']
         self.root_params = config['root_parameters']
-
-        # import the method's python class
-        path = config['class'].split('.')
-        mod_str, cls_str = '.'.join(path[:-1]), path[-1]
-        mod = import_module(mod_str)
-        self.class_ = getattr(mod, cls_str)
+        self.class_path = config['class']
 
         # create hyperparameters from the parameter config
         self.parameters = {k: HyperParameter(typ=v['type'], rang=v['range'])
@@ -82,12 +75,12 @@ class Method(object):
         free_cats: a list of names of free categorical variables
         tunables: a list of names of free tunable parameters
 
-        Returns: a list of Hyperpartition objects
+        Returns: a list of HyperPartition objects
         """
-        # if there are no more free variables, we have a new Hyperpartition. We've
+        # if there are no more free variables, we have a new HyperPartition. We've
         # reached the bottom of the recursion, so return.
         if not free_cats:
-            return [Hyperpartition(fixed_cats, constants, tunables)]
+            return [HyperPartition(fixed_cats, constants, tunables)]
 
         parts = []
 

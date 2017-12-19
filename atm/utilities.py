@@ -90,27 +90,19 @@ def vector_to_params(vector, tunables, categoricals, constants):
     """
     Converts a numpy vector to a dictionary mapping keys to named parameters.
 
-    `vector` is single example to convert
-    `tunables` keys back from vector format to dictionaries.
+    vector: single example to convert
 
-    Examples of the format for SVM sigmoid hyperpartition below:
+    Examples of the format for SVM sigmoid hyperpartition:
 
-        tunables = [
-            ('C', HyperParameter(type='float_exp', range=(1e-05, 1e5))),
-            ('degree', HyperParameter(type='int', range=(2, 4))),
-            ('gamma', HyperParameter(type='float_exp', range=(1e-05, 1e5))),
-        ]
+        tunables = [('C', HyperParameter(type='float_exp', range=(1e-05, 1e5))),
+                    ('degree', HyperParameter(type='int', range=(2, 4))),
+                    ('gamma', HyperParameter(type='float_exp', range=(1e-05, 1e5)))]
 
-        categoricals = (
-            ('kernel', 'poly'),
-            ('probability', True),
-            ('_scale', True)
-        )
+        categoricals = (('kernel', 'poly'),
+                        ('probability', True),
+                        ('_scale', True))
 
-        constants = [
-            ('cache_size', 15000)
-        ]
-
+        constants = [('cache_size', 15000)]
     """
     params = {}
 
@@ -142,11 +134,9 @@ def params_to_vectors(params, tunables):
         tunables: list of HyperParameter metadata structures describing all
             the optimizable hyperparameters that should be in each vector. e.g.
 
-        tunables = [
-            ('C',  HyperParameter(type='float_exp', range=(1e-5, 1e5))),
-            ('degree',  HyperParameter('int', (2, 4))),
-            ('gamma',  HyperParameter('float_exp', (1e-05, 1e5)))
-        ]
+        tunables = [('C',  HyperParameter(type='float_exp', range=(1e-5, 1e5))),
+                    ('degree',  HyperParameter('int', (2, 4))),
+                    ('gamma',  HyperParameter('float_exp', (1e-05, 1e5)))]
 
     Returns:
         vectors: np.array of parameter vectors ready to be optimized by a

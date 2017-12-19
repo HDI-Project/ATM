@@ -4,7 +4,6 @@ from atm.constants import *
 from atm.utilities import *
 from atm.model import Model
 from atm.database import Database, ClassifierStatus
-from atm.wrapper import create_wrapper
 from btb.tuning.constants import Tuners
 
 import argparse

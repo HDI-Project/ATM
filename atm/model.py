@@ -5,9 +5,11 @@
 """
 import numpy as np
 import time
+from importlib import import_module
 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.model_selection import train_test_split
 from sklearn import decomposition
 from gdbn.activationFunctions import Softmax, Sigmoid, Linear, Tanh
 from sklearn.gaussian_process.kernels import ConstantKernel, RBF, Matern, \
@@ -40,8 +42,7 @@ class Model(object):
     # number of folds for cross-validation (arbitrary, for speed)
     N_FOLDS = 5
 
-    def __init__(self, code, judgment_metric, params,
-                 compute_metrics=False):
+    def __init__(self, code, judgment_metric, params, compute_metrics=False):
         """
         Arguments
             code: the short method code (as defined in constants.py)
@@ -59,11 +60,16 @@ class Model(object):
         self.params = params
 
         # load the classifier method's class
-        config = METHODS_MAP[code]
-        self.class_ = Method(config).class_
+        path = Method(METHODS_MAP[code]).class_path.split('.')
+        mod_str, cls_str = '.'.join(path[:-1]), path[-1]
+        mod = import_module(mod_str)
+        self.class_ = getattr(mod, cls_str)
 
         # pipelining
         self.pipeline = None
+
+        # persistent random state
+        self.state =
 
     def load_data(self, path, dropvals=None, sep=','):
         # load data as a Pandas dataframe
@@ -72,6 +78,50 @@ class Model(object):
 
         # drop rows with any NA values
         return data.dropna(how='any')
+
+    def make_pipeline(self):
+        """
+        Makes the classifier as well as scaling or dimension reduction steps.
+        """
+        # create a list of steps, starting with the data encoder
+        steps = [self.encoder]
+
+        # create a classifier with specified parameters
+        hyperparameters = {k: v for k, v in self.params.iteritems()
+                           if k not in Wrapper.ATM_KEYS}
+        atm_params = {k: v for k, v in self.params.iteritems()
+                      if k in Wrapper.ATM_KEYS}
+
+        # do special conversions
+        hyperparameters = self.special_conversions(hyperparameters)
+        self.trainable_params = hyperparameters
+        classifier = self.class_(**hyperparameters)
+
+        self.dimensions = self.num_features
+        if Wrapper.PCA in atm_params and atm_params[Wrapper.PCA]:
+            whiten = (Wrapper.WHITEN in atm_params and
+                        atm_params[Wrapper.WHITEN])
+            pca_dims = atm_params[Wrapper.PCA_DIMS]
+            # PCA dimension in atm_params is a float reprsenting percentages of
+            # features to use
+            if pca_dims >= 1:
+                self.dimensions = int(pca_dims)
+            else:
+                self.dimensions = int(pca_dims * float(self.num_features))
+                print "*** Using PCA to reduce %d features to %d dimensions" %\
+                    (self.num_features, self.dimensions)
+                pca = decomposition.PCA(n_components=self.dimensions, whiten=whiten)
+                steps.append(('pca', pca))
+
+        # should we scale the data?
+        if atm_params.get(Wrapper.SCALE):
+            steps.append(('standard_scale', StandardScaler()))
+        elif self.params.get(Wrapper.MINMAX):
+            steps.append(('minmax_scale', MinMaxScaler()))
+
+        # add the classifier as the final step in the pipeline
+        steps.append((self.code, classifier))
+        self.pipeline = Pipeline(steps)
 
     def cross_validate(self, X, y):
         binary = self.num_classes == 2
@@ -103,6 +153,34 @@ class Model(object):
                                          include_roc=self.include_roc)
 
         self.test_judgment_metric = self.test_scores.get(self.judgment_metric)
+
+    def train_test(self, train_path, test_path=None):
+        # load train and (maybe) test data
+        train_data = self.load_data(train_path)
+        metadata = get_dataset_metadata(train_data, self.label_column)
+        self.num_classes = metadata.k_classes
+        self.num_features = metadata.d_features
+
+        # if necessary, generate permanent train/test split
+        if test_path:
+            test_data = self.load_data(test_path)
+        else:
+            train_data, test_data = train_test_split(all_data,
+                                                     test_size=self.testing_ratio,
+                                                     random_state=state)
+
+        # extract feature matrix and labels from raw data
+        self.encoder = DataEncoder()
+        X_train, y_train = self.encoder.fit_transform(train_data)
+        X_test, y_test = self.encoder.transform(test_data)
+
+        # create and cross-validate pipeline
+        self.make_pipeline()
+        self.cross_validate(X_train, y_train)
+
+        # train and test the final model
+        self.pipeline.fit(X_train, y_train)
+        self.test_final_model(X_test, y_test)
 
     def special_conversions(self, params):
         """
@@ -215,77 +293,3 @@ class Model(object):
 
         # return the updated parameter vector
         return params
-
-    def make_pipeline(self):
-        """
-        Makes the classifier as well as scaling or dimension reduction steps.
-        """
-        # create a list of steps, starting with the data encoder
-        steps = [self.encoder]
-
-        # create a classifier with specified parameters
-        hyperparameters = {k: v for k, v in self.params.iteritems()
-                           if k not in Wrapper.ATM_KEYS}
-        atm_params = {k: v for k, v in self.params.iteritems()
-                      if k in Wrapper.ATM_KEYS}
-
-        # do special conversions
-        hyperparameters = self.special_conversions(hyperparameters)
-        self.trainable_params = hyperparameters
-        classifier = self.class_(**hyperparameters)
-
-        dimensions = None
-        if Wrapper.PCA in atm_params and atm_params[Wrapper.PCA]:
-            whiten = (Wrapper.WHITEN in atm_params and
-                        atm_params[Wrapper.WHITEN])
-            # PCA dimension in atm_params is a float reprsenting percentages of
-            # features to use
-            percentage_dimensions = float(atm_params[Wrapper.PCA_DIMS])
-            if percentage_dimensions < 0.99:  # if close enough keep all features
-                new_dimensions = int(percentage_dimensions * float(self.num_features))
-                print "*** Using PCA to reduce data from %d dimensions to %d" %\
-                    (self.num_dimensions, new_dimensions)
-                pca = decomposition.PCA(n_components=new_dimensions, whiten=whiten)
-                steps.append(('pca', pca))
-
-        # keep track of the actual number of dimensions we used
-        self.dimensions = dimensions or self.num_features
-
-        # should we scale the data?
-        if atm_params.get(Wrapper.SCALE):
-            steps.append(('standard_scale', StandardScaler()))
-        elif self.params.get(Wrapper.MINMAX):
-            steps.append(('minmax_scale', MinMaxScaler()))
-
-        # add the classifier as the final step in the pipeline
-        steps.append((self.code, classifier))
-        self.pipeline = Pipeline(steps)
-
-    def train_test(self, train_path, test_path=None):
-        # load train and (maybe) test data
-        train_data = self.load_data(train_path)
-        metadata = get_dataset_metadata(train_data, self.label_column)
-        self.num_classes = metadata.k_classes
-        self.num_features = metadata.d_features
-
-        # if necessary, generate permanent train/test split
-        if test_path:
-            test_data = self.load_data(test_path)
-        else:
-            train_data, test_data = train_test_split(all_data,
-                                                     test_size=self.testing_ratio)
-
-        # extract feature matrix and labels from raw data
-        self.encoder = DataEncoder()
-        X_train, y_train = self.encoder.fit_transform(train_data)
-        X_test, y_test = self.encoder.transform(test)
-
-        # create and cross-validate pipeline
-        self.make_pipeline()
-        self.cross_validate(X_train, y_train)
-
-        # train and test the final model
-        self.pipeline.fit(train_X, train_y)
-        self.test_final_model(test_X, test_y)
-
-        return self.performance
