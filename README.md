@@ -50,8 +50,67 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
    This will also install [btb](https://github.com/hdi-project/btb), another
    project in development at DAI Lab, as an egg which will track changes to the git
    repository.
+   
+4. **Create a datarun** 
+    ```
+      $ python atm/enter_data.py
+    ```
+   This command will create a ``Datarun``. A ``Datarun`` in ATM is a unique machine learning task for which models are sought. This        command will use the following default settings:
+   * ``sqllite`` as the database 
+   * ``atm.db`` as the database name (more about what is collected in this database and what is it used for is described [here](https://cyphe.rs/static/atm.pdf)
+   * ``pollution_1.csv`` as the dataset for which classifiers are sought. 
+   * it will use the settings specified in ``run_config.yaml`` for btb (which is the tuning library)
+   
+   The command should produce a lot of output, the end of which looks something like this:
+  
+    ```
+        ========== Summary ==========
+        Training data: data/test/pollution_1.csv
+        Test data: <None>
+        Dataset ID: 1
+        Frozen set selection strategy: uniform
+        Parameter tuning strategy: gp_ei
+        Budget: 100 (learner)
+        Datarun ID: 1
+    ```
 
+   The most important piece of information is the datarun ID.
+ 
+ 
+5. **Start a worker**
+     ```
+        $ python atm/worker.py 
+     ```
 
+   This will start a process that computes learners (classifiers) and saves them to the model
+   directory you configured. Again, you can run worker.py without any arguments,
+   and the default configuration values will be used. If you don't specify any
+   dataruns, the worker will periodically check the ModelHub database for new
+   dataruns, and compute learners for any it finds in order of priority.  The
+   output should show which hyperparameters are being tested and the performance of
+   each learner (the "judgment metric"), plus the best overall performance so far.
+   ```
+    Classifier type: classify_logreg
+    Params chosen:
+            C = 8904.06127554
+            _scale = True
+            fit_intercept = False
+            penalty = l2
+            tol = 4.60893080631
+            dual = True
+            class_weight = auto
+
+    Judgment metric (f1): 0.536 +- 0.067
+    Best so far (learner 21): 0.716 +- 0.035
+   ```
+   And that's it! You can break out of the worker with Ctrl+C and restart it with
+   the same command; it will pick up right where it left off. You can also start
+   multiple workers at the same time in different terminals to parallelize the
+   work. When all 100 learners in your budget have been computed, all workers will
+   exit gracefully.
+ 
+## More settings     
+    
 4. **(Optional) Create copies of the sample configuration files, and edit them to
    add your settings.** 
 
@@ -107,20 +166,7 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
    use a mixture of config files and command line args; any command line arguments
    you specify will override the values found in config files.
 
-   The command should produce a lot of output, the end of which looks something
-   like this:
-   ```
-      ========== Summary ==========
-      Training data: data/test/pollution_1.csv
-      Test data: <None>
-      Dataset ID: 1
-      Frozen set selection strategy: uniform
-      Parameter tuning strategy: gp_ei
-      Budget: 100 (learner)
-      Datarun ID: 1
-   ```
-
-   The most important piece of information is the datarun ID.
+  
 
 6. **Start a worker, specifying your config files and the datarun(s) you'd like to
    compute on.**
