@@ -6,7 +6,7 @@ ATM is an open source software library under ["The human data interaction projec
 **atm** and the accompanying library **btb** are under active development (transitioning from an older system to new). In the next couple of weeks we intend to update its documentation, its testing infrastructure, provide apis and establish a framework for the community to contribute. Stay tuned for updates. Meanwhile, if you have any questions, or if would like to receive updates: **please email to dailabmit@gmail.com. **
 
 ## Quick start setup
-Below we will give a quick tutorial of how to run atm on your desktop. We will use a featurized dataset, already saved in ``data/test/pollution_1.csv``. Below we show a snapshot of the data.  
+Below we will give a quick tutorial of how to run atm on your desktop. We will use a featurized dataset, already saved in ``data/test/pollution_1.csv``. This is one of the datasets available on openl.org. More details can be found [here](https://www.openml.org/d/542). In this problem the goal is predict ``mortality`` using the metrics associated with the air pollution. Below we show a snapshot of the ``csv`` file.  The data has 15 features and the last column is the ``class`` label. 
 
   |PREC | JANT |  JULT |  OVR65 |	POPN|	EDUC|	HOUS| DENS|	NONW|	WWDRK	|POOR| HC	| NOX |	SO@	| HUMID |	class|
   |:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
