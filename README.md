@@ -29,9 +29,7 @@ ATM is an open source software library under ["The human data interaction projec
       $ . venv/bin/activate
       $ pip install -r requirements.txt
    ```
-   This will also install [btb](https://github.com/hdi-project/btb), another
-   project in development at DAI Lab, as an egg which will track changes to the git
-   repository.
+   This will also install [btb](https://github.com/hdi-project/btb), the core AutoML library in development under the HDI project, as an egg which will track changes to the git repository.
 
 ## Quick Usage
 Below we will give a quick tutorial of how to run atm on your desktop. We will use a featurized dataset, already saved in ``data/test/pollution_1.csv``. This is one of the datasets available on openl.org. More details can be found [here](https://www.openml.org/d/542). In this problem the goal is predict ``mortality`` using the metrics associated with the air pollution. Below we show a snapshot of the ``csv`` file.  The data has 15 features and the last column is the ``class`` label. 
@@ -84,11 +82,7 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
      ```
 
    This will start a process that computes learners (classifiers) and saves them to the model
-   directory you configured. Again, you can run worker.py without any arguments,
-   and the default configuration values will be used. If you don't specify any
-   dataruns, the worker will periodically check the ModelHub database for new
-   dataruns, and compute learners for any it finds in order of priority.  The
-   output should show which hyperparameters are being tested and the performance of
+   directory. The output should show which hyperparameters are being tested and the performance of
    each learner (the "judgment metric"), plus the best overall performance so far.
    ```
     Classifier type: classify_logreg
@@ -107,7 +101,7 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
    And that's it! You can break out of the worker with Ctrl+C and restart it with
    the same command; it will pick up right where it left off. You can also start
    multiple workers at the same time in different terminals to parallelize the
-   work. When all 100 learners in your budget have been computed, all workers will
+   work - by simply calling the above command again. When all 100 learners in your budget have been computed, all workers will
    exit gracefully.
  
 ## More settings     
