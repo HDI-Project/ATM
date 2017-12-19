@@ -98,13 +98,21 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
     Judgment metric (f1): 0.536 +- 0.067
     Best so far (learner 21): 0.716 +- 0.035
    ```
-   Occassionally the worker will throw an error when it can't learn a classifier due to erroneous settings. The errors are logged in the    database. The worker however moves on to the next task.  And that's it! You can break out of the worker with Ctrl+C and restart it      with the same command; it will pick up right where it left off. You can also start multiple workers at the same time in different   terminals to parallelize the
+   Occassionally the worker will throw an error when it can't learn a classifier due to erroneous settings. The errors are logged in the    database. The worker however moves on to trying the next classifier.  And that's it! You can break out of the worker with Ctrl+C and restart it      with the same command; it will pick up right where it left off. You can also start multiple workers at the same time in different   terminals to parallelize the
    work - by simply calling the above command again. When all 100 learners in your budget have been computed, all workers will
    exit gracefully.
  
-## More settings     
+## Customizing config settings, and running on your own data 
+
+3. **Running for your own dataset** 
+   If you want to use the system for your own dataset, create a csv file similar to the example shown above. The format is:
+   * Each column is a feature 
+   * Each row is a training example 
+   * The last column in the target column and is called ``class``
+   * The first row is the header row. 
+   
     
-4. **(Optional) Create copies of the sample configuration files, and edit them to
+4. **Create copies of the sample configuration files, and edit them to
    add your settings.** 
 
       Saving configuration as YAML files is an easy way to save complicated setups or
@@ -118,28 +126,27 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
          $ vim config/*.yaml
       ```
 
-   `run_config.yaml` contains all the settings for a single Dataset and Datarun.
-   You will need to modify `train_path` at the very least in order to use your own
-   dataset.
+      `run_config.yaml` contains all the settings for a single Dataset and Datarun.
+      Specify the `train_path` to point to your own dataset.
 
-   `sql_config.yaml` contains the settings for the ModelHub SQL database. The
-   default configuration will connect to (and create if necessary) a SQLite
-   database called atm.db. If you are using a MySQL database, you will need to
-   change it to something like this: 
-   ```
-      dialect: mysql
-      database: atm
-      username: username
-      password: password
-      host: localhost
-      port: 3306
-      query:
-    ```
+      `sql_config.yaml` contains the settings for the ModelHub SQL database. The
+      default configuration will connect to (and create if necessary) a SQLite
+      database called atm.db. If you are using a MySQL database, you will need to
+      change it to something like this: 
+      ```
+         dialect: mysql
+         database: atm
+         username: username
+         password: password
+         host: localhost
+         port: 3306
+         query:
+      ```
 
-   If you need to download data from an Amazon S3 bucket, you should update
-   `aws_config.yaml` with your credentials.
+      If you need to download data from an Amazon S3 bucket, you should update
+      `aws_config.yaml` with your credentials.
 
-5. Create a datarun.
+5. **Create a datarun.**
    ```
       $ python atm/enter_data.py --command --line --args
    ```
@@ -169,8 +176,7 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
    ```
 
    This will start a process that computes learners and saves them to the model
-   directory you configured. Again, you can run worker.py without any arguments,
-   and the default configuration values will be used. If you don't specify any
+   directory you configured. If you don't specify any
    dataruns, the worker will periodically check the ModelHub database for new
    dataruns, and compute learners for any it finds in order of priority.  The
    output should show which hyperparameters are being tested and the performance of
