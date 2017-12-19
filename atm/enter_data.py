@@ -120,20 +120,19 @@ def create_datarun(db, session, dataset, run_config):
         deadline = datetime.now() + timedelta(minutes=budget)
 
     target = run_config.score_target + '_judgment_metric'
-    datarun = db.Datarun(dataset_id=dataset.id,
-                         description=run_description,
-                         tuner=run_config.tuner,
-                         selector=run_config.selector,
-                         gridding=run_config.gridding,
-                         priority=run_config.priority,
-                         budget_type=run_config.budget_type,
-                         budget=run_config.budget,
-                         deadline=deadline,
-                         metric=run_config.metric,
-                         score_target=target,
-                         k_window=run_config.k_window,
-                         r_min=run_config.r_min)
-    session.add(datarun)
+    datarun = db.create_datarun(dataset_id=dataset.id,
+                                description=run_description,
+                                tuner=run_config.tuner,
+                                selector=run_config.selector,
+                                gridding=run_config.gridding,
+                                priority=run_config.priority,
+                                budget_type=run_config.budget_type,
+                                budget=run_config.budget,
+                                deadline=deadline,
+                                metric=run_config.metric,
+                                score_target=target,
+                                k_window=run_config.k_window,
+                                r_min=run_config.r_min)
     return datarun
 
 
@@ -192,45 +191,39 @@ def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False,
         dataset = db.get_dataset(run_config.dataset_id)
 
 
-    # create hyperpartitions for the new datarun
     print
     print 'creating hyperpartitions...'
-    session = db.get_session()
 
-    parts = []
+    method_parts = {}
     for m in run_config.methods:
         # enumerate all combinations of categorical variables for this method
         method = Method(METHODS_MAP[m])
-        parts.extend(method.get_hyperpartitions())
-        print 'method', m, 'has', len(parts), 'hyperpartitions'
+        method_parts[m] = method.get_hyperpartitions()
+        print 'method', m, 'has', len(method_parts[m]), 'hyperpartitions'
 
-    # create and save datarun to database
     print
     print 'creating datarun...'
 
     # create hyperpartitions and datarun(s)
     run_ids = []
     if not run_per_partition:
-        datarun = create_datarun(db, session, dataset, run_config)
-        session.commit()
+        datarun = create_datarun(db, dataset, run_config)
 
-    for part in parts:
-        # if necessary, create a new datarun for each hyperpartition.
-        # This setting is useful for debugging.
-        if run_per_partition:
-            datarun = create_datarun(db, session, dataset, run_config)
-            session.commit()
-            run_ids.append(datarun.id)
+    for method, parts in method_parts:
+        for part in parts:
+            # if necessary, create a new datarun for each hyperpartition.
+            # This setting is useful for debugging.
+            if run_per_partition:
+                datarun = create_datarun(db, dataset, run_config)
+                run_ids.append(datarun.id)
 
-        hp = db.Hyperpartition(datarun_id=datarun.id,
-                               method=m,
-                               tunables=part.tunables,
-                               constants=part.constants,
-                               categoricals=part.categoricals,
-                               status=PartitionStatus.INCOMPLETE)
-        session.add(hp)
-        session.commit()
-
+            # create a new hyperpartition in the database
+            db.create_hyperpartition(datarun_id=datarun.id,
+                                     method=method,
+                                     tunables=part.tunables,
+                                     constants=part.constants,
+                                     categoricals=part.categoricals,
+                                     status=PartitionStatus.INCOMPLETE)
 
     print
     print '========== Summary =========='

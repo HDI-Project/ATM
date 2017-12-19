@@ -122,7 +122,6 @@ class Database(object):
             __tablename__ = 'datasets'
 
             id = Column(Integer, primary_key=True, autoincrement=True)
-
             name = Column(String(100), nullable=False)
             description = Column(String(1000))
             train_path = Column(String(200), nullable=False)
@@ -491,6 +490,23 @@ class Database(object):
     ###########################################################################
     ##  Methods to update the database  #######################################
     ###########################################################################
+    @try_with_session(commit=True)
+    def create_dataset(self, session, **kwargs):
+        dataset = self.Dataset(**kwargs)
+        session.add(dataset)
+        return dataset
+
+    @try_with_session(commit=True)
+    def create_datarun(self, session, **kwargs):
+        datarun = self.Datarun(**kwargs)
+        session.add(datarun)
+        return datarun
+
+    @try_with_session(commit=True)
+    def create_hyperpartition(self, session, **kwargs):
+        part = self.Hyperpartition(**kwargs)
+        session.add(part)
+        return part
 
     @try_with_session(commit=True)
     def create_classifier(self, session, hyperpartition_id, datarun_id, host, params):
@@ -509,7 +525,7 @@ class Database(object):
         hyperpartition = session.query(self.Hyperpartition).get(hyperpartition_id)
         hyperpartition.classifiers += 1
 
-        return classifier.id
+        return classifier
 
     @try_with_session(commit=True)
     def complete_classifier(self, session, classifier_id, trainable_params,

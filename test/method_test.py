@@ -34,7 +34,7 @@ jobs are finished.
 parser.add_argument('--processes', help='number of processes to run concurrently',
                     type=int, default=1)
 parser.add_argument('--method', help='code for method to test')
-parser.add_argument('--method-json', help='path to config for method to test')
+parser.add_argument('--method-path', help='path to JSON config for method to test')
 
 args = parser.parse_args()
 sql_config, run_config, aws_config = load_config(sql_path=SQL_CONFIG,

@@ -89,13 +89,12 @@ class RunConfig(Config):
         'train_path',
         'test_path',
         'data_description',
-        'output_folder',
+        'output_dir',
         'label_column',
 
         # datarun config
         'dataset_id',
         'methods',
-        'models_dir',
         'priority',
         'budget_type',
         'budget',
@@ -111,7 +110,7 @@ class RunConfig(Config):
 
     DEFAULTS = {
         'train_path': 'data/test/pollution_1.csv',
-        'output_folder': 'data/processed/',
+        'output_dir': 'data/processed/',
         'label_column': 'class',
         'methods': ['logreg', 'dt', 'knn'],
         'priority': 1,
@@ -233,7 +232,7 @@ def add_arguments_datarun(parser):
     parser.add_argument('--train-path', help='Path to raw training data')
     parser.add_argument('--test-path', help='Path to raw test data (if applicable)')
     parser.add_argument('--data-description', help='Description of dataset')
-    parser.add_argument('--output-folder', help='Path where processed data will be saved')
+    parser.add_argument('--output-dir', help='Directory where processed data will be saved')
     parser.add_argument('--label-column', help='Name of the label column in the input data')
 
     ##  Datarun Arguments  #########################################################

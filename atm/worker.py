@@ -28,27 +28,31 @@ import pandas as pd
 from boto.s3.connection import S3Connection, Key as S3Key
 
 # shhh
-warnings.filterwarnings("ignore")
+warnings.filterwarnings('ignore')
 
 # for garrays
-os.environ["GNUMPY_IMPLICIT_CONVERSION"] = "allow"
+os.environ['GNUMPY_IMPLICIT_CONVERSION'] = 'allow'
 
 # get the file system in order
 # make sure we have directories where we need them
-ensure_directory("models")
-ensure_directory("metrics")
-ensure_directory("logs")
+MODELS_DIR = 'models'
+METRICS_DIR = 'metrics'
+LOG_DIR = 'logs'
+ensure_directory(MODELS_DIR)
+ensure_directory(METRICS_DIR)
+ensure_directory(LOG_DIR)
 
 # name log file after the local hostname
-LOG_FILE = "logs/%s.txt" % socket.gethostname()
+LOG_FILE = os.path.join(LOG_DIR, '%s.txt' % socket.gethostname())
+
 # how long to sleep between loops while waiting for new dataruns to be added
 LOOP_WAIT = 0
 
 
 # TODO: use python's logging module instead of this
 def _log(msg, stdout=True):
-    with open(LOG_FILE, "a") as lf:
-        lf.write(msg + "\n")
+    with open(LOG_FILE, 'a') as lf:
+        lf.write(msg + '\n')
     if stdout:
         print msg
 
@@ -94,7 +98,7 @@ class Worker(object):
         else:
             mod = imp.load_source('btb.selection.custom', self.datarun.selector)
             Selector = mod.CustomSelector
-        _log("Selector: %s" % Selector)
+        _log('Selector: %s' % Selector)
 
         # generate the arguments we need to initialize the selector
         hyperpartitions = self.db.get_hyperpartitions(datarun_id=self.datarun.id)
@@ -122,7 +126,7 @@ class Worker(object):
         else:
             mod = imp.load_source('btb.tuning.custom', self.datarun.tuner)
             self.Tuner = mod.CustomTuner
-        _log("Tuner: %s" % self.Tuner)
+        _log('Tuner: %s' % self.Tuner)
 
     def load_data(self):
         """
@@ -143,7 +147,7 @@ class Worker(object):
                                 aws_secret=self.aws_config.access_key,
                                 s3_bucket=self.aws_config.s3_bucket,
                                 s3_folder=self.aws_config.s3_folder) != dw.train_path_out:
-                raise Exception("Something about train dataset caching is wrong...")
+                raise Exception('Something about train dataset caching is wrong...')
 
         # load the data into matrix format
         trainX = read_atm_csv(dw.train_path_out)
@@ -156,7 +160,7 @@ class Worker(object):
                                 aws_secret=self.aws_secret,
                                 s3_bucket=self.s3_bucket,
                                 s3_folder=self.s3_folder) != dw.test_path_out:
-                raise Exception("Something about test dataset caching is wrong...")
+                raise Exception('Something about test dataset caching is wrong...')
 
         # load the data into matrix format
         testX = read_atm_csv(dw.test_path_out)
@@ -220,17 +224,17 @@ class Worker(object):
 
         # whether to save model and performance data to the filesystem
         if self.save_files:
-            local_model_path = make_model_path("models", phash, rhash,
+            local_model_path = make_model_path(MODELS_DIR, phash, rhash,
                                                self.datarun.description)
-            model.save(local_model_path)
-            _log("Saving model in: %s" % local_model_path)
+            _log('Saving model in: %s' % local_model_path)
+            joblib.dump(model, local_model_path, compress=9)
 
-            local_metric_path = make_metric_path("metrics", phash, rhash,
+            local_metric_path = make_metric_path(METRICS_DIR, phash, rhash,
                                                  self.datarun.description)
             metric_obj = dict(cv=performance['cv_object'],
                               test=performance['test_object'])
+            _log('Saving metrics in: %s' % local_model_path)
             save_metric(local_metric_path, object=metric_obj)
-            _log("Saving metrics in: %s" % local_model_path)
 
             # if necessary, save model and metrics to Amazon S3 bucket
             if self.cloud_mode:
@@ -238,7 +242,7 @@ class Worker(object):
                     self.save_classifier_cloud(local_model_path, local_metric_path)
                 except Exception:
                     msg = traceback.format_exc()
-                    _log("Error in save_classifier_cloud()")
+                    _log('Error in save_classifier_cloud()')
                     self.db.mark_classifier_errored(classifier_id, error_msg=msg)
         else:
             local_model_path = None
@@ -246,13 +250,13 @@ class Worker(object):
 
         # update the classifier in the database
         self.db.complete_classifier(classifier_id=classifier_id,
-                                 trainable_params=model.algorithm.trainable_params,
-                                 dimensions=model.algorithm.dimensions,
-                                 model_path=local_model_path,
-                                 metric_path=local_metric_path,
-                                 cv_score=performance['cv_judgment_metric'],
-                                 cv_stdev=performance['cv_judgment_metric_stdev'],
-                                 test_score=performance['test_judgment_metric'])
+                                    trainable_params=model.algorithm.trainable_params,
+                                    dimensions=model.algorithm.dimensions,
+                                    model_path=local_model_path,
+                                    metric_path=local_metric_path,
+                                    cv_score=performance['cv_judgment_metric'],
+                                    cv_stdev=performance['cv_judgment_metric_stdev'],
+                                    test_score=performance['test_judgment_metric'])
 
         # update this session's hyperpartition entry
         _log('Saved classifier %d.' % classifier_id)
@@ -296,7 +300,7 @@ class Worker(object):
         # If there aren't any tunable parameters, we're done. Return the vector
         # of values in the hyperpartition and mark the set as finished.
         if not len(tunables):
-            _log("No tunables for hyperpartition %d" % hyperpartition.id)
+            _log('No tunables for hyperpartition %d' % hyperpartition.id)
             self.db.mark_hyperpartition_gridding_done(hyperpartition.id)
             return vector_to_params(vector=[],
                                     tunables=tunables,
@@ -323,7 +327,7 @@ class Worker(object):
         vector = tuner.propose()
 
         if vector is None and self.datarun.gridding:
-            _log("Gridding done for hyperpartition %d" % hyperpartition.id)
+            _log('Gridding done for hyperpartition %d' % hyperpartition.id)
             self.db.mark_hyperpartition_gridding_done(hyperpartition.id)
             return None
 
@@ -341,22 +345,22 @@ class Worker(object):
         """
         hyperpartitions = self.db.get_hyperpartitions(datarun_id=self.datarun.id)
         if not hyperpartitions:
-            _log("No incomplete hyperpartitions for datarun %d present in database."
+            _log('No incomplete hyperpartitions for datarun %d present in database.'
                  % self.datarun.id)
             return True
 
-        if self.datarun.budget_type == "classifier":
+        if self.datarun.budget_type == 'classifier':
             # hyperpartition classifier counts are updated whenever a classifier
             # is created, so this will count running, errored, and complete.
             n_completed = sum([p.classifiers for p in hyperpartitions])
             if n_completed >= self.datarun.budget:
-                _log("Classifier budget has run out!")
+                _log('Classifier budget has run out!')
                 return True
 
-        elif self.datarun.budget_type == "walltime":
+        elif self.datarun.budget_type == 'walltime':
             deadline = self.datarun.deadline
             if datetime.datetime.now() > deadline:
-                _log("Walltime budget has run out!")
+                _log('Walltime budget has run out!')
                 return True
 
         return False
@@ -364,7 +368,7 @@ class Worker(object):
     def test_classifier(self, classifier_id, params):
         """
         Given a set of fully-qualified hyperparameters, create and test a
-        model.
+        classification model.
         Returns: Model object and performance dictionary
         """
         wrapper = create_wrapper(params, self.datarun.metric)
@@ -376,22 +380,21 @@ class Worker(object):
             old_val = old_best.cv_judgment_metric
             old_err = 2 * old_best.cv_judgment_metric_stdev
 
-        new_val = performance["cv_judgment_metric"]
-        new_err = 2 * performance["cv_judgment_metric_stdev"]
+        new_val = performance['cv_judgment_metric']
+        new_err = 2 * performance['cv_judgment_metric_stdev']
 
-        _log("Judgment metric (%s): %.3f +- %.3f" %
+        _log('Judgment metric (%s): %.3f +- %.3f' %
              (self.datarun.metric, new_val, new_err))
 
         if old_best is not None:
             if (new_val - new_err) > ():
-                _log("New best score! Previous best (classifier %s): %.3f +- %.3f" %
+                _log('New best score! Previous best (classifier %s): %.3f +- %.3f' %
                      (old_best.id, old_val, old_err))
             else:
-                _log("Best so far (classifier %s): %.3f +- %.3f" %
+                _log('Best so far (classifier %s): %.3f +- %.3f' %
                      (old_best.id, old_val, old_err))
 
-        model = Model(algorithm=wrapper, data=self.dataset.wrapper)
-        return model, performance
+        return wrapper, performance
 
     def run_classifier(self):
         """
@@ -401,48 +404,48 @@ class Worker(object):
         if self.is_datarun_finished():
             # marked the run as done successfully
             self.db.mark_datarun_complete(self.datarun.id)
-            _log("Datarun %d has ended." % self.datarun.id)
+            _log('Datarun %d has ended.' % self.datarun.id)
             return
 
         try:
-            _log("Choosing hyperparameters...")
+            _log('Choosing hyperparameters...')
             # use the multi-arm bandit to choose which hyperpartition to use next
             hyperpartition = self.select_hyperpartition()
             # use our tuner to choose a set of parameters for the hyperpartition
             params = self.tune_parameters(hyperpartition)
         except Exception as e:
-            _log("Error choosing hyperparameters: datarun=%s" % str(self.datarun))
+            _log('Error choosing hyperparameters: datarun=%s' % str(self.datarun))
             _log(traceback.format_exc())
             raise ClassifierError()
 
         if params is None:
-            _log("No parameters chosen: hyperpartition %d is finished." %
+            _log('No parameters chosen: hyperpartition %d is finished.' %
                  hyperpartition.id)
             return
 
-        _log("Chose parameters for method %s:" % hyperpartition.method)
+        _log('Chose parameters for method %s:' % hyperpartition.method)
         for k, v in params.items():
-            _log("\t%s = %s" % (k, v))
+            _log('\t%s = %s' % (k, v))
 
         # TODO: this doesn't belong here
-        params["function"] = hyperpartition.method
+        params['function'] = hyperpartition.method
 
-        _log("Creating classifier...")
-        classifier_id = self.db.create_classifier(hyperpartition_id=hyperpartition.id,
-                                            datarun_id=self.datarun.id,
-                                            host=get_public_ip(),
-                                            params=params)
+        _log('Creating classifier...')
+        classifier = self.db.create_classifier(hyperpartition_id=hyperpartition.id,
+                                               datarun_id=self.datarun.id,
+                                               host=get_public_ip(),
+                                               params=params)
 
         try:
-            _log("Testing classifier...")
-            model, performance = self.test_classifier(classifier_id, params)
-            _log("Saving classifier...")
-            self.save_classifier(classifier_id, model, performance)
+            _log('Testing classifier...')
+            model, performance = self.test_classifier(classifier.id, params)
+            _log('Saving classifier...')
+            self.save_classifier(classifier.id, model, performance)
         except Exception as e:
             msg = traceback.format_exc()
-            _log("Error testing classifier: datarun=%s" % str(self.datarun))
+            _log('Error testing classifier: datarun=%s' % str(self.datarun))
             _log(msg)
-            self.db.mark_classifier_errored(classifier_id, error_msg=msg)
+            self.db.mark_classifier_errored(classifier.id, error_msg=msg)
             raise ClassifierError()
 
 
@@ -478,7 +481,7 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         dataruns = db.get_dataruns(include_ids=datarun_ids)
         if not dataruns:
             if wait:
-                _log("No dataruns found. Sleeping %d seconds and trying again." %
+                _log('No dataruns found. Sleeping %d seconds and trying again.' %
                      LOOP_WAIT)
                 time.sleep(LOOP_WAIT)
                 continue
@@ -507,12 +510,12 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         except ClassifierError as e:
             # the exception has already been handled; just wait a sec so we
             # don't go out of control reporting errors
-            _log("Something went wrong. Sleeping %d seconds." % LOOP_WAIT)
+            _log('Something went wrong. Sleeping %d seconds.' % LOOP_WAIT)
             time.sleep(LOOP_WAIT)
 
         elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
         if total_time is not None and elapsed_time >= total_time:
-            _log("Total run time for worker exceeded; exiting.")
+            _log('Total run time for worker exceeded; exiting.')
             break
 
 
