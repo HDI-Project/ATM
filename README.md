@@ -1,10 +1,9 @@
 ATM - Auto Tune Models
 ====
 
-[![](https://img.shields.io/badge/docs-latest-blue.svg)](https://hdi-project.github.io/ATM/)
+# Quick start setup
 
-## Quick start setup
-1. Clone project.
+### 1. Clone project.
 ```
 $ git clone https://github.com/hdi-project/atm.git /path/to/atm
 $ cd /path/to/atm
