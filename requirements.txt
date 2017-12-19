@@ -7,5 +7,6 @@ scipy==0.19.1
 sklearn-pandas==1.5.0
 nolearn==0.6.0
 mysql-python==1.2.5
+pyyaml
 -e git+https://github.com/hdi-project/btb.git#egg=btb
 -e .
