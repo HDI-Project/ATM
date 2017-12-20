@@ -15,3 +15,5 @@ metrics/*
 atm-env/*
 *.pickle
 *.tsv
+*.db
+tm.egg-info/*
