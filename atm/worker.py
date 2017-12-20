@@ -324,15 +324,20 @@ class Worker(object):
 
         return False
 
-    def test_classifier(self, classifier, params):
+    def test_classifier(self, method, params):
         """
         Given a set of fully-qualified hyperparameters, create and test a
         classification model.
         Returns: Model object and performance dictionary
         """
-        model = Model(classifier.code, params, self.datarun.metric)
-        train_path, test_path = self.load_data()
-        performance = model.train_test(train_path, test_path)
+        model = Model(code=method, params=params,
+                      judgment_metric=self.datarun.metric,
+                      label_column=self.dataset.label_column)
+        train_path, test_path = download_data(self.dataset.train_path,
+                                              self.dataset.test_path,
+                                              self.aws_config)
+        performance = model.train_test(train_path=train_path,
+                                       test_path=test_path)
 
         old_best = self.db.get_best_classifier(datarun_id=self.datarun.id)
         if old_best is not None:
@@ -386,9 +391,6 @@ class Worker(object):
         for k, v in params.items():
             _log('\t%s = %s' % (k, v))
 
-        # TODO: this doesn't belong here
-        params['function'] = hyperpartition.method
-
         _log('Creating classifier...')
         classifier = self.db.create_classifier(hyperpartition_id=hyperpartition.id,
                                                datarun_id=self.datarun.id,
@@ -397,7 +399,8 @@ class Worker(object):
 
         try:
             _log('Testing classifier...')
-            model, performance = self.test_classifier(classifier.id, params)
+            model, performance = self.test_classifier(hyperpartition.method,
+                                                      params)
             _log('Saving classifier...')
             self.save_classifier(classifier.id, model, performance)
         except Exception as e:

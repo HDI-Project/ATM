@@ -9,9 +9,9 @@ from boto.s3.connection import S3Connection, Key as S3Key
 from atm.config import *
 from atm.constants import *
 from atm.database import Database
-from atm.datawrapper import DataWrapper
+from atm.encoder import MetaData
 from atm.method import Method
-from atm.utilities import ensure_directory, hash_nested_tuple, download_file_url
+from atm.utilities import ensure_directory, hash_nested_tuple, download_data
 
 warnings.filterwarnings("ignore")
 
@@ -27,23 +27,6 @@ def create_dataset(db, label_column, train_path, test_path=None,
     test_path: path to raw test data
     data_description: description of the dataset (max 1000 chars)
     """
-    if not os.path.isfile(train_path):
-        # train_path might be a URL
-        # TODO this is a temporary hack! (12/19)
-        try:
-            train_path = download_file_url(train_path,
-                                           local_folder='data/downloads/')
-        except Exception as e:
-            print e
-            print 'file %s dows not exist' % train_path
-
-    if test_path is not None and not os.path.isfile(test_path):
-        try:
-            test_path = download_file_url(test_path,
-                                          local_folder='data/downloads/')
-        except:
-            print 'file %s dows not exist' % test_path
-
     # create the name of the dataset from the path to the data
     name = os.path.basename(train_path)
     name = name.replace("_train.csv", "").replace(".csv", "")
@@ -52,19 +35,16 @@ def create_dataset(db, label_column, train_path, test_path=None,
     meta = MetaData(label_column, train_path, test_path)
 
     # enter dataset into database
-    session = db.get_session()
-    dataset = db.Dataset(name=name,
-                         description=data_description,
-                         train_path=train_path,
-                         test_path=test_path,
-                         label_column=label_column,
-                         n_examples=meta.n_examples,
-                         k_classes=meta.k_classes,
-                         d_features=meta.d_features,
-                         majority=meta.majority,
-                         size_kb=meta.datasize_bytes / 1000)
-    session.add(dataset)
-    session.commit()
+    dataset = db.create_dataset(name=name,
+                                description=data_description,
+                                train_path=train_path,
+                                test_path=test_path,
+                                label_column=label_column,
+                                n_examples=meta.n_examples,
+                                k_classes=meta.k_classes,
+                                d_features=meta.d_features,
+                                majority=meta.majority,
+                                size_kb=meta.size / 1000)
     return dataset
 
 
@@ -100,13 +80,12 @@ def upload_data(train_path, test_path, access_key, secret_key, s3_bucket,
     ktest.set_contents_from_filename(test_path)
 
 
-def create_datarun(db, session, dataset, run_config):
+def create_datarun(db, dataset, run_config):
     """
     Given a config, creates a set of dataruns for the config and enters them into
     the database. Returns the ID of the created datarun.
 
     db: initialized Database object
-    session: active SQLAlchemy session
     dataset: Dataset SQLAlchemy ORM object
     run_config: configuration describing the datarun to create
     """
@@ -207,15 +186,15 @@ def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False,
         print 'method', m, 'has', len(method_parts[m]), 'hyperpartitions'
 
     print
-    print 'creating datarun...'
-
     # create hyperpartitions and datarun(s)
     run_ids = []
     if not run_per_partition:
+        print 'saving datarun...'
         datarun = create_datarun(db, dataset, run_config)
 
-    for method, parts in method_parts:
+    for method, parts in method_parts.items():
         for part in parts:
+            print 'saving hyperpartion...'
             # if necessary, create a new datarun for each hyperpartition.
             # This setting is useful for debugging.
             if run_per_partition:

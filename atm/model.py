@@ -1,9 +1,10 @@
 """
 .. module:: wrapper
-   :synopsis: Wrapper around classification method.
+   :synopsis: Model around classification method.
 
 """
 import numpy as np
+import pandas as pd
 import time
 from importlib import import_module
 
@@ -15,10 +16,10 @@ from gdbn.activationFunctions import Softmax, Sigmoid, Linear, Tanh
 from sklearn.gaussian_process.kernels import ConstantKernel, RBF, Matern, \
                                              ExpSineSquared, RationalQuadratic
 
-from atm.constants import METHODS_MAP
+from atm.constants import *
+from atm.encoder import MetaData, DataEncoder
 from atm.method import Method
-from atm.metrics import Metrics, JUDGMENT_METRICS
-from atm.metrics import get_metrics_split, cross_validate
+from atm.metrics import cross_validate_pipeline
 
 
 class Model(object):
@@ -42,22 +43,22 @@ class Model(object):
     # number of folds for cross-validation (arbitrary, for speed)
     N_FOLDS = 5
 
-    def __init__(self, code, params, judgment_metric, compute_metrics=False):
+    def __init__(self, code, params, judgment_metric, label_column,
+                 testing_ratio=0.3):
         """
-        Arguments
+        Parameters:
             code: the short method code (as defined in constants.py)
-            judgment_metric: string that has a mapping in
-                metrics.JUDGMENT_METRICS and indicates which metric should be
+            judgment_metric: string that indicates which metric should be
                 optimized for.
             params: parameters passed to the sklearn classifier constructor
             class_: sklearn classifier class
-            compute_metrics: bool indicating whether all metrics should be
-                computed (True) or just the judgment metric (False)
         """
         # configuration & database
         self.code = code
-        self.judgment_metric = JUDGMENT_METRICS[judgment_metric]
         self.params = params
+        self.judgment_metric = judgment_metric
+        self.label_column = label_column
+        self.testing_ratio = testing_ratio
 
         # load the classifier method's class
         path = Method(METHODS_MAP[code]).class_path.split('.')
@@ -69,7 +70,7 @@ class Model(object):
         self.pipeline = None
 
         # persistent random state
-        self.state =
+        self.random_state = np.random.randint(1e7)
 
     def load_data(self, path, dropvals=None, sep=','):
         # load data as a Pandas dataframe
@@ -84,13 +85,13 @@ class Model(object):
         Makes the classifier as well as scaling or dimension reduction steps.
         """
         # create a list of steps, starting with the data encoder
-        steps = [self.encoder]
+        steps = []
 
         # create a classifier with specified parameters
         hyperparameters = {k: v for k, v in self.params.iteritems()
-                           if k not in Wrapper.ATM_KEYS}
+                           if k not in Model.ATM_KEYS}
         atm_params = {k: v for k, v in self.params.iteritems()
-                      if k in Wrapper.ATM_KEYS}
+                      if k in Model.ATM_KEYS}
 
         # do special conversions
         hyperparameters = self.special_conversions(hyperparameters)
@@ -98,10 +99,10 @@ class Model(object):
         classifier = self.class_(**hyperparameters)
 
         self.dimensions = self.num_features
-        if Wrapper.PCA in atm_params and atm_params[Wrapper.PCA]:
-            whiten = (Wrapper.WHITEN in atm_params and
-                        atm_params[Wrapper.WHITEN])
-            pca_dims = atm_params[Wrapper.PCA_DIMS]
+        if Model.PCA in atm_params and atm_params[Model.PCA]:
+            whiten = (Model.WHITEN in atm_params and
+                        atm_params[Model.WHITEN])
+            pca_dims = atm_params[Model.PCA_DIMS]
             # PCA dimension in atm_params is a float reprsenting percentages of
             # features to use
             if pca_dims >= 1:
@@ -114,9 +115,9 @@ class Model(object):
                 steps.append(('pca', pca))
 
         # should we scale the data?
-        if atm_params.get(Wrapper.SCALE):
+        if atm_params.get(Model.SCALE):
             steps.append(('standard_scale', StandardScaler()))
-        elif self.params.get(Wrapper.MINMAX):
+        elif self.params.get(Model.MINMAX):
             steps.append(('minmax_scale', MinMaxScaler()))
 
         # add the classifier as the final step in the pipeline
@@ -127,11 +128,10 @@ class Model(object):
         binary = self.num_classes == 2
         df, self.cv_scores = cross_validate_pipeline(pipeline=self.pipeline,
                                                      X=X, y=y,
-                                                     judgment_metric=self.judgment_metric,
                                                      binary=binary,
-                                                     n_folds=self.N_FOLDS,
-                                                     include_pr=self.include_pr,
-                                                     include_roc=self.include_roc)
+                                                     n_folds=self.N_FOLDS)
+                                                     #include_pr=self.include_pr,
+                                                     #include_roc=self.include_roc)
         self.cv_judgment_metric = np.mean(df[self.judgment_metric])
         self.cv_judgment_metric_std = np.std(df[self.judgment_metric])
 
@@ -142,32 +142,49 @@ class Model(object):
         """
         # time the prediction
         starttime = time.time()
-        y_preds = self.pipeline.predict(self.testX)
+        y_preds = self.pipeline.predict(X)
         total = time.time() - starttime
-        self.avg_prediction_time = total / float(len(self.testY))
+        self.avg_prediction_time = total / float(len(Y))
 
         binary = self.num_classes == 2
 
-        self.test_scores = test_pipeline(self.pipeline, X, y, binary,
-                                         include_pr=self.include_pr,
-                                         include_roc=self.include_roc)
+        self.test_scores = test_pipeline(self.pipeline, X, y, binary)
+                                         #include_pr=self.include_pr,
+                                         #include_roc=self.include_roc)
 
         self.test_judgment_metric = self.test_scores.get(self.judgment_metric)
 
     def train_test(self, train_path, test_path=None):
         # load train and (maybe) test data
-        train_data = self.load_data(train_path)
-        metadata = get_dataset_metadata(train_data, self.label_column)
+        metadata = MetaData(label_column=self.label_column,
+                            train_path=train_path,
+                            test_path=test_path)
         self.num_classes = metadata.k_classes
         self.num_features = metadata.d_features
+
+        # if necessary, cast judgment metric into its binary/multiary equivalent
+        if self.num_classes == 2:
+            if self.judgment_metric in [Metrics.F1_MICRO, Metrics.F1_MACRO]:
+                self.judgment_metric = Metrics.F1
+            elif self.judgment_metric in [Metrics.ROC_AUC_MICRO,
+                                          Metrics.ROC_AUC_MACRO]:
+                self.judgment_metric = Metrics.ROC_AUC
+        else:
+            if self.judgment_metric == Metrics.F1:
+                self.judgment_metric = Metrics.F1_MACRO
+            elif self.judgment_metric == Metrics.ROC_AUC:
+                self.judgment_metric = Metrics.ROC_AUC_MACRO
+
+        # load training data
+        train_data = self.load_data(train_path)
 
         # if necessary, generate permanent train/test split
         if test_path is not None:
             test_data = self.load_data(test_path)
         else:
-            train_data, test_data = train_test_split(all_data,
+            train_data, test_data = train_test_split(train_data,
                                                      test_size=self.testing_ratio,
-                                                     random_state=state)
+                                                     random_state=self.random_state)
 
         # extract feature matrix and labels from raw data
         self.encoder = DataEncoder()

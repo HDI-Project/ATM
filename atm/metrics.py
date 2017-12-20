@@ -4,55 +4,11 @@ from sklearn.metrics import f1_score, precision_recall_curve, auc, roc_curve,\
                             accuracy_score, cohen_kappa_score, roc_auc_score
 
 import numpy as np
+import pandas as pd
 import itertools
 import pdb
 
-
-# these are the strings that are used to index into results dictionaries
-class Metrics:
-    ACCURACY = 'accuracy'
-    RANK_ACCURACY = 'rank_accuracy'
-    COHEN_KAPPA = 'cohen_kappa'
-    F1 = 'f1'
-    F1_MICRO = 'f1_micro'
-    F1_MACRO = 'f1_macro'
-    ROC_AUC = 'roc_auc'
-    ROC_AUC_MICRO = 'roc_auc_micro'
-    ROC_AUC_MACRO = 'roc_auc_macro'
-    PR_AUC = 'pr_auc'
-
-METRICS_BINARY = [
-    Metrics.ACCURACY,
-    Metrics.COHEN_KAPPA,
-    Metrics.F1,
-    Metrics.ROC_AUC,
-    Metrics.PR_AUC,
-]
-
-METRICS_MULTICLASS = [
-    Metrics.ACCURACY,
-    Metrics.RANK_ACCURACY,
-    Metrics.COHEN_KAPPA,
-    Metrics.F1_MICRO,
-    Metrics.F1_MACRO,
-    Metrics.ROC_AUC_MICRO,
-    Metrics.ROC_AUC_MACRO,
-]
-
-METRIC_DEFAULT_SCORES = {
-    Metrics.ACCURACY: 0.0,
-    Metrics.RANK_ACCURACY: 0.0,
-    Metrics.COHEN_KAPPA: 0.0,
-    Metrics.F1: 0.0,
-    Metrics.F1_MICRO: 0.0,
-    Metrics.F1_MACRO: 0.0,
-    Metrics.ROC_AUC: 0.5,
-    Metrics.ROC_AUC_MICRO: 0.5,
-    Metrics.ROC_AUC_MACRO: 0.5,
-    Metrics.PR_AUC: 0.0,
-}
-
-N_FOLDS_DEFAULT = 10
+from atm.constants import *
 
 
 def rank_n_accuracy(y_true, y_prob_mat, rank=5):
@@ -133,30 +89,39 @@ def get_metrics_multiclass(y_true, y_pred, y_pred_probs, include_pr=False,
                                                          y_prob_mat=y_pred_probs,
                                                          rank=rank)
 
-    labels = range(len(y_pred_probs))
+    labels = range(y_pred_probs.shape[1])
     y_true_bin = np.zeros(y_pred_probs.shape)
     y_pred_bin = np.zeros(y_pred_probs.shape)
     for label in labels:
-        y_true_bin[label] = (y_true == label).astype(int)
-        y_pred_bin[label] = (y_pred == label).astype(int)
+        y_true_bin[:, label] = (y_true == label).astype(int)
+        y_pred_bin[:, label] = (y_pred == label).astype(int)
 
     results[Metrics.F1_MICRO] = f1_score(y_true, y_pred, average='micro')
     results[Metrics.F1_MACRO] = f1_score(y_true, y_pred, average='macro')
 
-    results[Metrics.ROC_AUC_MICRO] = roc_auc_score(y_true_bin, y_pred, average='micro')
-    results[Metrics.ROC_AUC_MACRO] = roc_auc_score(y_true_bin, y_pred, average='macro')
+    if len(np.unique(y_true)) == 1:
+        print "ROC/AUC undefined: setting AUC scores to defaults."
+        results[Metrics.ROC_AUC_MICRO] = \
+            METRIC_DEFAULT_SCORES[Metrics.ROC_AUC_MICRO]
+        results[Metrics.ROC_AUC_MACRO] = \
+            METRIC_DEFAULT_SCORES[Metrics.ROC_AUC_MACRO]
+    else:
+        results[Metrics.ROC_AUC_MICRO] = roc_auc_score(y_true_bin, y_pred_probs,
+                                                       average='micro')
+        results[Metrics.ROC_AUC_MACRO] = roc_auc_score(y_true_bin, y_pred_probs,
+                                                       average='macro')
 
     # labelwise controls whether to compute separate metrics for each posisble label
     if labelwise or include_pr or include_roc:
         results['labelwise'] = {}
         # for each label, generate F1, precision-recall, and ROC curves
         for label in labels:
-            label_res = get_pr_roc(y_true_bin[label],
-                                   y_pred_probs[:, int(label)],
+            label_res = get_pr_roc(y_true_bin[:, label],
+                                   y_pred_probs[:, label],
                                    include_pr=include_pr,
                                    include_roc=include_roc)
-            label_res[Metrics.F1] = f1_score(y_true=y_true_bin[label],
-                                             y_pred=y_pred_bin[label],
+            label_res[Metrics.F1] = f1_score(y_true=y_true_bin[:, label],
+                                             y_pred=y_pred_bin[:, label],
                                              pos_label=1)
             results['labelwise'][label] = label_res
 
@@ -170,7 +135,7 @@ def test_pipeline(pipeline, X, y, binary, **kwargs):
         get_metrics = get_metrics_multiclass
 
     # run the test data through the trained pipeline
-    y_pred = pipeline.predict(X[test_index])
+    y_pred = pipeline.predict(X)
 
     # if necessary, coerce class distance scores into probability scores
     method = pipeline.steps[-1][0]
@@ -188,7 +153,7 @@ def test_pipeline(pipeline, X, y, binary, **kwargs):
 def cross_validate_pipeline(pipeline, X, y, binary=True,
                             n_folds=N_FOLDS_DEFAULT, **kwargs):
     """
-    Compute metrics for each of `cv` folds of the training data in (X, y).
+    Compute metrics for each of `n_folds` folds of the training data in (X, y).
 
     pipeline: the sklearn Pipeline to train and test
     X: feature matrix
@@ -203,11 +168,11 @@ def cross_validate_pipeline(pipeline, X, y, binary=True,
     df = pd.DataFrame(columns=metrics)
     results = []
 
-    skf = StratifiedKFold(n_splits=cv)
+    skf = StratifiedKFold(n_splits=n_folds)
     skf.get_n_splits(X, y)
 
     for train_index, test_index in skf.split(X, y):
-        pipeline.fit(X_train, y_train)
+        pipeline.fit(X[train_index], y[train_index])
         split_results = test_pipeline(pipeline=pipeline,
                                       X=X[test_index],
                                       y=y[test_index],

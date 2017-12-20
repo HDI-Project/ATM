@@ -10,6 +10,8 @@ from boto.s3.connection import S3Connection, Key
 
 from btb import ParamTypes
 
+from atm.constants import *
+
 # global variable storing this machine's public IP address
 # (so we only have to fetch it once)
 public_ip = None
@@ -200,8 +202,8 @@ def download_file_s3(aws_path, aws_config, local_folder=DATA_PATH):
     s3_folder = '/'.join(split[:-1])
     keyname = split[-1]
 
-    if local_folder is not None::
-        ensure_directory(local_folder
+    if local_folder is not None:
+        ensure_directory(local_folder)
         path = os.path.join(local_folder, keyname)
     else:
         path = keyname
@@ -255,19 +257,20 @@ def download_data(train_path, test_path=None, aws_config=None):
     """
     local_train_path, train_type = get_local_data_path(train_path)
     local_test_path, test_type = get_local_data_path(test_path)
+
     # if the data are not present locally, try to download them from the
     # internet (either an S3 bucket or a http connection)
     if not os.path.isfile(local_train_path):
         if train_type == FileType.HTTP:
             path = download_file_http(train_path)
-        if train_type == FileType.S3
+        if train_type == FileType.S3:
             path = download_file_s3(train_path, aws_config=aws_config)
         assert path == local_train_path
 
     if local_test_path and not os.path.isfile(local_test_path):
         if test_type == FileType.HTTP:
             path = download_file_http(test_path)
-        if test_type == FileType.S3
+        if test_type == FileType.S3:
             path = download_file_s3(test_path, aws_config=aws_config)
         assert path == local_test_path
 
