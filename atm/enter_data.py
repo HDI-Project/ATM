@@ -11,7 +11,7 @@ from atm.constants import *
 from atm.database import Database
 from atm.datawrapper import DataWrapper
 from atm.method import Method
-from atm.utilities import ensure_directory, hash_nested_tuple
+from atm.utilities import ensure_directory, hash_nested_tuple, download_file_url
 
 warnings.filterwarnings("ignore")
 
@@ -27,6 +27,23 @@ def create_dataset(db, label_column, train_path, test_path=None,
     test_path: path to raw test data
     data_description: description of the dataset (max 1000 chars)
     """
+    if not os.path.isfile(train_path):
+        # train_path might be a URL
+        # TODO this is a temporary hack! (12/19)
+        try:
+            train_path = download_file_url(train_path,
+                                           local_folder='data/downloads/')
+        except Exception as e:
+            print e
+            print 'file %s dows not exist' % train_path
+
+    if test_path is not None and not os.path.isfile(test_path):
+        try:
+            test_path = download_file_url(test_path,
+                                          local_folder='data/downloads/')
+        except:
+            print 'file %s dows not exist' % test_path
+
     # create the name of the dataset from the path to the data
     name = os.path.basename(train_path)
     name = name.replace("_train.csv", "").replace(".csv", "")

@@ -200,7 +200,8 @@ def download_file_s3(aws_path, aws_config, local_folder=DATA_PATH):
     s3_folder = '/'.join(split[:-1])
     keyname = split[-1]
 
-    if local_folder:
+    if local_folder is not None::
+        ensure_directory(local_folder
         path = os.path.join(local_folder, keyname)
     else:
         path = keyname
@@ -225,8 +226,26 @@ def download_file_s3(aws_path, aws_config, local_folder=DATA_PATH):
     return path
 
 
-def download_file_http():
-    pass
+def download_file_http(url, local_folder=DATA_PATH):
+    """ Download a file from a public URL and save it locally. """
+    filename = url.split('/')[-1]
+    if local_folder is not None:
+        ensure_directory(local_folder)
+        path = os.path.join(local_folder, filename)
+    else:
+        path = filename
+
+    if os.path.isfile(path):
+        print 'file %s already exists!' % path
+        return path
+
+    print 'downloading data from %s...' % url
+    f = urllib2.urlopen(url)
+    data = f.read()
+    with open(path, "wb") as outfile:
+        outfile.write(data)
+
+    return path
 
 
 def download_data(train_path, test_path=None, aws_config=None):

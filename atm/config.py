@@ -246,7 +246,8 @@ def add_arguments_datarun(parser):
                         help='Value of the budget, either in classifiers or minutes')
     parser.add_argument('--deadline',
                         help='Deadline for datarun completion. If provided, this '
-                        'overrides the walltime budget. Format: ' + TIME_FMT)
+                        'overrides the walltime budget. Format: ' +
+                        TIME_FMT.replace('%', '%%'))
 
     # hyperparameter selection strategy
     # How should ATM sample hyperparameters from a given hyperpartition?

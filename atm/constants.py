@@ -22,7 +22,7 @@ DATARUN_STATUS = ['pending', 'running', 'complete']
 CLASSIFIER_STATUS = ['running', 'errored', 'complete']
 PARTITION_STATUS = ['incomplete', 'errored', 'gridding_done']
 
-TIME_FMT = '%y-%m-%d %H:%M'
+TIME_FMT = "%Y-%m-%d %H:%M"
 
 TUNERS_MAP = {
     'uniform': UniformTuner,
