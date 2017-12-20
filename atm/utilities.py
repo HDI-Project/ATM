@@ -170,9 +170,36 @@ def save_metric(metric_path, object):
         pickle.dump(object, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def download_file_s3(keyname, aws_key, aws_secret, s3_bucket,
-                     s3_folder=None, local_folder=None):
-    """ Download a file from an S3 bucket and save it at keyname.  """
+def get_local_data_path(data_path):
+    """
+    given a data path of the form "s3://..." or "http://...", return the local
+    path where the file should be stored once it's downloaded.
+    """
+    if data_path is None:
+        return None, None
+
+    m = re.match(S3_PREFIX, data_path)
+    if m:
+        path = data_path[len(m.group()):].split('/')
+        bucket = path.pop(0)
+        return os.path.join(DATA_PATH, path[-1]), FileType.S3
+
+    m = re.match(HTTP_PREFIX, data_path)
+    if m:
+        path = data_path[len(m.group()):].split('/')
+        return os.path.join(DATA_PATH, path[-1]), FileType.HTTP
+
+    return data_path, FileType.LOCAL
+
+
+def download_file_s3(aws_path, aws_config, local_folder=DATA_PATH):
+    """ Download a file from an S3 bucket and save it in the local folder. """
+    m = re.match(S3_PREFIX, data_path)
+    split = data_path[len(m.group()):].split('/')
+    s3_bucket = split.pop(0)
+    s3_folder = '/'.join(split[:-1])
+    keyname = split[-1]
+
     if local_folder:
         path = os.path.join(local_folder, keyname)
     else:
@@ -182,7 +209,7 @@ def download_file_s3(keyname, aws_key, aws_secret, s3_bucket,
         print 'file %s already exists!' % path
         return path
 
-    conn = S3Connection(aws_key, aws_secret)
+    conn = S3Connection(aws_config.access_key, aws_config.secret_key)
     bucket = conn.get_bucket(s3_bucket)
 
     if s3_folder:
@@ -196,3 +223,33 @@ def download_file_s3(keyname, aws_key, aws_secret, s3_bucket,
     s3key.get_contents_to_filename(path)
 
     return path
+
+
+def download_file_http():
+    pass
+
+
+def download_data(train_path, test_path=None, aws_config=None):
+    """
+    Download a set of train/test data from AWS (if necessary) and return the
+    path to the local data.
+    """
+    local_train_path, train_type = get_local_data_path(train_path)
+    local_test_path, test_type = get_local_data_path(test_path)
+    # if the data are not present locally, try to download them from the
+    # internet (either an S3 bucket or a http connection)
+    if not os.path.isfile(local_train_path):
+        if train_type == FileType.HTTP:
+            path = download_file_http(train_path)
+        if train_type == FileType.S3
+            path = download_file_s3(train_path, aws_config=aws_config)
+        assert path == local_train_path
+
+    if local_test_path and not os.path.isfile(local_test_path):
+        if test_type == FileType.HTTP:
+            path = download_file_http(test_path)
+        if test_type == FileType.S3
+            path = download_file_s3(test_path, aws_config=aws_config)
+        assert path == local_test_path
+
+    return local_train_path, local_test_path

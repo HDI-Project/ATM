@@ -89,7 +89,6 @@ class RunConfig(Config):
         'train_path',
         'test_path',
         'data_description',
-        'output_dir',
         'label_column',
 
         # datarun config
@@ -110,7 +109,6 @@ class RunConfig(Config):
 
     DEFAULTS = {
         'train_path': 'data/test/pollution_1.csv',
-        'output_dir': 'data/processed/',
         'label_column': 'class',
         'methods': ['logreg', 'dt', 'knn'],
         'priority': 1,
@@ -126,7 +124,7 @@ class RunConfig(Config):
     }
 
 
-def add_arguments_aws_s3(parser):
+def add_arguments_aws(parser):
     """
     Add all argparse arguments needed to parse AWS S3 configuration from the
     command line. This is separate from aws_ec2 because usually only one set of
@@ -140,21 +138,13 @@ def add_arguments_aws_s3(parser):
     # All of these arguments must start with --aws-, and must correspond to
     # keys present in the AWS config example file.
     # AWS API access key pair
-    # try... catch because this might be called after aws_s3
-    try:
-        parser.add_argument('--aws-access-key', help='AWS access key')
-        parser.add_argument('--aws-secret-key', help='AWS secret key')
-    except ArgumentError:
-        pass
-
-    # S3-specific arguments
-    parser.add_argument('--aws-s3-bucket', help='AWS S3 bucket to store data')
-    parser.add_argument('--aws-s3-folder', help='Folder in AWS S3 bucket in which to store data')
+    parser.add_argument('--aws-access-key', help='AWS access key')
+    parser.add_argument('--aws-secret-key', help='AWS secret key')
 
     return parser
 
 
-def add_arguments_aws_ec2(parser):
+def add_arguments_ec2(parser):
     """
     Add all argparse arguments needed to parse AWS EC2 configuration from the
     command line. This is separate from aws_s3 because usually only one set of
@@ -162,19 +152,6 @@ def add_arguments_aws_ec2(parser):
 
     parser: an argparse.ArgumentParser object
     """
-    # Config file
-    parser.add_argument('--aws-config', help='path to yaml AWS config file')
-
-    # All of these arguments must start with --aws-, and must correspond to
-    # keys present in the AWS config example file.
-    # AWS API access key pair
-    # try... catch because this might be called after aws_s3
-    try:
-        parser.add_argument('--aws-access-key', help='AWS access key')
-        parser.add_argument('--aws-secret-key', help='AWS secret key')
-    except ArgumentError:
-        pass
-
     # AWS EC2 configurations
     parser.add-argument('--num-instances', help='Number of EC2 instances to start')
     parser.add-argument('--num-workers-per-instance', help='Number of ATM workers per instances')
@@ -232,7 +209,6 @@ def add_arguments_datarun(parser):
     parser.add_argument('--train-path', help='Path to raw training data')
     parser.add_argument('--test-path', help='Path to raw test data (if applicable)')
     parser.add_argument('--data-description', help='Description of dataset')
-    parser.add_argument('--output-dir', help='Directory where processed data will be saved')
     parser.add_argument('--label-column', help='Name of the label column in the input data')
 
     ##  Datarun Arguments  #########################################################

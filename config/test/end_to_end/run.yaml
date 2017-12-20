@@ -2,7 +2,6 @@
 train_path: 
 test_path:
 data_description: 
-output_folder: data/processed/
 label_column: class
 
 # use every method we have

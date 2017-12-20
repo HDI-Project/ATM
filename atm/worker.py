@@ -127,84 +127,6 @@ class Worker(object):
             self.Tuner = mod.CustomTuner
         _log('Tuner: %s' % self.Tuner)
 
-    def load_data(self):
-        """
-        Download a set of train/test data from AWS (if necessary) and then load
-        it from disk into memory.
-
-        Returns: train/test data in the structures consumed by
-            wrapper.load_data_from_objects(), i.e. (trainX, testX, trainY,
-            testY)
-        """
-        # TODO TODO
-        # if the data are not present locally, check the S3 bucket detailed in
-        # the config for it.
-        if not os.path.isfile(self.dataset.train_path):
-            ensure_directory(dw.outfolder)
-            if download_file_s3(dw.train_path_out, aws_key=self.aws_config.access_key,
-                                aws_secret=self.aws_config.access_key,
-                                s3_bucket=self.aws_config.s3_bucket,
-                                s3_folder=self.aws_config.s3_folder) != dw.train_path_out:
-                raise Exception('Something about train dataset caching is wrong...')
-
-        # load the data into matrix format
-        trainX = read_atm_csv(dw.train_path_out)
-        trainY = trainX[:, self.dataset.label_column]
-        trainX = np.delete(trainX, self.dataset.label_column, axis=1)
-
-        if not os.path.isfile(dw.test_path_out):
-            ensure_directory(dw.outfolder)
-            if download_file_s3(dw.test_path_out, aws_key=self.aws_key,
-                                aws_secret=self.aws_secret,
-                                s3_bucket=self.s3_bucket,
-                                s3_folder=self.s3_folder) != dw.test_path_out:
-                raise Exception('Something about test dataset caching is wrong...')
-
-        # load the data into matrix format
-        testX = read_atm_csv(dw.test_path_out)
-        testY = testX[:, self.dataset.label_column]
-        testX = np.delete(testX, self.dataset.label_column, axis=1)
-
-        return trainX, testX, trainY, testY
-
-    def save_classifier_cloud(self, local_model_path, local_metric_path):
-        """
-        Save a classifier to the S3 bucket supplied by aws_config. Saves a
-        serialized representaion of the model as well as a detailed set
-        of metrics.
-
-        local_model_path: path to serialized model in the local file system
-        local_metric_path: path to serialized metrics in the local file system
-        """
-        conn = S3Connection(aws_key, aws_secret)
-        bucket = conn.get_bucket(s3_bucket)
-
-        if aws_folder:
-            aws_model_path = os.path.join(aws_folder, local_model_path)
-            aws_metric_path = os.path.join(aws_folder, local_metric_path)
-        else:
-            aws_model_path = local_model_path
-            aws_metric_path = local_metric_path
-
-        kmodel = S3Key(bucket)
-        kmodel.key = aws_model_path
-        kmodel.set_contents_from_filename(local_model_path)
-        _log('Uploading model at %s to S3 bucket %s' % (s3_bucket,
-                                                        local_model_path))
-
-        kmodel = S3Key(bucket)
-        kmodel.key = aws_metric_path
-        kmodel.set_contents_from_filename(local_metric_path)
-        _log('Uploading metrics at %s to S3 bucket %s' % (s3_bucket,
-                                                          local_metric_path))
-
-        # delete the local copy of the model & metrics so that they don't fill
-        # up the worker instance's hard drive
-        _log('Deleting local copies of %s and %s' % (local_model_path,
-                                                     local_metric_path))
-        os.remove(local_model_path)
-        os.remove(local_metric_path)
-
     def save_classifier(self, classifier_id, model, performance):
         """
         Update a classifier with performance and model information and mark it as
@@ -258,6 +180,45 @@ class Worker(object):
 
         # update this session's hyperpartition entry
         _log('Saved classifier %d.' % classifier_id)
+
+    def save_classifier_cloud(self, local_model_path, local_metric_path):
+        """
+        Save a classifier to the S3 bucket supplied by aws_config. Saves a
+        serialized representaion of the model as well as a detailed set
+        of metrics.
+
+        local_model_path: path to serialized model in the local file system
+        local_metric_path: path to serialized metrics in the local file system
+        """
+        # TODO: This does not work
+        conn = S3Connection(aws_key, aws_secret)
+        bucket = conn.get_bucket(s3_bucket)
+
+        if aws_folder:
+            aws_model_path = os.path.join(aws_folder, local_model_path)
+            aws_metric_path = os.path.join(aws_folder, local_metric_path)
+        else:
+            aws_model_path = local_model_path
+            aws_metric_path = local_metric_path
+
+        kmodel = S3Key(bucket)
+        kmodel.key = aws_model_path
+        kmodel.set_contents_from_filename(local_model_path)
+        _log('Uploading model at %s to S3 bucket %s' % (s3_bucket,
+                                                        local_model_path))
+
+        kmodel = S3Key(bucket)
+        kmodel.key = aws_metric_path
+        kmodel.set_contents_from_filename(local_metric_path)
+        _log('Uploading metrics at %s to S3 bucket %s' % (s3_bucket,
+                                                          local_metric_path))
+
+        # delete the local copy of the model & metrics so that they don't fill
+        # up the worker instance's hard drive
+        _log('Deleting local copies of %s and %s' % (local_model_path,
+                                                     local_metric_path))
+        os.remove(local_model_path)
+        os.remove(local_metric_path)
 
     def select_hyperpartition(self):
         """
@@ -370,8 +331,8 @@ class Worker(object):
         Returns: Model object and performance dictionary
         """
         model = Model(classifier.code, params, self.datarun.metric)
-        performance = model.train_test(self.dataset.train_path,
-                                       self.dataset.test_path)
+        train_path, test_path = self.load_data()
+        performance = model.train_test(train_path, test_path)
 
         old_best = self.db.get_best_classifier(datarun_id=self.datarun.id)
         if old_best is not None:
@@ -392,7 +353,7 @@ class Worker(object):
                 _log('Best so far (classifier %s): %.3f +- %.3f' %
                      (old_best.id, old_val, old_err))
 
-        return wrapper, performance
+        return model, performance
 
     def run_classifier(self):
         """
@@ -520,7 +481,7 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Add more classifiers to database')
     add_arguments_sql(parser)
-    add_arguments_aws_s3(parser)
+    add_arguments_aws(parser)
 
     # add worker-specific arguments
     parser.add_argument('--cloud-mode', action='store_true', default=False,

@@ -16,35 +16,23 @@ from atm.utilities import ensure_directory, hash_nested_tuple
 warnings.filterwarnings("ignore")
 
 
-def create_dataset(db, train_path, test_path=None, output_folder=None,
-                   label_column=None, data_description=None):
+def create_dataset(db, label_column, train_path, test_path=None,
+                   data_description=None):
     """
     Create a dataset and add it to the ModelHub database.
 
     db: initialized Database object
+    label_column: name of csv column representing the label
     train_path: path to raw training data
     test_path: path to raw test data
-    output_folder: folder where processed ('wrapped') data will be saved
-    label_column: name of csv column representing the label
     data_description: description of the dataset (max 1000 chars)
     """
     # create the name of the dataset from the path to the data
     name = os.path.basename(train_path)
     name = name.replace("_train.csv", "").replace(".csv", "")
 
-    # parse data and create data wrapper for vectorization and label encoding
-    if train_path and test_path:
-        dw = DataWrapper(name, output_folder, label_column,
-                         trainfile=train_path, testfile=test_path)
-    elif train_path:
-        dw = DataWrapper(name, output_folder, label_column,
-                         traintestfile=train_path)
-    else:
-        raise Exception("No valid training or testing files!")
-
     # process the data into the form ATM needs and save it to disk
-    dw.wrap()
-    stats = dw.statistics
+    meta = MetaData(label_column, train_path, test_path)
 
     # enter dataset into database
     session = db.get_session()
@@ -52,13 +40,12 @@ def create_dataset(db, train_path, test_path=None, output_folder=None,
                          description=data_description,
                          train_path=train_path,
                          test_path=test_path,
-                         wrapper=dw,
-                         label_column=int(stats['label_column']),
-                         n_examples=int(stats['n_examples']),
-                         k_classes=int(stats['k_classes']),
-                         d_features=int(stats['d_features']),
-                         majority=float(stats['majority']),
-                         size_kb=int(stats['datasize_bytes']) / 1000)
+                         label_column=label_column,
+                         n_examples=meta.n_examples,
+                         k_classes=meta.k_classes,
+                         d_features=meta.d_features,
+                         majority=meta.majority,
+                         size_kb=meta.datasize_bytes / 1000)
     session.add(dataset)
     session.commit()
     return dataset
@@ -148,16 +135,17 @@ def enter_dataset(db, run_config, aws_config=None, upload_data=False):
 
     Returns: the generated dataset object
     """
+    print 'downloading data...'
+    train_path, test_path = download_data(run_config.train_path,
+                                          run_config.test_path, aws_config)
     print 'creating dataset...'
-    dataset = create_dataset(db, run_config.train_path, run_config.test_path,
-                             run_config.output_folder, run_config.label_column,
+    dataset = create_dataset(db, run_config.label_column, train_path, test_path,
                              run_config.data_description)
     run_config.dataset_id = dataset.id
 
     # if we need to upload the train/test data, do it now
     if upload_data:
-        upload_data(dataset.wrapper.train_path_out,
-                    dataset.wrapper.test_path_out,
+        upload_data(dataset.train_path, dataset.test_path,
                     s3_config.access_key, s3_config.secret_key,
                     s3_config.bucket, s3_config.folder)
 
@@ -254,7 +242,7 @@ instead of passing individual arguments. Any arguments in the config files will
 override arguments passed on the command line. See the examples in the config/
 folder for more information. """)
     # Add argparse arguments for aws, sql, and datarun config
-    add_arguments_aws_s3(parser)
+    add_arguments_aws(parser)
     add_arguments_sql(parser)
     add_arguments_datarun(parser)
 

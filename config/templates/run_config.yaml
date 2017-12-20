@@ -3,7 +3,6 @@ train_path: data/samples/pollution_1.csv
 # if test_path is not supplied, train_path is assumed to point to train/test data
 test_path: 
 data_description: "Example dataset description"
-output_folder: data/processed/
 label_column: class
 
 ## Datarun arguments

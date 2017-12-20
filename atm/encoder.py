@@ -11,33 +11,30 @@ from atm.utilities import ensure_directory
 
 
 class MetaData(object):
-    def __init__(self, n, d, k, majority, size):
-        self.n_examples = n
-        self.d_features = d
-        self.k_classes = k
-        self.majority = majority
-        self.datasize_bytes = size
+    def __init__(self, label_column, *data_paths):
+        """
+        Compute a bunch of metadata about the dataset.
 
+        label_column: name of dataframe column containing labels
+        data_paths: paths to csvs with the same columns
+        """
+        data = pd.read_csv(data_paths.pop(0))
+        for path in data_paths:
+            data = data.append(pd.read_csv(data_path))
 
-def get_dataset_metadata(data, label_column):
-    """
-    Compute a bunch of metadata about the dataset.
+        # compute the portion of labels that are the most common value
+        counts = data[self.label_column].value_counts()
+        total_features = data.shape[1] - 1
+        for c in data.columns:
+            if data[c].dtype == 'object':
+                total_features += np.unique(data[c]) - 1
+        majority_percentage = float(max(counts)) / float(sum(counts))
 
-    data: pd.DataFrame of unprocessed data
-    label_column: name of dataframe column containing labels
-    """
-    # compute the portion of labels that are the most common value
-    counts = data[self.label_column].value_counts()
-    total_features = data.shape[1] - 1
-    for c in data.columns:
-        if data[c].dtype == 'object':
-            total_features += np.unique(data[c]) - 1
-    majority_percentage = float(max(counts)) / float(sum(counts))
-    return MetaData(n_examples=data.shape[0],
-                    d_features=total_features,
-                    k_classes=len(np.unique(data[label_column])),
-                    majority=majority_percentage,
-                    size=np.array(data).nbytes)
+        self.n_examples = data.shape[0]
+        self.d_features = total_features
+        self.k_classes = len(np.unique(data[label_column]))
+        self.majority = majority_percentage
+        self.size = np.array(data).nbytes)
 
 
 class DataEncoder(object):

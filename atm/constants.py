@@ -22,7 +22,7 @@ DATARUN_STATUS = ['pending', 'running', 'complete']
 CLASSIFIER_STATUS = ['running', 'errored', 'complete']
 PARTITION_STATUS = ['incomplete', 'errored', 'gridding_done']
 
-TIME_FMT = "%y-%m-%d %H:%M"
+TIME_FMT = '%y-%m-%d %H:%M'
 
 TUNERS_MAP = {
     'uniform': UniformTuner,
@@ -73,3 +73,11 @@ class PartitionStatus:
     INCOMPLETE = 'incomplete'
     GRIDDING_DONE = 'gridding_done'
     ERRORED = 'errored'
+
+S3_PREFIX = '^s3://'
+HTTP_PREFIX = '^https?://'
+
+class FileType:
+    LOCAL = 'local'
+    S3 = 's3'
+    HTTP = 'http'

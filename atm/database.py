@@ -15,7 +15,7 @@ from datetime import datetime
 from operator import attrgetter
 
 from atm.constants import *
-from atm.utilities import object_to_base_64, base_64_to_object
+from atm.utilities import *
 
 
 METHOD_ROWS = [
@@ -123,25 +123,19 @@ class Database(object):
 
             id = Column(Integer, primary_key=True, autoincrement=True)
             name = Column(String(100), nullable=False)
+
+            # fields necessary for loading/processing data
             description = Column(String(1000))
             train_path = Column(String(200), nullable=False)
             test_path = Column(String(200))
-            wrapper64 = Column(String(200), nullable=False)
+            label_column = Column(String(100), nullable=False)
 
-            label_column = Column(Integer, nullable=False)
+            # metadata fields, for convenience
             n_examples = Column(Integer, nullable=False)
             k_classes = Column(Integer, nullable=False)
             d_features = Column(Integer, nullable=False)
             majority = Column(Numeric(precision=10, scale=9), nullable=False)
             size_kb = Column(Integer, nullable=False)
-
-            @property
-            def wrapper(self):
-                return base_64_to_object(self.wrapper64)
-
-            @wrapper.setter
-            def wrapper(self, value):
-                self.wrapper64 = object_to_base_64(value)
 
             def __repr__(self):
                 base = "<%s: %s, %d classes, %d features, %d examples>"

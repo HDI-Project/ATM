@@ -48,7 +48,7 @@ Test the performance of a new selector or tuner and compare it to that of other
 methods.
 ''')
 add_arguments_sql(parser)
-add_arguments_aws_s3(parser)
+add_arguments_aws(parser)
 add_arguments_datarun(parser)
 args = parser.parse_args()
 
