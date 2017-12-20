@@ -8,7 +8,7 @@ from os.path import join
 from atm.config import *
 from atm.database import Database
 from atm.enter_data import enter_datarun, enter_dataset
-from atm.utilities import download_file_s3
+from atm.utilities import download_file_url
 from atm.worker import work
 
 from utilities import *
@@ -18,7 +18,8 @@ CONF_DIR = 'config/test/end_to_end/'
 DATA_DIR = 'data/test/'
 RUN_CONFIG = join(CONF_DIR, 'run.yaml')
 SQL_CONFIG = join(CONF_DIR, 'sql.yaml')
-AWS_CONFIG = join(CONF_DIR, 'aws.yaml')
+AWS_CONFIG = join(CONF_DIR, 'aws.yaml') if 'aws.yaml' in os.listdir(CONF_DIR) else None
+S3_BUCKET = 'https://s3.amazonaws.com/mit-dai-delphi-datastore/downloaded/'
 
 DATASETS_MAX_MIN = [
     'wholesale-customers_1.csv',
@@ -45,7 +46,8 @@ DATASETS_MAX_FIRST = [
     'monks-problems-2_1.csv',
 ]
 DATASETS_SIMPLE = [
-    'iris.data.csv',
+    'vowel_1.csv',
+    #'iris.data.csv',
     #'multilabeltest.csv',
     #'bigmultilabeltest.csv',
 ]
@@ -70,7 +72,7 @@ db = Database(**vars(sql_config))
 print 'creating dataruns...'
 datarun_ids = []
 for ds in DATASETS:
-    run_config.train_path = join(DATA_DIR, ds)
+    run_config.train_path = download_file_url(S3_BUCKET+ds, DATA_DIR)
     dataset = enter_dataset(db, run_config, aws_config)
     datarun_ids.append(enter_datarun(sql_config, run_config, aws_config))
 
