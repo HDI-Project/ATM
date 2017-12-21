@@ -130,8 +130,6 @@ class Model(object):
                                                      X=X, y=y,
                                                      binary=binary,
                                                      n_folds=self.N_FOLDS)
-                                                     #include_pr=self.include_pr,
-                                                     #include_roc=self.include_roc)
         self.cv_judgment_metric = np.mean(df[self.judgment_metric])
         self.cv_judgment_metric_std = np.std(df[self.judgment_metric])
 
@@ -147,11 +145,7 @@ class Model(object):
         self.avg_prediction_time = total / float(len(Y))
 
         binary = self.num_classes == 2
-
         self.test_scores = test_pipeline(self.pipeline, X, y, binary)
-                                         #include_pr=self.include_pr,
-                                         #include_roc=self.include_roc)
-
         self.test_judgment_metric = self.test_scores.get(self.judgment_metric)
 
     def train_test(self, train_path, test_path=None):

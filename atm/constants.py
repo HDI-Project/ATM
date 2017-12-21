@@ -92,17 +92,19 @@ class Metrics:
     F1 = 'f1'
     F1_MICRO = 'f1_micro'
     F1_MACRO = 'f1_macro'
-    ROC_AUC = 'roc_auc'
+    ROC_AUC = 'roc_auc'     # receiver operating characteristic
     ROC_AUC_MICRO = 'roc_auc_micro'
     ROC_AUC_MACRO = 'roc_auc_macro'
-    PR_AUC = 'pr_auc'
+    AP = 'ap'               # average precision
+    PR_CURVE = 'pr_curve'
+    ROC_CURVE = 'roc_curve'
 
 METRICS_BINARY = [
     Metrics.ACCURACY,
     Metrics.COHEN_KAPPA,
     Metrics.F1,
     Metrics.ROC_AUC,
-    Metrics.PR_AUC,
+    Metrics.AP,
 ]
 
 METRICS_MULTICLASS = [
@@ -125,7 +127,7 @@ METRIC_DEFAULT_SCORES = {
     Metrics.ROC_AUC: 0.5,
     Metrics.ROC_AUC_MICRO: 0.5,
     Metrics.ROC_AUC_MACRO: 0.5,
-    Metrics.PR_AUC: 0.0,
+    Metrics.AP: 0.0,
 }
 
 N_FOLDS_DEFAULT = 10
