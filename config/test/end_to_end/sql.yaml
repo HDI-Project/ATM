@@ -1,7 +1,7 @@
 # SQL dialect
 dialect: sqlite
 # Name of the database
-database: atm.db
+database: test/atm.db
 # Username to gain access to the database
 username: 
 # Password to gain access to the database

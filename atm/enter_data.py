@@ -174,10 +174,6 @@ def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False,
     else:
         dataset = db.get_dataset(run_config.dataset_id)
 
-
-    print
-    print 'creating hyperpartitions...'
-
     method_parts = {}
     for m in run_config.methods:
         # enumerate all combinations of categorical variables for this method
@@ -192,9 +188,9 @@ def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False,
         print 'saving datarun...'
         datarun = create_datarun(db, dataset, run_config)
 
+    print 'saving hyperpartions...'
     for method, parts in method_parts.items():
         for part in parts:
-            print 'saving hyperpartion...'
             # if necessary, create a new datarun for each hyperpartition.
             # This setting is useful for debugging.
             if run_per_partition:
@@ -209,6 +205,7 @@ def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False,
                                      categoricals=part.categoricals,
                                      status=PartitionStatus.INCOMPLETE)
 
+    print 'done!'
     print
     print '========== Summary =========='
     print 'Dataset ID:', dataset.id
