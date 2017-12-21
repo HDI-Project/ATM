@@ -215,12 +215,16 @@ def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False,
     print 'creating hyperpartitions...'
     session = db.get_session()
 
-    parts = []
+    method_and_parts = []
     for m in run_config.methods:
         # enumerate all combinations of categorical variables for this method
         method = Method(METHODS_MAP[m])
-        parts.extend(method.get_hyperpartitions())
-        print 'method', m, 'has', len(parts), 'hyperpartitions'
+        method_hyperparitions = method.get_hyperpartitions()
+
+        for method_hyperparition in method_hyperparitions:
+            method_and_parts.append((m, method_hyperparition))
+
+        print 'method', m, 'has', len(method_hyperparitions), 'hyperpartitions'
 
     # create and save datarun to database
     print
@@ -232,7 +236,7 @@ def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False,
         datarun = create_datarun(db, session, dataset, run_config)
         session.commit()
 
-    for part in parts:
+    for method, part in method_and_parts:
         # if necessary, create a new datarun for each hyperpartition.
         # This setting is useful for debugging.
         if run_per_partition:
@@ -241,7 +245,7 @@ def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False,
             run_ids.append(datarun.id)
 
         hp = db.Hyperpartition(datarun_id=datarun.id,
-                               method=m,
+                               method=method,
                                tunables=part.tunables,
                                constants=part.constants,
                                categoricals=part.categoricals,
