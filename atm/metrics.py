@@ -1,7 +1,8 @@
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.metrics import f1_score, precision_recall_curve, auc, roc_curve,\
-                            accuracy_score, cohen_kappa_score, roc_auc_score
+                            accuracy_score, cohen_kappa_score, roc_auc_score,\
+                            average_precision_score
 
 import numpy as np
 import pandas as pd
@@ -26,6 +27,14 @@ def rank_n_accuracy(y_true, y_prob_mat, rank=5):
             correct_sample_count += 1.0
 
     return correct_sample_count / num_samples
+
+def get_per_class_matrix(y, shape):
+    # create a (num_classes x num_examples) binary matrix representation of the
+    # true and predicted y values.
+    y_bin = np.zeros(shape)
+    for label in range(shape[1]):
+        y_bin[:, label] = (y == label).astype(int)
+    return y_bin
 
 
 def get_pr_roc_curves(y_true, y_pred_probs):
@@ -68,9 +77,11 @@ def get_metrics_binary(y_true, y_pred, y_pred_probs, include_curves=False):
     all_labels_same = len(np.unique(y_true)) == 1
     any_probs_nan = np.any(np.isnan(y_pred_probs))
     if not any_probs_nan:
-        results[Metrics.AP] = average_precision_score(y_true, y_pred_probs)
+        y_true_bin = get_per_class_matrix(y_true, y_pred_probs.shape)
+        results[Metrics.AP] = average_precision_score(y_true_bin, y_pred_probs)
+
         if not all_labels_same:
-            results[Metrics.ROC_AUC] = roc_auc_score(y_true, y_pred_probs)
+            results[Metrics.ROC_AUC] = roc_auc_score(y_true_bin, y_pred_probs)
 
         # if necessary, compute point-by-point precision/recall and ROC curve data
         if include_curves:
@@ -81,9 +92,15 @@ def get_metrics_binary(y_true, y_pred, y_pred_probs, include_curves=False):
 
 def get_metrics_multiclass(y_true, y_pred, y_pred_probs, rank_accuracy=False,
                            include_per_label=False, include_curves=False):
-    results = {}
-    results[Metrics.ACCURACY] = accuracy_score(y_true, y_pred)
-    results[Metrics.COHEN_KAPPA] = cohen_kappa_score(y_true, y_pred)
+    results = {
+        Metrics.ACCURACY: accuracy_score(y_true, y_pred),
+        Metrics.COHEN_KAPPA: cohen_kappa_score(y_true, y_pred),
+        Metrics.F1_MICRO: f1_score(y_true, y_pred, average='micro'),
+        Metrics.F1_MACRO: f1_score(y_true, y_pred, average='macro'),
+        Metrics.ROC_AUC_MICRO: np.nan,
+        Metrics.ROC_AUC_MACRO: np.nan,
+        Metrics.RANK_ACCURACY: np.nan,
+    }
 
     # this parameter should only be used for datasets with high-cardinality
     # labels (lots of poosible values)
@@ -92,45 +109,27 @@ def get_metrics_multiclass(y_true, y_pred, y_pred_probs, rank_accuracy=False,
                                                          y_prob_mat=y_pred_probs,
                                                          rank=rank)
 
-    labels = range(y_pred_probs.shape[1])
-
-    # create a (num_classes x num_examples) binary matrix representation of the
-    # true and predicted y values.
-    y_true_bin = np.zeros(y_pred_probs.shape)
-    y_pred_bin = np.zeros(y_pred_probs.shape)
-    for label in labels:
-        y_true_bin[:, label] = (y_true == label).astype(int)
-        y_pred_bin[:, label] = (y_pred == label).astype(int)
-
-    # compute multi-label F1 metrics
-    results[Metrics.F1_MICRO] = f1_score(y_true, y_pred, average='micro')
-    results[Metrics.F1_MACRO] = f1_score(y_true, y_pred, average='macro')
 
     # if possible, compute multi-label AUC metrics
-    # TODO: multi-label AP metrics?
     all_labels_same = len(np.unique(y_true)) == 1
     any_probs_nan = np.any(np.isnan(y_pred_probs))
-    if all_labels_same or any_probs_nan:
-        print "ROC/AUC undefined: setting AUC scores to defaults."
-        results[Metrics.ROC_AUC_MICRO] = \
-            METRIC_DEFAULT_SCORES[Metrics.ROC_AUC_MICRO]
-        results[Metrics.ROC_AUC_MACRO] = \
-            METRIC_DEFAULT_SCORES[Metrics.ROC_AUC_MACRO]
-    else:
-        try:
-            results[Metrics.ROC_AUC_MICRO] = roc_auc_score(y_true_bin, y_pred_probs,
-                                                           average='micro')
-            results[Metrics.ROC_AUC_MACRO] = roc_auc_score(y_true_bin, y_pred_probs,
-                                                           average='macro')
-        except:
-            pdb.set_trace()
+    if not (all_labels_same or any_probs_nan):
+        # get binary label matrices
+        y_true_bin = get_per_class_matrix(y_true, y_pred_probs.shape)
+        y_pred_bin = get_per_class_matrix(y_true, y_pred_probs.shape)
+        results[Metrics.ROC_AUC_MICRO] = roc_auc_score(y_true_bin, y_pred_probs,
+                                                       average='micro')
+        results[Metrics.ROC_AUC_MACRO] = roc_auc_score(y_true_bin, y_pred_probs,
+                                                       average='macro')
+
+    # TODO: multi-label AP metrics?
 
     # labelwise controls whether to compute separate metrics for each posisble label
     if include_per_label or include_curves:
         results['labelwise'] = {}
         # for each possible class, generate F1, precision-recall, and ROC scores
         # using the binary metrics function.
-        for label in labels:
+        for label in range(y_pred_probs.shape[1]):
             label_pred_probs = np.column_stack((1 - y_pred_probs[:, label],
                                                 y_pred_probs[:, label]))
             label_res = get_metrics_binary(y_true=y_true_bin[:, label],
@@ -176,6 +175,8 @@ def cross_validate_pipeline(pipeline, X, y, binary=True,
     X: feature matrix
     y: series of labels corresponding to rows in X
     binary: whether the label is binary or multi-ary
+    n_folds: number of non-overlapping "folds" of the data to make for
+        cross-validation
     """
     if binary:
         metrics = METRICS_BINARY

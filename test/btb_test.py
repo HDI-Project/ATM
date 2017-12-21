@@ -13,10 +13,10 @@ from utilities import *
 
 CONF_DIR = 'config/test/btb/'
 BASELINE_PATH = 'test/baselines/best_so_far/'
-DATA_DIR = 'data/test/'
 RUN_CONFIG = join(CONF_DIR, 'run.yaml')
 SQL_CONFIG = join(CONF_DIR, 'sql.yaml')
-AWS_CONFIG = join(CONF_DIR, 'aws.yaml')
+
+DATA_URL = 'https://s3.amazonaws.com/mit-dai-delphi-datastore/downloaded/'
 
 DATASETS_MAX_MIN = [
     'wholesale-customers_1.csv',
@@ -48,37 +48,27 @@ Test the performance of a new selector or tuner and compare it to that of other
 methods.
 ''')
 add_arguments_sql(parser)
-add_arguments_aws(parser)
 add_arguments_datarun(parser)
 args = parser.parse_args()
 
-sql_conf, run_conf, aws_conf = load_config(sql_path=SQL_CONFIG,
-                                           run_path=RUN_CONFIG,
-                                           aws_path=AWS_CONFIG,
-                                           args=args)
+sql_conf, run_conf, _ = load_config(sql_path=SQL_CONFIG,
+                                    run_path=RUN_CONFIG,
+                                    args=args)
 db = Database(**vars(sql_conf))
 datarun_ids = {}
 
 datasets = os.listdir(BASELINE_PATH)
-random.shuffle(datasets)
-# choose a single random dataset
 datasets = datasets[:5]
 print 'using datasets', ', '.join(datasets)
 
 # generate datasets and dataruns
 for ds in datasets:
-    # download the datset from S3
-    run_conf.train_path = download_file_s3(ds, aws_conf.access_key,
-                                           aws_conf.secret_key,
-                                           aws_conf.s3_bucket,
-                                           s3_folder=aws_conf.s3_folder,
-                                           local_folder=DATA_DIR)
+    run_conf.train_path = DATA_URL + ds
     run_conf.dataset_id = None
-    datarun_ids[ds] = enter_datarun(sql_conf, run_conf, aws_conf)
+    datarun_ids[ds] = enter_datarun(sql_conf, run_conf)
 
 # work on the dataruns til they're done
-work_parallel(db=db, datarun_ids=datarun_ids.values(),
-              aws_config=aws_conf, n_procs=4)
+work_parallel(db=db, datarun_ids=datarun_ids.values(), n_procs=4)
 
 # graph the results
 for ds in datasets:

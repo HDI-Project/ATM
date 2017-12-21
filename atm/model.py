@@ -143,12 +143,14 @@ class Model(object):
         # time the prediction
         starttime = time.time()
         y_preds = self.pipeline.predict(X)
-        total = time.time() - starttime
-        self.avg_prediction_time = total / float(len(y))
 
         binary = self.num_classes == 2
         test_scores = test_pipeline(self.pipeline, X, y, binary)
+
+        total = time.time() - starttime
+        self.avg_prediction_time = total / float(len(y))
         self.test_judgment_metric = test_scores.get(self.judgment_metric)
+
         return test_scores
 
     def train_test(self, train_path, test_path=None):
@@ -196,6 +198,14 @@ class Model(object):
         self.pipeline.fit(X_train, y_train)
         test_scores = self.test_final_model(X_test, y_test)
         return {'cv': cv_scores, 'test': test_scores}
+
+    def predict(self, data):
+        """
+        Use the trained encoder and pipeline to transform training data into
+        predicted labels
+        """
+        X, _ = self.encoder.transform(data)
+        return self.pipeline.predict(X)
 
     def special_conversions(self, params):
         """

@@ -38,8 +38,9 @@ class MetaData(object):
 
 
 class DataEncoder(object):
-    def __init__(self, label_column='class'):
+    def __init__(self, label_column='class', feature_columns=None):
         self.label_column = label_column
+        self.feature_columns = feature_columns
 
         # these will be trained with fit_encoders()
         self.column_encoders = {}
@@ -55,7 +56,11 @@ class DataEncoder(object):
         data: pd.DataFrame of unprocessed data
         """
         cat_cols = []
-        features = data.drop([self.label_column], axis=1)
+        if self.feature_columns is None:
+            features = data.drop([self.label_column], axis=1)
+            self.feature_columns = features.columns
+        else:
+            features = data[self.feature_columns]
 
         # encode categorical columns, leave ordinal values alone
         for column in features.columns:
@@ -84,12 +89,15 @@ class DataEncoder(object):
         Convert a DataFrame of labeled data to a feature matrix in the form
         that ATM can use.
         """
-        # pull labels into a separate series and transform them to integers
-        labels = np.array(data[[self.label_column]])
-        y = self.label_encoder.transform(labels)
+        if self.label_column in data:
+            # pull labels into a separate series and transform them to integers
+            labels = np.array(data[[self.label_column]])
+            y = self.label_encoder.transform(labels)
+            # drop the label column and transform the remaining features
+        else:
+            y = None
 
-        # drop the label column and transform the remaining features
-        features = data.drop([self.label_column], axis=1)
+        features = data[self.feature_columns]
 
         # encode each categorical feature as an integer
         for column, encoder in self.column_encoders.items():

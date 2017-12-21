@@ -9,7 +9,6 @@ import re
 from boto.s3.connection import S3Connection, Key
 
 from btb import ParamTypes
-
 from atm.constants import *
 
 # global variable storing this machine's public IP address
@@ -96,15 +95,15 @@ def vector_to_params(vector, tunables, categoricals, constants):
 
     Examples of the format for SVM sigmoid hyperpartition:
 
-        tunables = [('C', HyperParameter(type='float_exp', range=(1e-05, 1e5))),
-                    ('degree', HyperParameter(type='int', range=(2, 4))),
-                    ('gamma', HyperParameter(type='float_exp', range=(1e-05, 1e5)))]
+    tunables = [('C', HyperParameter(type='float_exp', range=(1e-05, 1e5))),
+                ('degree', HyperParameter(type='int', range=(2, 4))),
+                ('gamma', HyperParameter(type='float_exp', range=(1e-05, 1e5)))]
 
-        categoricals = (('kernel', 'poly'),
-                        ('probability', True),
-                        ('_scale', True))
+    categoricals = (('kernel', 'poly'),
+                    ('probability', True),
+                    ('_scale', True))
 
-        constants = [('cache_size', 15000)]
+    constants = [('cache_size', 15000)]
     """
     params = {}
 
@@ -196,12 +195,14 @@ def get_local_data_path(data_path):
 
 def download_file_s3(aws_path, aws_config, local_folder=DATA_PATH):
     """ Download a file from an S3 bucket and save it in the local folder. """
-    m = re.match(S3_PREFIX, data_path)
-    split = data_path[len(m.group()):].split('/')
+    # remove the prefix and extract the S3 bucket, folder, and file name
+    m = re.match(S3_PREFIX, aws_path)
+    split = aws_path[len(m.group()):].split('/')
     s3_bucket = split.pop(0)
     s3_folder = '/'.join(split[:-1])
     keyname = split[-1]
 
+    # create the local folder if necessary
     if local_folder is not None:
         ensure_directory(local_folder)
         path = os.path.join(local_folder, keyname)

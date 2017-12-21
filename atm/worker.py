@@ -18,6 +18,7 @@ import sys
 import time
 import traceback
 import warnings
+import joblib
 from collections import defaultdict
 from decimal import Decimal
 from operator import attrgetter
@@ -63,7 +64,7 @@ class ClassifierError(Exception):
 
 
 class Worker(object):
-    def __init__(self, database, datarun, save_files=False, cloud_mode=False,
+    def __init__(self, database, datarun, save_files=True, cloud_mode=False,
                  aws_config=None):
         """
         database: Database object with connection information
@@ -189,7 +190,7 @@ class Worker(object):
         local_metric_path: path to serialized metrics in the local file system
         """
         # TODO: This does not work
-        conn = S3Connection(aws_key, aws_secret)
+        conn = S3Connection(self.aws_config.access_key, self.aws_config.secret_key)
         bucket = conn.get_bucket(s3_bucket)
 
         if aws_folder:
@@ -481,7 +482,7 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Add more classifiers to database')
     add_arguments_sql(parser)
-    add_arguments_aws(parser)
+    add_arguments_aws_s3(parser)
 
     # add worker-specific arguments
     parser.add_argument('--cloud-mode', action='store_true', default=False,

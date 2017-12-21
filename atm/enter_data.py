@@ -194,7 +194,7 @@ instead of passing individual arguments. Any arguments in the config files will
 override arguments passed on the command line. See the examples in the config/
 folder for more information. """)
     # Add argparse arguments for aws, sql, and datarun config
-    add_arguments_aws(parser)
+    add_arguments_aws_s3(parser)
     add_arguments_sql(parser)
     add_arguments_datarun(parser)
 
