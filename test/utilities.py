@@ -54,7 +54,7 @@ def print_summary(db, rid):
     print 'Datarun %s' % run
 
     classifiers = db.get_classifiers(datarun_id=rid)
-    print 'Classifierss: %d total' % len(classifiers)
+    print 'Classifiers: %d total' % len(classifiers)
 
     best = db.get_best_classifier(datarun_id=run.id)
     if best is not None:
