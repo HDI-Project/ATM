@@ -45,9 +45,8 @@ DATASETS_MAX_FIRST = [
     'monks-problems-2_1.csv',
 ]
 DATASETS_SIMPLE = [
-    'iris.data.csv',
-    #'multilabeltest.csv',
-    #'bigmultilabeltest.csv',
+    'pollution_1.csv',  # binary test data
+    'iris.data.csv',    # ternary test data
 ]
 
 DATASETS = DATASETS_SIMPLE

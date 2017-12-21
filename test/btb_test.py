@@ -49,6 +49,8 @@ methods.
 ''')
 add_arguments_sql(parser)
 add_arguments_datarun(parser)
+parser.add_argument('--processes', help='number of processes to run concurrently',
+                    type=int, default=4)
 args = parser.parse_args()
 
 sql_conf, run_conf, _ = load_config(sql_path=SQL_CONFIG,
@@ -68,7 +70,8 @@ for ds in datasets:
     datarun_ids[ds] = enter_datarun(sql_conf, run_conf)
 
 # work on the dataruns til they're done
-work_parallel(db=db, datarun_ids=datarun_ids.values(), n_procs=4)
+work_parallel(db=db, datarun_ids=datarun_ids.values(),
+              n_procs=args.processes)
 
 # graph the results
 for ds in datasets:
