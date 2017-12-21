@@ -38,20 +38,19 @@ def get_pr_roc_curves(y_true, y_pred_probs):
         class 1
     """
     results = {}
-    if not np.any(np.isnan(y_pred_probs)):
-        roc = roc_curve(y_true, y_pred_probs, pos_label=1)
-        results[Metrics.ROC_CURVE] = {
-            'fprs': roc[0],
-            'tprs': roc[1],
-            'thresholds': roc[2],
-        }
+    roc = roc_curve(y_true, y_pred_probs, pos_label=1)
+    results[Metrics.ROC_CURVE] = {
+        'fprs': roc[0],
+        'tprs': roc[1],
+        'thresholds': roc[2],
+    }
 
-        pr = precision_recall_curve(y_true, y_pred_probs, pos_label=1)
-        results[Metrics.PR_CURVE] = {
-            'precisions': pr[0],
-            'recalls': pr[1],
-            'thresholds': pr[2],
-        }
+    pr = precision_recall_curve(y_true, y_pred_probs, pos_label=1)
+    results[Metrics.PR_CURVE] = {
+        'precisions': pr[0],
+        'recalls': pr[1],
+        'thresholds': pr[2],
+    }
 
     return results
 
@@ -73,9 +72,9 @@ def get_metrics_binary(y_true, y_pred, y_pred_probs, include_curves=False):
         if not all_labels_same:
             results[Metrics.ROC_AUC] = roc_auc_score(y_true, y_pred_probs)
 
-    # if necessary, compute point-by-point precision/recall and ROC curve data
-    if include_curves:
-        results.update(get_pr_roc(y_true, y_pred_probs[:, 1]))
+        # if necessary, compute point-by-point precision/recall and ROC curve data
+        if include_curves:
+            results.update(get_pr_roc_curves(y_true, y_pred_probs[:, 1]))
 
     return results
 
@@ -118,10 +117,13 @@ def get_metrics_multiclass(y_true, y_pred, y_pred_probs, rank_accuracy=False,
         results[Metrics.ROC_AUC_MACRO] = \
             METRIC_DEFAULT_SCORES[Metrics.ROC_AUC_MACRO]
     else:
-        results[Metrics.ROC_AUC_MICRO] = roc_auc_score(y_true_bin, y_pred_probs,
-                                                       average='micro')
-        results[Metrics.ROC_AUC_MACRO] = roc_auc_score(y_true_bin, y_pred_probs,
-                                                       average='macro')
+        try:
+            results[Metrics.ROC_AUC_MICRO] = roc_auc_score(y_true_bin, y_pred_probs,
+                                                           average='micro')
+            results[Metrics.ROC_AUC_MACRO] = roc_auc_score(y_true_bin, y_pred_probs,
+                                                           average='macro')
+        except:
+            pdb.set_trace()
 
     # labelwise controls whether to compute separate metrics for each posisble label
     if include_per_label or include_curves:
@@ -129,9 +131,11 @@ def get_metrics_multiclass(y_true, y_pred, y_pred_probs, rank_accuracy=False,
         # for each possible class, generate F1, precision-recall, and ROC scores
         # using the binary metrics function.
         for label in labels:
+            label_pred_probs = np.column_stack((1 - y_pred_probs[:, label],
+                                                y_pred_probs[:, label]))
             label_res = get_metrics_binary(y_true=y_true_bin[:, label],
                                            y_pred=y_pred_bin[:, label],
-                                           y_pred_probsy_pred_probs[:, label],
+                                           y_pred_probs=label_pred_probs,
                                            include_curves=include_curves)
             results['labelwise'][label] = label_res
 
@@ -147,13 +151,16 @@ def test_pipeline(pipeline, X, y, binary, **kwargs):
     # run the test data through the trained pipeline
     y_pred = pipeline.predict(X)
 
-    # if necessary, coerce class distance scores into probability scores
+    # if necessary (i.e. if a pipeline does not produce probability scores by
+    # default), use class distance scores in lieu of probability scores
     method = pipeline.steps[-1][0]
     if method in ['sgd', 'pa']:
-        class_1_distance = pipeline.decision_function(X)
-        class_0_distance = -class_1_distance
-        # this is needed for some of the scoring methods
-        y_pred_probs = np.column_stack((class_0_distance, class_1_distance))
+        if binary:
+            class_1_distance = pipeline.decision_function(X)
+            class_0_distance = -class_1_distance
+            y_pred_probs = np.column_stack((class_0_distance, class_1_distance))
+        else:
+            y_pred_probs = pipeline.decision_function(X)
     else:
         y_pred_probs = pipeline.predict_proba(X)
 
@@ -187,7 +194,7 @@ def cross_validate_pipeline(pipeline, X, y, binary=True,
                                       X=X[test_index],
                                       y=y[test_index],
                                       binary=binary, **kwargs)
-        df.append([{m: split_results.get(m) for m in metrics}])
+        df = df.append([{m: split_results.get(m) for m in metrics}])
         results.append(split_results)
 
     return df, results

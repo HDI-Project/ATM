@@ -6,6 +6,7 @@
 import numpy as np
 import pandas as pd
 import time
+import pdb
 from importlib import import_module
 
 from sklearn.pipeline import Pipeline
@@ -19,7 +20,7 @@ from sklearn.gaussian_process.kernels import ConstantKernel, RBF, Matern, \
 from atm.constants import *
 from atm.encoder import MetaData, DataEncoder
 from atm.method import Method
-from atm.metrics import cross_validate_pipeline
+from atm.metrics import cross_validate_pipeline, test_pipeline
 
 
 class Model(object):
@@ -126,27 +127,29 @@ class Model(object):
 
     def cross_validate(self, X, y):
         binary = self.num_classes == 2
-        df, self.cv_scores = cross_validate_pipeline(pipeline=self.pipeline,
-                                                     X=X, y=y,
-                                                     binary=binary,
-                                                     n_folds=self.N_FOLDS)
+        df, cv_scores = cross_validate_pipeline(pipeline=self.pipeline,
+                                                X=X, y=y, binary=binary,
+                                                n_folds=self.N_FOLDS)
         self.cv_judgment_metric = np.mean(df[self.judgment_metric])
-        self.cv_judgment_metric_std = np.std(df[self.judgment_metric])
+        self.cv_judgment_metric_stdev = np.std(df[self.judgment_metric])
+        return cv_scores
 
     def test_final_model(self, X, y):
         """
         Test the (already trained) model pipeline on the provided test data (X
-        and y). Store the resulting metrics in self.test_scores.
+        and y). Store the test judgment metric and return the rest of the
+        metrics as a hierarchical dictionary.
         """
         # time the prediction
         starttime = time.time()
         y_preds = self.pipeline.predict(X)
         total = time.time() - starttime
-        self.avg_prediction_time = total / float(len(Y))
+        self.avg_prediction_time = total / float(len(y))
 
         binary = self.num_classes == 2
-        self.test_scores = test_pipeline(self.pipeline, X, y, binary)
-        self.test_judgment_metric = self.test_scores.get(self.judgment_metric)
+        test_scores = test_pipeline(self.pipeline, X, y, binary)
+        self.test_judgment_metric = test_scores.get(self.judgment_metric)
+        return test_scores
 
     def train_test(self, train_path, test_path=None):
         # load train and (maybe) test data
@@ -187,11 +190,12 @@ class Model(object):
 
         # create and cross-validate pipeline
         self.make_pipeline()
-        self.cross_validate(X_train, y_train)
+        cv_scores = self.cross_validate(X_train, y_train)
 
         # train and test the final model
         self.pipeline.fit(X_train, y_train)
-        self.test_final_model(X_test, y_test)
+        test_scores = self.test_final_model(X_test, y_test)
+        return {'cv': cv_scores, 'test': test_scores}
 
     def special_conversions(self, params):
         """

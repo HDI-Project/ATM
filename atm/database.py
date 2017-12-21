@@ -465,7 +465,7 @@ class Database(object):
             One of ['mu_sigma', 'cv_judgment_metric', 'test_judgment_metric'].
         """
         if score_target == 'mu_sigma':
-            func = lambda l: l.cv_judgment_metric - 2 * l.cv_judgment_metric_stdev
+            func = lambda c: c.cv_judgment_metric - 2 * c.cv_judgment_metric_stdev
         else:
             func = attrgetter(score_target)
 
