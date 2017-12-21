@@ -75,8 +75,8 @@ def object_to_base_64(obj):
 
 def base_64_to_object(b64str):
     """
-    Inverse of ObjectToBase64.
-    Decode base64-encoded string and then de-pickle it.
+    Inverse of object_to_base_64.
+    Decode base64-encoded string and then unpickle it.
     """
     decoded = base64.b64decode(b64str)
     return pickle.loads(decoded)
