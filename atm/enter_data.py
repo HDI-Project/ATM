@@ -48,38 +48,6 @@ def create_dataset(db, label_column, train_path, test_path=None,
     return dataset
 
 
-def upload_data(train_path, test_path, access_key, secret_key, s3_bucket,
-                s3_folder=None):
-    """
-    Upload processed train/test data to an AWS bucket.
-
-    train_path: path to processed training data
-    test_path: path to processed test data
-    access_key: AWS API access key
-    secret_key: AWS secret API key
-    s3_bucket: path to s3 bucket where data will be saved
-    s3_folder: optional path within bucket where data will be saved
-    """
-    print 'Uploading train and test files to AWS S3 bucket', s3_bucket
-
-    conn = S3Connection(aws_key, aws_secret)
-    bucket = conn.get_bucket(s3_bucket)
-    ktrain = S3Key(bucket)
-
-    if s3_folder:
-        aws_train_path = os.path.join(s3_folder, train_path)
-        aws_test_path = os.path.join(s3_folder, test_path)
-    else:
-        aws_train_path = train_path
-        aws_test_path = test_path
-
-    ktrain.key = aws_train_path
-    ktrain.set_contents_from_filename(train_path)
-    ktest = S3Key(bucket)
-    ktest.key = aws_test_path
-    ktest.set_contents_from_filename(test_path)
-
-
 def create_datarun(db, dataset, run_config):
     """
     Given a config, creates a set of dataruns for the config and enters them into
@@ -119,7 +87,7 @@ def create_datarun(db, dataset, run_config):
     return datarun
 
 
-def enter_dataset(db, run_config, aws_config=None, upload_data=False):
+def enter_dataset(db, run_config, aws_config=None):
     """
     Generate a dataset, and update run_config with the dataset ID.
 
@@ -127,7 +95,6 @@ def enter_dataset(db, run_config, aws_config=None, upload_data=False):
     run_config: all attributes necessary to initialize a Datarun, including
         Dataset info
     aws_config: all attributes necessary to connect to an S3 bucket.
-    upload_data: whether to store processed data in the cloud
 
     Returns: the generated dataset object
     """
@@ -139,16 +106,10 @@ def enter_dataset(db, run_config, aws_config=None, upload_data=False):
                              run_config.data_description)
     run_config.dataset_id = dataset.id
 
-    # if we need to upload the train/test data, do it now
-    if upload_data:
-        upload_data(dataset.train_path, dataset.test_path,
-                    s3_config.access_key, s3_config.secret_key,
-                    s3_config.bucket, s3_config.folder)
-
     return dataset
 
 
-def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False,
+def enter_datarun(sql_config, run_config, aws_config=None,
                   run_per_partition=False):
     """
     Generate a datarun, including a dataset if necessary.
@@ -157,7 +118,6 @@ def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False,
     run_config: all attributes necessary to initialize a Datarun, including
         Dataset info if the dataset has not already been created.
     aws_config: all attributes necessary to connect to an S3 bucket.
-    upload_data: whether to store processed data in the cloud
 
     Returns: ID of the generated datarun
     """
@@ -169,8 +129,7 @@ def enter_datarun(sql_config, run_config, aws_config=None, upload_data=False,
     # if the user has provided a dataset id, use that. Otherwise, create a new
     # dataset based on the arguments we were passed.
     if run_config.dataset_id is None:
-        dataset = enter_dataset(db, run_config, aws_config=aws_config,
-                                upload_data=upload_data)
+        dataset = enter_dataset(db, run_config, aws_config=aws_config)
     else:
         dataset = db.get_dataset(run_config.dataset_id)
 
@@ -239,10 +198,6 @@ folder for more information. """)
     add_arguments_sql(parser)
     add_arguments_datarun(parser)
 
-    # add our own argument, which determines whether to upload data
-    parser.add_argument('--upload-data', action='store_true',
-                        help='Whether to upload processed data to s3')
-
     args = parser.parse_args()
 
     # create config objects from the config files and/or command line args
@@ -251,4 +206,4 @@ folder for more information. """)
                                                      aws_path=args.aws_config,
                                                      args=args)
     # create and save the dataset and datarun
-    enter_datarun(sql_config, run_config, aws_config, upload_data=args.upload_data)
+    enter_datarun(sql_config, run_config, aws_config)
