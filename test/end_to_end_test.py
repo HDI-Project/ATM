@@ -72,6 +72,8 @@ db = Database(**vars(sql_config))
 print 'creating dataruns...'
 datarun_ids = []
 for ds in DATASETS:
+    # remove existing and redownload data to ensure clasifiers are generated
+    os.remove(DATA_DIR+ds)
     run_config.train_path = download_file_url(S3_BUCKET+ds, DATA_DIR)
     dataset = enter_dataset(db, run_config, aws_config)
     datarun_ids.append(enter_datarun(sql_config, run_config, aws_config))
