@@ -507,4 +507,5 @@ if __name__ == '__main__':
          save_files=args.save_files,
          cloud_mode=args.cloud_mode,
          aws_config=aws_config,
-         total_time=args.time)
+         total_time=args.time,
+         wait=False)

@@ -3,16 +3,22 @@ ATM - Auto Tune Models
 ATM is an open source software library under ["The human data interaction project"](https://hdi-dai.lids.mit.edu/) at MIT.  It is a distributed scalable AutoML system designed with ease of use in mind. ATM takes in data with pre-extracted feature vectors and labels (target column) in a simple CSV file format. It attempts to learn several classifiers (machine learning models to predict the label) in parallel. In the end, ATM returns a number of classifiers and the best classifier with a specified set of hyperparameters. 
 
 ## Current status
-**atm** and the accompanying library **btb** are under active development (transitioning from an older system to new). In the next couple of weeks we intend to update its documentation, its testing infrastructure, provide apis and establish a framework for the community to contribute. Stay tuned for updates. Meanwhile, if you have any questions, or if would like to receive updates: **please email to dailabmit@gmail.com. **
+**atm** and the accompanying library **btb** are under active development (transitioning from an older system to a new one). In the next couple of weeks we intend to update its documentation, its testing infrastructure, provide APIs and establish a framework for the community to contribute. Stay tuned for updates. Meanwhile, if you have any questions or you would like to receive updates, **please email dailabmit@gmail.com. **
 
 ## Setup/Installation 
-1. **Clone project**.
+This section describes the quickest way to get started with ATM on a modern
+machine running Ubuntu Linux. We hope to have more in-depth guides in the
+future, but for now, you should be able to substitute commands for the package
+manager of your choice to get ATM up and running on most modern Unix-based
+systems.
+
+1. **Clone the project**.
    ```
       $ git clone https://github.com/hdi-project/atm.git /path/to/atm
       $ cd /path/to/atm
    ```
 
-2. **Install database.**
+2. **Install a database.**
    - for SQLite (simpler):
    ```
       $ sudo apt install sqlite3
@@ -54,7 +60,7 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
     ```
       $ python atm/enter_data.py
     ```
-   This command will create a ``Datarun``. A ``Datarun`` in ATM is a unique machine learning task for which models are sought. This        command will use the following default settings:
+   This command will create a ``Datarun``. A ``Datarun`` in ATM is a single logical machine learning task. If you run the above command without any arguments, it will use the following default settings:
    * ``sqllite`` as the database 
    * ``atm.db`` as the database name (more about what is collected in this database and what is it used for is described [here](https://cyphe.rs/static/atm.pdf)
    * ``pollution_1.csv`` as the dataset for which classifiers are sought. 
@@ -98,9 +104,9 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
     Judgment metric (f1): 0.536 +- 0.067
     Best so far (learner 21): 0.716 +- 0.035
    ```
-   Occassionally the worker will throw an error when it can't learn a classifier due to erroneous settings. The errors are logged in the    database. The worker however moves on to trying the next classifier.  And that's it! You can break out of the worker with Ctrl+C and restart it      with the same command; it will pick up right where it left off. You can also start multiple workers at the same time in different   terminals to parallelize the
-   work - by simply calling the above command again. When all 100 learners in your budget have been computed, all workers will
-   exit gracefully.
+   Occassionally the worker will throw an error when it can't learn a classifier due to erroneous settings. The errors are logged in the database. The worker however moves on to trying the next classifier.  
+
+You can break out of the worker with Ctrl+C and restart it with the same command; it will pick up right where it left off. You can also start multiple workers at the same time in different   terminals to parallelize the work by calling the above command again. When all 100 learners in your budget have been computed, all workers will exit gracefully.
  
 ## Customizing config settings, and running on your own data 
 
