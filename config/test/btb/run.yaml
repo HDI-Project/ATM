@@ -1,8 +1,7 @@
 # this will be overridden by the test script
-train_path: 
+train_path:
 test_path:
 data_description: 
-output_folder: data/processed/
 label_column: class
 
 # use every algorithm we have

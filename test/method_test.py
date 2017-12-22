@@ -18,11 +18,9 @@ CONF_DIR = 'config/test/method/'
 DATA_DIR = 'data/test/'
 RUN_CONFIG = join(CONF_DIR, 'run.yaml')
 SQL_CONFIG = join(CONF_DIR, 'sql.yaml')
-AWS_CONFIG = join(CONF_DIR, 'aws.yaml')
 DATASETS = [
     'iris.data.csv',
-    #'multilabeltest.csv',
-    #'bigmultilabeltest.csv',
+    'pollution_1.csv',
 ]
 
 
@@ -34,12 +32,11 @@ jobs are finished.
 parser.add_argument('--processes', help='number of processes to run concurrently',
                     type=int, default=1)
 parser.add_argument('--method', help='code for method to test')
-parser.add_argument('--method-json', help='path to config for method to test')
+parser.add_argument('--method-path', help='path to JSON config for method to test')
 
 args = parser.parse_args()
 sql_config, run_config, aws_config = load_config(sql_path=SQL_CONFIG,
-                                                 run_path=RUN_CONFIG,
-                                                 aws_path=AWS_CONFIG)
+                                                 run_path=RUN_CONFIG)
 db = Database(**vars(sql_config))
 
 print 'creating dataruns...'

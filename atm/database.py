@@ -15,7 +15,7 @@ from datetime import datetime
 from operator import attrgetter
 
 from atm.constants import *
-from atm.utilities import object_to_base_64, base_64_to_object
+from atm.utilities import *
 
 
 METHOD_ROWS = [
@@ -122,27 +122,20 @@ class Database(object):
             __tablename__ = 'datasets'
 
             id = Column(Integer, primary_key=True, autoincrement=True)
-
             name = Column(String(100), nullable=False)
+
+            # fields necessary for loading/processing data
             description = Column(String(1000))
             train_path = Column(String(200), nullable=False)
             test_path = Column(String(200))
-            wrapper64 = Column(String(200), nullable=False)
+            label_column = Column(String(100), nullable=False)
 
-            label_column = Column(Integer, nullable=False)
+            # metadata fields, for convenience
             n_examples = Column(Integer, nullable=False)
             k_classes = Column(Integer, nullable=False)
             d_features = Column(Integer, nullable=False)
             majority = Column(Numeric(precision=10, scale=9), nullable=False)
             size_kb = Column(Integer, nullable=False)
-
-            @property
-            def wrapper(self):
-                return base_64_to_object(self.wrapper64)
-
-            @wrapper.setter
-            def wrapper(self, value):
-                self.wrapper64 = object_to_base_64(value)
 
             def __repr__(self):
                 base = "<%s: %s, %d classes, %d features, %d examples>"
@@ -472,7 +465,7 @@ class Database(object):
             One of ['mu_sigma', 'cv_judgment_metric', 'test_judgment_metric'].
         """
         if score_target == 'mu_sigma':
-            func = lambda l: l.cv_judgment_metric - 2 * l.cv_judgment_metric_stdev
+            func = lambda c: c.cv_judgment_metric - 2 * c.cv_judgment_metric_stdev
         else:
             func = attrgetter(score_target)
 
@@ -491,6 +484,23 @@ class Database(object):
     ###########################################################################
     ##  Methods to update the database  #######################################
     ###########################################################################
+    @try_with_session(commit=True)
+    def create_dataset(self, session, **kwargs):
+        dataset = self.Dataset(**kwargs)
+        session.add(dataset)
+        return dataset
+
+    @try_with_session(commit=True)
+    def create_datarun(self, session, **kwargs):
+        datarun = self.Datarun(**kwargs)
+        session.add(datarun)
+        return datarun
+
+    @try_with_session(commit=True)
+    def create_hyperpartition(self, session, **kwargs):
+        part = self.Hyperpartition(**kwargs)
+        session.add(part)
+        return part
 
     @try_with_session(commit=True)
     def create_classifier(self, session, hyperpartition_id, datarun_id, host, params):
@@ -509,7 +519,7 @@ class Database(object):
         hyperpartition = session.query(self.Hyperpartition).get(hyperpartition_id)
         hyperpartition.classifiers += 1
 
-        return classifier.id
+        return classifier
 
     @try_with_session(commit=True)
     def complete_classifier(self, session, classifier_id, trainable_params,

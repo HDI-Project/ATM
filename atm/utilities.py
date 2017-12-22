@@ -9,6 +9,7 @@ import re
 from boto.s3.connection import S3Connection, Key
 
 from btb import ParamTypes
+from atm.constants import *
 
 # global variable storing this machine's public IP address
 # (so we only have to fetch it once)
@@ -74,8 +75,8 @@ def object_to_base_64(obj):
 
 def base_64_to_object(b64str):
     """
-    Inverse of ObjectToBase64.
-    Decode base64-encoded string and then de-pickle it.
+    Inverse of object_to_base_64.
+    Decode base64-encoded string and then unpickle it.
     """
     decoded = base64.b64decode(b64str)
     return pickle.loads(decoded)
@@ -90,27 +91,19 @@ def vector_to_params(vector, tunables, categoricals, constants):
     """
     Converts a numpy vector to a dictionary mapping keys to named parameters.
 
-    `vector` is single example to convert
-    `tunables` keys back from vector format to dictionaries.
+    vector: single example to convert
 
-    Examples of the format for SVM sigmoid hyperpartition below:
+    Examples of the format for SVM sigmoid hyperpartition:
 
-        tunables = [
-            ('C', HyperParameter(type='float_exp', range=(1e-05, 1e5))),
-            ('degree', HyperParameter(type='int', range=(2, 4))),
-            ('gamma', HyperParameter(type='float_exp', range=(1e-05, 1e5))),
-        ]
+    tunables = [('C', HyperParameter(type='float_exp', range=(1e-05, 1e5))),
+                ('degree', HyperParameter(type='int', range=(2, 4))),
+                ('gamma', HyperParameter(type='float_exp', range=(1e-05, 1e5)))]
 
-        categoricals = (
-            ('kernel', 'poly'),
-            ('probability', True),
-            ('_scale', True)
-        )
+    categoricals = (('kernel', 'poly'),
+                    ('probability', True),
+                    ('_scale', True))
 
-        constants = [
-            ('cache_size', 15000)
-        ]
-
+    constants = [('cache_size', 15000)]
     """
     params = {}
 
@@ -142,11 +135,9 @@ def params_to_vectors(params, tunables):
         tunables: list of HyperParameter metadata structures describing all
             the optimizable hyperparameters that should be in each vector. e.g.
 
-        tunables = [
-            ('C',  HyperParameter(type='float_exp', range=(1e-5, 1e5))),
-            ('degree',  HyperParameter('int', (2, 4))),
-            ('gamma',  HyperParameter('float_exp', (1e-05, 1e5)))
-        ]
+        tunables = [('C',  HyperParameter(type='float_exp', range=(1e-5, 1e5))),
+                    ('degree',  HyperParameter('int', (2, 4))),
+                    ('gamma',  HyperParameter('float_exp', (1e-05, 1e5)))]
 
     Returns:
         vectors: np.array of parameter vectors ready to be optimized by a
@@ -180,30 +171,66 @@ def save_metric(metric_path, object):
         pickle.dump(object, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def read_atm_csv(filepath):
+def get_local_data_path(data_path):
     """
-    Read a csv and return a numpy array.
-    This works from the assumption the data has been preprocessed by atm:
-    no headers, numerical data only
+    given a data path of the form "s3://..." or "http://...", return the local
+    path where the file should be stored once it's downloaded.
     """
-    num_cols = len(open(filepath).readline().split(','))
-    with open(filepath) as f:
-        for i, _ in enumerate(f):
-            pass
-    num_rows = i + 1
+    if data_path is None:
+        return None, None
 
-    data = np.zeros((num_rows, num_cols))
+    m = re.match(S3_PREFIX, data_path)
+    if m:
+        path = data_path[len(m.group()):].split('/')
+        bucket = path.pop(0)
+        return os.path.join(DATA_PATH, path[-1]), FileType.S3
 
-    with open(filepath) as f:
-        for i, line in enumerate(f):
-            for j, cell in enumerate(line.split(',')):
-                data[i, j] = float(cell)
+    m = re.match(HTTP_PREFIX, data_path)
+    if m:
+        path = data_path[len(m.group()):].split('/')
+        return os.path.join(DATA_PATH, path[-1]), FileType.HTTP
 
-    return data
+    return data_path, FileType.LOCAL
 
 
-def download_file_url(url, local_folder=None):
-    """ Download a file from an S3 bucket and save it at keyname.  """
+def download_file_s3(aws_path, aws_config, local_folder=DATA_PATH):
+    """ Download a file from an S3 bucket and save it in the local folder. """
+    # remove the prefix and extract the S3 bucket, folder, and file name
+    m = re.match(S3_PREFIX, aws_path)
+    split = aws_path[len(m.group()):].split('/')
+    s3_bucket = split.pop(0)
+    s3_folder = '/'.join(split[:-1])
+    keyname = split[-1]
+
+    # create the local folder if necessary
+    if local_folder is not None:
+        ensure_directory(local_folder)
+        path = os.path.join(local_folder, keyname)
+    else:
+        path = keyname
+
+    if os.path.isfile(path):
+        print 'file %s already exists!' % path
+        return path
+
+    conn = S3Connection(aws_config.access_key, aws_config.secret_key)
+    bucket = conn.get_bucket(s3_bucket)
+
+    if s3_folder:
+        aws_keyname = os.path.join(s3_folder, keyname)
+    else:
+        aws_keyname = keyname
+
+    print 'downloading data from S3...'
+    s3key = Key(bucket)
+    s3key.key = aws_keyname
+    s3key.get_contents_to_filename(path)
+
+    return path
+
+
+def download_file_http(url, local_folder=DATA_PATH):
+    """ Download a file from a public URL and save it locally. """
     filename = url.split('/')[-1]
     if local_folder is not None:
         ensure_directory(local_folder)
@@ -224,30 +251,28 @@ def download_file_url(url, local_folder=None):
     return path
 
 
-def download_file_s3(keyname, aws_key, aws_secret, s3_bucket,
-                     s3_folder=None, local_folder=None):
-    """ Download a file from an S3 bucket and save it at keyname.  """
-    if local_folder is not None:
-        ensure_directory(local_folder)
-        path = os.path.join(local_folder, keyname)
-    else:
-        path = keyname
+def download_data(train_path, test_path=None, aws_config=None):
+    """
+    Download a set of train/test data from AWS (if necessary) and return the
+    path to the local data.
+    """
+    local_train_path, train_type = get_local_data_path(train_path)
+    local_test_path, test_type = get_local_data_path(test_path)
 
-    if os.path.isfile(path):
-        print 'file %s already exists!' % path
-        return path
+    # if the data are not present locally, try to download them from the
+    # internet (either an S3 bucket or a http connection)
+    if not os.path.isfile(local_train_path):
+        if train_type == FileType.HTTP:
+            assert (download_file_http(train_path) == local_train_path)
+        elif train_type == FileType.S3:
+            assert (download_file_s3(train_path, aws_config=aws_config) ==
+                    local_train_path)
 
-    conn = S3Connection(aws_key, aws_secret)
-    bucket = conn.get_bucket(s3_bucket)
+    if local_test_path and not os.path.isfile(local_test_path):
+        if test_type == FileType.HTTP:
+            assert (download_file_http(test_path) == local_test_path)
+        elif test_type == FileType.S3:
+            assert (download_file_s3(test_path, aws_config=aws_config) ==
+                    local_test_path)
 
-    if s3_folder:
-        aws_keyname = os.path.join(s3_folder, keyname)
-    else:
-        aws_keyname = keyname
-
-    print 'downloading data from S3...'
-    s3key = Key(bucket)
-    s3key.key = aws_keyname
-    s3key.get_contents_to_filename(path)
-
-    return path
+    return local_train_path, local_test_path

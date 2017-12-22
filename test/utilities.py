@@ -54,7 +54,7 @@ def print_summary(db, rid):
     print 'Datarun %s' % run
 
     classifiers = db.get_classifiers(datarun_id=rid)
-    print 'Classifierss: %d total' % len(classifiers)
+    print 'Classifiers: %d total' % len(classifiers)
 
     best = db.get_best_classifier(datarun_id=run.id)
     if best is not None:
@@ -126,13 +126,16 @@ def work_parallel(db, datarun_ids=None, aws_config=None, n_procs=4):
                   choose_randomly=True, cloud_mode=False,
                   aws_config=aws_config, wait=False)
 
-    # spawn a set of worker processes to work on the dataruns
-    procs = []
-    for i in range(n_procs):
-        p = Process(target=work, kwargs=kwargs)
-        p.start()
-        procs.append(p)
+    if n_procs > 1:
+        # spawn a set of worker processes to work on the dataruns
+        procs = []
+        for i in range(n_procs):
+            p = Process(target=work, kwargs=kwargs)
+            p.start()
+            procs.append(p)
 
-    # wait for them to finish
-    for p in procs:
-        p.join()
+        # wait for them to finish
+        for p in procs:
+            p.join()
+    else:
+        work(**kwargs)

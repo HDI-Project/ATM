@@ -24,6 +24,8 @@ PARTITION_STATUS = ['incomplete', 'errored', 'gridding_done']
 
 TIME_FMT = "%Y-%m-%d %H:%M"
 
+DATA_PATH = 'data/downloads'
+
 TUNERS_MAP = {
     'uniform': UniformTuner,
     'gp': GP,
@@ -73,3 +75,59 @@ class PartitionStatus:
     INCOMPLETE = 'incomplete'
     GRIDDING_DONE = 'gridding_done'
     ERRORED = 'errored'
+
+S3_PREFIX = '^s3://'
+HTTP_PREFIX = '^https?://'
+
+class FileType:
+    LOCAL = 'local'
+    S3 = 's3'
+    HTTP = 'http'
+
+# these are the strings that are used to index into results dictionaries
+class Metrics:
+    ACCURACY = 'accuracy'
+    RANK_ACCURACY = 'rank_accuracy'
+    COHEN_KAPPA = 'cohen_kappa'
+    F1 = 'f1'
+    F1_MICRO = 'f1_micro'
+    F1_MACRO = 'f1_macro'
+    ROC_AUC = 'roc_auc'     # receiver operating characteristic
+    ROC_AUC_MICRO = 'roc_auc_micro'
+    ROC_AUC_MACRO = 'roc_auc_macro'
+    AP = 'ap'               # average precision
+    PR_CURVE = 'pr_curve'
+    ROC_CURVE = 'roc_curve'
+
+METRICS_BINARY = [
+    Metrics.ACCURACY,
+    Metrics.COHEN_KAPPA,
+    Metrics.F1,
+    Metrics.ROC_AUC,
+    Metrics.AP,
+]
+
+METRICS_MULTICLASS = [
+    Metrics.ACCURACY,
+    Metrics.RANK_ACCURACY,
+    Metrics.COHEN_KAPPA,
+    Metrics.F1_MICRO,
+    Metrics.F1_MACRO,
+    Metrics.ROC_AUC_MICRO,
+    Metrics.ROC_AUC_MACRO,
+]
+
+METRIC_DEFAULT_SCORES = {
+    Metrics.ACCURACY: 0.0,
+    Metrics.RANK_ACCURACY: 0.0,
+    Metrics.COHEN_KAPPA: 0.0,
+    Metrics.F1: 0.0,
+    Metrics.F1_MICRO: 0.0,
+    Metrics.F1_MACRO: 0.0,
+    Metrics.ROC_AUC: 0.5,
+    Metrics.ROC_AUC_MICRO: 0.5,
+    Metrics.ROC_AUC_MACRO: 0.5,
+    Metrics.AP: 0.0,
+}
+
+N_FOLDS_DEFAULT = 10

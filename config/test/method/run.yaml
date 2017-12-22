@@ -4,22 +4,8 @@ test_path:
 data_description: 
 label_column: class
 
-# use every method we have
+# methods have to be specified by the test script
 methods: 
-    - logreg
-    - svm
-    - sgd
-    - dt
-    - et
-    - rf
-    - gnb
-    - mnb
-    - bnb
-    - gp
-    - pa
-    - knn
-    - dbn
-    - mlp
 # directory to store trained models; will be created if it doesn't exist
 models_dir: models/
 # priority (higher number is more important)
@@ -27,7 +13,7 @@ priority: 1
 # Should there be a classifier or walltime budget?
 budget_type: classifier
 # If budget_type is classifier, how many classifiers to try?
-budget: 100
+budget: 1
 # How should ATM sample hyperparameters from a given frozen set?
 tuner: gp
 # r_min is the number of random runs performed in each hyperpartition before 
@@ -38,7 +24,7 @@ gridding: 0
 # How should ATM select a particular hyperpartition (frozen set) from the 
 # set of all hyperpartitions? 
 selector: bestk
-# k is number that xxx_k methods use. It is similar to r_min, except it is 
+# k is number that xxx_k tuners use. It is similar to r_min, except it is 
 # called k_window and determines how much "history" ATM considers for certain
 # frozen selection logics.
 k_window: 5
