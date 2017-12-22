@@ -1,5 +1,4 @@
 import argparse
-import matplotlib.pyplot as plt
 import numpy as np
 
 from collections import defaultdict
@@ -7,6 +6,12 @@ from multiprocessing import Process
 
 from atm.config import *
 from atm.worker import work
+
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    plt = None
+
 
 def get_best_so_far(db, datarun_id):
     """
@@ -30,6 +35,9 @@ def graph_series(length, title, **series):
     title: what to title the graph
     **series: mapping of labels to series of performance data
     """
+    if plt is None:
+        raise ImportError("Unable to import matplotlib")
+
     lines = []
     for label, data in series.items():
         # copy up to `length` of the values in `series` into y.
