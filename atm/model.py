@@ -186,7 +186,7 @@ class Model(object):
                                                      random_state=self.random_state)
 
         # extract feature matrix and labels from raw data
-        self.encoder = DataEncoder()
+        self.encoder = DataEncoder(label_column=self.label_column)
         X_train, y_train = self.encoder.fit_transform(train_data)
         X_test, y_test = self.encoder.transform(test_data)
 
