@@ -53,6 +53,10 @@
         "_scale": {
            "type": "string",
            "range": [true]
+        },
+        "max_iter": {
+           "type": "int",
+           "range": [50000]
         }
     },
     "root_parameters": ["batch_size", "solver", "alpha", "activation", "num_hidden_layers", "_scale"],

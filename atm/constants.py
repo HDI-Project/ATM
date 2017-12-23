@@ -14,7 +14,7 @@ METRICS = ['f1', 'roc_auc', 'accuracy', 'mu_sigma']
 SCORE_TARGETS = ['cv', 'test']
 BUDGET_TYPES = ['none', 'classifier', 'walltime']
 METHODS = ['logreg', 'svm', 'sgd', 'dt', 'et', 'rf', 'gnb', 'mnb', 'bnb',
-              'gp', 'pa', 'knn', 'dbn', 'mlp']
+              'gp', 'pa', 'knn', 'dbn', 'mlp', 'ada']
 TUNERS = ['uniform', 'gp', 'gp_ei', 'gp_eivel']
 SELECTORS = ['uniform', 'ucb1', 'bestk', 'bestkvel', 'purebestkvel', 'recentk',
              'recentkvel', 'hieralg']
@@ -59,6 +59,7 @@ METHODS_MAP = {
     'knn': 'k_nearest_neighbors.json',
     'dbn': 'deep_belief_network.json',
     'mlp': 'multi_layer_perceptron.json',
+    'ada': 'adaboost.json'
 }
 
 class ClassifierStatus:
