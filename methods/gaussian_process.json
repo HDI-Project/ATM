@@ -21,6 +21,10 @@
         "periodicity": {
            "type": "int_cat",
            "range": [0, 1]
+        },
+        "max_iter_predict": {
+           "type": "int",
+           "range": [5000]
         }
     },
     "root_parameters": ["kernel"],

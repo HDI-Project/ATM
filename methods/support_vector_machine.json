@@ -41,6 +41,10 @@
         "_scale": {
            "type": "bool",
            "range": [true]
+        },
+        "max_iter": {
+           "type": "int",
+           "range": [50000]
         }
     },
     "root_parameters": ["C", "kernel", "probability", "shrinking", "cache_size", "class_weight", "_scale"],
