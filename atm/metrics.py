@@ -2,7 +2,7 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.metrics import f1_score, precision_recall_curve, auc, roc_curve,\
                             accuracy_score, cohen_kappa_score, roc_auc_score,\
-                            average_precision_score
+                            average_precision_score, matthews_corrcoef
 
 import numpy as np
 import pandas as pd
@@ -69,6 +69,7 @@ def get_metrics_binary(y_true, y_pred, y_pred_probs, include_curves=False):
         Metrics.ACCURACY: accuracy_score(y_true, y_pred),
         Metrics.COHEN_KAPPA: cohen_kappa_score(y_true, y_pred),
         Metrics.F1: f1_score(y_true, y_pred),
+        Metrics.MCC: matthews_corrcoef(y_true, y_pred),
         Metrics.ROC_AUC: np.nan,
         Metrics.AP: np.nan,
     }

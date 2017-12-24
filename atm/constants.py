@@ -10,7 +10,7 @@ from btb.selection import Uniform as UniformSelector, UCB1,\
 # TODO: convert these lists and classes to something more elegant, like enums
 # perhaps?
 SQL_DIALECTS = ['sqlite', 'mysql']
-METRICS = ['f1', 'roc_auc', 'accuracy', 'mu_sigma']
+METRICS = ['f1', 'roc_auc', 'accuracy', 'mu_sigma', 'mcc']
 SCORE_TARGETS = ['cv', 'test']
 BUDGET_TYPES = ['none', 'classifier', 'walltime']
 METHODS = ['logreg', 'svm', 'sgd', 'dt', 'et', 'rf', 'gnb', 'mnb', 'bnb',
@@ -99,6 +99,7 @@ class Metrics:
     AP = 'ap'               # average precision
     PR_CURVE = 'pr_curve'
     ROC_CURVE = 'roc_curve'
+    MCC = 'mcc'
 
 METRICS_BINARY = [
     Metrics.ACCURACY,
@@ -106,6 +107,7 @@ METRICS_BINARY = [
     Metrics.F1,
     Metrics.ROC_AUC,
     Metrics.AP,
+    Metrics.MCC,
 ]
 
 METRICS_MULTICLASS = [
