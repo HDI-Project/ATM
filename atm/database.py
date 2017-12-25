@@ -275,6 +275,8 @@ class Database(object):
             def mu_sigma_judgment_metric(self):
                 # compute the lower confidence bound on the cross-validated
                 # judgment metric
+                if self.cv_judgment_metric is None:
+                    return None
                 return (self.cv_judgment_metric - 2 *
                         self.cv_judgment_metric_stdev)
 

@@ -342,12 +342,13 @@ class Worker(object):
         def metric_string(model):
             if 'cv' in target or 'mu_sigma' in target:
                 return '%.3f +- %.3f' % (model.cv_judgment_metric,
-                                           2 * model.cv_judgment_metric_stdev)
+                                         2 * model.cv_judgment_metric_stdev)
             else:
                 return '%.3f' % model.test_judgment_metric
 
-        _log('Judgment metric (%s): %s' % (self.datarun.metric,
-                                           metric_string(model)))
+        _log('Judgment metric (%s, %s): %s' % (self.datarun.metric,
+                                               target[:-len('_judgment_metric')],
+                                               metric_string(model)))
 
         old_best = self.db.get_best_classifier(datarun_id=self.datarun.id,
                                                score_target=target)
@@ -356,8 +357,8 @@ class Worker(object):
                 _log('New best score! Previous best (classifier %s): %s' %
                      (old_best.id, metric_string(old_best)))
             else:
-                _log('Best so far (classifier %s): %.3f +- %.3f' %
-                     (old_best.id, metric_string(old_best)))
+                _log('Best so far (classifier %s): %s' % (old_best.id,
+                                                          metric_string(old_best)))
 
         return model, performance
 
