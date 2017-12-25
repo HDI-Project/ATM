@@ -35,11 +35,7 @@ os.environ['GNUMPY_IMPLICIT_CONVERSION'] = 'allow'
 
 # get the file system in order
 # make sure we have directories where we need them
-MODELS_DIR = 'models'
-METRICS_DIR = 'metrics'
 LOG_DIR = 'logs'
-ensure_directory(MODELS_DIR)
-ensure_directory(METRICS_DIR)
 ensure_directory(LOG_DIR)
 
 # name log file after the local hostname
@@ -65,7 +61,7 @@ class ClassifierError(Exception):
 
 class Worker(object):
     def __init__(self, database, datarun, save_files=True, cloud_mode=False,
-                 aws_config=None):
+                 aws_config=None, model_dir='models', metric_dir='metrics'):
         """
         database: Database object with connection information
         datarun: Datarun ORM object to work on.
@@ -78,6 +74,11 @@ class Worker(object):
         self.save_files = save_files
         self.cloud_mode = cloud_mode
         self.aws_config = aws_config
+
+        self.model_dir = model_dir
+        self.metric_dir = metric_dir
+        ensure_directory(self.model_dir)
+        ensure_directory(self.metric_dir)
 
         # load the Dataset from the database
         self.dataset = self.db.get_dataset(self.datarun.dataset_id)
@@ -145,12 +146,12 @@ class Worker(object):
 
         # whether to save model and performance data to the filesystem
         if self.save_files:
-            local_model_path = make_model_path(MODELS_DIR, phash, rhash,
+            local_model_path = make_model_path(self.model_dir, phash, rhash,
                                                self.datarun.description)
             _log('Saving model in: %s' % local_model_path)
             joblib.dump(model, local_model_path, compress=9)
 
-            local_metric_path = make_metric_path(METRICS_DIR, phash, rhash,
+            local_metric_path = make_metric_path(self.metric_dir, phash, rhash,
                                                  self.datarun.description)
             _log('Saving metrics in: %s' % local_metric_path)
             save_metric(local_metric_path, object=performance)
@@ -410,7 +411,8 @@ class Worker(object):
 
 
 def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
-         cloud_mode=False, aws_config=None, total_time=None, wait=True):
+         cloud_mode=False, aws_config=None, total_time=None, wait=True,
+         model_dir='models',metric_dir='metrics'):
     """
     Check the ModelHub database for unfinished dataruns, and spawn workers to
     work on them as they are added. This process will continue to run until it
@@ -464,7 +466,8 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         _log('Computing on datarun %d' % run.id)
         # actual work happens here
         worker = Worker(db, run, save_files=save_files,
-                        cloud_mode=cloud_mode, aws_config=aws_config)
+                        cloud_mode=cloud_mode, aws_config=aws_config,
+                        model_dir=model_dir, metric_dir=metric_dir)
         try:
             worker.run_classifier()
         except ClassifierError as e:
@@ -495,6 +498,10 @@ if __name__ == '__main__':
     parser.add_argument('--no-save', dest='save_files', default=True,
                         action='store_const', const=False,
                         help="don't save models and metrics for later")
+    parser.add_argument('--model-dir', dest='model_persist_dir', default='models',
+                        help='Directory where computed models will be saved')
+    parser.add_argument('--metric-dir', dest='metric_persist_dir', default='metrics',
+                        help='Directory where model metrics will be saved')
 
     # parse arguments and load configuration
     args = parser.parse_args()
@@ -508,4 +515,6 @@ if __name__ == '__main__':
          cloud_mode=args.cloud_mode,
          aws_config=aws_config,
          total_time=args.time,
-         wait=False)
+         wait=False,
+         model_dir=args.model_persist_dir,
+         metric_dir=args.metric_persist_dir)
