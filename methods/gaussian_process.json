@@ -7,8 +7,8 @@
             "range": ["constant", "rbf", "matern", "rational_quadratic", "exp_sine_squared"]
         },
         "nu": {
-            "type": "string",
-            "range": ["l1", "l2", "elasticnet"]
+            "type": "float_cat",
+            "range": [0.5, 1.5, 2.5]
         },
         "length_scale": {
            "type": "float_exp",
@@ -21,10 +21,6 @@
         "periodicity": {
            "type": "int_cat",
            "range": [0, 1]
-        },
-        "max_iter_predict": {
-           "type": "int",
-           "range": [5000]
         }
     },
     "root_parameters": ["kernel"],
