@@ -30,6 +30,7 @@ systems.
    ```
 
 3. **Install python dependencies.**
+   - python=2.7
    ```
       $ virtualenv venv
       $ . venv/bin/activate
