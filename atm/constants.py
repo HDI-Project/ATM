@@ -10,11 +10,10 @@ from btb.selection import Uniform as UniformSelector, UCB1,\
 # TODO: convert these lists and classes to something more elegant, like enums
 # perhaps?
 SQL_DIALECTS = ['sqlite', 'mysql']
-METRICS = ['f1', 'roc_auc', 'accuracy', 'mu_sigma', 'mcc']
-SCORE_TARGETS = ['cv', 'test']
+SCORE_TARGETS = ['cv', 'test', 'mu_sigma']
 BUDGET_TYPES = ['none', 'classifier', 'walltime']
 METHODS = ['logreg', 'svm', 'sgd', 'dt', 'et', 'rf', 'gnb', 'mnb', 'bnb',
-              'gp', 'pa', 'knn', 'dbn', 'mlp', 'ada']
+           'gp', 'pa', 'knn', 'dbn', 'mlp', 'ada']
 TUNERS = ['uniform', 'gp', 'gp_ei', 'gp_eivel']
 SELECTORS = ['uniform', 'ucb1', 'bestk', 'bestkvel', 'purebestkvel', 'recentk',
              'recentkvel', 'hieralg']
@@ -97,9 +96,22 @@ class Metrics:
     ROC_AUC_MICRO = 'roc_auc_micro'
     ROC_AUC_MACRO = 'roc_auc_macro'
     AP = 'ap'               # average precision
+    MCC = 'mcc'             # matthews correlation coefficient
     PR_CURVE = 'pr_curve'
     ROC_CURVE = 'roc_curve'
-    MCC = 'mcc'
+
+METRIC_DEFAULT_SCORES = {
+    Metrics.ACCURACY: 0.0,
+    Metrics.RANK_ACCURACY: 0.0,
+    Metrics.COHEN_KAPPA: 0.0,
+    Metrics.F1: 0.0,
+    Metrics.F1_MICRO: 0.0,
+    Metrics.F1_MACRO: 0.0,
+    Metrics.ROC_AUC: 0.5,
+    Metrics.ROC_AUC_MICRO: 0.5,
+    Metrics.ROC_AUC_MACRO: 0.5,
+    Metrics.AP: 0.0,
+}
 
 METRICS_BINARY = [
     Metrics.ACCURACY,
@@ -120,17 +132,6 @@ METRICS_MULTICLASS = [
     Metrics.ROC_AUC_MACRO,
 ]
 
-METRIC_DEFAULT_SCORES = {
-    Metrics.ACCURACY: 0.0,
-    Metrics.RANK_ACCURACY: 0.0,
-    Metrics.COHEN_KAPPA: 0.0,
-    Metrics.F1: 0.0,
-    Metrics.F1_MICRO: 0.0,
-    Metrics.F1_MACRO: 0.0,
-    Metrics.ROC_AUC: 0.5,
-    Metrics.ROC_AUC_MICRO: 0.5,
-    Metrics.ROC_AUC_MACRO: 0.5,
-    Metrics.AP: 0.0,
-}
+METRICS = list(set(METRICS_BINARY + METRICS_MULTICLASS))
 
 N_FOLDS_DEFAULT = 10
