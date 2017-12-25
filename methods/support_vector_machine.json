@@ -47,7 +47,7 @@
            "range": [50000]
         }
     },
-    "root_parameters": ["C", "kernel", "probability", "shrinking", "cache_size", "class_weight", "_scale"],
+    "root_parameters": ["C", "kernel", "probability", "shrinking", "cache_size", "class_weight", "max_iter", "_scale"],
     "conditions": {
         "kernel": {
             "rbf": ["gamma"],
