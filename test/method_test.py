@@ -1,4 +1,5 @@
 #!/usr/bin/python2.7
+from __future__ import print_function
 import argparse
 import os
 import yaml
@@ -39,7 +40,7 @@ sql_config, run_config, aws_config = load_config(sql_path=SQL_CONFIG,
                                                  run_path=RUN_CONFIG)
 db = Database(**vars(sql_config))
 
-print 'creating dataruns...'
+print('creating dataruns...')
 datarun_ids = []
 for ds in DATASETS:
     run_config.train_path = join(DATA_DIR, ds)
@@ -48,11 +49,11 @@ for ds in DATASETS:
     datarun_ids.extend(enter_datarun(sql_config, run_config, aws_config,
                                      run_per_partition=True))
 
-print 'computing on dataruns', datarun_ids
+print('computing on dataruns', datarun_ids)
 work_parallel(db=db, datarun_ids=datarun_ids, aws_config=aws_config,
               n_procs=args.processes)
 
-print 'workers finished.'
+print('workers finished.')
 
 for rid in datarun_ids:
     print_hp_summary(db, rid)

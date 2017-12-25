@@ -1,3 +1,4 @@
+from __future__ import print_function
 import argparse
 import os
 import random
@@ -61,7 +62,7 @@ datarun_ids = {}
 
 datasets = os.listdir(BASELINE_PATH)
 datasets = datasets[:5]
-print 'using datasets', ', '.join(datasets)
+print('using datasets', ', '.join(datasets))
 
 # generate datasets and dataruns
 for ds in datasets:

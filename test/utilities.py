@@ -1,3 +1,4 @@
+from __future__ import print_function
 import argparse
 import numpy as np
 
@@ -20,7 +21,7 @@ def get_best_so_far(db, datarun_id):
     # generate a list of the "best so far" score after each classifier was
     # computed (in chronological order)
     classifiers = db.get_classifiers(datarun_id=datarun_id)
-    print 'run %s: %d classifiers' % (datarun_id, len(classifiers))
+    print('run %s: %d classifiers' % (datarun_id, len(classifiers)))
     y = []
     for l in classifiers:
         best_so_far = max(y + [l.cv_judgment_metric])
@@ -57,19 +58,19 @@ def graph_series(length, title, **series):
 def print_summary(db, rid):
     run = db.get_datarun(rid)
     ds = db.get_dataset(run.dataset_id)
-    print
-    print 'Dataset %s' % ds
-    print 'Datarun %s' % run
+    print()
+    print('Dataset %s' % ds)
+    print('Datarun %s' % run)
 
     classifiers = db.get_classifiers(datarun_id=rid)
-    print 'Classifiers: %d total' % len(classifiers)
+    print('Classifiers: %d total' % len(classifiers))
 
     best = db.get_best_classifier(datarun_id=run.id)
     if best is not None:
         score = best.cv_judgment_metric
         err = 2 * best.cv_judgment_metric_stdev
-        print 'Best result overall: classifier %d, %s = %.3f +- %.3f' %\
-            (best.id, run.metric, score, err)
+        print('Best result overall: classifier %d, %s = %.3f +- %.3f' %\
+            (best.id, run.metric, score, err))
 
 
 def print_method_summary(db, rid):
@@ -84,22 +85,22 @@ def print_method_summary(db, rid):
         alg_map[hp.method][hp.id].append(l)
 
     for alg, hp_map in alg_map.items():
-        print
-        print 'method %s:' % alg
+        print()
+        print('method %s:' % alg)
 
         classifiers = sum(hp_map.values(), [])
         errored = len([l for l in classifiers if l.status ==
                        ClassifierStatus.ERRORED])
         complete = len([l for l in classifiers if l.status ==
                         ClassifierStatus.COMPLETE])
-        print '\t%d errored, %d complete' % (errored, complete)
+        print('\t%d errored, %d complete' % (errored, complete))
 
         best = db.get_best_classifier(datarun_id=rid, method=alg)
         if best is not None:
             score = best.cv_judgment_metric
             err = 2 * best.cv_judgment_metric_stdev
-            print '\tBest: classifier %s, %s = %.3f +- %.3f' % (best, run.metric,
-                                                                score, err)
+            print('\tBest: classifier %s, %s = %.3f +- %.3f' % (best, run.metric,
+                                                                score, err))
 
 def print_hp_summary(db, rid):
     run = db.get_datarun(rid)
@@ -111,25 +112,25 @@ def print_hp_summary(db, rid):
         part_map[hp].append(c)
 
     for hp, classifiers in part_map.items():
-        print
-        print 'hyperpartition', hp
-        print db.get_hyperpartition(hp)
+        print()
+        print('hyperpartition', hp)
+        print(db.get_hyperpartition(hp))
 
         errored = len([c for c in classifiers if c.status ==
                        ClassifierStatus.ERRORED])
         complete = len([c for c in classifiers if c.status ==
                         ClassifierStatus.COMPLETE])
-        print '\t%d errored, %d complete' % (errored, complete)
+        print('\t%d errored, %d complete' % (errored, complete))
 
         best = db.get_best_classifier(datarun_id=rid, hyperpartition_id=hp)
         if best is not None:
             score = best.cv_judgment_metric
             err = 2 * best.cv_judgment_metric_stdev
-            print '\tBest: classifier %s, %s = %.3f +- %.3f' % (best, run.metric,
-                                                                score, err)
+            print('\tBest: classifier %s, %s = %.3f +- %.3f' % (best, run.metric,
+                                                                score, err))
 
 def work_parallel(db, datarun_ids=None, aws_config=None, n_procs=4):
-    print 'starting workers...'
+    print('starting workers...')
     kwargs = dict(db=db, datarun_ids=datarun_ids, save_files=False,
                   choose_randomly=True, cloud_mode=False,
                   aws_config=aws_config, wait=False)
