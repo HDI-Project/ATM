@@ -1,6 +1,10 @@
 from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+
 import pickle
-import urllib2
+import urllib.request
 import hashlib
 import numpy as np
 import os
@@ -55,7 +59,7 @@ def get_public_ip():
     global public_ip
     if public_ip is None:
         try:
-            response = urllib2.urlopen(PUBLIC_IP_URL, timeout=2)
+            response = urllib.request.urlopen(PUBLIC_IP_URL, timeout=2)
             data = response.read().strip()
             # pull an ip-looking set of numbers from the response
             match = re.search('\d+\.\d+\.\d+\.\d+', data)
@@ -244,7 +248,7 @@ def download_file_http(url, local_folder=DATA_PATH):
         return path
 
     print('downloading data from %s...' % url)
-    f = urllib2.urlopen(url)
+    f = urllib.request.urlopen(url)
     data = f.read()
     with open(path, "wb") as outfile:
         outfile.write(data)

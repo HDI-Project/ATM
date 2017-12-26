@@ -1,3 +1,4 @@
+from builtins import object
 import yaml
 from argparse import ArgumentError
 

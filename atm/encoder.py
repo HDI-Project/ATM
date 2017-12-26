@@ -1,3 +1,5 @@
+from __future__ import division
+from builtins import object
 import pandas as pd
 import numpy as np
 import os
@@ -28,7 +30,7 @@ class MetaData(object):
         for c in data.columns:
             if data[c].dtype == 'object':
                 total_features += len(np.unique(data[c])) - 1
-        majority_percentage = float(max(counts)) / float(sum(counts))
+        majority_percentage = max(counts) / sum(counts)
 
         self.n_examples = data.shape[0]
         self.d_features = total_features

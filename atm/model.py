@@ -3,7 +3,8 @@
    :synopsis: Model around classification method.
 
 """
-from __future__ import print_function
+from __future__ import print_function, division
+from builtins import object
 import numpy as np
 import pandas as pd
 import time
@@ -90,9 +91,9 @@ class Model(object):
         steps = []
 
         # create a classifier with specified parameters
-        hyperparameters = {k: v for k, v in self.params.iteritems()
+        hyperparameters = {k: v for k, v in self.params.items()
                            if k not in Model.ATM_KEYS}
-        atm_params = {k: v for k, v in self.params.iteritems()
+        atm_params = {k: v for k, v in self.params.items()
                       if k in Model.ATM_KEYS}
 
         # do special conversions
@@ -149,7 +150,7 @@ class Model(object):
         test_scores = test_pipeline(self.pipeline, X, y, binary)
 
         total = time.time() - starttime
-        self.avg_prediction_time = total / float(len(y))
+        self.avg_prediction_time = total / len(y)
         self.test_judgment_metric = test_scores.get(self.judgment_metric)
 
         return test_scores

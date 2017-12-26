@@ -1,4 +1,7 @@
-from __future__ import print_function
+from __future__ import print_function, division
+from builtins import map
+from past.utils import old_div
+
 import argparse
 import os
 import warnings
@@ -45,7 +48,7 @@ def create_dataset(db, label_column, train_path, test_path=None,
                                 k_classes=meta.k_classes,
                                 d_features=meta.d_features,
                                 majority=meta.majority,
-                                size_kb=meta.size / 1000)
+                                size_kb=old_div(meta.size, 1000))
     return dataset
 
 

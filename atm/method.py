@@ -1,3 +1,4 @@
+from builtins import str, object
 import json
 from os.path import join
 from btb import HyperParameter

@@ -1,11 +1,6 @@
 #!/usr/bin/python2.7
 from __future__ import print_function
-from atm.config import *
-from atm.constants import *
-from atm.utilities import *
-from atm.model import Model
-from atm.database import Database, ClassifierStatus
-from btb.tuning.constants import Tuners
+from builtins import str, object
 
 import argparse
 import ast
@@ -27,6 +22,13 @@ from operator import attrgetter
 import numpy as np
 import pandas as pd
 from boto.s3.connection import S3Connection, Key as S3Key
+
+from atm.config import *
+from atm.constants import *
+from atm.utilities import *
+from atm.model import Model
+from atm.database import Database, ClassifierStatus
+from btb.tuning.constants import Tuners
 
 # shhh
 warnings.filterwarnings('ignore')

@@ -1,4 +1,5 @@
 from __future__ import print_function
+from builtins import str, object
 from sqlalchemy import (create_engine, inspect, exists, Column, Unicode, String,
                         ForeignKey, Integer, Boolean, DateTime, Enum, MetaData,
                         Numeric, Table, Text)
