@@ -1,4 +1,5 @@
 #!/usr/bin/python2.7
+from __future__ import print_function
 from atm.config import *
 from atm.constants import *
 from atm.utilities import *
@@ -54,7 +55,7 @@ def _log(msg, stdout=True):
     with open(LOG_FILE, 'a') as lf:
         lf.write(msg + '\n')
     if stdout:
-        print msg
+        print(msg)
 
 
 # Exception thrown when something goes wrong for the worker, but the worker

@@ -1,3 +1,4 @@
+from __future__ import print_function
 from sqlalchemy import (create_engine, inspect, exists, Column, Unicode, String,
                         ForeignKey, Integer, Boolean, DateTime, Enum, MetaData,
                         Numeric, Table, Text)
@@ -65,8 +66,8 @@ def try_with_session(default=lambda: None, commit=False):
                 result = default()
                 argstr = ', '.join([str(a) for a in args])
                 kwargstr = ', '.join(['%s=%s' % kv for kv in kwargs.items()])
-                print "Error in %s(%s, %s):" % (func.__name__, argstr, kwargstr)
-                print traceback.format_exc()
+                print("Error in %s(%s, %s):" % (func.__name__, argstr, kwargstr))
+                print(traceback.format_exc())
             finally:
                 session.close()
 

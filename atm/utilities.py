@@ -1,3 +1,4 @@
+from __future__ import print_function
 import pickle
 import urllib2
 import hashlib
@@ -61,7 +62,7 @@ def get_public_ip():
             if match:
                 public_ip = match.group()
         except Exception as e:  # any exception, doesn't matter what
-            print 'could not get public IP:', e
+            print('could not get public IP:', e)
             public_ip = 'localhost'
 
     return public_ip
@@ -210,7 +211,7 @@ def download_file_s3(aws_path, aws_config, local_folder=DATA_PATH):
         path = keyname
 
     if os.path.isfile(path):
-        print 'file %s already exists!' % path
+        print('file %s already exists!' % path)
         return path
 
     conn = S3Connection(aws_config.access_key, aws_config.secret_key)
@@ -221,7 +222,7 @@ def download_file_s3(aws_path, aws_config, local_folder=DATA_PATH):
     else:
         aws_keyname = keyname
 
-    print 'downloading data from S3...'
+    print('downloading data from S3...')
     s3key = Key(bucket)
     s3key.key = aws_keyname
     s3key.get_contents_to_filename(path)
@@ -239,10 +240,10 @@ def download_file_http(url, local_folder=DATA_PATH):
         path = filename
 
     if os.path.isfile(path):
-        print 'file %s already exists!' % path
+        print('file %s already exists!' % path)
         return path
 
-    print 'downloading data from %s...' % url
+    print('downloading data from %s...' % url)
     f = urllib2.urlopen(url)
     data = f.read()
     with open(path, "wb") as outfile:

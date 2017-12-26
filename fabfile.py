@@ -1,3 +1,4 @@
+from __future__ import print_function
 from fabric.api import *
 from fabric.colors import green as _green, yellow as _yellow
 import boto.ec2

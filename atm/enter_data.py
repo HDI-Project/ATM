@@ -1,3 +1,4 @@
+from __future__ import print_function
 import argparse
 import os
 import warnings
@@ -98,10 +99,10 @@ def enter_dataset(db, run_config, aws_config=None):
 
     Returns: the generated dataset object
     """
-    print 'downloading data...'
+    print('downloading data...')
     train_path, test_path = download_data(run_config.train_path,
                                           run_config.test_path, aws_config)
-    print 'creating dataset...'
+    print('creating dataset...')
     dataset = create_dataset(db, run_config.label_column, train_path, test_path,
                              run_config.data_description)
     run_config.dataset_id = dataset.id
@@ -138,16 +139,16 @@ def enter_datarun(sql_config, run_config, aws_config=None,
         # enumerate all combinations of categorical variables for this method
         method = Method(METHODS_MAP[m])
         method_parts[m] = method.get_hyperpartitions()
-        print 'method', m, 'has', len(method_parts[m]), 'hyperpartitions'
+        print('method', m, 'has', len(method_parts[m]), 'hyperpartitions')
 
-    print
+    print()
     # create hyperpartitions and datarun(s)
     run_ids = []
     if not run_per_partition:
-        print 'saving datarun...'
+        print('saving datarun...')
         datarun = create_datarun(db, dataset, run_config)
 
-    print 'saving hyperpartions...'
+    print('saving hyperpartions...')
     for method, parts in method_parts.items():
         for part in parts:
             # if necessary, create a new datarun for each hyperpartition.
@@ -164,20 +165,20 @@ def enter_datarun(sql_config, run_config, aws_config=None,
                                      categoricals=part.categoricals,
                                      status=PartitionStatus.INCOMPLETE)
 
-    print 'done!'
-    print
-    print '========== Summary =========='
-    print 'Dataset ID:', dataset.id
-    print 'Training data:', dataset.train_path
-    print 'Test data:', (dataset.test_path or '(None)')
+    print('done!')
+    print()
+    print('========== Summary ==========')
+    print('Dataset ID:', dataset.id)
+    print('Training data:', dataset.train_path)
+    print('Test data:', (dataset.test_path or '(None)'))
     if run_per_partition:
-        print 'Datarun IDs:', ', '.join(map(str, run_ids))
+        print('Datarun IDs:', ', '.join(map(str, run_ids)))
     else:
-        print 'Datarun ID:', datarun.id
-    print 'Hyperpartition selection strategy:', datarun.selector
-    print 'Parameter tuning strategy:', datarun.tuner
-    print 'Budget: %d (%s)' % (datarun.budget, datarun.budget_type)
-    print
+        print('Datarun ID:', datarun.id)
+    print('Hyperpartition selection strategy:', datarun.selector)
+    print('Parameter tuning strategy:', datarun.tuner)
+    print('Budget: %d (%s)' % (datarun.budget, datarun.budget_type))
+    print()
 
     return run_ids or datarun.id
 

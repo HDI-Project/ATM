@@ -1,4 +1,5 @@
 #!/usr/bin/python2.7
+from __future__ import print_function
 import argparse
 import os
 import yaml
@@ -65,7 +66,7 @@ sql_config, run_config, _ = load_config(sql_path=SQL_CONFIG,
 
 db = Database(**vars(sql_config))
 
-print 'creating dataruns...'
+print('creating dataruns...')
 datarun_ids = []
 for ds in DATASETS:
     run_config.train_path = join(DATA_DIR, ds)
@@ -75,7 +76,7 @@ for ds in DATASETS:
 
 work_parallel(db=db, datarun_ids=datarun_ids, n_procs=args.processes)
 
-print 'workers finished.'
+print('workers finished.')
 
 for rid in datarun_ids:
     print_summary(db, rid)

@@ -3,6 +3,7 @@
    :synopsis: Model around classification method.
 
 """
+from __future__ import print_function
 import numpy as np
 import pandas as pd
 import time
@@ -110,8 +111,8 @@ class Model(object):
                 self.dimensions = int(pca_dims)
             else:
                 self.dimensions = int(pca_dims * float(self.num_features))
-                print "*** Using PCA to reduce %d features to %d dimensions" %\
-                    (self.num_features, self.dimensions)
+                print("*** Using PCA to reduce %d features to %d dimensions" %\
+                    (self.num_features, self.dimensions))
                 pca = decomposition.PCA(n_components=self.dimensions, whiten=whiten)
                 steps.append(('pca', pca))
 
