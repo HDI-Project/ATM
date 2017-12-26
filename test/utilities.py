@@ -63,7 +63,11 @@ def print_summary(db, rid):
     print('Datarun %s' % run)
 
     classifiers = db.get_classifiers(datarun_id=rid)
-    print('Classifiers: %d total' % len(classifiers))
+    errs = db.get_classifiers(datarun_id=rid, status=ClassifierStatus.ERRORED)
+    complete = db.get_classifiers(datarun_id=rid,
+                                  status=ClassifierStatus.COMPLETE)
+    print('Classifiers: %d total; %d errors, %d complete' %
+          (len(classifiers), len(errs), len(complete)))
 
     best = db.get_best_classifier(datarun_id=run.id)
     if best is not None:

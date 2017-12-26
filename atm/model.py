@@ -111,8 +111,8 @@ class Model(object):
                 self.dimensions = int(pca_dims)
             else:
                 self.dimensions = int(pca_dims * float(self.num_features))
-                print("*** Using PCA to reduce %d features to %d dimensions" %\
-                    (self.num_features, self.dimensions))
+                print("*** Using PCA to reduce %d features to %d dimensions" %
+                      (self.num_features, self.dimensions))
                 pca = decomposition.PCA(n_components=self.dimensions, whiten=whiten)
                 steps.append(('pca', pca))
 
@@ -137,8 +137,8 @@ class Model(object):
 
     def test_final_model(self, X, y):
         """
-        Test the (already trained) model pipeline on the provided test data (X
-        and y). Store the test judgment metric and return the rest of the
+        Test the (already trained) model pipeline on the provided test data
+        (X and y). Store the test judgment metric and return the rest of the
         metrics as a hierarchical dictionary.
         """
         # time the prediction

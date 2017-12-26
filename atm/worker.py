@@ -47,7 +47,7 @@ ensure_directory(LOG_DIR)
 LOG_FILE = os.path.join(LOG_DIR, '%s.txt' % socket.gethostname())
 
 # how long to sleep between loops while waiting for new dataruns to be added
-LOOP_WAIT = 5
+LOOP_WAIT = 1
 
 
 # TODO: use python's logging module instead of this

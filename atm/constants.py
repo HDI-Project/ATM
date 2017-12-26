@@ -1,20 +1,19 @@
-# sample tuning
+# sample tuners
 from btb.tuning import Uniform as UniformTuner, GP, GPEi, GPEiVelocity
 # hyperpartition selectors
 from btb.selection import Uniform as UniformSelector, UCB1,\
-                                     BestKReward, BestKVelocity,\
-                                     RecentKReward, RecentKVelocity,\
-                                     HierarchicalByAlgorithm, PureBestKVelocity
+                          BestKReward, BestKVelocity, RecentKReward,\
+                          RecentKVelocity, HierarchicalByAlgorithm,\
+                          PureBestKVelocity
 
 # A bunch of constants which are used throughout the project, mostly for config.
 # TODO: convert these lists and classes to something more elegant, like enums
-# perhaps?
 SQL_DIALECTS = ['sqlite', 'mysql']
 METRICS = ['f1', 'roc_auc', 'accuracy', 'mu_sigma', 'mcc']
 SCORE_TARGETS = ['cv', 'test']
 BUDGET_TYPES = ['none', 'classifier', 'walltime']
 METHODS = ['logreg', 'svm', 'sgd', 'dt', 'et', 'rf', 'gnb', 'mnb', 'bnb',
-              'gp', 'pa', 'knn', 'dbn', 'mlp', 'ada']
+           'gp', 'pa', 'knn', 'dbn', 'mlp', 'ada']
 TUNERS = ['uniform', 'gp', 'gp_ei', 'gp_eivel']
 SELECTORS = ['uniform', 'ucb1', 'bestk', 'bestkvel', 'purebestkvel', 'recentk',
              'recentkvel', 'hieralg']
