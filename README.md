@@ -257,3 +257,9 @@ There are a number of ways user can use the system and most of it is controlled 
 <!--```-->
 
 <!--Note: Any dataset with less than 30 samples will fail for the DBN classifier unless the DBN `minibatch_size` constant is changed to match the number of samples.-->
+
+## Related Projects
+
+### Featuretools
+
+[Featuretools](https://github.com/featuretools/featuretools) is a python library for automated feature engineering. It can be used to prepare raw transactional and relational datasets for ATM. It is created and maintaned by [Feature Labs](https://www.featurelabs.com) and is also a part of the [Human Data Interaction Project](https://hdi-dai.lids.mit.edu/).
