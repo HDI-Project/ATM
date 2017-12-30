@@ -15,6 +15,7 @@ ATM has the following features:
 * It can be run locally, on AWS\*, or on a custom compute cluster\* 
 * It can be configured to use a variety of AutoML approaches for hyperparameter tuning and selection, available in the accompanying library [btb](https://github.com/hdi-project/btb)
 * It stores models, metrics and cross validated accuracy information about each classifier it has trained. 
+
 (\**work in progress! See issue [#40](https://github.com/HDI-Project/ATM/issues/40)*)
 
 ## Current status
