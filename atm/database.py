@@ -1,7 +1,6 @@
 from __future__ import print_function
-from sqlalchemy import (create_engine, inspect, exists, Column, Unicode, String,
-                        ForeignKey, Integer, Boolean, DateTime, Enum, MetaData,
-                        Numeric, Table, Text)
+from sqlalchemy import (create_engine, Column,  String, ForeignKey, Integer,
+                        Boolean, DateTime, Enum, MetaData, Numeric, Table, Text)
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.url import URL
@@ -94,13 +93,13 @@ class Database(object):
             id = Column(Integer, primary_key=True, autoincrement=True)
             name = Column(String(100), nullable=False)
 
-            # fields necessary for loading/processing data
+            # columns necessary for loading/processing data
             description = Column(String(1000))
             train_path = Column(String(200), nullable=False)
             test_path = Column(String(200))
             label_column = Column(String(100), nullable=False)
 
-            # metadata fields, for convenience
+            # metadata columns, for convenience
             n_examples = Column(Integer, nullable=False)
             k_classes = Column(Integer, nullable=False)
             d_features = Column(Integer, nullable=False)
@@ -112,31 +111,35 @@ class Database(object):
                 return base % (self.name, self.description, self.k_classes,
                                self.d_features, self.n_examples)
 
-        self.Dataset = Dataset
-
         class Datarun(Base):
             __tablename__ = 'dataruns'
 
+            # relational columns
             id = Column(Integer, primary_key=True, autoincrement=True)
             dataset_id = Column(Integer, ForeignKey('datasets.id'))
+            dataset = relationship('Dataset', back_populates='dataruns')
 
             description = Column(String(200), nullable=False)
             priority = Column(Integer)
 
+            # hyperparameter selection and tuning settings
             selector = Column(Enum(*SELECTORS), nullable=False)
             k_window = Column(Integer)
             tuner = Column(Enum(*TUNERS), nullable=False)
             gridding = Column(Integer, nullable=False)
             r_min = Column(Integer)
 
+            # budget settings
             budget_type = Column(Enum(*BUDGET_TYPES))
             budget = Column(Integer)
             deadline = Column(DateTime)
 
+            # which metric to use for judgment, and how to compute it
             metric = Column(Enum(*METRICS))
             score_target = Column(Enum(*[s + '_judgment_metric' for s in
                                          SCORE_TARGETS]))
 
+            # variables that store the status of the datarun
             started = Column(DateTime)
             completed = Column(DateTime)
             status = Column(Enum(*DATARUN_STATUS), default=RunStatus.PENDING)
@@ -146,20 +149,24 @@ class Database(object):
                 return base % (self.id, self.dataset_id, self.description,
                                self.budget_type, self.budget, self.status)
 
-        self.Datarun = Datarun
+        Dataset.dataruns = relationship('Datarun', order_by='Datarun.id',
+                                        back_populates='dataset')
 
         class Hyperpartition(Base):
             __tablename__ = 'hyperpartitions'
 
+            # relational columns
             id = Column(Integer, primary_key=True, autoincrement=True)
             datarun_id = Column(Integer, ForeignKey('dataruns.id'))
-            method = Column(String(15))
+            datarun = relationship('Datarun', back_populates='hyperpartitions')
 
+            # these columns define the partition
+            method = Column(String(15))
             categoricals64 = Column(Text)
             tunables64 = Column(Text)
             constants64 = Column(Text)
 
-            classifiers = Column(Integer, default=0)
+            # has the partition had too many errors, or is gridding done?
             status = Column(Enum(*PARTITION_STATUS),
                             default=PartitionStatus.INCOMPLETE)
 
@@ -199,15 +206,22 @@ class Database(object):
             def __repr__(self):
                 return "<%s: %s>" % (self.method, self.categoricals)
 
-        self.Hyperpartition = Hyperpartition
+        Datarun.hyperpartitions = relationship('Hyperpartition',
+                                               order_by='Hyperpartition.id',
+                                               back_populates='datarun')
 
         class Classifier(Base):
             __tablename__ = 'classifiers'
 
+            # relational columns
             id = Column(Integer, primary_key=True, autoincrement=True)
             datarun_id = Column(Integer, ForeignKey('dataruns.id'))
+            datarun = relationship('Datarun', back_populates='classifiers')
             hyperpartition_id = Column(Integer, ForeignKey('hyperpartitions.id'))
+            hyperpartition = relationship('Hyperpartition',
+                                          back_populates='classifiers')
 
+            # these columns point to where the output is stored
             model_path = Column(String(300))
             metric_path = Column(String(300))
             params64 = Column(Text, nullable=False)
@@ -254,6 +268,16 @@ class Database(object):
                 params = ', '.join(['%s: %s' % i for i in self.params.items()])
                 return "<id=%d, params=(%s)>" % (self.id, params)
 
+        Datarun.classifiers = relationship('Classifier',
+                                           order_by='Classifier.id',
+                                           back_populates='datarun')
+        Hyperpartition.classifiers = relationship('Classifier',
+                                                  order_by='Classifier.id',
+                                                  back_populates='hyperpartition')
+
+        self.Dataset = Dataset
+        self.Datarun = Datarun
+        self.Hyperpartition = Hyperpartition
         self.Classifier = Classifier
 
         Base.metadata.create_all(bind=self.engine)
@@ -479,7 +503,6 @@ class Database(object):
         session.add(classifier)
 
         hyperpartition = session.query(self.Hyperpartition).get(hyperpartition_id)
-        hyperpartition.classifiers += 1
 
         return classifier
 
