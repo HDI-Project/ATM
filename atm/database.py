@@ -272,6 +272,15 @@ class Database(object):
             def trainable_params(self, value):
                 self.trainable_params64 = object_to_base_64(value)
 
+            @property
+            def mu_sigma_judgment_metric(self):
+                # compute the lower confidence bound on the cross-validated
+                # judgment metric
+                if self.cv_judgment_metric is None:
+                    return None
+                return (self.cv_judgment_metric - 2 *
+                        self.cv_judgment_metric_stdev)
+
             def __repr__(self):
                 params = ', '.join(['%s: %s' % i for i in self.params.items()])
                 return "<id=%d, params=(%s)>" % (self.id, params)
@@ -455,7 +464,7 @@ class Database(object):
         return None
 
     @try_with_session()
-    def get_best_classifier(self, session, score_target='mu_sigma',
+    def get_best_classifier(self, session, score_target,
                             dataset_id=None, datarun_id=None,
                             method=None, hyperpartition_id=None):
         """
@@ -463,13 +472,7 @@ class Database(object):
         classifier has the highest value of (score.mean - 2 * score.std)?
 
         score_target: indicates the metric by which to judge the best classifier.
-            One of ['mu_sigma', 'cv_judgment_metric', 'test_judgment_metric'].
         """
-        if score_target == 'mu_sigma':
-            func = lambda c: c.cv_judgment_metric - 2 * c.cv_judgment_metric_stdev
-        else:
-            func = attrgetter(score_target)
-
         classifiers = self.get_classifiers(dataset_id=dataset_id,
                                            datarun_id=datarun_id,
                                            method=method,
@@ -479,7 +482,7 @@ class Database(object):
         if not classifiers:
             return None
 
-        best = max(classifiers, key=func)
+        best = max(classifiers, key=attrgetter(score_target))
         return best
 
     ###########################################################################

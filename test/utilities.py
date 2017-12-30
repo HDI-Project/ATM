@@ -69,7 +69,8 @@ def print_summary(db, rid):
     print('Classifiers: %d total; %d errors, %d complete' %
           (len(classifiers), len(errs), len(complete)))
 
-    best = db.get_best_classifier(datarun_id=run.id)
+    best = db.get_best_classifier(score_target=run.score_target,
+                                  datarun_id=run.id)
     if best is not None:
         score = best.cv_judgment_metric
         err = 2 * best.cv_judgment_metric_stdev
@@ -99,7 +100,8 @@ def print_method_summary(db, rid):
                         ClassifierStatus.COMPLETE])
         print('\t%d errored, %d complete' % (errored, complete))
 
-        best = db.get_best_classifier(datarun_id=rid, method=alg)
+        best = db.get_best_classifier(score_target=run.score_target,
+                                      datarun_id=rid, method=alg)
         if best is not None:
             score = best.cv_judgment_metric
             err = 2 * best.cv_judgment_metric_stdev
@@ -126,7 +128,8 @@ def print_hp_summary(db, rid):
                         ClassifierStatus.COMPLETE])
         print('\t%d errored, %d complete' % (errored, complete))
 
-        best = db.get_best_classifier(datarun_id=rid, hyperpartition_id=hp)
+        best = db.get_best_classifier(score_target=run.score_target,
+                                      datarun_id=rid, hyperpartition_id=hp)
         if best is not None:
             score = best.cv_judgment_metric
             err = 2 * best.cv_judgment_metric_stdev

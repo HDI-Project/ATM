@@ -330,9 +330,10 @@ def add_arguments_datarun(parser):
     # Which data to use for computing judgment score
     #   cv   - cross-validated performance on training data
     #   test - performance on test data
+    #   mu_sigma - lower confidence bound on cv score
     parser.add_argument('--score-target', choices=SCORE_TARGETS,
                         help='whether to compute metrics by cross-validation or on '
-                        'test data (if available)')
+                        'test data')
 
     return parser
 

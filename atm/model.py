@@ -133,6 +133,8 @@ class Model(object):
                                                 n_folds=self.N_FOLDS)
         self.cv_judgment_metric = np.mean(df[self.judgment_metric])
         self.cv_judgment_metric_stdev = np.std(df[self.judgment_metric])
+        self.mu_sigma_judgment_metric = (self.cv_judgment_metric -
+                                         2 * self.cv_judgment_metric_stdev)
         return cv_scores
 
     def test_final_model(self, X, y):
