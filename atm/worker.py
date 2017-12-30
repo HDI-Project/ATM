@@ -302,7 +302,7 @@ class Worker(object):
         if self.datarun.budget_type == 'classifier':
             # hyperpartition classifier counts are updated whenever a classifier
             # is created, so this will count running, errored, and complete.
-            n_completed = sum([len(p.classifiers) for p in hyperpartitions])
+            n_completed = len(self.db.get_classifiers(datarun_id=self.datarun.id))
             if n_completed >= self.datarun.budget:
                 _log('Classifier budget has run out!')
                 return True

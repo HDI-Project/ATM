@@ -344,8 +344,8 @@ class Database(object):
 
     @try_with_session(default=list)
     def get_hyperpartitions(self, session, dataset_id=None, datarun_id=None,
-                        method=None, ignore_gridding_done=True,
-                        ignore_errored=True):
+                            method=None, ignore_gridding_done=True,
+                            ignore_errored=True):
         """
         Return all the hyperpartitions in a given datarun by id.
         By default, only returns incomplete hyperpartitions.
@@ -427,7 +427,7 @@ class Database(object):
 
     @try_with_session(default=list)
     def get_methods(self, session, dataset_id=None, datarun_id=None,
-                       ignore_errored=False, ignore_gridding_done=False):
+                    ignore_errored=False, ignore_gridding_done=False):
         """ Get all methods used in a particular datarun. """
         hyperpartitions = self.get_hyperpartitions(dataset_id=dataset_id,
                                                    datarun_id=datarun_id,
