@@ -16,7 +16,7 @@ ATM has the following features:
 * It can be configured to use a variety of AutoML approaches for hyperparameter tuning and selection, available in the accompanying library [btb](https://github.com/hdi-project/btb)
 * It stores models, metrics and cross validated accuracy information about each classifier it has trained. 
 
-(\**work in progress! See issue [#40](https://github.com/HDI-Project/ATM/issues/40)*)
+\**work in progress! See issue [#40](https://github.com/HDI-Project/ATM/issues/40)*
 
 ## Current status
 ATM and the accompanying library BTB are under active development (transitioning from an older system to a new one). In the coming weeks we intend to update ATM's documentation, build out testing infrastructure, stablize its APIs, and establish a framework for the community to contribute. In the meantime, ATM's API and its conventions will be *highly volatile*. In particular, the ModelHub database schema and the code used to save and load models and performance data are likely to change. If you save data with one version of ATM and then pull the latest version of the code, there is **no guarantee** that the new code will be compatible with the old data. If you intend to build a long-term project on ATM starting right now, you should be comfortable doing your own data/database migrations in order to receive new features and bug fixes. It may be advisable to fork this repository and pull in changes manually. 
