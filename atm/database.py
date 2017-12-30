@@ -19,23 +19,6 @@ from atm.constants import *
 from atm.utilities import *
 
 
-METHOD_ROWS = [
-	dict(id=1, code='svm', name='Support Vector Machine', probability=True),
-	dict(id=2, code='et', name='Extra Trees', probability=True),
-	dict(id=3, code='pa', name='Passive Aggressive', probability=False),
-	dict(id=4, code='sgd', name='Stochastic Gradient Descent', probability=True),
-	dict(id=5, code='rf', name='Random Forest', probability=True),
-	dict(id=6, code='mnb', name='Multinomial Naive Bayes', probability=True),
-	dict(id=7, code='bnb', name='Bernoulii Naive Bayes', probability=True),
-	dict(id=8, code='dbn', name='Deef Belief Network', probability=False),
-	dict(id=9, code='logreg', name='Logistic Regression', probability=True),
-	dict(id=10, code='gnb', name='Gaussian Naive Bayes', probability=True),
-	dict(id=11, code='dt', name='Decision Tree', probability=True),
-	dict(id=12, code='knn', name='K Nearest Neighbors', probability=True),
-	dict(id=13, code='mlp', name='Multi-Layer Perceptron', probability=True),
-	dict(id=14, code='gp', name='Gaussian Process', probability=True),
-]
-
 MAX_HYPERPARTITION_ERRORS = 3
 
 
@@ -90,7 +73,6 @@ class Database(object):
         self.get_session = sessionmaker(bind=self.engine,
                                         expire_on_commit=False)
         self.define_tables()
-        self.create_methods()
 
     def define_tables(self):
         """
@@ -105,19 +87,6 @@ class Database(object):
 
         metadata = MetaData(bind=self.engine)
         Base = declarative_base()
-
-        class Method(Base):
-            __tablename__ = 'methods'
-
-            id = Column(Integer, primary_key=True, autoincrement=True)
-            code = Column(String(15), nullable=False)
-            name = Column(String(30), nullable=False)
-            probability = Column(Boolean)
-
-            def __repr__(self):
-                return "<%s (%s)>" % (self.name, self.code)
-
-        self.Method = Method
 
         class Dataset(Base):
             __tablename__ = 'datasets'
@@ -288,17 +257,6 @@ class Database(object):
         self.Classifier = Classifier
 
         Base.metadata.create_all(bind=self.engine)
-
-    @try_with_session()
-    def create_methods(self, session):
-        """ Enter all the default methods into the database. """
-        for r in METHOD_ROWS:
-            if not session.query(self.Dataset).get(r['id']):
-                args = dict(r)
-                del args['id']
-                m = self.Method(**args)
-                session.add(m)
-        session.commit()
 
     ###########################################################################
     ##  Standard query methods  ###############################################
