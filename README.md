@@ -3,7 +3,9 @@ ATM - Auto Tune Models
 ATM is an open source software library under ["The human data interaction project"](https://hdi-dai.lids.mit.edu/) at MIT.  It is a distributed scalable AutoML system designed with ease of use in mind. ATM takes in data with pre-extracted feature vectors and labels (target column) in a simple CSV file format. It attempts to learn several classifiers (machine learning models to predict the label) in parallel. In the end, ATM returns a number of classifiers and the best classifier with a specified set of hyperparameters. 
 
 ## Current status
-**atm** and the accompanying library **btb** are under active development (transitioning from an older system to a new one). In the next couple of weeks we intend to update its documentation, its testing infrastructure, provide APIs and establish a framework for the community to contribute. Stay tuned for updates. Meanwhile, if you have any questions or you would like to receive updates, **please email dailabmit@gmail.com. **
+**atm** and the accompanying library **btb** are under active development (transitioning from an older system to a new one). In the coming weeks we intend to update its documentation and its testing infrastructure, develop stable APIs, and establish a framework for the community to contribute. In the meantime, ATM's API and its conventions will be *highly volatile*. In particular, the ModelHub database schema and the code used to save and load models and performance data are likely to change. If you save data with one version of ATM and then pull the latest version of the code, there is no guarantee that the new code will be compatible with the old data. If you intend to build a long-term project on ATM starting right now, you should be comfortable doing your own data/database migrations in order to receive new features and bug fixes. It may be advisable to fork this repository and pull in changes manually. 
+
+Stay tuned for updates. If you have any questions or you would like to stay informed about the status of the project, **please email dailabmit@gmail.com.**
 
 ## Setup/Installation 
 This section describes the quickest way to get started with ATM on a modern
@@ -260,6 +262,10 @@ There are a number of ways user can use the system and most of it is controlled 
 
 ## Related Projects
 
+### BTB
+[BTB](https://github.com/hdi-project/btb), for Bayesian Tuning and Bandits, is the core AutoML library in development under the HDI project. BTB exposes several methods for hyperparameter selection and tuning through a common API. It allows domain experts to extend existing methods and add new ones easily. BTB is a central part of ATM, and the two projects were developed in tandem, but it is designed to be implementation-agnostic and should be useful for a wide range of hyperparameter selection tasks.
+
 ### Featuretools
 
 [Featuretools](https://github.com/featuretools/featuretools) is a python library for automated feature engineering. It can be used to prepare raw transactional and relational datasets for ATM. It is created and maintaned by [Feature Labs](https://www.featurelabs.com) and is also a part of the [Human Data Interaction Project](https://hdi-dai.lids.mit.edu/).
+
