@@ -143,9 +143,12 @@ class Worker(object):
         """
         # whether to save model and metrics data to the filesystem
         if self.save_files:
-            classifier = self.db.get_classifier(classifier_id)
-            model_path = save_model(classifier, self.model_dir, model)
-            metric_path = save_metrics(classifier, self.metric_dir, metrics)
+            # keep a database session open so that the utility functions can
+            # access the linked hyperpartitions and dataruns
+            with db_session(self.db):
+                classifier = self.db.get_classifier(classifier_id)
+                model_path = save_model(classifier, self.model_dir, model)
+                metric_path = save_metrics(classifier, self.metric_dir, metrics)
 
             # if necessary, save model and metrics to Amazon S3 bucket
             if self.cloud_mode:
