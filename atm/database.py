@@ -577,6 +577,6 @@ class Database(object):
         Set the status of the Datarun to COMPLETE and set the 'completed' field
         to the current datetime.
         """
-        datarun = self.get_datarnu(datarun_id)
+        datarun = self.get_datarun(datarun_id)
         datarun.status = RunStatus.COMPLETE
         datarun.completed = datetime.now()

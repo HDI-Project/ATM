@@ -44,7 +44,10 @@ print('creating dataruns...')
 datarun_ids = []
 for ds in DATASETS:
     run_config.train_path = join(DATA_DIR, ds)
-    run_config.methods = [args.method]
+    if args.method:
+        run_config.methods = [args.method]
+    else:
+        run_config.methods = METHODS
     dataset = enter_dataset(db, run_config, aws_config)
     datarun_ids.extend(enter_datarun(sql_config, run_config, aws_config,
                                      run_per_partition=True))
