@@ -18,7 +18,6 @@ methods:
     - gp
     - pa
     - knn
-    - dbn
     - mlp
 # directory to store trained models; will be created if it doesn't exist
 models_dir: models/

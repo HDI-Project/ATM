@@ -12,7 +12,7 @@ SQL_DIALECTS = ['sqlite', 'mysql']
 SCORE_TARGETS = ['cv', 'test', 'mu_sigma']
 BUDGET_TYPES = ['none', 'classifier', 'walltime']
 METHODS = ['logreg', 'svm', 'sgd', 'dt', 'et', 'rf', 'gnb', 'mnb', 'bnb',
-           'gp', 'pa', 'knn', 'dbn', 'mlp', 'ada']
+           'gp', 'pa', 'knn', 'mlp', 'ada']
 TUNERS = ['uniform', 'gp', 'gp_ei', 'gp_eivel']
 SELECTORS = ['uniform', 'ucb1', 'bestk', 'bestkvel', 'purebestkvel', 'recentk',
              'recentkvel', 'hieralg']
@@ -55,7 +55,6 @@ METHODS_MAP = {
     'gp': 'gaussian_process.json',
     'pa': 'passive_aggressive.json',
     'knn': 'k_nearest_neighbors.json',
-    'dbn': 'deep_belief_network.json',
     'mlp': 'multi_layer_perceptron.json',
     'ada': 'adaboost.json'
 }
