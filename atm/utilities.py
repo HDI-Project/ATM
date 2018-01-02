@@ -1,4 +1,5 @@
 from __future__ import print_function
+import json
 import pickle
 import urllib2
 import hashlib
@@ -88,6 +89,8 @@ def obj_has_method(obj, method):
     return hasattr(obj, method) and callable(getattr(obj, method))
 
 
+## Converting hyperparameters to and from BTB-compatible formats
+
 def vector_to_params(vector, tunables, categoricals, constants):
     """
     Converts a numpy vector to a dictionary mapping keys to named parameters.
@@ -157,20 +160,61 @@ def params_to_vectors(params, tunables):
     return vectors
 
 
-def make_model_path(model_dir, params_hash, run_hash, desc):
-    filename = "%s-%s-%s.model" % (run_hash, params_hash, desc)
-    return os.path.join(model_dir, filename)
+## Serializing and deserializing data on disk
+
+def make_save_path(dir, classifier, suffix):
+    """
+    Generate the base save path for a classifier's model and metrics files,
+    based on the classifier's dataset name and hyperparameters.
+    """
+    run_hash = hash_string(classifier.datarun.dataset.name)
+    params_hash = hash_dict(classifier.params)
+    filename = "%s-%s-%s.%s" % (run_hash, params_hash,
+                                classifier.datarun.description, suffix)
+    return os.path.join(dir, filename)
 
 
-def make_metric_path(metric_dir, params_hash, run_hash, desc):
-    filename = "%s-%s-%s.metric" % (run_hash, params_hash, desc)
-    return os.path.join(metric_dir, filename)
+def save_model(classifier, model_dir, model):
+    """
+    Save a serialized version of a Model object for a particular classifier.
+    The object will be stored at a path generated from the classifier's
+    attributes.
+    """
+    path = make_save_path(model_dir, classifier, '.model')
+    print('Saving model in: %s' % path)
+    with open(path, 'wb') as f:
+        pickle.dump(model, f, protocol=pickle.HIGHEST_PROTOCOL)
+    return path
 
 
-def save_metric(metric_path, object):
-    with open(metric_path, 'wb') as handle:
-        pickle.dump(object, handle, protocol=pickle.HIGHEST_PROTOCOL)
+def save_metrics(classifier, metric_dir, metrics):
+    """
+    Save a JSON-serialized version of a set of performance metrics for a
+    particular classifier. The metrics will be stored at a path generated from
+    the classifier's attributes.
+    """
+    path = make_save_path(metric_dir, classifier, '.metric')
+    print('Saving metrics in: %s' % path)
+    with open(path, 'w') as f:
+        json.dump(metrics, f)
+    return path
 
+
+def load_model(classifier, model_dir):
+    """ Load the Model object for a particular classifier """
+    path = make_save_path(model_dir, classifier, '.model')
+    with open(path, 'rb') as f:
+        return pickle.load(f)
+
+
+def load_metrics(classifier, metric_dir):
+    """ Load the performance metrics for a particular classifier """
+    path = make_save_path(metric_dir, classifier, '.metric')
+    with open(path) as f:
+        return json.load(f)
+
+
+## Downloading data from the web
 
 def get_local_data_path(data_path):
     """

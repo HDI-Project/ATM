@@ -1,7 +1,6 @@
 from __future__ import print_function
-from sqlalchemy import (create_engine, inspect, exists, Column, Unicode, String,
-                        ForeignKey, Integer, Boolean, DateTime, Enum, MetaData,
-                        Numeric, Table, Text)
+from sqlalchemy import (create_engine, Column,  String, ForeignKey, Integer,
+                        Boolean, DateTime, Enum, MetaData, Numeric, Table, Text)
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.url import URL
@@ -19,61 +18,49 @@ from atm.constants import *
 from atm.utilities import *
 
 
-METHOD_ROWS = [
-	dict(id=1, code='svm', name='Support Vector Machine', probability=True),
-	dict(id=2, code='et', name='Extra Trees', probability=True),
-	dict(id=3, code='pa', name='Passive Aggressive', probability=False),
-	dict(id=4, code='sgd', name='Stochastic Gradient Descent', probability=True),
-	dict(id=5, code='rf', name='Random Forest', probability=True),
-	dict(id=6, code='mnb', name='Multinomial Naive Bayes', probability=True),
-	dict(id=7, code='bnb', name='Bernoulii Naive Bayes', probability=True),
-	dict(id=8, code='dbn', name='Deef Belief Network', probability=False),
-	dict(id=9, code='logreg', name='Logistic Regression', probability=True),
-	dict(id=10, code='gnb', name='Gaussian Naive Bayes', probability=True),
-	dict(id=11, code='dt', name='Decision Tree', probability=True),
-	dict(id=12, code='knn', name='K Nearest Neighbors', probability=True),
-	dict(id=13, code='mlp', name='Multi-Layer Perceptron', probability=True),
-	dict(id=14, code='gp', name='Gaussian Process', probability=True),
-]
-
 MAX_HYPERPARTITION_ERRORS = 3
 
 
-def try_with_session(default=lambda: None, commit=False):
+def try_with_session(commit=False):
     """
     Decorator for instance methods on Database that need a sqlalchemy session.
 
-    This wrapping function creates a new session with the Database's engine and
-    passes it to the instance method to use. Everything is inside a try-catch
-    statement, so if something goes wrong, this prints a nice error string and
-    fails gracefully.
-
-    In case of an error, the function passed to this decorator as `default` is
-    called (without arguments) to generate a response. This needs to be a
-    function instead of just a static argument to avoid issues with leaving
-    empty lists ([]) in method signatures.
+    This wrapping function checks if the Database has an active session yet. If
+    not, it wraps the function call in a `with db_session():` block.
     """
     def wrap(func):
         def call(db, *args, **kwargs):
-            session = db.get_session()
-            try:
-                result = func(db, session, *args, **kwargs)
+            # if the Database has an active session, don't create a new one
+            if db.session is not None:
+                result = func(db, *args, **kwargs)
                 if commit:
-                    session.commit()
-            except Exception:
-                if commit:
-                    session.rollback()
-                result = default()
-                argstr = ', '.join([str(a) for a in args])
-                kwargstr = ', '.join(['%s=%s' % kv for kv in kwargs.items()])
-                print("Error in %s(%s, %s):" % (func.__name__, argstr, kwargstr))
-                print(traceback.format_exc())
-            finally:
-                session.close()
+                    db.session.commit()
+            else:
+                # otherwise, use the session generator
+                with db_session(db, commit=commit):
+                    result = func(db, *args, **kwargs)
 
             return result
         return call
     return wrap
+
+
+class db_session(object):
+    def __init__(self, db, commit=False):
+        self.db = db
+        self.commit = commit
+
+    def __enter__(self):
+        self.db.session = self.db.get_session()
+
+    def __exit__(self, type, error, traceback):
+        if error is not None:
+            self.db.session.rollback()
+        elif self.commit:
+            self.db.session.commit()
+
+        self.db.session.close()
+        self.db.session = None
 
 
 class Database(object):
@@ -86,13 +73,14 @@ class Database(object):
         db_url = URL(drivername=dialect, database=database, username=username,
                      password=password, host=host, port=port, query=query)
         self.engine = create_engine(db_url)
-
+        self.session = None
         self.get_session = sessionmaker(bind=self.engine,
                                         expire_on_commit=False)
-        self.define_tables()
-        self.create_methods()
 
-    def define_tables(self):
+        # create ORM objects for the tables
+        self._define_tables()
+
+    def _define_tables(self):
         """
         Define the SQLAlchemy ORM class for each table in the ModelHub database.
 
@@ -106,32 +94,19 @@ class Database(object):
         metadata = MetaData(bind=self.engine)
         Base = declarative_base()
 
-        class Method(Base):
-            __tablename__ = 'methods'
-
-            id = Column(Integer, primary_key=True, autoincrement=True)
-            code = Column(String(15), nullable=False)
-            name = Column(String(30), nullable=False)
-            probability = Column(Boolean)
-
-            def __repr__(self):
-                return "<%s (%s)>" % (self.name, self.code)
-
-        self.Method = Method
-
         class Dataset(Base):
             __tablename__ = 'datasets'
 
             id = Column(Integer, primary_key=True, autoincrement=True)
             name = Column(String(100), nullable=False)
 
-            # fields necessary for loading/processing data
+            # columns necessary for loading/processing data
             description = Column(String(1000))
             train_path = Column(String(200), nullable=False)
             test_path = Column(String(200))
             label_column = Column(String(100), nullable=False)
 
-            # metadata fields, for convenience
+            # metadata columns, for convenience
             n_examples = Column(Integer, nullable=False)
             k_classes = Column(Integer, nullable=False)
             d_features = Column(Integer, nullable=False)
@@ -143,31 +118,35 @@ class Database(object):
                 return base % (self.name, self.description, self.k_classes,
                                self.d_features, self.n_examples)
 
-        self.Dataset = Dataset
-
         class Datarun(Base):
             __tablename__ = 'dataruns'
 
+            # relational columns
             id = Column(Integer, primary_key=True, autoincrement=True)
             dataset_id = Column(Integer, ForeignKey('datasets.id'))
+            dataset = relationship('Dataset', back_populates='dataruns')
 
             description = Column(String(200), nullable=False)
             priority = Column(Integer)
 
+            # hyperparameter selection and tuning settings
             selector = Column(Enum(*SELECTORS), nullable=False)
             k_window = Column(Integer)
             tuner = Column(Enum(*TUNERS), nullable=False)
             gridding = Column(Integer, nullable=False)
             r_min = Column(Integer)
 
+            # budget settings
             budget_type = Column(Enum(*BUDGET_TYPES))
             budget = Column(Integer)
             deadline = Column(DateTime)
 
+            # which metric to use for judgment, and how to compute it
             metric = Column(Enum(*METRICS))
             score_target = Column(Enum(*[s + '_judgment_metric' for s in
                                          SCORE_TARGETS]))
 
+            # variables that store the status of the datarun
             started = Column(DateTime)
             completed = Column(DateTime)
             status = Column(Enum(*DATARUN_STATUS), default=RunStatus.PENDING)
@@ -177,20 +156,24 @@ class Database(object):
                 return base % (self.id, self.dataset_id, self.description,
                                self.budget_type, self.budget, self.status)
 
-        self.Datarun = Datarun
+        Dataset.dataruns = relationship('Datarun', order_by='Datarun.id',
+                                        back_populates='dataset')
 
         class Hyperpartition(Base):
             __tablename__ = 'hyperpartitions'
 
+            # relational columns
             id = Column(Integer, primary_key=True, autoincrement=True)
             datarun_id = Column(Integer, ForeignKey('dataruns.id'))
-            method = Column(String(15))
+            datarun = relationship('Datarun', back_populates='hyperpartitions')
 
+            # these columns define the partition
+            method = Column(String(15))
             categoricals64 = Column(Text)
             tunables64 = Column(Text)
             constants64 = Column(Text)
 
-            classifiers = Column(Integer, default=0)
+            # has the partition had too many errors, or is gridding done?
             status = Column(Enum(*PARTITION_STATUS),
                             default=PartitionStatus.INCOMPLETE)
 
@@ -230,15 +213,22 @@ class Database(object):
             def __repr__(self):
                 return "<%s: %s>" % (self.method, self.categoricals)
 
-        self.Hyperpartition = Hyperpartition
+        Datarun.hyperpartitions = relationship('Hyperpartition',
+                                               order_by='Hyperpartition.id',
+                                               back_populates='datarun')
 
         class Classifier(Base):
             __tablename__ = 'classifiers'
 
+            # relational columns
             id = Column(Integer, primary_key=True, autoincrement=True)
             datarun_id = Column(Integer, ForeignKey('dataruns.id'))
+            datarun = relationship('Datarun', back_populates='classifiers')
             hyperpartition_id = Column(Integer, ForeignKey('hyperpartitions.id'))
+            hyperpartition = relationship('Hyperpartition',
+                                          back_populates='classifiers')
 
+            # these columns point to where the output is stored
             model_path = Column(String(300))
             metric_path = Column(String(300))
             params64 = Column(Text, nullable=False)
@@ -285,37 +275,36 @@ class Database(object):
                 params = ', '.join(['%s: %s' % i for i in self.params.items()])
                 return "<id=%d, params=(%s)>" % (self.id, params)
 
+        Datarun.classifiers = relationship('Classifier',
+                                           order_by='Classifier.id',
+                                           back_populates='datarun')
+        Hyperpartition.classifiers = relationship('Classifier',
+                                                  order_by='Classifier.id',
+                                                  back_populates='hyperpartition')
+
+        self.Dataset = Dataset
+        self.Datarun = Datarun
+        self.Hyperpartition = Hyperpartition
         self.Classifier = Classifier
 
         Base.metadata.create_all(bind=self.engine)
-
-    @try_with_session()
-    def create_methods(self, session):
-        """ Enter all the default methods into the database. """
-        for r in METHOD_ROWS:
-            if not session.query(self.Dataset).get(r['id']):
-                args = dict(r)
-                del args['id']
-                m = self.Method(**args)
-                session.add(m)
-        session.commit()
 
     ###########################################################################
     ##  Standard query methods  ###############################################
     ###########################################################################
 
     @try_with_session()
-    def get_dataset(self, session, dataset_id):
+    def get_dataset(self, dataset_id):
         """ Get a specific dataset. """
-        return session.query(self.Dataset).get(dataset_id)
+        return self.session.query(self.Dataset).get(dataset_id)
 
     @try_with_session()
-    def get_datarun(self, session, datarun_id):
+    def get_datarun(self, datarun_id):
         """ Get a specific datarun. """
-        return session.query(self.Datarun).get(datarun_id)
+        return self.session.query(self.Datarun).get(datarun_id)
 
     @try_with_session()
-    def get_dataruns(self, session, ignore_pending=False, ignore_running=False,
+    def get_dataruns(self, ignore_pending=False, ignore_running=False,
                      ignore_complete=True, include_ids=None, exclude_ids=None,
                      max_priority=True):
         """
@@ -330,7 +319,7 @@ class Database(object):
             max_priority: only return dataruns which have the highest priority
                 of any in the filtered set
         """
-        query = session.query(self.Datarun)
+        query = self.session.query(self.Datarun)
         if ignore_pending:
             query = query.filter(self.Datarun.status != RunStatus.PENDING)
         if ignore_running:
@@ -356,19 +345,18 @@ class Database(object):
         return dataruns
 
     @try_with_session()
-    def get_hyperpartition(self, session, hyperpartition_id):
+    def get_hyperpartition(self, hyperpartition_id):
         """ Get a specific classifier.  """
-        return session.query(self.Hyperpartition).get(hyperpartition_id)
+        return self.session.query(self.Hyperpartition).get(hyperpartition_id)
 
-    @try_with_session(default=list)
-    def get_hyperpartitions(self, session, dataset_id=None, datarun_id=None,
-                        method=None, ignore_gridding_done=True,
-                        ignore_errored=True):
+    @try_with_session()
+    def get_hyperpartitions(self, dataset_id=None, datarun_id=None, method=None,
+                            ignore_gridding_done=True, ignore_errored=True):
         """
         Return all the hyperpartitions in a given datarun by id.
         By default, only returns incomplete hyperpartitions.
         """
-        query = session.query(self.Hyperpartition)
+        query = self.session.query(self.Hyperpartition)
         if dataset_id is not None:
             query = query.join(self.Datarun)\
                 .filter(self.Datarun.dataset_id == dataset_id)
@@ -386,15 +374,15 @@ class Database(object):
         return query.all()
 
     @try_with_session()
-    def get_classifier(self, session, classifier_id):
+    def get_classifier(self, classifier_id):
         """ Get a specific classifier. """
-        return session.query(self.Classifier).get(classifier_id)
+        return self.session.query(self.Classifier).get(classifier_id)
 
     @try_with_session()
-    def get_classifiers(self, session, dataset_id=None, datarun_id=None,
-                        method=None, hyperpartition_id=None, status=None):
+    def get_classifiers(self, dataset_id=None, datarun_id=None, method=None,
+                        hyperpartition_id=None, status=None):
         """ Get a set of classifiers, filtered by the passed-in arguments. """
-        query = session.query(self.Classifier)
+        query = self.session.query(self.Classifier)
         if dataset_id is not None:
             query = query.join(self.Datarun)\
                 .filter(self.Datarun.dataset_id == dataset_id)
@@ -415,37 +403,35 @@ class Database(object):
     ##  Special-purpose queries  ##############################################
     ###########################################################################
 
-    @try_with_session(default=lambda: True)
-    def is_datatun_gridding_done(self, session, datarun_id):
+    @try_with_session()
+    def is_datatun_gridding_done(self, datarun_id):
         """
         Check whether gridding is done for the entire datarun.
         """
-        hyperpartitions = session.query(self.Hyperpartition)\
-            .filter(self.Hyperpartition.datarun_id == datarun_id).all()
-
+        datarun = self.get_datarun(datarun_id)
         is_done = True
-        for hyperpartition in hyperpartitions:
-            # If any hyperpartiton has not finished gridding or errored out, we are
-            # not done.
+        for hyperpartition in datarun.hyperpartitions:
+            # If any hyperpartiton has not finished gridding or errored out,
+            # gridding is not done for the datarun.
             if hyperpartition.status == PartitionStatus.INCOMPLETE:
                 is_done = False
 
         return is_done
 
-    @try_with_session(default=int)
-    def get_number_of_hyperpartition_errors(self, session, hyperpartition_id):
+    @try_with_session()
+    def get_number_of_hyperpartition_errors(self, hyperpartition_id):
         """
         Get the number of classifiers that have errored using a specified
         hyperpartition.
         """
-        classifiers = session.query(self.Classifier)\
+        classifiers = self.session.query(self.Classifier)\
             .filter(and_(self.Classifier.hyperpartition_id == hyperpartition_id,
                          self.Classifier.status == ClassifierStatus.ERRORED)).all()
         return len(classifiers)
 
-    @try_with_session(default=list)
-    def get_methods(self, session, dataset_id=None, datarun_id=None,
-                       ignore_errored=False, ignore_gridding_done=False):
+    @try_with_session()
+    def get_methods(self, dataset_id=None, datarun_id=None,
+                    ignore_errored=False, ignore_gridding_done=False):
         """ Get all methods used in a particular datarun. """
         hyperpartitions = self.get_hyperpartitions(dataset_id=dataset_id,
                                                    datarun_id=datarun_id,
@@ -455,21 +441,22 @@ class Database(object):
         return list(methods)
 
     @try_with_session()
-    def get_maximum_y(self, session, datarun_id, score_target):
+    def get_maximum_y(self, datarun_id, score_target):
         """ Get the maximum value of a numeric column by name, or None. """
-        result = session.query(func.max(getattr(self.Classifier, score_target)))\
-            .filter(self.Classifier.datarun_id == datarun_id).one()[0]
+        query = self.session.query(func.max(getattr(self.Classifier,
+                                                    score_target)))
+        result = query.filter(self.Classifier.datarun_id == datarun_id).first()
         if result:
             return float(result)
         return None
 
     @try_with_session()
-    def get_best_classifier(self, session, score_target,
-                            dataset_id=None, datarun_id=None,
-                            method=None, hyperpartition_id=None):
+    def get_best_classifier(self, score_target, dataset_id=None,
+                            datarun_id=None, method=None,
+                            hyperpartition_id=None):
         """
-        Get the classifier with the highest lower error bound. In other words, what
-        classifier has the highest value of (score.mean - 2 * score.std)?
+        Get the classifier with the best judgment metric, as indicated by
+        score_target.
 
         score_target: indicates the metric by which to judge the best classifier.
         """
@@ -481,33 +468,32 @@ class Database(object):
 
         if not classifiers:
             return None
-
-        best = max(classifiers, key=attrgetter(score_target))
-        return best
+        return max(classifiers, key=attrgetter(score_target))
 
     ###########################################################################
     ##  Methods to update the database  #######################################
     ###########################################################################
+
     @try_with_session(commit=True)
-    def create_dataset(self, session, **kwargs):
+    def create_dataset(self, **kwargs):
         dataset = self.Dataset(**kwargs)
-        session.add(dataset)
+        self.session.add(dataset)
         return dataset
 
     @try_with_session(commit=True)
-    def create_datarun(self, session, **kwargs):
+    def create_datarun(self, **kwargs):
         datarun = self.Datarun(**kwargs)
-        session.add(datarun)
+        self.session.add(datarun)
         return datarun
 
     @try_with_session(commit=True)
-    def create_hyperpartition(self, session, **kwargs):
+    def create_hyperpartition(self, **kwargs):
         part = self.Hyperpartition(**kwargs)
-        session.add(part)
+        self.session.add(part)
         return part
 
     @try_with_session(commit=True)
-    def create_classifier(self, session, hyperpartition_id, datarun_id, host, params):
+    def create_classifier(self, hyperpartition_id, datarun_id, host, params):
         """
         Save a new, fully qualified classifier object to the database.
         Returns: the ID of the newly-created classifier
@@ -518,22 +504,18 @@ class Database(object):
                                      params=params,
                                      started=datetime.now(),
                                      status=ClassifierStatus.RUNNING)
-        session.add(classifier)
-
-        hyperpartition = session.query(self.Hyperpartition).get(hyperpartition_id)
-        hyperpartition.classifiers += 1
-
+        self.session.add(classifier)
         return classifier
 
     @try_with_session(commit=True)
-    def complete_classifier(self, session, classifier_id, trainable_params,
-                            dimensions, model_path, metric_path,
-                            cv_score, cv_stdev, test_score):
+    def complete_classifier(self, classifier_id, trainable_params, dimensions,
+                            model_path, metric_path, cv_score, cv_stdev,
+                            test_score):
         """
         Set all the parameters on a classifier that haven't yet been set, and mark
         it as complete.
         """
-        classifier = session.query(self.Classifier).get(classifier_id)
+        classifier = self.session.query(self.Classifier).get(classifier_id)
 
         classifier.trainable_params = trainable_params
         classifier.dimensions = dimensions
@@ -542,64 +524,59 @@ class Database(object):
         classifier.cv_judgment_metric = cv_score
         classifier.cv_judgment_metric_stdev = cv_stdev
         classifier.test_judgment_metric = test_score
-
         classifier.completed = datetime.now()
         classifier.status = ClassifierStatus.COMPLETE
 
     @try_with_session(commit=True)
-    def mark_classifier_errored(self, session, classifier_id, error_msg):
+    def mark_classifier_errored(self, classifier_id, error_msg):
         """
         Mark an existing classifier as having errored and set the error message. If
         the classifier's hyperpartiton has produced too many erring classifiers, mark it
         as errored as well.
         """
-        classifier = session.query(self.Classifier).get(classifier_id)
+        classifier = self.session.query(self.Classifier).get(classifier_id)
         classifier.error_msg = error_msg
         classifier.status = ClassifierStatus.ERRORED
         classifier.completed = datetime.now()
-        if self.get_number_of_hyperpartition_errors(classifier.hyperpartition_id) > \
-                MAX_HYPERPARTITION_ERRORS:
+        if (self.get_number_of_hyperpartition_errors(classifier.hyperpartition_id)
+                > MAX_HYPERPARTITION_ERRORS):
             self.mark_hyperpartition_errored(classifier.hyperpartition_id)
 
     @try_with_session(commit=True)
-    def mark_hyperpartition_gridding_done(self, session, hyperpartition_id):
+    def mark_hyperpartition_gridding_done(self, hyperpartition_id):
         """
         Mark a hyperpartiton as having all of its possible grid points explored.
         """
-        hyperpartition = session.query(self.Hyperpartition)\
-            .filter(self.Hyperpartition.id == hyperpartition_id).one()
+        hyperpartition = self.get_hyperpartition(hyperpartition_id)
         hyperpartition.status = PartitionStatus.GRIDDING_DONE
 
     @try_with_session(commit=True)
-    def mark_hyperpartition_errored(self, session, hyperpartition_id):
+    def mark_hyperpartition_errored(self, hyperpartition_id):
         """
         Mark a hyperpartiton as having had too many classifier errors. This will
         prevent more classifiers from being trained on this hyperpartiton in the
         future.
         """
-        hyperpartition = session.query(self.Hyperpartition)\
-            .filter(self.Hyperpartition.id == hyperpartition_id).one()
+        hyperpartition = self.get_hyperpartition(hyperpartition_id)
         hyperpartition.status = PartitionStatus.ERRORED
 
     @try_with_session(commit=True)
-    def mark_datarun_running(self, session, datarun_id):
+    def mark_datarun_running(self, datarun_id):
         """
         Set the status of the Datarun to RUNNING and set the 'started' field to
         the current datetime.
         """
-        datarun = session.query(self.Datarun)\
-            .filter(self.Datarun.id == datarun_id).one()
+        datarun = self.get_datarun(datarun_id)
         if datarun.status == RunStatus.PENDING:
             datarun.status = RunStatus.RUNNING
             datarun.started = datetime.now()
 
     @try_with_session(commit=True)
-    def mark_datarun_complete(self, session, datarun_id):
+    def mark_datarun_complete(self, datarun_id):
         """
         Set the status of the Datarun to COMPLETE and set the 'completed' field
         to the current datetime.
         """
-        datarun = session.query(self.Datarun)\
-            .filter(self.Datarun.id == datarun_id).one()
+        datarun = self.get_datarun(datarun_id)
         datarun.status = RunStatus.COMPLETE
         datarun.completed = datetime.now()

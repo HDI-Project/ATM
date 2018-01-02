@@ -141,7 +141,6 @@ def enter_datarun(sql_config, run_config, aws_config=None,
         method_parts[m] = method.get_hyperpartitions()
         print('method', m, 'has', len(method_parts[m]), 'hyperpartitions')
 
-    print()
     # create hyperpartitions and datarun(s)
     run_ids = []
     if not run_per_partition:

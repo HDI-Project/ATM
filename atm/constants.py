@@ -21,7 +21,6 @@ CLASSIFIER_STATUS = ['running', 'errored', 'complete']
 PARTITION_STATUS = ['incomplete', 'errored', 'gridding_done']
 
 TIME_FMT = "%Y-%m-%d %H:%M"
-
 DATA_PATH = 'data/downloads'
 
 TUNERS_MAP = {
@@ -97,19 +96,6 @@ class Metrics:
     MCC = 'mcc'             # matthews correlation coefficient
     PR_CURVE = 'pr_curve'
     ROC_CURVE = 'roc_curve'
-
-METRIC_DEFAULT_SCORES = {
-    Metrics.ACCURACY: 0.0,
-    Metrics.RANK_ACCURACY: 0.0,
-    Metrics.COHEN_KAPPA: 0.0,
-    Metrics.F1: 0.0,
-    Metrics.F1_MICRO: 0.0,
-    Metrics.F1_MACRO: 0.0,
-    Metrics.ROC_AUC: 0.5,
-    Metrics.ROC_AUC_MICRO: 0.5,
-    Metrics.ROC_AUC_MACRO: 0.5,
-    Metrics.AP: 0.0,
-}
 
 METRICS_BINARY = [
     Metrics.ACCURACY,
