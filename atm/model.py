@@ -14,7 +14,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn import decomposition
-from gdbn.activationFunctions import Softmax, Sigmoid, Linear, Tanh
 from sklearn.gaussian_process.kernels import ConstantKernel, RBF, Matern, \
                                              ExpSineSquared, RationalQuadratic
 
@@ -212,18 +211,9 @@ class Model(object):
 
     def special_conversions(self, params):
         """
-        TODO: Make this logic into subclasses
-
-        ORRRR, should make each enumerator handle it in a static function
-        something like:
-
-        @staticmethod
-        def transform_params(params_dict):
-            # does classifier-specific changes
-            return params_dict
-
+        TODO: replace this logic with something better
         """
-        ### GPC ###
+        ## Gaussian process classifier
         if self.code == "gp":
             if params["kernel"] == "constant":
                 params["kernel"] = ConstantKernel()
@@ -234,7 +224,7 @@ class Model(object):
                 del params["nu"]
             elif params["kernel"] == "rational_quadratic":
                 params["kernel"] = RationalQuadratic(length_scale=params["length_scale"],
-                                                             alpha=params["alpha"])
+                                                     alpha=params["alpha"])
                 del params["length_scale"]
                 del params["alpha"]
             elif params["kernel"] == "exp_sine_squared":
@@ -243,7 +233,7 @@ class Model(object):
                 del params["length_scale"]
                 del params["periodicity"]
 
-        ### MLP ###
+        ## Multi-layer perceptron
         if self.code == "mlp":
 
             params["hidden_layer_sizes"] = []
@@ -268,56 +258,10 @@ class Model(object):
                 del params["hidden_size_layer3"]
 
             params["hidden_layer_sizes"] = [int(x) for x in
-                                                    params["hidden_layer_sizes"]]  # convert to ints
+                                            params["hidden_layer_sizes"]]  # convert to ints
 
             # delete our fabricated keys
             del params["num_hidden_layers"]
-
-        # print "Added stuff for DBNs! %s" % params
-        ### DBN ###
-        if self.code == "dbn":
-
-            # print "Adding stuff for DBNs! %s" % params
-            params["layer_sizes"] = [params["inlayer_size"]]
-
-            # set layer topology
-            if int(params["num_hidden_layers"]) == 1:
-                params["layer_sizes"].append(params["hidden_size_layer1"])
-                del params["hidden_size_layer1"]
-
-            elif int(params["num_hidden_layers"]) == 2:
-                params["layer_sizes"].append(params["hidden_size_layer1"])
-                params["layer_sizes"].append(params["hidden_size_layer2"])
-                del params["hidden_size_layer1"]
-                del params["hidden_size_layer2"]
-
-            elif int(params["num_hidden_layers"]) == 3:
-                params["layer_sizes"].append(params["hidden_size_layer1"])
-                params["layer_sizes"].append(params["hidden_size_layer2"])
-                params["layer_sizes"].append(params["hidden_size_layer3"])
-                del params["hidden_size_layer1"]
-                del params["hidden_size_layer2"]
-                del params["hidden_size_layer3"]
-
-            params["layer_sizes"].append(params["outlayer_size"])
-            params["layer_sizes"] = [int(x) for x in params["layer_sizes"]]  # convert to ints
-
-            # set activation function
-            if params["output_act_funct"] == "Linear":
-                params["output_act_funct"] = Linear()
-            elif params["output_act_funct"] == "Sigmoid":
-                params["output_act_funct"] = Sigmoid()
-            elif params["output_act_funct"] == "Softmax":
-                params["output_act_funct"] = Softmax()
-            elif params["output_act_funct"] == "tanh":
-                params["output_act_funct"] = Tanh()
-
-            params["epochs"] = int(params["epochs"])
-
-            # delete our fabricated keys
-            del params["num_hidden_layers"]
-            del params["inlayer_size"]
-            del params["outlayer_size"]
 
         # return the updated parameter vector
         return params

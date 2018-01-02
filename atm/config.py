@@ -253,7 +253,6 @@ def add_arguments_datarun(parser):
     #   gp     - gaussian process
     #   pa     - passive aggressive
     #   knn    - K nearest neighbors
-    #   dbn    - deep belief network
     #   mlp    - multi-layer perceptron
     parser.add_argument('--methods', nargs='+', choices=METHODS,
                         help='list of methods which the datarun will use')
