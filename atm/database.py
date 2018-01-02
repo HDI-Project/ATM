@@ -455,8 +455,8 @@ class Database(object):
                             datarun_id=None, method=None,
                             hyperpartition_id=None):
         """
-        Get the classifier with the highest lower error bound. In other words, what
-        classifier has the highest value of (score.mean - 2 * score.std)?
+        Get the classifier with the best judgment metric, as indicated by
+        score_target.
 
         score_target: indicates the metric by which to judge the best classifier.
         """

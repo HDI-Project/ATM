@@ -204,7 +204,7 @@ def load_model(classifier, model_dir):
     """ Load the Model object for a particular classifier """
     path = make_save_path(model_dir, classifier, '.model')
     with open(path, 'rb') as f:
-        return pickle.load(f, protocol=pickle.HIGHEST_PROTOCOL)
+        return pickle.load(f)
 
 
 def load_metrics(classifier, metric_dir):
