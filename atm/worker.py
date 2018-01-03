@@ -385,8 +385,8 @@ class Worker(object):
             return
 
         _log('Chose parameters for method %s:' % hyperpartition.method)
-        for k, v in params.items():
-            _log('\t%s = %s' % (k, v))
+        for k in sorted(params.keys()):
+            _log('\t%s = %s' % (k, params[k]))
 
         _log('Creating classifier...')
         classifier = self.db.create_classifier(hyperpartition_id=hyperpartition.id,

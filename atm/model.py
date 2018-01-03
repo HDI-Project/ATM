@@ -8,7 +8,9 @@ import numpy as np
 import pandas as pd
 import time
 import pdb
+import re
 from importlib import import_module
+from collections import defaultdict
 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
@@ -213,6 +215,29 @@ class Model(object):
         """
         TODO: replace this logic with something better
         """
+        # create list parameters
+        lists = defaultdict(list)
+        element_regex = re.compile('(.*)\[(\d)\]')
+        for name, param in params.items():
+            # look for variables of the form "param_name[1]"
+            match = element_regex.match(name)
+            if match:
+                # name of the list parameter
+                lname = match.groups()[0]
+                # index of the list item
+                index = int(match.groups()[1])
+                lists[lname].append((index, param))
+
+                # drop the element parameter from our list
+                del params[name]
+
+        for lname, items in lists.items():
+            # drop the list size parameter
+            del params[lname + '_size']
+
+            # sort the list by index
+            params[lname] = [val for idx, val in sorted(items)]
+
         ## Gaussian process classifier
         if self.code == "gp":
             if params["kernel"] == "constant":
@@ -229,39 +254,9 @@ class Model(object):
                 del params["alpha"]
             elif params["kernel"] == "exp_sine_squared":
                 params["kernel"] = ExpSineSquared(length_scale=params["length_scale"],
-                                                          periodicity=params["periodicity"])
+                                                  periodicity=params["periodicity"])
                 del params["length_scale"]
                 del params["periodicity"]
-
-        ## Multi-layer perceptron
-        if self.code == "mlp":
-
-            params["hidden_layer_sizes"] = []
-
-            # set layer topology
-            if int(params["num_hidden_layers"]) == 1:
-                params["hidden_layer_sizes"].append(params["hidden_size_layer1"])
-                del params["hidden_size_layer1"]
-
-            elif int(params["num_hidden_layers"]) == 2:
-                params["hidden_layer_sizes"].append(params["hidden_size_layer1"])
-                params["hidden_layer_sizes"].append(params["hidden_size_layer2"])
-                del params["hidden_size_layer1"]
-                del params["hidden_size_layer2"]
-
-            elif int(params["num_hidden_layers"]) == 3:
-                params["hidden_layer_sizes"].append(params["hidden_size_layer1"])
-                params["hidden_layer_sizes"].append(params["hidden_size_layer2"])
-                params["hidden_layer_sizes"].append(params["hidden_size_layer3"])
-                del params["hidden_size_layer1"]
-                del params["hidden_size_layer2"]
-                del params["hidden_size_layer3"]
-
-            params["hidden_layer_sizes"] = [int(x) for x in
-                                            params["hidden_layer_sizes"]]  # convert to ints
-
-            # delete our fabricated keys
-            del params["num_hidden_layers"]
 
         # return the updated parameter vector
         return params
