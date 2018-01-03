@@ -1,5 +1,5 @@
 import yaml
-from argparse import ArgumentError
+from argparse import ArgumentError, ArgumentTypeError
 
 from atm.constants import *
 
@@ -124,6 +124,16 @@ class RunConfig(Config):
     }
 
 
+def option_or_path(options, regex='.*\.py'):
+    def type_check(s):
+        if re.match(regex, s) and os.path.isfile(s):
+            return s
+        if s in options:
+            return s
+        raise ArgumentTypeError
+    return type_check
+
+
 def add_arguments_aws_s3(parser):
     """
     Add all argparse arguments needed to parse AWS S3 configuration from the
@@ -219,8 +229,8 @@ def add_arguments_datarun(parser):
     # Config file
     parser.add_argument('--run-config', help='path to yaml datarun config file')
 
-    ##  Dataset Arguments  #########################################################
-    ################################################################################
+    ##  Dataset Arguments  #####################################################
+    ############################################################################
     parser.add_argument('--dataset-id', type=int,
                         help="ID of dataset, if it's already in the database")
 
@@ -230,20 +240,20 @@ def add_arguments_datarun(parser):
     parser.add_argument('--data-description', help='Description of dataset')
     parser.add_argument('--label-column', help='Name of the label column in the input data')
 
-    ##  Datarun Arguments  #########################################################
-    ################################################################################
+    ##  Datarun Arguments  #####################################################
+    ############################################################################
     # Notes:
     # - Support vector machines (svm) can take a long time to train. It's not an
     #   error, it's just part of what happens when the method happens to explore
     #   a crappy set of parameters on a powerful algo like this.
-    # - Stochastic gradient descent (sgd) can sometimes fail on certain parameter
-    #   settings as well. Don't worry, they train SUPER fast, and the worker.py will
-    #   simply log the error and continue.
+    # - Stochastic gradient descent (sgd) can sometimes fail on certain
+    #   parameter settings as well. Don't worry, they train SUPER fast, and the
+    #   worker.py will simply log the error and continue.
     #
     # Method options:
     #   logreg - logistic regression
     #   svm    - support vector machine
-    #   sgd    - linear classifier (SVM or logreg) using stochastic gradient descent
+    #   sgd    - linear classifier with stochastic gradient descent
     #   dt     - decision tree
     #   et     - extra trees
     #   rf     - random forest
@@ -267,14 +277,17 @@ def add_arguments_datarun(parser):
                         'overrides the walltime budget. Format: ' +
                         TIME_FMT.replace('%', '%%'))
 
+    ##  AutoML Arguments #######################################################
+    ############################################################################
     # hyperparameter selection strategy
     # How should ATM sample hyperparameters from a given hyperpartition?
     #    uniform  - pick randomly! (baseline)
     #    gp       - vanilla Gaussian Process
     #    gp_ei    - Gaussian Process expected improvement criterion
-    #    gp_eivel - Gaussian Process expected improvement, with randomness added in
-    #              based on velocity of improvement
-    parser.add_argument('--tuner', choices=TUNERS,
+    #    gp_eivel - Gaussian Process expected improvement, with randomness added
+    #               in based on velocity of improvement
+    #   path to custom tuner, defined in python
+    parser.add_argument('--tuner', type=option_or_path(TUNERS),
                         help='type of BTB tuner to use')
 
     # How should ATM select a particular hyperpartition from the set of all
@@ -289,12 +302,13 @@ def add_arguments_datarun(parser):
     #   recentkvel   - MAB with velocity of most recent K runs
     #   hieralg      - hierarchical MAB: choose a classifier first, then choose
     #                  a partition
-    parser.add_argument('--selector', choices=SELECTORS,
+    #   path to custom selector, defined in python
+    parser.add_argument('--selector', type=option_or_path(SELECTORS),
                         help='type of BTB selector to use')
 
     # r_min is the number of random runs performed in each hyperpartition before
-    # allowing bayesian opt to select parameters. Consult the thesis to understand
-    # what those mean, but essentially:
+    # allowing bayesian opt to select parameters. Consult the thesis to
+    # understand what those mean, but essentially:
     #
     #  if (num_classifiers_trained_in_hyperpartition >= r_min)
     #    # train using sample criteria
@@ -311,9 +325,10 @@ def add_arguments_datarun(parser):
 
     # gridding determines whether or not sample selection will happen on a grid.
     # If any positive integer, a grid with `gridding` points on each axis is
-    # established, and hyperparameter vectors are sampled from this finite space.
-    # If 0 (or blank), hyperparameters are sampled from continuous space, and there
-    # is no limit to the number of hyperparameter vectors that may be tried.
+    # established, and hyperparameter vectors are sampled from this finite
+    # space. If 0 (or blank), hyperparameters are sampled from continuous
+    # space, and there is no limit to the number of hyperparameter vectors that
+    # may be tried.
     parser.add_argument('--gridding', type=int,
                         help='gridding factor (0: no gridding)')
 
@@ -347,10 +362,10 @@ def load_config(sql_path=None, run_path=None, aws_path=None, args=None):
         run_path: path to .yaml file with Dataset and Datarun config info
         aws_path: path to .yaml file with AWS config info
         args: Namespace object with miscellaneous arguments attached to it as
-            attributes (the type that is generated by parser.parse_arguments()). Any
-            attributes beginning with sql_ are SQL config arguments, any beginning
-            with aws_ are AWS config, and the rest are assumed to be dataset or
-            datarun config.
+            attributes (the type that is generated by parser.parse_arguments()).
+            Any attributes beginning with sql_ are SQL config arguments, any
+            beginning with aws_ are AWS config, and the rest are assumed to be
+            dataset or datarun config.
 
     Returns: sql_conf, run_conf, aws_conf
     """

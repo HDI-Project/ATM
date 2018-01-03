@@ -130,9 +130,9 @@ class Database(object):
             priority = Column(Integer)
 
             # hyperparameter selection and tuning settings
-            selector = Column(Enum(*SELECTORS), nullable=False)
+            selector = Column(String(200), nullable=False)
             k_window = Column(Integer)
-            tuner = Column(Enum(*TUNERS), nullable=False)
+            tuner = Column(String(200), nullable=False)
             gridding = Column(Integer, nullable=False)
             r_min = Column(Integer)
 
