@@ -8,11 +8,11 @@
         },
         "weights": {
            "type": "string",
-           "range": ["uniform", "distance"]
+           "values": ["uniform", "distance"]
         },
         "algorithm": {
            "type": "string",
-           "range": ["ball_tree", "kd_tree", "brute"]
+           "values": ["ball_tree", "kd_tree", "brute"]
         },
         "leaf_size": {
            "type": "int",
@@ -20,7 +20,7 @@
         },
         "metric": {
             "type": "string",
-            "range": ["minkowski", "euclidean", "manhattan", "chebyshev"]
+            "values": ["minkowski", "euclidean", "manhattan", "chebyshev"]
         },
         "p": {
            "type": "int",
@@ -28,7 +28,7 @@
         },
         "_scale": {
            "type": "bool",
-           "range": [true]
+           "values": [true]
         }
     },
     "root_parameters": ["n_neighbors", "weights", "algorithm", "metric", "_scale"],

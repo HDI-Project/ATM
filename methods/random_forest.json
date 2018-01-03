@@ -4,7 +4,7 @@
     "parameters": {
         "criterion": {
             "type": "string",
-            "range": ["entropy", "gini"]
+            "values": ["entropy", "gini"]
         },
         "max_features": {
             "type": "float",
@@ -24,11 +24,11 @@
         },
         "n_estimators": {
            "type": "int_cat",
-           "range": [100]
+           "values": [100]
         },
         "n_jobs": {
            "type": "int_cat",
-           "range": [-1]
+           "values": [-1]
         }
     },
     "root_parameters": ["criterion", "max_features", "max_depth", "min_samples_leaf", "min_samples_leaf", "n_estimators", "n_jobs"],

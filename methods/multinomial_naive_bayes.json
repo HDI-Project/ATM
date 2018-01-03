@@ -12,11 +12,11 @@
         },
         "class_prior": {
            "type": "string",
-           "range": [null]
+           "values": [null]
         },
         "_scale_minmax": {
            "type": "bool",
-           "range": [true]
+           "values": [true]
         }
     },
     "root_parameters": ["alpha", "fit_prior", "class_prior", "_scale_minmax"],

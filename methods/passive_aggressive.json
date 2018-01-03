@@ -8,7 +8,7 @@
         },
         "fit_intercept": {
            "type": "int_cat",
-           "range": [0, 1]
+           "values": [0, 1]
         },
         "n_iter": {
            "type": "int",
@@ -16,19 +16,19 @@
         },
         "shuffle": {
            "type": "bool",
-           "range": [true]
+           "values": [true]
         },
         "loss": {
             "type": "string",
-            "range": ["hinge", "squared_hinge"]
+            "values": ["hinge", "squared_hinge"]
         },
         "_scale": {
            "type": "bool",
-           "range": [true]
+           "values": [true]
         },
         "n_jobs": {
            "type": "int_cat",
-           "range": [-1]
+           "values": [-1]
         }
     },
     "root_parameters": ["C", "fit_intercept", "n_iter", "shuffle", "loss", "_scale", "n_jobs"],

@@ -4,11 +4,11 @@
     "parameters": {
         "kernel": {
             "type": "string",
-            "range": ["constant", "rbf", "matern", "rational_quadratic", "exp_sine_squared"]
+            "values": ["constant", "rbf", "matern", "rational_quadratic", "exp_sine_squared"]
         },
         "nu": {
             "type": "float_cat",
-            "range": [0.5, 1.5, 2.5]
+            "values": [0.5, 1.5, 2.5]
         },
         "length_scale": {
            "type": "float_exp",
@@ -20,7 +20,7 @@
         },
         "periodicity": {
            "type": "int_cat",
-           "range": [0, 1]
+           "values": [0, 1]
         }
     },
     "root_parameters": ["kernel"],

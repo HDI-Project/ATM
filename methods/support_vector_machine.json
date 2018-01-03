@@ -12,7 +12,7 @@
         },
         "kernel": {
            "type": "string",
-           "range": ["rbf", "poly", "linear", "sigmoid"]
+           "values": ["rbf", "poly", "linear", "sigmoid"]
         },
         "degree": {
            "type": "int",
@@ -24,11 +24,11 @@
         },
         "probability": {
             "type": "bool",
-            "range": [true]
+            "values": [true]
         },
         "shrinking": {
             "type": "bool",
-            "range": [true]
+            "values": [true]
         },
         "cache_size": {
            "type": "int",
@@ -36,11 +36,11 @@
         },
         "class_weight": {
            "type": "string",
-           "range": ["auto"]
+           "values": ["auto"]
         },
         "_scale": {
            "type": "bool",
-           "range": [true]
+           "values": [true]
         },
         "max_iter": {
            "type": "int",

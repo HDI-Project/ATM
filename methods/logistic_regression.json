@@ -12,23 +12,23 @@
         },
         "penalty": {
            "type": "string",
-           "range": ["l1", "l2"]
+           "values": ["l1", "l2"]
         },
         "dual": {
            "type": "bool",
-           "range": [true, false]
+           "values": [true, false]
         },
         "fit_intercept": {
             "type": "bool",
-            "range": [true, false]
+            "values": [true, false]
         },
         "class_weight": {
            "type": "string",
-           "range": ["auto"]
+           "values": ["auto"]
         },
         "_scale": {
            "type": "bool",
-           "range": [true]
+           "values": [true]
         }
     },
     "root_parameters": ["C", "tol", "penalty", "fit_intercept", "class_weight", "_scale"],

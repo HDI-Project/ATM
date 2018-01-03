@@ -4,7 +4,7 @@
     "parameters": {
         "criterion": {
             "type": "string",
-            "range": ["entropy", "gini"]
+            "values": ["entropy", "gini"]
         },
         "max_features": {
             "type": "float",

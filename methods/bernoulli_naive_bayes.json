@@ -16,11 +16,11 @@
         },
         "class_prior": {
            "type": "string",
-           "range": [null]
+           "values": [null]
         },
         "_scale": {
            "type": "bool",
-           "range": [true]
+           "values": [true]
         }
     },
     "root_parameters": ["alpha", "binarize", "fit_prior", "class_prior", "_scale"],
