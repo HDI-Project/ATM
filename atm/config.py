@@ -1,3 +1,4 @@
+import re
 import yaml
 from argparse import ArgumentError, ArgumentTypeError
 
