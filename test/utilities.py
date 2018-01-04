@@ -68,7 +68,7 @@ def report_auc_vs_baseline(db, rid, graph=False):
         test = [float(y) for y in get_best_so_far(db, rid)]
 
     ds_file = os.path.basename(ds.train_path)
-    with open('test/baselines/best_so_far/' + ds_file) as f:
+    with open(BASELINE_PATH + ds_file) as f:
         baseline = [float(l.strip()) for l in f]
 
     min_len = min(len(baseline), len(test))
@@ -83,6 +83,8 @@ def report_auc_vs_baseline(db, rid, graph=False):
 
     if graph:
         graph_series(100, ds_file, baseline=baseline, test=test)
+
+    return test_auc, bl_auc
 
 
 def print_summary(db, rid):
