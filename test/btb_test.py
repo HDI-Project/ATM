@@ -7,7 +7,6 @@ from os.path import join
 from atm.config import *
 from atm.database import Database
 from atm.enter_data import enter_datarun
-from atm.utilities import download_file_s3
 
 from utilities import *
 
@@ -15,8 +14,6 @@ from utilities import *
 CONF_DIR = 'config/test/btb/'
 RUN_CONFIG = join(CONF_DIR, 'run.yaml')
 SQL_CONFIG = join(CONF_DIR, 'sql.yaml')
-
-DATA_URL = 'https://s3.amazonaws.com/mit-dai-delphi-datastore/downloaded/'
 
 DATASETS_MAX_FIRST = [
     # the first three datasets do not have baselines
@@ -49,9 +46,7 @@ def btb_test(tuner=None, selector=None, dataruns=None, datasets=None,
 
     db = Database(**vars(sql_conf))
     datarun_ids = dataruns or []
-    baselines = os.listdir(BASELINE_PATH)
     datasets = datasets or DATASETS_MAX_FIRST
-    datasets = [d for d in datasets if d in baselines]
 
     # if necessary, generate datasets and dataruns
     if not datarun_ids:

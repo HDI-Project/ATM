@@ -10,6 +10,7 @@ from sklearn.metrics import auc
 from atm.config import *
 from atm.worker import work
 from atm.database import db_session
+from atm.utilities import download_file_http
 
 try:
     import matplotlib.pyplot as plt
@@ -17,6 +18,8 @@ except ImportError:
     plt = None
 
 BASELINE_PATH = 'test/baselines/best_so_far/'
+DATA_URL = 'https://s3.amazonaws.com/mit-dai-delphi-datastore/downloaded/'
+BASELINE_URL = 'https://s3.amazonaws.com/mit-dai-delphi-datastore/best_so_far/'
 
 
 def get_best_so_far(db, datarun_id):
@@ -68,7 +71,10 @@ def report_auc_vs_baseline(db, rid, graph=False):
         test = [float(y) for y in get_best_so_far(db, rid)]
 
     ds_file = os.path.basename(ds.train_path)
-    with open(BASELINE_PATH + ds_file) as f:
+    bl_path = download_file_http(BASELINE_URL + ds_file,
+                                 local_folder=BASELINE_PATH)
+
+    with open(bl_path) as f:
         baseline = [float(l.strip()) for l in f]
 
     min_len = min(len(baseline), len(test))
