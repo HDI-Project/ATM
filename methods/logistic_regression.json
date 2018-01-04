@@ -24,7 +24,7 @@
         },
         "class_weight": {
            "type": "string",
-           "range": ["auto"]
+           "range": ["balanced"]
         },
         "_scale": {
            "type": "bool",
