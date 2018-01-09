@@ -437,7 +437,8 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
     while True:
         # get all pending and running dataruns, or all pending/running dataruns
         # from the list we were given
-        dataruns = db.get_dataruns(include_ids=datarun_ids)
+        dataruns = db.get_dataruns(include_ids=datarun_ids,
+                                   ignore_complete=True)
         if not dataruns:
             if wait:
                 _log('No dataruns found. Sleeping %d seconds and trying again.' %
@@ -445,6 +446,7 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
                 time.sleep(LOOP_WAIT)
                 continue
             else:
+                _log('No dataruns found. Exiting.')
                 break
 
         max_priority = max([r.priority for r in dataruns])

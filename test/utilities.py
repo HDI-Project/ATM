@@ -78,6 +78,7 @@ def report_auc_vs_baseline(db, rid, graph=False):
         baseline = [float(l.strip()) for l in f]
 
     min_len = min(len(baseline), len(test))
+    print(min_len)
     x = range(min_len)
 
     test_auc = auc(x, test[:min_len])

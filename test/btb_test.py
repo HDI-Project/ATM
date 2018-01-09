@@ -86,8 +86,16 @@ if __name__ == '__main__':
                         help='if this flag is inculded, graph the best-so-far '
                         'results of each datarun against the baseline.')
     parser.add_argument('--dataruns', nargs='+', type=int,
-                        help='(optional) IDs of previously-created dataruns to graph. '
-                        'If this option is included, no new dataruns will be created.')
+                        help='(optional) IDs of previously-created dataruns to '
+                        'graph. If this option is included, no new dataruns '
+                        'will be created, but any of the specified dataruns '
+                        'will be finished if they are not already.')
+    parser.add_argument('--datasets', nargs='+',
+                        help='(optional) file names of training data to use. '
+                        'Each should be a csv file present in the downloaded/ '
+                        'folder of the HDI project S3 bucket '
+                        '(https://s3.amazonaws.com/mit-dai-delphi-datastore/downloaded/).'
+                        'The default is to use the files in DATASETS_MAX_FIRST.')
     args = parser.parse_args()
 
     btb_test(**vars(args))
