@@ -4,7 +4,7 @@ ATM is an open source software library under ["The human data interaction projec
 
 ## Summary
 For a given classification problem, ATM's goal is to find 
-1. a classification *method*, like "decision tree" or "support vector machine" or “random forest”, and 
+1. a classification *method*, like "decision tree," "support vector machine," or “random forest”, and 
 2. a set of *hyperparameters* for that method
 which generates the best classifier possible.
 
