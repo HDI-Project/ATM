@@ -31,7 +31,7 @@ DATASETS_MAX_FIRST = [
 
 
 def btb_test(tuner=None, selector=None, dataruns=None, datasets=None,
-             processes=1, graph=False):
+             processes=1, graph=False, **kwargs):
     """
     Run a test datarun using the chosen tuner and selector, and compare it to
     the baseline performance
@@ -78,10 +78,6 @@ if __name__ == '__main__':
     ''')
     parser.add_argument('--processes', help='number of processes to run concurrently',
                         type=int, default=1)
-    parser.add_argument('--tuner', type=option_or_path(TUNERS),
-                        help='type of, or path to, BTB tuner')
-    parser.add_argument('--selector', type=option_or_path(SELECTORS),
-                        help='type of, or path to, BTB selector')
     parser.add_argument('--graph', action='store_true', default=False,
                         help='if this flag is inculded, graph the best-so-far '
                         'results of each datarun against the baseline.')
@@ -96,6 +92,7 @@ if __name__ == '__main__':
                         'folder of the HDI project S3 bucket '
                         '(https://s3.amazonaws.com/mit-dai-delphi-datastore/downloaded/).'
                         'The default is to use the files in DATASETS_MAX_FIRST.')
+    add_arguments_datarun(parser)
     args = parser.parse_args()
 
     btb_test(**vars(args))

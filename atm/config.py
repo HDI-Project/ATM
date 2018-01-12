@@ -1,4 +1,5 @@
 import re
+import os
 import yaml
 from argparse import ArgumentError, ArgumentTypeError
 
@@ -125,13 +126,21 @@ class RunConfig(Config):
     }
 
 
-def option_or_path(options, regex='.*\.py:\w+$'):
+def option_or_path(options, regex=CUSTOM_CLASS_REGEX):
     def type_check(s):
-        if re.match(regex, s) and os.path.isfile(s):
-            return s
+        # first, check whether the argument is one of the preconfigured options
         if s in options:
             return s
-        raise ArgumentTypeError
+
+        # otherwise, check it against the regex, and try to pull out a path to a
+        # real file. The regex must extract the path to the file as groups()[0].
+        match = re.match(regex, s)
+        if match and os.path.isfile(match.groups()[0]):
+            return s
+
+        # if both of those fail, there's something wrong
+        raise ArgumentTypeError('%s is not a valid option or path!' % s)
+
     return type_check
 
 
@@ -278,6 +287,29 @@ def add_arguments_datarun(parser):
                         'overrides the walltime budget. Format: ' +
                         TIME_FMT.replace('%', '%%'))
 
+    # Which field to use for judgment of performance
+    # options:
+    #   f1        - F1 score (harmonic mean of precision and recall)
+    #   roc_auc   - area under the Receiver Operating Characteristic curve
+    #   accuracy  - percent correct
+    #   mu_sigma  - one standard deviation below the average cross-validated F1
+    #               score (mu - sigma)
+    parser.add_argument('--metric', choices=METRICS,
+                        help='Metric by which ATM should evaluate classifiers. '
+                        'The metric function specified here will be used to '
+                        'compute the "judgment metric" for each classifier.')
+
+    # Which data to use for computing judgment score
+    #   cv   - cross-validated performance on training data
+    #   test - performance on test data
+    #   mu_sigma - lower confidence bound on cv score
+    parser.add_argument('--score-target', choices=SCORE_TARGETS,
+                        help='Determines which judgment metric will be used to '
+                        'search the hyperparameter space. "cv" will use the mean '
+                        'cross-validated performance, "test" will use the '
+                        'performance on a test dataset, and "mu_sigma" will use '
+                        'the lower confidence bound on the CV performance.')
+
     ##  AutoML Arguments #######################################################
     ############################################################################
     # hyperparameter selection strategy
@@ -338,29 +370,6 @@ def add_arguments_datarun(parser):
     # may be tried.
     parser.add_argument('--gridding', type=int,
                         help='gridding factor (0: no gridding)')
-
-    # Which field to use for judgment of performance
-    # options:
-    #   f1        - F1 score (harmonic mean of precision and recall)
-    #   roc_auc   - area under the Receiver Operating Characteristic curve
-    #   accuracy  - percent correct
-    #   mu_sigma  - one standard deviation below the average cross-validated F1
-    #               score (mu - sigma)
-    parser.add_argument('--metric', choices=METRICS,
-                        help='Metric by which ATM should evaluate classifiers. '
-                        'The metric function specified here will be used to '
-                        'compute the "judgment metric" for each classifier.')
-
-    # Which data to use for computing judgment score
-    #   cv   - cross-validated performance on training data
-    #   test - performance on test data
-    #   mu_sigma - lower confidence bound on cv score
-    parser.add_argument('--score-target', choices=SCORE_TARGETS,
-                        help='Determines which judgment metric will be used to '
-                        'search the hyperparameter space. "cv" will use the mean '
-                        'cross-validated performance, "test" will use the '
-                        'performance on a test dataset, and "mu_sigma" will use '
-                        'the lower confidence bound on the CV performance.')
 
     return parser
 

@@ -98,8 +98,10 @@ class Worker(object):
         if self.datarun.selector in SELECTORS_MAP:
             Selector = SELECTORS_MAP[self.datarun.selector]
         else:
-            mod = imp.load_source('btb.selection.custom', self.datarun.selector)
-            Selector = mod.CustomSelector
+            path, classname = re.match(CUSTOM_CLASS_REGEX,
+                                       self.datarun.selector).groups()
+            mod = imp.load_source('btb.selection.custom', path)
+            Selector = getattr(mod, classname)
         _log('Selector: %s' % Selector)
 
         # generate the arguments we need to initialize the selector
@@ -126,8 +128,9 @@ class Worker(object):
         if self.datarun.tuner in TUNERS_MAP:
             self.Tuner = TUNERS_MAP[self.datarun.tuner]
         else:
-            path, classname = self.datarun.tuner.split(':')
-            mod = imp.load_source('btb.tuning.custom', self.datarun.tuner)
+            path, classname = re.match(CUSTOM_CLASS_REGEX,
+                                       self.datarun.tuner).groups()
+            mod = imp.load_source('btb.tuning.custom', path)
             self.Tuner = getattr(mod, classname)
         _log('Tuner: %s' % self.Tuner)
 
