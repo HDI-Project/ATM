@@ -125,7 +125,7 @@ class RunConfig(Config):
     }
 
 
-def option_or_path(options, regex='.*\.py'):
+def option_or_path(options, regex='.*\.py:\w+$'):
     def type_check(s):
         if re.match(regex, s) and os.path.isfile(s):
             return s
@@ -289,7 +289,10 @@ def add_arguments_datarun(parser):
     #               in based on velocity of improvement
     #   path to custom tuner, defined in python
     parser.add_argument('--tuner', type=option_or_path(TUNERS),
-                        help='type of BTB tuner to use')
+                        help='type of BTB tuner to use. Can either be one of '
+                        'the pre-configured tuners listed below or a path to a '
+                        'custom tuner in the form "/path/to/tuner.py:ClassName".'
+                        ' [%s]' + ', '.join(str(s) for s in TUNERS))
 
     # How should ATM select a particular hyperpartition from the set of all
     # possible hyperpartitions?
@@ -305,7 +308,10 @@ def add_arguments_datarun(parser):
     #                  a partition
     #   path to custom selector, defined in python
     parser.add_argument('--selector', type=option_or_path(SELECTORS),
-                        help='type of BTB selector to use')
+                        help='type of BTB selector to use. Can either be one of '
+                        'the pre-configured selectors listed below or a path to a '
+                        'custom tuner in the form "/path/to/selector.py:ClassName".'
+                        ' [%s]' + ', '.join(str(s) for s in TUNERS))
 
     # r_min is the number of random runs performed in each hyperpartition before
     # allowing bayesian opt to select parameters. Consult the thesis to
@@ -340,15 +346,21 @@ def add_arguments_datarun(parser):
     #   accuracy  - percent correct
     #   mu_sigma  - one standard deviation below the average cross-validated F1
     #               score (mu - sigma)
-    parser.add_argument('--metric', choices=METRICS, help='type of BTB selector to use')
+    parser.add_argument('--metric', choices=METRICS,
+                        help='Metric by which ATM should evaluate classifiers. '
+                        'The metric function specified here will be used to '
+                        'compute the "judgment metric" for each classifier.')
 
     # Which data to use for computing judgment score
     #   cv   - cross-validated performance on training data
     #   test - performance on test data
     #   mu_sigma - lower confidence bound on cv score
     parser.add_argument('--score-target', choices=SCORE_TARGETS,
-                        help='whether to compute metrics by cross-validation or on '
-                        'test data')
+                        help='Determines which judgment metric will be used to '
+                        'search the hyperparameter space. "cv" will use the mean '
+                        'cross-validated performance, "test" will use the '
+                        'performance on a test dataset, and "mu_sigma" will use '
+                        'the lower confidence bound on the CV performance.')
 
     return parser
 

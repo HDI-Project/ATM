@@ -466,6 +466,9 @@ class Database(object):
                                            hyperpartition_id=hyperpartition_id,
                                            status=ClassifierStatus.COMPLETE)
 
+        if '_judgment_metric' not in score_target:
+            score_target += '_judgment_metric'
+
         if not classifiers:
             return None
         return max(classifiers, key=attrgetter(score_target))

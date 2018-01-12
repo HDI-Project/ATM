@@ -126,8 +126,9 @@ class Worker(object):
         if self.datarun.tuner in TUNERS_MAP:
             self.Tuner = TUNERS_MAP[self.datarun.tuner]
         else:
+            path, classname = self.datarun.tuner.split(':')
             mod = imp.load_source('btb.tuning.custom', self.datarun.tuner)
-            self.Tuner = mod.CustomTuner
+            self.Tuner = getattr(mod, classname)
         _log('Tuner: %s' % self.Tuner)
 
     def save_classifier(self, classifier_id, model, metrics):
