@@ -204,6 +204,6 @@ folder for more information. """)
     sql_config, run_config, aws_config = load_config(sql_path=args.sql_config,
                                                      run_path=args.run_config,
                                                      aws_path=args.aws_config,
-                                                     args=args)
+                                                     **kwargs)
     # create and save the dataset and datarun
     enter_datarun(sql_config, run_config, aws_config)

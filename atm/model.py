@@ -207,7 +207,8 @@ class Model(object):
         predicted labels
         """
         X, _ = self.encoder.transform(data)
-        return self.pipeline.predict(X)
+        predictions = self.pipeline.predict(X)
+        return self.encoder
 
     def special_conversions(self, params):
         """

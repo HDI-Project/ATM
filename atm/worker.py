@@ -508,7 +508,7 @@ if __name__ == '__main__':
 
     # parse arguments and load configuration
     args = parser.parse_args()
-    sql_config, _, aws_config = load_config(args=args)
+    sql_config, _, aws_config = load_config(**vars(args))
 
     # let's go
     work(db=Database(**vars(sql_config)),

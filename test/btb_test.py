@@ -16,10 +16,6 @@ RUN_CONFIG = join(CONF_DIR, 'run.yaml')
 SQL_CONFIG = join(CONF_DIR, 'sql.yaml')
 
 DATASETS_MAX_FIRST = [
-    # the first three datasets do not have baselines
-    #'wine_1.csv',
-    #'balance-scale_1.csv',
-    #'seeds_1.csv',
     'collins_1.csv',
     'cpu_1.csv',
     'vowel_1.csv',
@@ -27,22 +23,24 @@ DATASETS_MAX_FIRST = [
     'hill-valley_2.csv',
     'rabe_97_1.csv',
     'monks-problems-2_1.csv',
+    # these datasets do not have baseline numbers
+    #'wine_1.csv',
+    #'balance-scale_1.csv',
+    #'seeds_1.csv',
 ]
 
 
-def btb_test(tuner=None, selector=None, dataruns=None, datasets=None,
-             processes=1, graph=False, **kwargs):
+def btb_test(dataruns=None, datasets=None, processes=1, graph=False, **kwargs):
     """
     Run a test datarun using the chosen tuner and selector, and compare it to
-    the baseline performance
+    the baseline performance.
+
+    Tuner and selector will be specified in **kwargs, along with the rest of the
+    standard datarun arguments.
     """
     sql_conf, run_conf, _ = load_config(sql_path=SQL_CONFIG,
-                                        run_path=RUN_CONFIG)
-
-    if tuner is not None:
-        run_conf.tuner = tuner
-    if selector is not None:
-        run_conf.selector = selector
+                                        run_path=RUN_CONFIG,
+                                        **kwargs)
 
     db = Database(**vars(sql_conf))
     datarun_ids = dataruns or []
@@ -73,8 +71,8 @@ def btb_test(tuner=None, selector=None, dataruns=None, datasets=None,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='''
-    Test the performance of a new selector or tuner and compare it to that of other
-    methods.
+    Test the performance of an AutoML method and compare it to the baseline
+    performance curve.
     ''')
     parser.add_argument('--processes', help='number of processes to run concurrently',
                         type=int, default=1)
