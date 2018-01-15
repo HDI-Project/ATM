@@ -361,7 +361,7 @@ class Worker(object):
 
         return model, metrics
 
-    def run_classifier(self):
+    def run_classifier(self, hyperpartition_id=None):
         """
         Choose hyperparameters, then use them to test and save a Classifier.
         """
@@ -374,9 +374,13 @@ class Worker(object):
 
         try:
             _log('Choosing hyperparameters...')
-            # use the multi-arm bandit to choose which hyperpartition to use next
-            hyperpartition = self.select_hyperpartition()
-            # use our tuner to choose a set of parameters for the hyperpartition
+            if hyperpartition_id is not None:
+                hyperpartition = self.db.get_hyperpartition(hyperpartition_id)
+            else:
+                # use the multi-arm bandit to choose which hyperpartition to use next
+                hyperpartition = self.select_hyperpartition()
+
+            # use tuner to choose a set of parameters for the hyperpartition
             params = self.tune_parameters(hyperpartition)
         except Exception as e:
             _log('Error choosing hyperparameters: datarun=%s' % str(self.datarun))

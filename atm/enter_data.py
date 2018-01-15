@@ -56,7 +56,7 @@ def create_datarun(db, dataset, run_config):
 
     db: initialized Database object
     dataset: Dataset SQLAlchemy ORM object
-    run_config: configuration describing the datarun to create
+    run_config: RunConfig object describing the datarun to create
     """
     # describe the datarun by its tuner and selector
     run_description =  '__'.join([run_config.tuner, run_config.selector])
