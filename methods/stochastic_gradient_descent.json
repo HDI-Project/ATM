@@ -12,7 +12,7 @@
         },
         "alpha": {
            "type": "float_exp",
-           "range": [10e-5, 10e5]
+           "range": [1e-5, 1e5]
         },
         "l1_ratio": {
            "type": "float",
@@ -32,7 +32,7 @@
         },
         "epsilon": {
            "type": "float_exp",
-           "range": [10e-5, 10e5]
+           "range": [1e-5, 1e5]
         },
         "learning_rate": {
            "type": "string",
@@ -40,7 +40,7 @@
         },
         "eta0": {
            "type": "float_exp",
-           "range": [10e-5, 10e5]
+           "range": [1e-5, 1e5]
         },
         "class_weight": {
            "type": "string",

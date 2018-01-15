@@ -4,11 +4,11 @@
     "parameters": {
         "C": {
            "type": "float_exp",
-           "range": [10e-5, 10e5]
+           "range": [1e-5, 1e5]
         },
         "gamma": {
            "type": "float_exp",
-           "range": [10e-5, 10e5]
+           "range": [1e-5, 1e5]
         },
         "kernel": {
            "type": "string",
@@ -20,7 +20,7 @@
         },
         "coef0": {
             "type": "int",
-            "range": [-10e3, 10e3]
+            "range": [-1e3, 1e3]
         },
         "probability": {
             "type": "bool",

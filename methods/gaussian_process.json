@@ -12,7 +12,7 @@
         },
         "length_scale": {
            "type": "float_exp",
-           "range": [10e-5, 10e5]
+           "range": [0.01, 100]
         },
         "alpha": {
            "type": "float",
