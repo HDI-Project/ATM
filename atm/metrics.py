@@ -12,28 +12,44 @@ import pdb
 from atm.constants import *
 
 
-def rank_n_accuracy(y_true, y_prob_mat, rank=5):
+def rank_n_accuracy(y_true, y_prob_mat, n=0.33):
     """
-    Compute the model's accuracy on just the n most commmon classes (I think?)
+    Compute how often the true label is one of the top n predicted classes
+    for each training example.
+    If n is an integer, consider the top n predictions for each example.
+    If n is a float, it represents a proportion of the top predictions.
+    This metric is only really useful when the total number of classes is large.
     """
+    n_classes = y_prob_mat.shape[1]
+    if n < 1:
+        # round to nearest int before casting
+        n = int(round(n_classes * n))
+
     rankings = np.argsort(-y_prob_mat) # negative because we want highest value first
-    rankings = rankings[:, 0:rank-1]
+    rankings = rankings[:, :n]
 
     num_samples = len(y_true)
-    correct_sample_count = 0.0
+    correct_sample_count = 0.0   # force floating point math
 
     for i in range(num_samples):
         if y_true[i] in rankings[i, :]:
-            correct_sample_count += 1.0
+            correct_sample_count += 1
 
     return correct_sample_count / num_samples
 
-def get_per_class_matrix(y, shape):
-    # create a (num_classes x num_examples) binary matrix representation of the
-    # true and predicted y values.
-    y_bin = np.zeros(shape)
-    for label in range(shape[1]):
-        y_bin[:, label] = (y == label).astype(int)
+
+def get_per_class_matrix(y, classes=None):
+    """
+    Create a (num_classes x num_examples) binary matrix representation of the
+    true and predicted y values.
+    If classes is None, class values will be extracted from y. Values that are
+    not present at all will not receive a column -- this is to allow computation
+    of per-class roc_auc scores without error.
+    """
+    classes = classes or np.unique(y)
+    y_bin = np.zeros((len(y), len(classes)))
+    for i, cls in enumerate(classes):
+        y_bin[:, i] = (y == cls).astype(int)
     return y_bin
 
 
@@ -49,16 +65,16 @@ def get_pr_roc_curves(y_true, y_pred_probs):
     results = {}
     roc = roc_curve(y_true, y_pred_probs, pos_label=1)
     results[Metrics.ROC_CURVE] = {
-        'fprs': roc[0],
-        'tprs': roc[1],
-        'thresholds': roc[2],
+        'fprs': list(roc[0]),
+        'tprs': list(roc[1]),
+        'thresholds': list(roc[2]),
     }
 
     pr = precision_recall_curve(y_true, y_pred_probs, pos_label=1)
     results[Metrics.PR_CURVE] = {
-        'precisions': pr[0],
-        'recalls': pr[1],
-        'thresholds': pr[2],
+        'precisions': list(pr[0]),
+        'recalls': list(pr[1]),
+        'thresholds': list(pr[2]),
     }
 
     return results
@@ -78,7 +94,8 @@ def get_metrics_binary(y_true, y_pred, y_pred_probs, include_curves=False):
     all_labels_same = len(np.unique(y_true)) == 1
     any_probs_nan = np.any(np.isnan(y_pred_probs))
     if not any_probs_nan:
-        y_true_bin = get_per_class_matrix(y_true, y_pred_probs.shape)
+        # AP can be computed even if all labels are the same
+        y_true_bin = get_per_class_matrix(y_true, range(2))
         results[Metrics.AP] = average_precision_score(y_true_bin, y_pred_probs)
 
         if not all_labels_same:
@@ -91,8 +108,8 @@ def get_metrics_binary(y_true, y_pred, y_pred_probs, include_curves=False):
     return results
 
 
-def get_metrics_multiclass(y_true, y_pred, y_pred_probs, rank_accuracy=False,
-                           include_per_label=False, include_curves=False):
+def get_metrics_multiclass(y_true, y_pred, y_pred_probs,
+                           include_per_class=False, include_curves=False):
     results = {
         Metrics.ACCURACY: accuracy_score(y_true, y_pred),
         Metrics.COHEN_KAPPA: cohen_kappa_score(y_true, y_pred),
@@ -103,41 +120,53 @@ def get_metrics_multiclass(y_true, y_pred, y_pred_probs, rank_accuracy=False,
         Metrics.RANK_ACCURACY: np.nan,
     }
 
-    # this parameter should only be used for datasets with high-cardinality
+    # this parameter is most relevant for datasets with high-cardinality
     # labels (lots of poosible values)
-    if rank_accuracy:
-        results[Metrics.RANK_ACCURACY] = rank_n_accuracy(y_true=y_true,
-                                                         y_prob_mat=y_pred_probs,
-                                                         rank=rank)
+    # TODO: make the rank parameter configurable
+    results[Metrics.RANK_ACCURACY] = rank_n_accuracy(y_true=y_true,
+                                                     y_prob_mat=y_pred_probs)
 
 
     # if possible, compute multi-label AUC metrics
-    all_labels_same = len(np.unique(y_true)) == 1
+    present_classes = np.unique(y_true)
+    all_labels_same = len(present_classes) == 1
     any_probs_nan = np.any(np.isnan(y_pred_probs))
     if not (all_labels_same or any_probs_nan):
-        # get binary label matrices
-        y_true_bin = get_per_class_matrix(y_true, y_pred_probs.shape)
-        y_pred_bin = get_per_class_matrix(y_true, y_pred_probs.shape)
-        results[Metrics.ROC_AUC_MICRO] = roc_auc_score(y_true_bin, y_pred_probs,
+        # get binary label matrix, ignoring classes that aren't present
+        y_true_bin = get_per_class_matrix(y_true)
+
+        # filter out probabilities for classes that aren't in this sample
+        filtered_probs = y_pred_probs[:, present_classes]
+
+        # actually compute roc_auc score
+        results[Metrics.ROC_AUC_MICRO] = roc_auc_score(y_true_bin,
+                                                       filtered_probs,
                                                        average='micro')
-        results[Metrics.ROC_AUC_MACRO] = roc_auc_score(y_true_bin, y_pred_probs,
+        results[Metrics.ROC_AUC_MACRO] = roc_auc_score(y_true_bin,
+                                                       filtered_probs,
                                                        average='macro')
 
     # TODO: multi-label AP metrics?
 
     # labelwise controls whether to compute separate metrics for each posisble label
-    if include_per_label or include_curves:
-        results['labelwise'] = {}
+    if include_per_class or include_curves:
+        results['class_wise'] = {}
+
+        # create binary matrices, including classes that aren't actually present
+        all_classes = list(range(y_pred_probs.shape[1]))
+        y_true_bin = get_per_class_matrix(y_true, classes=all_classes)
+        y_pred_bin = get_per_class_matrix(y_pred, classes=all_classes)
+
         # for each possible class, generate F1, precision-recall, and ROC scores
         # using the binary metrics function.
-        for label in range(y_pred_probs.shape[1]):
-            label_pred_probs = np.column_stack((1 - y_pred_probs[:, label],
-                                                y_pred_probs[:, label]))
-            label_res = get_metrics_binary(y_true=y_true_bin[:, label],
-                                           y_pred=y_pred_bin[:, label],
-                                           y_pred_probs=label_pred_probs,
+        for cls in all_classes:
+            class_pred_probs = np.column_stack((1 - y_pred_probs[:, cls],
+                                                y_pred_probs[:, cls]))
+            class_res = get_metrics_binary(y_true=y_true_bin[:, cls],
+                                           y_pred=y_pred_bin[:, cls],
+                                           y_pred_probs=class_pred_probs,
                                            include_curves=include_curves)
-            results['labelwise'][label] = label_res
+            results['class_wise'][cls] = class_res
 
     return results
 
@@ -187,6 +216,8 @@ def cross_validate_pipeline(pipeline, X, y, binary=True,
     df = pd.DataFrame(columns=metrics)
     results = []
 
+    # TODO: how to handle classes that are so uncommon that stratified sampling
+    # doesn't work? i.e. len([c for c in y if c == some_class]) < n_folds
     skf = StratifiedKFold(n_splits=n_folds)
     skf.get_n_splits(X, y)
 
