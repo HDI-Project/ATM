@@ -5,8 +5,6 @@ import btb
 
 CONFIG_PATH = 'methods'
 
-pp = pprint.PrettyPrinter(indent=4)
-
 
 class HyperParameter(object):
     @property
@@ -126,6 +124,9 @@ class Method(object):
             param_type = HYPERPARAMETER_TYPES[v['type']]
             self.parameters[k] = param_type(name=k, **v)
 
+        # List hyperparameters are special. These are replaced in the
+        # CPT with a size hyperparameter and sets of element hyperparameters
+        # conditioned on the size.
         for name, param in self.parameters.items():
             if type(param) == List:
                 elements, conditions = param.get_elements()
@@ -135,12 +136,29 @@ class Method(object):
                 # add the size parameter, remove the list parameter
                 self.parameters[param.size.name] = param.size
                 del self.parameters[param.name]
-                self.root_params.append(param.size.name)
-                self.root_params.remove(param.name)
 
+                # if this is a root param, replace its name with the new size
+                # name in the root params list
+                if param.name in self.root_params:
+                    self.root_params.append(param.size.name)
+                    self.root_params.remove(param.name)
+
+                # if this is a conditional param, replace it there instead
+                for cond, deps in self.conditions.items():
+                    if param.name in deps:
+                        deps.append(param.size.name)
+                        deps.remove(param.name)
+                        self.conditions[cond] = deps
+
+                # finally, add all the potential sets of list elements as
+                # conditions of the list's size
                 self.conditions[param.size.name] = conditions
 
-    def sort_parameters(self, params):
+    def _sort_parameters(self, params):
+        """
+        Sort a list of HyperParameter objects into lists of constants,
+        categoricals, and tunables.
+        """
         constants = []
         categoricals = []
         tunables = []
@@ -157,13 +175,6 @@ class Method(object):
                 tunables.append((p, param.as_tunable()))
 
         return constants, categoricals, tunables
-
-    def get_hyperpartitions(self):
-        """
-        Traverse the CPT and enumerate all possible hyperpartitions of parameters
-        for this method
-        """
-        return self._enumerate([], *self.sort_parameters(self.root_params))
 
     def _enumerate(self, fixed_cats, constants, free_cats, tunables):
         """
@@ -205,7 +216,7 @@ class Method(object):
             if cat in self.conditions and str(val) in self.conditions[cat]:
                 # categorize the conditional variables which are now in play
                 new_params = self.conditions[cat][str(val)]
-                cons, cats, tuns = self.sort_parameters(new_params)
+                cons, cats, tuns = self._sort_parameters(new_params)
                 new_constants = constants + cons
                 new_free_cats = free_cats + cats
                 new_tunables = tunables + tuns
@@ -217,3 +228,10 @@ class Method(object):
                                          tunables=new_tunables))
 
         return parts
+
+    def get_hyperpartitions(self):
+        """
+        Traverse the CPT and enumerate all possible hyperpartitions of parameters
+        for this method
+        """
+        return self._enumerate([], *self._sort_parameters(self.root_params))
