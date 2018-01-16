@@ -108,6 +108,9 @@ class DataEncoder(object):
 
         return X, y
 
+    def inverse_transform(self, data):
+        data = pd.DataFrame(columns=self.feature_columns)
+
     def fit_transform(self, data):
         """ Process data into a form that ATM can use. """
         self.fit(data)

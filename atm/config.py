@@ -1,5 +1,7 @@
+import re
+import os
 import yaml
-from argparse import ArgumentError
+from argparse import ArgumentError, ArgumentTypeError, RawTextHelpFormatter
 
 from atm.constants import *
 
@@ -124,6 +126,24 @@ class RunConfig(Config):
     }
 
 
+def option_or_path(options, regex=CUSTOM_CLASS_REGEX):
+    def type_check(s):
+        # first, check whether the argument is one of the preconfigured options
+        if s in options:
+            return s
+
+        # otherwise, check it against the regex, and try to pull out a path to a
+        # real file. The regex must extract the path to the file as groups()[0].
+        match = re.match(regex, s)
+        if match and os.path.isfile(match.groups()[0]):
+            return s
+
+        # if both of those fail, there's something wrong
+        raise ArgumentTypeError('%s is not a valid option or path!' % s)
+
+    return type_check
+
+
 def add_arguments_aws_s3(parser):
     """
     Add all argparse arguments needed to parse AWS S3 configuration from the
@@ -216,11 +236,15 @@ def add_arguments_datarun(parser):
 
     parser: an argparse.ArgumentParser object
     """
+    # make sure the text for these arguments is formatted correctly
+    # this allows newlines in the help strings
+    parser.formatter_class = RawTextHelpFormatter
+
     # Config file
     parser.add_argument('--run-config', help='path to yaml datarun config file')
 
-    ##  Dataset Arguments  #########################################################
-    ################################################################################
+    ##  Dataset Arguments  #####################################################
+    ############################################################################
     parser.add_argument('--dataset-id', type=int,
                         help="ID of dataset, if it's already in the database")
 
@@ -230,20 +254,20 @@ def add_arguments_datarun(parser):
     parser.add_argument('--data-description', help='Description of dataset')
     parser.add_argument('--label-column', help='Name of the label column in the input data')
 
-    ##  Datarun Arguments  #########################################################
-    ################################################################################
+    ##  Datarun Arguments  #####################################################
+    ############################################################################
     # Notes:
     # - Support vector machines (svm) can take a long time to train. It's not an
     #   error, it's just part of what happens when the method happens to explore
     #   a crappy set of parameters on a powerful algo like this.
-    # - Stochastic gradient descent (sgd) can sometimes fail on certain parameter
-    #   settings as well. Don't worry, they train SUPER fast, and the worker.py will
-    #   simply log the error and continue.
+    # - Stochastic gradient descent (sgd) can sometimes fail on certain
+    #   parameter settings as well. Don't worry, they train SUPER fast, and the
+    #   worker.py will simply log the error and continue.
     #
     # Method options:
     #   logreg - logistic regression
     #   svm    - support vector machine
-    #   sgd    - linear classifier (SVM or logreg) using stochastic gradient descent
+    #   sgd    - linear classifier with stochastic gradient descent
     #   dt     - decision tree
     #   et     - extra trees
     #   rf     - random forest
@@ -264,18 +288,47 @@ def add_arguments_datarun(parser):
                         help='Value of the budget, either in classifiers or minutes')
     parser.add_argument('--deadline',
                         help='Deadline for datarun completion. If provided, this '
-                        'overrides the walltime budget. Format: ' +
+                        'overrides the walltime budget.\nFormat: ' +
                         TIME_FMT.replace('%', '%%'))
 
+    # Which field to use for judgment of performance
+    # options:
+    #   f1        - F1 score (harmonic mean of precision and recall)
+    #   roc_auc   - area under the Receiver Operating Characteristic curve
+    #   accuracy  - percent correct
+    #   mu_sigma  - one standard deviation below the average cross-validated F1
+    #               score (mu - sigma)
+    parser.add_argument('--metric', choices=METRICS,
+                        help='Metric by which ATM should evaluate classifiers. '
+                        'The metric function specified here will be used to '
+                        'compute the "judgment metric" for each classifier.')
+
+    # Which data to use for computing judgment score
+    #   cv   - cross-validated performance on training data
+    #   test - performance on test data
+    #   mu_sigma - lower confidence bound on cv score
+    parser.add_argument('--score-target', choices=SCORE_TARGETS,
+                        help='Determines which judgment metric will be used to '
+                        'search the hyperparameter space. "cv" will use the mean '
+                        'cross-validated performance, "test" will use the '
+                        'performance on a test dataset, and "mu_sigma" will use '
+                        'the lower confidence bound on the CV performance.')
+
+    ##  AutoML Arguments #######################################################
+    ############################################################################
     # hyperparameter selection strategy
     # How should ATM sample hyperparameters from a given hyperpartition?
     #    uniform  - pick randomly! (baseline)
     #    gp       - vanilla Gaussian Process
     #    gp_ei    - Gaussian Process expected improvement criterion
-    #    gp_eivel - Gaussian Process expected improvement, with randomness added in
-    #              based on velocity of improvement
-    parser.add_argument('--tuner', choices=TUNERS,
-                        help='type of BTB tuner to use')
+    #    gp_eivel - Gaussian Process expected improvement, with randomness added
+    #               in based on velocity of improvement
+    #   path to custom tuner, defined in python
+    parser.add_argument('--tuner', type=option_or_path(TUNERS),
+                        help='Type of BTB tuner to use. Can either be one of '
+                        'the pre-configured tuners listed below or a path to a '
+                        'custom tuner in the form "/path/to/tuner.py:ClassName".'
+                        '\nOptions: [%s]' % ', '.join(str(s) for s in TUNERS))
 
     # How should ATM select a particular hyperpartition from the set of all
     # possible hyperpartitions?
@@ -289,12 +342,16 @@ def add_arguments_datarun(parser):
     #   recentkvel   - MAB with velocity of most recent K runs
     #   hieralg      - hierarchical MAB: choose a classifier first, then choose
     #                  a partition
-    parser.add_argument('--selector', choices=SELECTORS,
-                        help='type of BTB selector to use')
+    #   path to custom selector, defined in python
+    parser.add_argument('--selector', type=option_or_path(SELECTORS),
+                        help='Type of BTB selector to use. Can either be one of '
+                        'the pre-configured selectors listed below or a path to a '
+                        'custom tuner in the form "/path/to/selector.py:ClassName".'
+                        '\nOptions: [%s]' % ', '.join(str(s) for s in SELECTORS))
 
     # r_min is the number of random runs performed in each hyperpartition before
-    # allowing bayesian opt to select parameters. Consult the thesis to understand
-    # what those mean, but essentially:
+    # allowing bayesian opt to select parameters. Consult the thesis to
+    # understand what those mean, but essentially:
     #
     #  if (num_classifiers_trained_in_hyperpartition >= r_min)
     #    # train using sample criteria
@@ -311,33 +368,17 @@ def add_arguments_datarun(parser):
 
     # gridding determines whether or not sample selection will happen on a grid.
     # If any positive integer, a grid with `gridding` points on each axis is
-    # established, and hyperparameter vectors are sampled from this finite space.
-    # If 0 (or blank), hyperparameters are sampled from continuous space, and there
-    # is no limit to the number of hyperparameter vectors that may be tried.
+    # established, and hyperparameter vectors are sampled from this finite
+    # space. If 0 (or blank), hyperparameters are sampled from continuous
+    # space, and there is no limit to the number of hyperparameter vectors that
+    # may be tried.
     parser.add_argument('--gridding', type=int,
                         help='gridding factor (0: no gridding)')
-
-    # Which field to use for judgment of performance
-    # options:
-    #   f1        - F1 score (harmonic mean of precision and recall)
-    #   roc_auc   - area under the Receiver Operating Characteristic curve
-    #   accuracy  - percent correct
-    #   mu_sigma  - one standard deviation below the average cross-validated F1
-    #               score (mu - sigma)
-    parser.add_argument('--metric', choices=METRICS, help='type of BTB selector to use')
-
-    # Which data to use for computing judgment score
-    #   cv   - cross-validated performance on training data
-    #   test - performance on test data
-    #   mu_sigma - lower confidence bound on cv score
-    parser.add_argument('--score-target', choices=SCORE_TARGETS,
-                        help='whether to compute metrics by cross-validation or on '
-                        'test data')
 
     return parser
 
 
-def load_config(sql_path=None, run_path=None, aws_path=None, args=None):
+def load_config(sql_path=None, run_path=None, aws_path=None, **kwargs):
     """
     Load config objects from yaml files and command line arguments. Command line
     args override yaml files where applicable.
@@ -346,11 +387,10 @@ def load_config(sql_path=None, run_path=None, aws_path=None, args=None):
         sql_path: path to .yaml file with SQL config info
         run_path: path to .yaml file with Dataset and Datarun config info
         aws_path: path to .yaml file with AWS config info
-        args: Namespace object with miscellaneous arguments attached to it as
-            attributes (the type that is generated by parser.parse_arguments()). Any
-            attributes beginning with sql_ are SQL config arguments, any beginning
-            with aws_ are AWS config, and the rest are assumed to be dataset or
-            datarun config.
+        **kwargs: miscellaneous arguments specifying individual configuration
+            parameters. Any kwargs beginning with sql_ are SQL config
+            arguments, any beginning with aws_ are AWS config, and the rest are
+            assumed to be dataset or datarun config.
 
     Returns: sql_conf, run_conf, aws_conf
     """
@@ -358,12 +398,15 @@ def load_config(sql_path=None, run_path=None, aws_path=None, args=None):
     run_args = {}
     aws_args = {}
 
-    # check the args object for config paths
-    if args is not None:
-        arg_vars = vars(args)
-        sql_path = sql_path or arg_vars.get('sql_config')
-        run_path = run_path or arg_vars.get('run_config')
-        aws_path = aws_path or arg_vars.get('aws_config')
+    # kwargs are most likely generated by argparse.
+    # Any unspecified argparse arguments will be None, so ignore those. We only
+    # care about arguments explicitly specified by the user.
+    kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+    # check the keyword args for config paths
+    sql_path = sql_path or kwargs.get('sql_config')
+    run_path = run_path or kwargs.get('run_config')
+    aws_path = aws_path or kwargs.get('aws_config')
 
     # load any yaml config files for which paths were provided
     if sql_path:
@@ -378,16 +421,13 @@ def load_config(sql_path=None, run_path=None, aws_path=None, args=None):
         with open(aws_path) as f:
             aws_args = yaml.load(f)
 
-    # Use args to override yaml config values
-    # Any unspecified argparse arguments will be None, so ignore those. We only
-    # care about arguments explicitly specified by the user.
-    if args is not None:
-        sql_args.update({k.replace('sql_', ''): v for k, v in arg_vars.items()
-                         if 'sql_' in k and v is not None})
-        aws_args.update({k.replace('aws_', ''): v for k, v in arg_vars.items()
-                         if 'aws_' in k and v is not None})
-        run_args.update({k: v for k, v in arg_vars.items() if 'sql_' not in k
-                         and 'aws_' not in k and v is not None})
+    # Use keyword args to override yaml config values
+    sql_args.update({k.replace('sql_', ''): v for k, v in kwargs.items()
+                     if 'sql_' in k})
+    aws_args.update({k.replace('aws_', ''): v for k, v in kwargs.items()
+                     if 'aws_' in k})
+    run_args.update({k: v for k, v in kwargs.items()
+                     if 'sql_' not in k and 'aws_' not in k})
 
     # It's ok if there are some extra arguments that get passed in here; only
     # kwargs that correspond to real config values will be stored on the config

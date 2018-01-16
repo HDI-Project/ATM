@@ -11,48 +11,48 @@
             "values": ["l1", "l2", "elasticnet"]
         },
         "alpha": {
-           "type": "float_exp",
-           "range": [10e-5, 10e5]
+            "type": "float_exp",
+            "range": [1e-5, 1e5]
         },
         "l1_ratio": {
-           "type": "float",
-           "range": [0.0, 1.0]
+            "type": "float",
+            "range": [0.0, 1.0]
         },
         "fit_intercept": {
-           "type": "int_cat",
-           "range": [0, 1]
+            "type": "int_cat",
+            "range": [0, 1]
         },
         "n_iter": {
-           "type": "int",
-           "range": [10, 200]
+            "type": "int",
+            "range": [10, 200]
         },
         "shuffle": {
-           "type": "bool",
-           "values": [true]
+            "type": "bool",
+            "values": [true]
         },
         "epsilon": {
-           "type": "float_exp",
-           "range": [10e-5, 10e5]
+            "type": "float_exp",
+            "range": [1e-5, 1e5]
         },
         "learning_rate": {
-           "type": "string",
-           "values": ["constant", "optimal"]
+            "type": "string",
+            "values": ["constant", "optimal"]
         },
         "eta0": {
-           "type": "float_exp",
-           "range": [10e-5, 10e5]
+            "type": "float_exp",
+            "range": [1e-5, 1e5]
         },
         "class_weight": {
-           "type": "string",
-           "values": [null]
+            "type": "string",
+            "values": [null]
         },
         "_scale_minmax": {
-           "type": "bool",
-           "values": [true]
+            "type": "bool",
+            "values": [true]
         },
         "n_jobs": {
-           "type": "int_cat",
-           "values": [-1]
+            "type": "int_cat",
+            "values": [-1]
         }
     },
     "root_parameters": ["loss", "penalty", "alpha", "l1_ratio", "fit_intercept", "n_iter", "shuffle", "epsilon", "learning_rate", "eta0", "class_weight", "_scale_minmax", "n_jobs"],

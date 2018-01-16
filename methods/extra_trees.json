@@ -11,24 +11,24 @@
             "range": [0.1, 1.0]
         },
         "max_depth": {
-           "type": "int",
-           "range": [2, 10]
+            "type": "int",
+            "range": [2, 10]
         },
         "min_samples_split": {
-           "type": "int",
-           "range": [2, 3]
+            "type": "int",
+            "range": [2, 3]
         },
         "min_samples_leaf": {
-           "type": "int",
-           "range": [1, 2]
+            "type": "int",
+            "range": [1, 2]
         },
         "n_estimators": {
-           "type": "int_cat",
-           "values": [100]
+            "type": "int_cat",
+            "values": [100]
         },
         "n_jobs": {
-           "type": "int",
-           "range": [-1]
+            "type": "int",
+            "range": [-1]
         }
     },
     "root_parameters": ["criterion", "max_features", "max_depth", "min_samples_leaf", "min_samples_leaf", "n_estimators", "n_jobs"],

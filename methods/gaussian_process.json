@@ -11,16 +11,16 @@
             "values": [0.5, 1.5, 2.5]
         },
         "length_scale": {
-           "type": "float_exp",
-           "range": [10e-5, 10e5]
+            "type": "float_exp",
+            "range": [0.01, 100]
         },
         "alpha": {
-           "type": "float",
-           "range": [0.0, 1.0]
+            "type": "float",
+            "range": [0.0, 1.0]
         },
         "periodicity": {
-           "type": "int_cat",
-           "values": [0, 1]
+            "type": "int_cat",
+            "values": [0, 1]
         }
     },
     "root_parameters": ["kernel"],

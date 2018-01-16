@@ -98,8 +98,10 @@ class Worker(object):
         if self.datarun.selector in SELECTORS_MAP:
             Selector = SELECTORS_MAP[self.datarun.selector]
         else:
-            mod = imp.load_source('btb.selection.custom', self.datarun.selector)
-            Selector = mod.CustomSelector
+            path, classname = re.match(CUSTOM_CLASS_REGEX,
+                                       self.datarun.selector).groups()
+            mod = imp.load_source('btb.selection.custom', path)
+            Selector = getattr(mod, classname)
         _log('Selector: %s' % Selector)
 
         # generate the arguments we need to initialize the selector
@@ -126,8 +128,10 @@ class Worker(object):
         if self.datarun.tuner in TUNERS_MAP:
             self.Tuner = TUNERS_MAP[self.datarun.tuner]
         else:
-            mod = imp.load_source('btb.tuning.custom', self.datarun.tuner)
-            self.Tuner = mod.CustomTuner
+            path, classname = re.match(CUSTOM_CLASS_REGEX,
+                                       self.datarun.tuner).groups()
+            mod = imp.load_source('btb.tuning.custom', path)
+            self.Tuner = getattr(mod, classname)
         _log('Tuner: %s' % self.Tuner)
 
     def save_classifier(self, classifier_id, model, metrics):
@@ -437,7 +441,8 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
     while True:
         # get all pending and running dataruns, or all pending/running dataruns
         # from the list we were given
-        dataruns = db.get_dataruns(include_ids=datarun_ids)
+        dataruns = db.get_dataruns(include_ids=datarun_ids,
+                                   ignore_complete=True)
         if not dataruns:
             if wait:
                 _log('No dataruns found. Sleeping %d seconds and trying again.' %
@@ -445,6 +450,7 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
                 time.sleep(LOOP_WAIT)
                 continue
             else:
+                _log('No dataruns found. Exiting.')
                 break
 
         max_priority = max([r.priority for r in dataruns])
@@ -502,7 +508,7 @@ if __name__ == '__main__':
 
     # parse arguments and load configuration
     args = parser.parse_args()
-    sql_config, _, aws_config = load_config(args=args)
+    sql_config, _, aws_config = load_config(**vars(args))
 
     # let's go
     work(db=Database(**vars(sql_config)),

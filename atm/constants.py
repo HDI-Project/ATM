@@ -20,8 +20,10 @@ DATARUN_STATUS = ['pending', 'running', 'complete']
 CLASSIFIER_STATUS = ['running', 'errored', 'complete']
 PARTITION_STATUS = ['incomplete', 'errored', 'gridding_done']
 
-TIME_FMT = "%Y-%m-%d %H:%M"
+TIME_FMT = '%Y-%m-%d %H:%M'
 DATA_PATH = 'data/downloads'
+
+CUSTOM_CLASS_REGEX = '(.*\.py):(\w+)$'
 
 TUNERS_MAP = {
     'uniform': UniformTuner,

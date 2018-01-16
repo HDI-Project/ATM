@@ -4,9 +4,9 @@ ATM is an open source software library under ["The human data interaction projec
 
 ## Summary
 For a given classification problem, ATM's goal is to find 
-1. a classification *method*, like decision tree or support vector machine, and 
+1. a classification *method*, like "decision tree," "support vector machine," or “random forest”, and 
 2. a set of *hyperparameters* for that method
-which generate the best classifier possible.
+which generates the best classifier possible.
 
 ATM takes in a dataset with pre-extracted feature vectors and labels as a CSV file. It then begins training and testing classifiers (machine learning models) in parallel. As time goes on, ATM will use the results of previous classifiers to intelligently select which methods and hyperparameters to try next. Along the way, ATM saves data about each classifier it trains, including the hyperparameters used to train it, extensive performace metrics, and a serialized version of the model itself.
 

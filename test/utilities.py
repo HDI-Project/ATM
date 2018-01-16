@@ -1,17 +1,25 @@
 from __future__ import print_function
 import argparse
 import numpy as np
+import os
 
 from collections import defaultdict
 from multiprocessing import Process
+from sklearn.metrics import auc
 
 from atm.config import *
 from atm.worker import work
+from atm.database import db_session
+from atm.utilities import download_file_http
 
 try:
     import matplotlib.pyplot as plt
 except ImportError:
     plt = None
+
+BASELINE_PATH = 'test/baselines/best_so_far/'
+DATA_URL = 'https://s3.amazonaws.com/mit-dai-delphi-datastore/downloaded/'
+BASELINE_URL = 'https://s3.amazonaws.com/mit-dai-delphi-datastore/best_so_far/'
 
 
 def get_best_so_far(db, datarun_id):
@@ -21,12 +29,12 @@ def get_best_so_far(db, datarun_id):
     # generate a list of the "best so far" score after each classifier was
     # computed (in chronological order)
     classifiers = db.get_classifiers(datarun_id=datarun_id)
-    print('run %s: %d classifiers' % (datarun_id, len(classifiers)))
     y = []
     for l in classifiers:
         best_so_far = max(y + [l.cv_judgment_metric])
         y.append(best_so_far)
     return y
+
 
 def graph_series(length, title, **series):
     """
@@ -54,6 +62,37 @@ def graph_series(length, title, **series):
     plt.title(title)
     plt.legend(handles=lines)
     plt.show()
+
+
+def report_auc_vs_baseline(db, rid, graph=False):
+    with db_session(db):
+        run = db.get_datarun(rid)
+        ds = run.dataset
+        test = [float(y) for y in get_best_so_far(db, rid)]
+
+    ds_file = os.path.basename(ds.train_path)
+    bl_path = download_file_http(BASELINE_URL + ds_file,
+                                 local_folder=BASELINE_PATH)
+
+    with open(bl_path) as f:
+        baseline = [float(l.strip()) for l in f]
+
+    min_len = min(len(baseline), len(test))
+    print(min_len)
+    x = range(min_len)
+
+    test_auc = auc(x, test[:min_len])
+    bl_auc = auc(x, baseline[:min_len])
+    diff = test_auc - bl_auc
+
+    print('Dataset %s (datarun %d)' % (ds_file, rid))
+    print('AUC: test = %.3f, baseline = %.3f (%.3f)' % (test_auc, bl_auc, diff))
+
+    if graph:
+        graph_series(100, ds_file, baseline=baseline, test=test)
+
+    return test_auc, bl_auc
+
 
 def print_summary(db, rid):
     run = db.get_datarun(rid)

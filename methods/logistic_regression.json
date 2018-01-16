@@ -3,32 +3,32 @@
     "class": "sklearn.linear_model.LogisticRegression",
     "parameters": {
         "C": {
-           "type": "float_exp",
-           "range": [10e-5, 10e5]
+            "type": "float_exp",
+            "range": [1e-5, 1e5]
         },
         "tol": {
-           "type": "float_exp",
-           "range": [10e-5, 10e5]
+            "type": "float_exp",
+            "range": [1e-5, 1e5]
         },
         "penalty": {
-           "type": "string",
-           "values": ["l1", "l2"]
+            "type": "string",
+            "values": ["l1", "l2"]
         },
         "dual": {
-           "type": "bool",
-           "values": [true, false]
+            "type": "bool",
+            "values": [true, false]
         },
         "fit_intercept": {
             "type": "bool",
             "values": [true, false]
         },
         "class_weight": {
-           "type": "string",
-           "values": ["auto"]
+            "type": "string",
+            "values": ["balanced"]
         },
         "_scale": {
-           "type": "bool",
-           "values": [true]
+            "type": "bool",
+            "values": [true]
         }
     },
     "root_parameters": ["C", "tol", "penalty", "fit_intercept", "class_weight", "_scale"],

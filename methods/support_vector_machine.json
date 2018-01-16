@@ -3,24 +3,24 @@
     "class": "sklearn.svm.SVC",
     "parameters": {
         "C": {
-           "type": "float_exp",
-           "range": [10e-5, 10e5]
+            "type": "float_exp",
+            "range": [1e-5, 1e5]
         },
         "gamma": {
-           "type": "float_exp",
-           "range": [10e-5, 10e5]
+            "type": "float_exp",
+            "range": [1e-5, 1e5]
         },
         "kernel": {
-           "type": "string",
-           "values": ["rbf", "poly", "linear", "sigmoid"]
+            "type": "string",
+            "values": ["rbf", "poly", "linear", "sigmoid"]
         },
         "degree": {
-           "type": "int",
-           "range": [2, 5]
+            "type": "int",
+            "range": [2, 5]
         },
         "coef0": {
             "type": "int",
-            "range": [-10e3, 10e3]
+            "range": [-1e3, 1e3]
         },
         "probability": {
             "type": "bool",
@@ -31,20 +31,20 @@
             "values": [true]
         },
         "cache_size": {
-           "type": "int",
-           "range": [15000]
+            "type": "int",
+            "range": [15000]
         },
         "class_weight": {
-           "type": "string",
-           "values": ["auto"]
+            "type": "string",
+            "range": ["balanced"]
         },
         "_scale": {
-           "type": "bool",
-           "values": [true]
+            "type": "bool",
+            "values": [true]
         },
         "max_iter": {
-           "type": "int",
-           "range": [50000]
+            "type": "int",
+            "range": [50000]
         }
     },
     "root_parameters": ["C", "kernel", "probability", "shrinking", "cache_size", "class_weight", "max_iter", "_scale"],

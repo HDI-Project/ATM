@@ -11,16 +11,16 @@
             "range": [0.1, 1.0]
         },
         "max_depth": {
-           "type": "int",
-           "range": [2, 10]
+            "type": "int",
+            "range": [2, 10]
         },
         "min_samples_split": {
-           "type": "int",
-           "range": [2, 4]
+            "type": "int",
+            "range": [2, 4]
         },
         "min_samples_leaf": {
-           "type": "int",
-           "range": [1, 3]
+            "type": "int",
+            "range": [1, 3]
         }
     },
     "root_parameters": ["criterion", "max_features", "max_depth", "min_samples_split", "min_samples_leaf"],
