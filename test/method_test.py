@@ -15,8 +15,8 @@ from atm.worker import work
 from utilities import *
 
 
-CONF_DIR = 'config/test/method/'
-DATA_DIR = 'data/test/'
+CONF_DIR = os.path.join(PROJECT_ROOT, 'config/test/method/')
+DATA_DIR = os.path.join(PROJECT_ROOT, 'data/test/')
 RUN_CONFIG = join(CONF_DIR, 'run.yaml')
 SQL_CONFIG = join(CONF_DIR, 'sql.yaml')
 DATASETS = [

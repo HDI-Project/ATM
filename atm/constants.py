@@ -1,3 +1,5 @@
+import os
+from atm import PROJECT_ROOT
 # sample tuners
 from btb.tuning import Uniform as UniformTuner, GP, GPEi, GPEiVelocity
 # hyperpartition selectors
@@ -21,9 +23,12 @@ CLASSIFIER_STATUS = ['running', 'errored', 'complete']
 PARTITION_STATUS = ['incomplete', 'errored', 'gridding_done']
 
 TIME_FMT = '%Y-%m-%d %H:%M'
-DATA_PATH = 'data/downloads'
+DATA_DL_PATH = os.path.join(PROJECT_ROOT, 'data/downloads')
+METHOD_PATH = os.path.join(PROJECT_ROOT, 'methods')
+LOG_PATH = os.path.join(PROJECT_ROOT, 'logs')
 
 CUSTOM_CLASS_REGEX = '(.*\.py):(\w+)$'
+JSON_REGEX = '(.*\.json)$'
 
 TUNERS_MAP = {
     'uniform': UniformTuner,

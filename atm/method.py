@@ -1,9 +1,8 @@
 import json
-import pprint
 from os.path import join
-import btb
 
-CONFIG_PATH = 'methods'
+import btb
+from atm.constants import METHODS_MAP, METHOD_PATH
 
 
 class HyperParameter(object):
@@ -43,6 +42,9 @@ class Categorical(HyperParameter):
     @property
     def is_constant(self):
         return len(self.values) == 1
+
+    def as_tunable(self):
+        return btb.HyperParameter(typ=self.type, rang=self.values)
 
 
 class List(HyperParameter):
@@ -104,12 +106,19 @@ class Method(object):
     hyperparameter arguments it needs to run. Its main purpose is to generate
     hyperpartitions (possible combinations of categorical hyperparameters).
     """
-    def __init__(self, config):
+    def __init__(self, method):
         """
-        config: JSON dictionary containing all the information needed to specify
-            this enumerator
+        method: method code or path to JSON file containing all the information
+            needed to specify this enumerator.
         """
-        with open(join(CONFIG_PATH, config)) as f:
+        if method in METHODS_MAP:
+            # if the configured method is a code, look up the path to its json
+            config_path = join(METHOD_PATH, METHODS_MAP[method])
+        else:
+            # otherwise, it must be a path to a file
+            config_path = method
+
+        with open(config_path) as f:
             config = json.load(f)
 
         self.name = config['name']
@@ -231,7 +240,7 @@ class Method(object):
 
     def get_hyperpartitions(self):
         """
-        Traverse the CPT and enumerate all possible hyperpartitions of parameters
-        for this method
+        Traverse the CPT and enumerate all possible hyperpartitions of
+        categorical parameters for this method.
         """
         return self._enumerate([], *self._sort_parameters(self.root_params))

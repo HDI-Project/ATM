@@ -168,7 +168,7 @@ class Database(object):
             datarun = relationship('Datarun', back_populates='hyperpartitions')
 
             # these columns define the partition
-            method = Column(String(15))
+            method = Column(String(255))
             categoricals64 = Column(Text)
             tunables64 = Column(Text)
             constants64 = Column(Text)

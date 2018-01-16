@@ -137,7 +137,7 @@ def enter_datarun(sql_config, run_config, aws_config=None,
     method_parts = {}
     for m in run_config.methods:
         # enumerate all combinations of categorical variables for this method
-        method = Method(METHODS_MAP[m])
+        method = Method(m)
         method_parts[m] = method.get_hyperpartitions()
         print('method', m, 'has', len(method_parts[m]), 'hyperpartitions')
 

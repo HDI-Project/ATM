@@ -4,6 +4,7 @@ import os
 import random
 from os.path import join
 
+from atm import PROJECT_ROOT
 from atm.config import *
 from atm.database import Database
 from atm.enter_data import enter_datarun
@@ -11,7 +12,7 @@ from atm.enter_data import enter_datarun
 from utilities import *
 
 
-CONF_DIR = 'config/test/btb/'
+CONF_DIR = os.path.join(PROJECT_ROOT, 'config/test/btb/')
 RUN_CONFIG = join(CONF_DIR, 'run.yaml')
 SQL_CONFIG = join(CONF_DIR, 'sql.yaml')
 

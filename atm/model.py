@@ -46,25 +46,26 @@ class Model(object):
     # number of folds for cross-validation (arbitrary, for speed)
     N_FOLDS = 5
 
-    def __init__(self, code, params, judgment_metric, label_column,
+    def __init__(self, method, params, judgment_metric, label_column,
                  testing_ratio=0.3):
         """
         Parameters:
-            code: the short method code (as defined in constants.py)
+            method: the short method code (as defined in constants.py) or path
+                to method json
             judgment_metric: string that indicates which metric should be
                 optimized for.
             params: parameters passed to the sklearn classifier constructor
             class_: sklearn classifier class
         """
         # configuration & database
-        self.code = code
+        self.method = method
         self.params = params
         self.judgment_metric = judgment_metric
         self.label_column = label_column
         self.testing_ratio = testing_ratio
 
         # load the classifier method's class
-        path = Method(METHODS_MAP[code]).class_path.split('.')
+        path = Method(method).class_path.split('.')
         mod_str, cls_str = '.'.join(path[:-1]), path[-1]
         mod = import_module(mod_str)
         self.class_ = getattr(mod, cls_str)
@@ -124,7 +125,7 @@ class Model(object):
             steps.append(('minmax_scale', MinMaxScaler()))
 
         # add the classifier as the final step in the pipeline
-        steps.append((self.code, classifier))
+        steps.append((self.method, classifier))
         self.pipeline = Pipeline(steps)
 
     def cross_validate(self, X, y):
@@ -240,7 +241,7 @@ class Model(object):
             params[lname] = [val for idx, val in sorted(items)]
 
         ## Gaussian process classifier
-        if self.code == "gp":
+        if self.method == "gp":
             if params["kernel"] == "constant":
                 params["kernel"] = ConstantKernel()
             elif params["kernel"] == "rbf":
