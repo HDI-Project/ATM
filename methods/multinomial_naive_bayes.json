@@ -1,24 +1,24 @@
 {   
     "name": "mnb",
     "class": "sklearn.naive_bayes.MultinomialNB",
-    "parameters": {
+    "hyperparameters": {
         "alpha": {
             "type": "float",
             "range": [0.0, 1.0]
         },
         "fit_prior": {
-           "type": "int",
-           "range": [0, 1]
+            "type": "int",
+            "range": [0, 1]
         },
         "class_prior": {
-           "type": "string",
-           "range": [null]
+            "type": "string",
+            "values": [null]
         },
         "_scale_minmax": {
-           "type": "bool",
-           "range": [true]
+            "type": "bool",
+            "values": [true]
         }
     },
-    "root_parameters": ["alpha", "fit_prior", "class_prior", "_scale_minmax"],
-    "conditions": {}
+    "root_hyperparameters": ["alpha", "fit_prior", "class_prior", "_scale_minmax"],
+    "conditional_hyperparameters": {}
 }
