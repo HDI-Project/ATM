@@ -12,9 +12,11 @@ class HyperPartition(object):
     def __init__(self, categoricals, constants, tunables):
         """
         categoricals: the values for this hyperpartition which have been fixed, thus
-            defining the hyperpartition
-        constants: the values for this hyperpartition for which there was no choice
-        tunables: the free variables which must be tuned
+            defining the hyperpartition. List of tuples of the form ('param', val).
+        constants: the values for this hyperpartition for which there was no
+            choice. List of tuples of the form ('param', val).
+        tunables: the free variables which must be tuned. List of tuples of the
+            form ('param', HyperParameter).
         """
         self.categoricals = categoricals
         self.constants = constants
