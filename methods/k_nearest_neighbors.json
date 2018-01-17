@@ -1,38 +1,38 @@
 {   
     "name": "knn",
     "class": "sklearn.neighbors.KNeighborsClassifier",
-    "parameters": {
+    "hyperparameters": {
         "n_neighbors": {
-           "type": "int",
-           "range": [1, 20]
+            "type": "int",
+            "range": [1, 20]
         },
         "weights": {
-           "type": "string",
-           "range": ["uniform", "distance"]
+            "type": "string",
+            "values": ["uniform", "distance"]
         },
         "algorithm": {
-           "type": "string",
-           "range": ["ball_tree", "kd_tree", "brute"]
+            "type": "string",
+            "values": ["ball_tree", "kd_tree", "brute"]
         },
         "leaf_size": {
-           "type": "int",
-           "range": [1, 50]
+            "type": "int",
+            "range": [1, 50]
         },
         "metric": {
             "type": "string",
-            "range": ["minkowski", "euclidean", "manhattan", "chebyshev"]
+            "values": ["minkowski", "euclidean", "manhattan", "chebyshev"]
         },
         "p": {
-           "type": "int",
-           "range": [1, 3]
+            "type": "int",
+            "range": [1, 3]
         },
         "_scale": {
-           "type": "bool",
-           "range": [true]
+            "type": "bool",
+            "values": [true]
         }
     },
-    "root_parameters": ["n_neighbors", "weights", "algorithm", "metric", "_scale"],
-    "conditions": {
+    "root_hyperparameters": ["n_neighbors", "weights", "algorithm", "metric", "_scale"],
+    "conditional_hyperparameters": {
         "metric": {
             "minkowski": ["p"]
         },

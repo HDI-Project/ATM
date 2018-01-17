@@ -35,12 +35,14 @@ warnings.filterwarnings('ignore')
 os.environ['GNUMPY_IMPLICIT_CONVERSION'] = 'allow'
 
 # get the file system in order
+DEFAULT_MODEL_DIR = os.path.join(PROJECT_ROOT, 'models')
+DEFAULT_METRIC_DIR = os.path.join(PROJECT_ROOT, 'metrics')
+
 # make sure we have directories where we need them
-LOG_DIR = 'logs'
-ensure_directory(LOG_DIR)
+ensure_directory(LOG_PATH)
 
 # name log file after the local hostname
-LOG_FILE = os.path.join(LOG_DIR, '%s.txt' % socket.gethostname())
+LOG_FILE = os.path.join(LOG_PATH, '%s.txt' % socket.gethostname())
 
 # how long to sleep between loops while waiting for new dataruns to be added
 LOOP_WAIT = 1
@@ -62,8 +64,8 @@ class ClassifierError(Exception):
 
 class Worker(object):
     def __init__(self, database, datarun, save_files=True, cloud_mode=False,
-                 aws_config=None, model_dir='models', metric_dir='metrics',
-                 verbose_metrics=False):
+                 aws_config=None, model_dir=DEFAULT_MODEL_DIR,
+                 metric_dir=DEFAULT_METRIC_DIR, verbose_metrics=False):
         """
         database: Database object with connection information
         datarun: Datarun ORM object to work on.
@@ -330,7 +332,7 @@ class Worker(object):
         classification model.
         Returns: Model object and metrics dictionary
         """
-        model = Model(code=method, params=params,
+        model = Model(method=method, params=params,
                       judgment_metric=self.datarun.metric,
                       label_column=self.dataset.label_column,
                       verbose_metrics=self.verbose_metrics)
@@ -391,9 +393,9 @@ class Worker(object):
                  hyperpartition.id)
             return
 
-        _log('Chose parameters for method %s:' % hyperpartition.method)
-        for k, v in params.items():
-            _log('\t%s = %s' % (k, v))
+        _log('Chose parameters for method "%s":' % hyperpartition.method)
+        for k in sorted(params.keys()):
+            _log('\t%s = %s' % (k, params[k]))
 
         _log('Creating classifier...')
         classifier = self.db.create_classifier(hyperpartition_id=hyperpartition.id,
@@ -505,9 +507,11 @@ if __name__ == '__main__':
     parser.add_argument('--no-save', dest='save_files', default=True,
                         action='store_const', const=False,
                         help="don't save models and metrics for later")
-    parser.add_argument('--model-dir', dest='model_persist_dir', default='models',
+    parser.add_argument('--model-dir', dest='model_persist_dir',
+                        default=DEFAULT_MODEL_DIR,
                         help='Directory where computed models will be saved')
-    parser.add_argument('--metric-dir', dest='metric_persist_dir', default='metrics',
+    parser.add_argument('--metric-dir', dest='metric_persist_dir',
+                        default=DEFAULT_METRIC_DIR,
                         help='Directory where model metrics will be saved')
     parser.add_argument('--verbose-metrics', default=False, action='store_true',
                         help='If set, compute full ROC and PR curves and '

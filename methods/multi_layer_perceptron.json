@@ -1,67 +1,54 @@
 {   
     "name": "mlp",
     "class": "sklearn.neural_network.MLPClassifier",
-    "parameters": {
+    "hyperparameters": {
         "batch_size": {
-           "type": "string",
-           "range": ["auto"]
+            "type": "string",
+            "values": ["auto"]
         },
         "solver": {
-           "type": "string",
-           "range": ["lbfgs", "sgd", "adam"]
+            "type": "string",
+            "values": ["lbfgs", "sgd", "adam"]
         },
         "alpha": {
-           "type": "float",
-           "range": [0.0001, 0.009]
-        },
-        "num_hidden_layers": {
-           "type": "int_cat",
-           "range": [1, 2, 3]
-        },
-        "hidden_size_layer1": {
-            "type": "int",
-            "range": [2, 300]
-        },
-        "hidden_size_layer2": {
-            "type": "int",
-            "range": [2, 300]
-        },
-        "hidden_size_layer3": {
-            "type": "int",
-            "range": [2, 300]
+            "type": "float",
+            "range": [0.0001, 0.009]
         },
         "learning_rate_init": {
-           "type": "float",
-           "range": [0.001, 0.99]
+            "type": "float",
+            "range": [0.001, 0.99]
         },
         "beta_1": {
-           "type": "float",
-           "range": [0.8, 0.9999]
+            "type": "float",
+            "range": [0.8, 0.9999]
         },
         "beta_2": {
-           "type": "float",
-           "range": [0.8, 0.9999]
+            "type": "float",
+            "range": [0.8, 0.9999]
         },
         "learning_rate": {
-           "type": "string",
-           "range": ["constant", "invscaling", "adaptive"]
+            "type": "string",
+            "values": ["constant", "invscaling", "adaptive"]
         },
         "activation": {
-           "type": "string",
-           "range": ["relu", "logistic", "identity", "tanh"]
+            "type": "string",
+            "values": ["relu", "logistic", "identity", "tanh"]
+        },
+        "hidden_layer_sizes": {
+            "type": "list",
+            "list_length": [1, 2, 3],
+            "element": {
+                "type": "int",
+                "range": [2, 300]
+            }
         },
         "_scale": {
-           "type": "string",
-           "range": [true]
+            "type": "string",
+            "values": [true]
         }
     },
-    "root_parameters": ["batch_size", "solver", "alpha", "activation", "num_hidden_layers", "_scale"],
-    "conditions": {
-        "num_hidden_layers": {
-            "1": ["hidden_size_layer1"],
-            "2": ["hidden_size_layer1", "hidden_size_layer2"],
-            "3": ["hidden_size_layer1", "hidden_size_layer2", "hidden_size_layer3"]
-        },
+    "root_hyperparameters": ["batch_size", "solver", "alpha", "activation", "hidden_layer_sizes", "_scale"],
+    "conditional_hyperparameters": {
         "solver": {
             "sgd": ["learning_rate_init", "learning_rate"],
             "adam": ["learning_rate_init", "beta_1", "beta_2"]

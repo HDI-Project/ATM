@@ -1,30 +1,30 @@
 {   
     "name": "gp",
     "class": "sklearn.gaussian_process.GaussianProcessClassifier",
-    "parameters": {
+    "hyperparameters": {
         "kernel": {
             "type": "string",
-            "range": ["constant", "rbf", "matern", "rational_quadratic", "exp_sine_squared"]
+            "values": ["constant", "rbf", "matern", "rational_quadratic", "exp_sine_squared"]
         },
         "nu": {
             "type": "float_cat",
-            "range": [0.5, 1.5, 2.5]
+            "values": [0.5, 1.5, 2.5]
         },
         "length_scale": {
-           "type": "float_exp",
-           "range": [0.01, 100]
+            "type": "float_exp",
+            "range": [0.01, 100]
         },
         "alpha": {
-           "type": "float",
-           "range": [0.0, 1.0]
+            "type": "float",
+            "range": [0.0, 1.0]
         },
         "periodicity": {
-           "type": "int_cat",
-           "range": [0, 1]
+            "type": "int_cat",
+            "values": [0, 1]
         }
     },
-    "root_parameters": ["kernel"],
-    "conditions": {
+    "root_hyperparameters": ["kernel"],
+    "conditional_hyperparameters": {
         "kernel": {
             "matern": ["nu"],
             "rational_quadratic": ["length_scale", "alpha"],

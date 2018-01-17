@@ -228,17 +228,17 @@ def get_local_data_path(data_path):
     if m:
         path = data_path[len(m.group()):].split('/')
         bucket = path.pop(0)
-        return os.path.join(DATA_PATH, path[-1]), FileType.S3
+        return os.path.join(DATA_DL_PATH, path[-1]), FileType.S3
 
     m = re.match(HTTP_PREFIX, data_path)
     if m:
         path = data_path[len(m.group()):].split('/')
-        return os.path.join(DATA_PATH, path[-1]), FileType.HTTP
+        return os.path.join(DATA_DL_PATH, path[-1]), FileType.HTTP
 
     return data_path, FileType.LOCAL
 
 
-def download_file_s3(aws_path, aws_config, local_folder=DATA_PATH):
+def download_file_s3(aws_path, aws_config, local_folder=DATA_DL_PATH):
     """ Download a file from an S3 bucket and save it in the local folder. """
     # remove the prefix and extract the S3 bucket, folder, and file name
     m = re.match(S3_PREFIX, aws_path)
@@ -274,7 +274,7 @@ def download_file_s3(aws_path, aws_config, local_folder=DATA_PATH):
     return path
 
 
-def download_file_http(url, local_folder=DATA_PATH):
+def download_file_http(url, local_folder=DATA_DL_PATH):
     """ Download a file from a public URL and save it locally. """
     filename = url.split('/')[-1]
     if local_folder is not None:
