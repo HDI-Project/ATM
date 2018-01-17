@@ -47,7 +47,7 @@ class Model(object):
     N_FOLDS = 5
 
     def __init__(self, method, params, judgment_metric, label_column,
-                 testing_ratio=0.3):
+                 testing_ratio=0.3, verbose_metrics=False):
         """
         Parameters:
             method: the short method code (as defined in constants.py) or path
@@ -63,6 +63,7 @@ class Model(object):
         self.judgment_metric = judgment_metric
         self.label_column = label_column
         self.testing_ratio = testing_ratio
+        self.verbose_metrics = verbose_metrics
 
         # load the classifier method's class
         path = Method(method).class_path.split('.')
@@ -129,10 +130,18 @@ class Model(object):
         self.pipeline = Pipeline(steps)
 
     def cross_validate(self, X, y):
+        # TODO: this is hacky. See https://github.com/HDI-Project/ATM/issues/48
         binary = self.num_classes == 2
+        kwargs = {}
+        if self.verbose_metrics:
+            kwargs['include_curves'] = True
+            if not binary:
+                kwargs['include_per_class'] = True
+
         df, cv_scores = cross_validate_pipeline(pipeline=self.pipeline,
                                                 X=X, y=y, binary=binary,
-                                                n_folds=self.N_FOLDS)
+                                                n_folds=self.N_FOLDS, **kwargs)
+
         self.cv_judgment_metric = np.mean(df[self.judgment_metric])
         self.cv_judgment_metric_stdev = np.std(df[self.judgment_metric])
         self.mu_sigma_judgment_metric = (self.cv_judgment_metric -
@@ -146,14 +155,23 @@ class Model(object):
         metrics as a hierarchical dictionary.
         """
         # time the prediction
-        starttime = time.time()
+        start_time = time.time()
         y_preds = self.pipeline.predict(X)
+        total = time.time() - start_time
+        self.avg_predict_time = total / float(len(y))
 
+        # TODO: this is hacky. See https://github.com/HDI-Project/ATM/issues/48
         binary = self.num_classes == 2
-        test_scores = test_pipeline(self.pipeline, X, y, binary)
+        kwargs = {}
+        if self.verbose_metrics:
+            kwargs['include_curves'] = True
+            if not binary:
+                kwargs['include_per_class'] = True
 
-        total = time.time() - starttime
-        self.avg_prediction_time = total / float(len(y))
+        # compute the actual test scores!
+        test_scores = test_pipeline(self.pipeline, X, y, binary, **kwargs)
+
+        # save meta-metrics
         self.test_judgment_metric = test_scores.get(self.judgment_metric)
 
         return test_scores

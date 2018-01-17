@@ -101,10 +101,10 @@ class Database(object):
             name = Column(String(100), nullable=False)
 
             # columns necessary for loading/processing data
-            description = Column(String(1000))
+            label_column = Column(String(100), nullable=False)
             train_path = Column(String(200), nullable=False)
             test_path = Column(String(200))
-            label_column = Column(String(100), nullable=False)
+            description = Column(String(1000))
 
             # metadata columns, for convenience
             n_examples = Column(Integer, nullable=False)
