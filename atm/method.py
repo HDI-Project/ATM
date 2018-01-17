@@ -1,3 +1,5 @@
+from builtins import object, str as newstr
+
 import json
 from os.path import join
 
@@ -33,6 +35,20 @@ class Categorical(HyperParameter):
     def __init__(self, name, type, values):
         self.name = name
         self.type = type
+        for i, val in enumerate(values):
+            if val is None:
+                # the value None is allowed for every parameter type
+                continue
+            if self.type == 'int_cat':
+                values[i] = int(val)
+            elif self.type == 'float_cat':
+                values[i] = float(val)
+            elif self.type == 'string':
+                # this is necessary to avoid a bug in sklearn, which won't be
+                # fixed until 0.20
+                values[i] = str(newstr(val))
+            elif self.type == 'bool':
+                values[i] = bool(val)
         self.values = values
 
     @property

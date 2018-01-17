@@ -36,7 +36,7 @@
         },
         "class_weight": {
             "type": "string",
-            "range": ["balanced"]
+            "values": ["balanced"]
         },
         "_scale": {
             "type": "bool",

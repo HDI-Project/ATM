@@ -19,7 +19,7 @@
             "range": [0.0, 1.0]
         },
         "fit_intercept": {
-            "type": "int_cat",
+            "type": "int",
             "range": [0, 1]
         },
         "n_iter": {
