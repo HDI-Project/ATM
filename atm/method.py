@@ -48,9 +48,9 @@ class Categorical(HyperParameter):
 
 
 class List(HyperParameter):
-    def __init__(self, name, type, sizes, element):
+    def __init__(self, name, type, list_length, element):
         self.name = name
-        self.size = Categorical(self.name + '_size', 'int_cat', sizes)
+        self.size = Categorical('len(%s)' % self.name, 'int_cat', list_length)
         element_type = HYPERPARAMETER_TYPES[element['type']]
         self.element = element_type('element', **element)
 
@@ -122,14 +122,14 @@ class Method(object):
             config = json.load(f)
 
         self.name = config['name']
-        self.conditions = config['conditions']
-        self.root_params = config['root_parameters']
+        self.root_params = config['root_hyperparameters']
+        self.conditions = config['conditional_hyperparameters']
         self.class_path = config['class']
 
         # create hyperparameters from the parameter config
         self.parameters = {}
         lists = []
-        for k, v in config['parameters'].items():
+        for k, v in config['hyperparameters'].items():
             param_type = HYPERPARAMETER_TYPES[v['type']]
             self.parameters[k] = param_type(name=k, **v)
 

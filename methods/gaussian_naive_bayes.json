@@ -1,12 +1,12 @@
 {   
     "name": "gnb",
     "class": "sklearn.naive_bayes.GaussianNB",
-    "parameters": {
+    "hyperparameters": {
         "_scale_minmax": {
             "type": "bool",
             "values": [true]
         }
     },
-    "root_parameters": ["_scale_minmax"],
-    "conditions": {}
+    "root_hyperparameters": ["_scale_minmax"],
+    "conditional_hyperparameters": {}
 }

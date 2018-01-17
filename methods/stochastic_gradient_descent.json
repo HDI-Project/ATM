@@ -1,7 +1,7 @@
 {   
     "name": "sgd",
     "class": "sklearn.linear_model.SGDClassifier",
-    "parameters": {
+    "hyperparameters": {
         "loss": {
             "type": "string",
             "values": ["hinge", "log", "modified_huber", "squared_hinge"]
@@ -55,6 +55,6 @@
             "values": [-1]
         }
     },
-    "root_parameters": ["loss", "penalty", "alpha", "l1_ratio", "fit_intercept", "n_iter", "shuffle", "epsilon", "learning_rate", "eta0", "class_weight", "_scale_minmax", "n_jobs"],
-    "conditions": {}
+    "root_hyperparameters": ["loss", "penalty", "alpha", "l1_ratio", "fit_intercept", "n_iter", "shuffle", "epsilon", "learning_rate", "eta0", "class_weight", "_scale_minmax", "n_jobs"],
+    "conditional_hyperparameters": {}
 }

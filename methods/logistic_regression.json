@@ -1,7 +1,7 @@
 {   
     "name": "logreg",
     "class": "sklearn.linear_model.LogisticRegression",
-    "parameters": {
+    "hyperparameters": {
         "C": {
             "type": "float_exp",
             "range": [1e-5, 1e5]
@@ -31,8 +31,8 @@
             "values": [true]
         }
     },
-    "root_parameters": ["C", "tol", "penalty", "fit_intercept", "class_weight", "_scale"],
-    "conditions": {
+    "root_hyperparameters": ["C", "tol", "penalty", "fit_intercept", "class_weight", "_scale"],
+    "conditional_hyperparameters": {
         "penalty": {
             "l2": ["dual"]
         }

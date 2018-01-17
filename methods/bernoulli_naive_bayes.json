@@ -1,7 +1,7 @@
 {   
     "name": "bnb",
     "class": "sklearn.naive_bayes.BernoulliNB",
-    "parameters": {
+    "hyperparameters": {
         "alpha": {
             "type": "float",
             "range": [0.0, 1.0]
@@ -23,6 +23,6 @@
             "values": [true]
         }
     },
-    "root_parameters": ["alpha", "binarize", "fit_prior", "class_prior", "_scale"],
-    "conditions": {}
+    "root_hyperparameters": ["alpha", "binarize", "fit_prior", "class_prior", "_scale"],
+    "conditional_hyperparameters": {}
 }

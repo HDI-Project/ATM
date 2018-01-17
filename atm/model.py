@@ -235,7 +235,7 @@ class Model(object):
 
         for lname, items in lists.items():
             # drop the list size parameter
-            del params[lname + '_size']
+            del params['len(%s)' % lname]
 
             # sort the list by index
             params[lname] = [val for idx, val in sorted(items)]

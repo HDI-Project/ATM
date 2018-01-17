@@ -1,7 +1,7 @@
 {   
     "name": "dt",
     "class": "sklearn.tree.DecisionTreeClassifier",
-    "parameters": {
+    "hyperparameters": {
         "criterion": {
             "type": "string",
             "values": ["entropy", "gini"]
@@ -23,6 +23,6 @@
             "range": [1, 3]
         }
     },
-    "root_parameters": ["criterion", "max_features", "max_depth", "min_samples_split", "min_samples_leaf"],
-    "conditions": {}
+    "root_hyperparameters": ["criterion", "max_features", "max_depth", "min_samples_split", "min_samples_leaf"],
+    "conditional_hyperparameters": {}
 }

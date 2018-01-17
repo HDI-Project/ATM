@@ -1,7 +1,7 @@
 {   
     "name": "gp",
     "class": "sklearn.gaussian_process.GaussianProcessClassifier",
-    "parameters": {
+    "hyperparameters": {
         "kernel": {
             "type": "string",
             "values": ["constant", "rbf", "matern", "rational_quadratic", "exp_sine_squared"]
@@ -23,8 +23,8 @@
             "values": [0, 1]
         }
     },
-    "root_parameters": ["kernel"],
-    "conditions": {
+    "root_hyperparameters": ["kernel"],
+    "conditional_hyperparameters": {
         "kernel": {
             "matern": ["nu"],
             "rational_quadratic": ["length_scale", "alpha"],

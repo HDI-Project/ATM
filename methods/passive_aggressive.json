@@ -1,7 +1,7 @@
 {   
     "name": "pa",
     "class": "sklearn.linear_model.PassiveAggressiveClassifier",
-    "parameters": {
+    "hyperparameters": {
         "C": {
             "type": "float_exp",
             "range": [1e-5, 1e5]
@@ -31,6 +31,6 @@
             "values": [-1]
         }
     },
-    "root_parameters": ["C", "fit_intercept", "n_iter", "shuffle", "loss", "_scale", "n_jobs"],
-    "conditions": {}
+    "root_hyperparameters": ["C", "fit_intercept", "n_iter", "shuffle", "loss", "_scale", "n_jobs"],
+    "conditional_hyperparameters": {}
 }

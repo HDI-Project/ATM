@@ -1,7 +1,7 @@
 {   
     "name": "et",
     "class": "sklearn.ensemble.ExtraTreesClassifier",
-    "parameters": {
+    "hyperparameters": {
         "criterion": {
             "type": "string",
             "values": ["entropy", "gini"]
@@ -31,6 +31,6 @@
             "range": [-1]
         }
     },
-    "root_parameters": ["criterion", "max_features", "max_depth", "min_samples_leaf", "min_samples_leaf", "n_estimators", "n_jobs"],
-    "conditions": {}
+    "root_hyperparameters": ["criterion", "max_features", "max_depth", "min_samples_leaf", "min_samples_leaf", "n_estimators", "n_jobs"],
+    "conditional_hyperparameters": {}
 }

@@ -1,7 +1,7 @@
 {   
     "name": "svm",
     "class": "sklearn.svm.SVC",
-    "parameters": {
+    "hyperparameters": {
         "C": {
             "type": "float_exp",
             "range": [1e-5, 1e5]
@@ -47,8 +47,8 @@
             "range": [50000]
         }
     },
-    "root_parameters": ["C", "kernel", "probability", "shrinking", "cache_size", "class_weight", "max_iter", "_scale"],
-    "conditions": {
+    "root_hyperparameters": ["C", "kernel", "probability", "shrinking", "cache_size", "class_weight", "max_iter", "_scale"],
+    "conditional_hyperparameters": {
         "kernel": {
             "rbf": ["gamma"],
             "sigmoid": ["gamma", "coef0"],
