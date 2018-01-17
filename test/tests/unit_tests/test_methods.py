@@ -1,21 +1,13 @@
 #!/usr/bin/python2.7
 import pytest
 import json
-from collections import defaultdict
-from os.path import join
 
-from atm.config import RunConfig
-from atm.database import Database
-from atm.enter_data import create_dataset, create_datarun
-from atm.utilities import download_file_s3
-from atm.worker import work
-
-from utilities import work_parallel
+from atm.method import Method
 
 
 def test_enumerate():
     js = {'name': 'test', 'class': 'test'}
-    js['hyperparameters'] = {
+    js['parameters'] = {
         'a': {'type': 'int_cat', 'range': [0, 3]},
         'b': {'type': 'int', 'range': [0, 3]},
         'c': {'type': 'bool', 'range': [True, False]},
@@ -25,7 +17,7 @@ def test_enumerate():
     }
     js['root_parameters'] = ['a', 'f']
     js['conditions'] = {
-        'a': {'1': 'b', '2': 'c'},
+        'a': {'0': 'b', '3': 'c'},
         'c': {'True': 'd', 'False': 'e'},
     }
 
@@ -35,7 +27,7 @@ def test_enumerate():
 
     hp = Method(config_path).get_hyperpartitions()
 
-    assert len(hp) == 8
-    #assert all('a' in zip(*p.categoricals)[0] for p in hp)
-    #assert all(('f', 0.5) in p.constants for p in hp)
-    #assert len(['b' in zip(*p.categoricals)[0] for p in hp])
+    assert len(hp) == 6
+    assert all('a' in zip(*p.categoricals)[0] for p in hp)
+    assert all(('f', 0.5) in p.constants for p in hp)
+    assert len(['b' in zip(*p.categoricals)[0] for p in hp])

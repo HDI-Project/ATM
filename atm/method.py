@@ -22,6 +22,16 @@ class HyperPartition(object):
         self.constants = constants
         self.tunables = tunables
 
+    def __repr__(self):
+        cats, cons, tuns = [None] * 3
+        if self.categoricals:
+            cats = '[%s]' % ', '.join(['%s=%s' % c for c in self.categoricals])
+        if self.constants:
+            cons = '[%s]' % ', '.join(['%s=%s' % c for c in self.constants])
+        if self.tunables:
+            tuns = '[%s]' % ', '.join(['%s' % t for t, _ in self.tunables])
+        return '<HyperPartition: categoricals: %s; constants: %s; tunables: %s>' % (cats, cons, tuns)
+
 
 class Method(object):
     """
