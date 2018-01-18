@@ -197,6 +197,8 @@ folder for more information. """)
     add_arguments_aws_s3(parser)
     add_arguments_sql(parser)
     add_arguments_datarun(parser)
+    parser.add_argument('--run-per-partition', default=False, action='store_true',
+                        help='if set, generate a new datarun for each hyperpartition')
 
     args = parser.parse_args()
 
@@ -206,4 +208,4 @@ folder for more information. """)
                                                      aws_path=args.aws_config,
                                                      **vars(args))
     # create and save the dataset and datarun
-    enter_datarun(sql_config, run_config, aws_config)
+    enter_datarun(sql_config, run_config, aws_config, args.run_per_partition)
