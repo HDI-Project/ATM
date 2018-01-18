@@ -1,36 +1,36 @@
 {   
     "name": "pa",
     "class": "sklearn.linear_model.PassiveAggressiveClassifier",
-    "parameters": {
+    "hyperparameters": {
         "C": {
-           "type": "float_exp",
-           "range": [1e-5, 1e5]
+            "type": "float_exp",
+            "range": [1e-5, 1e5]
         },
         "fit_intercept": {
-           "type": "int_cat",
-           "range": [0, 1]
+            "type": "int_cat",
+            "values": [0, 1]
         },
         "n_iter": {
-           "type": "int",
-           "range": [10, 200]
+            "type": "int",
+            "range": [10, 200]
         },
         "shuffle": {
-           "type": "bool",
-           "range": [true]
+            "type": "bool",
+            "values": [true]
         },
         "loss": {
             "type": "string",
-            "range": ["hinge", "squared_hinge"]
+            "values": ["hinge", "squared_hinge"]
         },
         "_scale": {
-           "type": "bool",
-           "range": [true]
+            "type": "bool",
+            "values": [true]
         },
         "n_jobs": {
-           "type": "int_cat",
-           "range": [-1]
+            "type": "int_cat",
+            "values": [-1]
         }
     },
-    "root_parameters": ["C", "fit_intercept", "n_iter", "shuffle", "loss", "_scale", "n_jobs"],
-    "conditions": {}
+    "root_hyperparameters": ["C", "fit_intercept", "n_iter", "shuffle", "loss", "_scale", "n_jobs"],
+    "conditional_hyperparameters": {}
 }

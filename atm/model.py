@@ -8,7 +8,9 @@ import numpy as np
 import pandas as pd
 import time
 import pdb
+import re
 from importlib import import_module
+from collections import defaultdict
 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
@@ -44,25 +46,27 @@ class Model(object):
     # number of folds for cross-validation (arbitrary, for speed)
     N_FOLDS = 5
 
-    def __init__(self, code, params, judgment_metric, label_column,
-                 testing_ratio=0.3):
+    def __init__(self, method, params, judgment_metric, label_column,
+                 testing_ratio=0.3, verbose_metrics=False):
         """
         Parameters:
-            code: the short method code (as defined in constants.py)
+            method: the short method code (as defined in constants.py) or path
+                to method json
             judgment_metric: string that indicates which metric should be
                 optimized for.
             params: parameters passed to the sklearn classifier constructor
             class_: sklearn classifier class
         """
         # configuration & database
-        self.code = code
+        self.method = method
         self.params = params
         self.judgment_metric = judgment_metric
         self.label_column = label_column
         self.testing_ratio = testing_ratio
+        self.verbose_metrics = verbose_metrics
 
         # load the classifier method's class
-        path = Method(METHODS_MAP[code]).class_path.split('.')
+        path = Method(method).class_path.split('.')
         mod_str, cls_str = '.'.join(path[:-1]), path[-1]
         mod = import_module(mod_str)
         self.class_ = getattr(mod, cls_str)
@@ -122,14 +126,22 @@ class Model(object):
             steps.append(('minmax_scale', MinMaxScaler()))
 
         # add the classifier as the final step in the pipeline
-        steps.append((self.code, classifier))
+        steps.append((self.method, classifier))
         self.pipeline = Pipeline(steps)
 
     def cross_validate(self, X, y):
+        # TODO: this is hacky. See https://github.com/HDI-Project/ATM/issues/48
         binary = self.num_classes == 2
+        kwargs = {}
+        if self.verbose_metrics:
+            kwargs['include_curves'] = True
+            if not binary:
+                kwargs['include_per_class'] = True
+
         df, cv_scores = cross_validate_pipeline(pipeline=self.pipeline,
                                                 X=X, y=y, binary=binary,
-                                                n_folds=self.N_FOLDS)
+                                                n_folds=self.N_FOLDS, **kwargs)
+
         self.cv_judgment_metric = np.mean(df[self.judgment_metric])
         self.cv_judgment_metric_stdev = np.std(df[self.judgment_metric])
         self.mu_sigma_judgment_metric = (self.cv_judgment_metric -
@@ -143,14 +155,23 @@ class Model(object):
         metrics as a hierarchical dictionary.
         """
         # time the prediction
-        starttime = time.time()
+        start_time = time.time()
         y_preds = self.pipeline.predict(X)
+        total = time.time() - start_time
+        self.avg_predict_time = total / float(len(y))
 
+        # TODO: this is hacky. See https://github.com/HDI-Project/ATM/issues/48
         binary = self.num_classes == 2
-        test_scores = test_pipeline(self.pipeline, X, y, binary)
+        kwargs = {}
+        if self.verbose_metrics:
+            kwargs['include_curves'] = True
+            if not binary:
+                kwargs['include_per_class'] = True
 
-        total = time.time() - starttime
-        self.avg_prediction_time = total / float(len(y))
+        # compute the actual test scores!
+        test_scores = test_pipeline(self.pipeline, X, y, binary, **kwargs)
+
+        # save meta-metrics
         self.test_judgment_metric = test_scores.get(self.judgment_metric)
 
         return test_scores
@@ -214,8 +235,31 @@ class Model(object):
         """
         TODO: replace this logic with something better
         """
+        # create list parameters
+        lists = defaultdict(list)
+        element_regex = re.compile('(.*)\[(\d)\]')
+        for name, param in params.items():
+            # look for variables of the form "param_name[1]"
+            match = element_regex.match(name)
+            if match:
+                # name of the list parameter
+                lname = match.groups()[0]
+                # index of the list item
+                index = int(match.groups()[1])
+                lists[lname].append((index, param))
+
+                # drop the element parameter from our list
+                del params[name]
+
+        for lname, items in lists.items():
+            # drop the list size parameter
+            del params['len(%s)' % lname]
+
+            # sort the list by index
+            params[lname] = [val for idx, val in sorted(items)]
+
         ## Gaussian process classifier
-        if self.code == "gp":
+        if self.method == "gp":
             if params["kernel"] == "constant":
                 params["kernel"] = ConstantKernel()
             elif params["kernel"] == "rbf":
@@ -230,39 +274,9 @@ class Model(object):
                 del params["alpha"]
             elif params["kernel"] == "exp_sine_squared":
                 params["kernel"] = ExpSineSquared(length_scale=params["length_scale"],
-                                                          periodicity=params["periodicity"])
+                                                  periodicity=params["periodicity"])
                 del params["length_scale"]
                 del params["periodicity"]
-
-        ## Multi-layer perceptron
-        if self.code == "mlp":
-
-            params["hidden_layer_sizes"] = []
-
-            # set layer topology
-            if int(params["num_hidden_layers"]) == 1:
-                params["hidden_layer_sizes"].append(params["hidden_size_layer1"])
-                del params["hidden_size_layer1"]
-
-            elif int(params["num_hidden_layers"]) == 2:
-                params["hidden_layer_sizes"].append(params["hidden_size_layer1"])
-                params["hidden_layer_sizes"].append(params["hidden_size_layer2"])
-                del params["hidden_size_layer1"]
-                del params["hidden_size_layer2"]
-
-            elif int(params["num_hidden_layers"]) == 3:
-                params["hidden_layer_sizes"].append(params["hidden_size_layer1"])
-                params["hidden_layer_sizes"].append(params["hidden_size_layer2"])
-                params["hidden_layer_sizes"].append(params["hidden_size_layer3"])
-                del params["hidden_size_layer1"]
-                del params["hidden_size_layer2"]
-                del params["hidden_size_layer3"]
-
-            params["hidden_layer_sizes"] = [int(x) for x in
-                                            params["hidden_layer_sizes"]]  # convert to ints
-
-            # delete our fabricated keys
-            del params["num_hidden_layers"]
 
         # return the updated parameter vector
         return params

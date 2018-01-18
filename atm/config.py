@@ -278,8 +278,13 @@ def add_arguments_datarun(parser):
     #   pa     - passive aggressive
     #   knn    - K nearest neighbors
     #   mlp    - multi-layer perceptron
-    parser.add_argument('--methods', nargs='+', choices=METHODS,
-                        help='list of methods which the datarun will use')
+    parser.add_argument('--methods', nargs='+',
+                        type=option_or_path(METHODS, JSON_REGEX),
+                        help='Method or list of methods to use for '
+                        'classification. Each method can either be one of the '
+                        'pre-defined method codes listed below or a path to a '
+                        'JSON file defining a custom method.' +
+                        '\n\nOptions: [%s]' % ', '.join(str(s) for s in METHODS))
     parser.add_argument('--priority', type=int,
                         help='Priority of the datarun (higher = more important')
     parser.add_argument('--budget-type', choices=BUDGET_TYPES,
@@ -291,13 +296,21 @@ def add_arguments_datarun(parser):
                         'overrides the walltime budget.\nFormat: ' +
                         TIME_FMT.replace('%', '%%'))
 
-    # Which field to use for judgment of performance
+    # Which field to use to judge performance, for the sake of AutoML
     # options:
     #   f1        - F1 score (harmonic mean of precision and recall)
     #   roc_auc   - area under the Receiver Operating Characteristic curve
     #   accuracy  - percent correct
-    #   mu_sigma  - one standard deviation below the average cross-validated F1
-    #               score (mu - sigma)
+    #   cohen_kappa     - measures accuracy, but controls for chance of guessing
+    #                     correctly
+    #   rank_accuracy   - multiclass only: percent of examples for which the true
+    #                     label is in the top 1/3 most likely predicted labels
+    #   ap        - average precision: nearly identical to area under
+    #               precision/recall curve.
+    #   mcc       - matthews correlation coefficient: good for unbalanced classes
+    #
+    # f1 and roc_auc may be appended with _micro or _macro to use with
+    # multiclass problems.
     parser.add_argument('--metric', choices=METRICS,
                         help='Metric by which ATM should evaluate classifiers. '
                         'The metric function specified here will be used to '
@@ -328,7 +341,7 @@ def add_arguments_datarun(parser):
                         help='Type of BTB tuner to use. Can either be one of '
                         'the pre-configured tuners listed below or a path to a '
                         'custom tuner in the form "/path/to/tuner.py:ClassName".'
-                        '\nOptions: [%s]' % ', '.join(str(s) for s in TUNERS))
+                        '\n\nOptions: [%s]' % ', '.join(str(s) for s in TUNERS))
 
     # How should ATM select a particular hyperpartition from the set of all
     # possible hyperpartitions?
@@ -347,7 +360,7 @@ def add_arguments_datarun(parser):
                         help='Type of BTB selector to use. Can either be one of '
                         'the pre-configured selectors listed below or a path to a '
                         'custom tuner in the form "/path/to/selector.py:ClassName".'
-                        '\nOptions: [%s]' % ', '.join(str(s) for s in SELECTORS))
+                        '\n\nOptions: [%s]' % ', '.join(str(s) for s in SELECTORS))
 
     # r_min is the number of random runs performed in each hyperpartition before
     # allowing bayesian opt to select parameters. Consult the thesis to
