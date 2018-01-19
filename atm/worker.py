@@ -270,7 +270,8 @@ class Worker(object):
 
         # Get previously-used parameters: every classifier should either be
         # completed or have thrown an error
-        classifiers = [l for l in self.db.get_classifiers(hyperpartition_id=hyperpartition.id)
+        all_clfs = self.db.get_classifiers(hyperpartition_id=hyperpartition.id)
+        classifiers = [l for l in all_clfs
                        if l.status == ClassifierStatus.COMPLETE]
 
         # Extract parameters and scores as numpy arrays from classifiers
@@ -329,7 +330,7 @@ class Worker(object):
     def test_classifier(self, method, params):
         """
         Given a set of fully-qualified hyperparameters, create and test a
-        classification model.
+        classifier model.
         Returns: Model object and metrics dictionary
         """
         model = Model(method=method, params=params,

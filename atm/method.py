@@ -66,7 +66,7 @@ class Categorical(HyperParameter):
 class List(HyperParameter):
     def __init__(self, name, type, list_length, element):
         self.name = name
-        self.size = Categorical('len(%s)' % self.name, 'int_cat', list_length)
+        self.length = Categorical('len(%s)' % self.name, 'int_cat', list_length)
         element_type = HYPERPARAMETER_TYPES[element['type']]
         self.element = element_type('element', **element)
 
@@ -76,12 +76,12 @@ class List(HyperParameter):
 
     def get_elements(self):
         elements = []
-        for i in range(max(self.size.values)):
+        for i in range(max(self.length.values)):
             # generate names for the pseudo-hyperparameters in the list
             elt_name = '%s[%d]' % (self.name, i)
             elements.append(elt_name)
 
-        conditions = {str(i): elements[:i] for i in self.size.values}
+        conditions = {str(i): elements[:i] for i in self.length.values}
         return elements, conditions
 
 
@@ -170,25 +170,26 @@ class Method(object):
                     self.parameters[e] = param.element
 
                 # add the size parameter, remove the list parameter
-                self.parameters[param.size.name] = param.size
+                self.parameters[param.length.name] = param.length
                 del self.parameters[param.name]
 
                 # if this is a root param, replace its name with the new size
                 # name in the root params list
                 if param.name in self.root_params:
-                    self.root_params.append(param.size.name)
+                    self.root_params.append(param.length.name)
                     self.root_params.remove(param.name)
 
                 # if this is a conditional param, replace it there instead
-                for cond, deps in self.conditions.items():
-                    if param.name in deps:
-                        deps.append(param.size.name)
-                        deps.remove(param.name)
-                        self.conditions[cond] = deps
+                for var, cond in self.conditions.items():
+                    for val, deps in cond.items():
+                        if param.name in deps:
+                            deps.append(param.length.name)
+                            deps.remove(param.name)
+                            self.conditions[var][val] = deps
 
                 # finally, add all the potential sets of list elements as
                 # conditions of the list's size
-                self.conditions[param.size.name] = conditions
+                self.conditions[param.length.name] = conditions
 
     def _sort_parameters(self, params):
         """

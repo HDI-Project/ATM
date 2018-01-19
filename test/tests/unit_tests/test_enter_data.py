@@ -5,7 +5,7 @@ import pytest
 from atm import constants, PROJECT_ROOT
 from atm.config import SQLConfig, RunConfig
 from atm.database import Database, db_session
-from atm.enter_data import enter_datarun, enter_dataset, create_dataset, create_datarun
+from atm.enter_data import enter_data, create_dataset, create_datarun
 from atm.utilities import get_local_data_path
 
 
@@ -31,12 +31,12 @@ METHOD_HYPERPARTS = {
 }
 
 
-@pytest.fixture()
+@pytest.fixture
 def db():
     return Database(dialect='sqlite', database=DB_PATH)
 
 
-@pytest.fixture()
+@pytest.fixture
 def dataset(db):
     ds = db.get_dataset(1)
     if ds:
@@ -46,43 +46,46 @@ def dataset(db):
         return create_dataset(db, 'class', data_path)
 
 
-def test_enter_dataset(db):
+def test_create_dataset(db):
     train_url = DATA_URL + 'pollution_1_train.csv'
     test_url = DATA_URL + 'pollution_1_test.csv'
 
     train_path_local, _ = get_local_data_path(train_url)
     if os.path.exists(train_path_local):
-        os.path.remove(train_path_local)
+        os.remove(train_path_local)
 
     test_path_local, _ = get_local_data_path(test_url)
     if os.path.exists(test_path_local):
-        os.path.remove(test_path_local)
+        os.remove(test_path_local)
 
     run_conf = RunConfig(train_path=train_url,
                          test_path=test_url,
                          data_description='test',
                          label_column='class')
-    dataset = enter_dataset(db, run_conf)
+    dataset = create_dataset(db, run_conf)
+    dataset = db.get_dataset(dataset.id)
 
     assert os.path.exists(train_path_local)
     assert os.path.exists(test_path_local)
 
-    assert db.get_dataset(dataset.id) == dataset
+    assert dataset.train_path == train_url
+    assert dataset.test_path == test_url
+    assert dataset.description == 'test'
     assert dataset.label_column == 'class'
     assert dataset.n_examples == 60
-    assert dataset.d_features == 15
+    assert dataset.d_features == 16
     assert dataset.k_classes == 2
     assert dataset.majority >= 0.5
 
 
-def test_enter_datarun_by_methods(dataset):
+def test_enter_data_by_methods(dataset):
     sql_conf = SQLConfig(database=DB_PATH)
     db = Database(**vars(sql_conf))
     run_conf = RunConfig(dataset_id=dataset.id)
 
     for method, n_parts in METHOD_HYPERPARTS.items():
         run_conf.methods = [method]
-        run_id = enter_datarun(sql_conf, run_conf)
+        run_id = enter_data(sql_conf, run_conf)
 
         assert db.get_datarun(run_id)
         with db_session(db):
@@ -91,12 +94,13 @@ def test_enter_datarun_by_methods(dataset):
             assert len(run.hyperpartitions) == n_parts
 
 
-def test_enter_datarun_all(dataset):
+def test_enter_data_all(dataset):
     sql_conf = SQLConfig(database=DB_PATH)
     db = Database(**vars(sql_conf))
-    run_conf = RunConfig(dataset_id=dataset.id)
+    run_conf = RunConfig(dataset_id=dataset.id,
+                         methods=METHOD_HYPERPARTS.keys())
 
-    run_id = enter_datarun(sql_conf, run_conf)
+    run_id = enter_data(sql_conf, run_conf)
 
     with db_session(db):
         run = db.get_datarun(run_id)
@@ -106,11 +110,17 @@ def test_enter_datarun_all(dataset):
 
 def test_run_per_partition(dataset):
     sql_conf = SQLConfig(database=DB_PATH)
+    db = Database(**vars(sql_conf))
     run_conf = RunConfig(dataset_id=dataset.id, methods=['logreg'])
 
-    run_id = enter_datarun(sql_conf, run_conf, run_per_partition=True)
+    run_ids = enter_data(sql_conf, run_conf, run_per_partition=True)
 
     with db_session(db):
-        runs = db.get_datarun(run_id)
+        runs = []
+        for run_id in run_ids:
+            run = db.get_datarun(run_id)
+            if run is not None:
+                runs.append(run)
+
         assert len(runs) == METHOD_HYPERPARTS['logreg']
-        assert all([len(run.hyperparpartitions) == 1 for run in runs])
+        assert all([len(run.hyperpartitions) == 1 for run in runs])
