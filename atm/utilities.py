@@ -162,7 +162,7 @@ def params_to_vectors(params, tunables):
 
 ## Serializing and deserializing data on disk
 
-def make_save_path(dir, classifier, suffix):
+def _make_save_path_old(dir, classifier, suffix):
     """
     Generate the base save path for a classifier's model and metrics files,
     based on the classifier's dataset name and hyperparameters.
@@ -171,6 +171,18 @@ def make_save_path(dir, classifier, suffix):
     params_hash = hash_dict(classifier.params)
     filename = "%s-%s-%s.%s" % (run_hash, params_hash,
                                 classifier.datarun.description, suffix)
+    return os.path.join(dir, filename)
+
+
+def make_save_path(dir, classifier, suffix):
+    """
+    Generate the base save path for a classifier's model and metrics files,
+    based on the classifier's dataset name and hyperparameters.
+    """
+    run_name = "".join([c for c in classifier.datarun.dataset.name
+                        if c.isalnum() or c in (' ', '-', '_')]).rstrip()
+    params_hash = hash_dict(classifier.params)[:8]
+    filename = "%s-%s.%s" % (run_name, params_hash, suffix)
     return os.path.join(dir, filename)
 
 
