@@ -18,7 +18,6 @@ except ImportError:
     plt = None
 
 BASELINE_PATH = os.path.join(PROJECT_ROOT, 'test/baselines/best_so_far_multi_trial/')
-SAVE_PATH = os.path.join(PROJECT_ROOT, 'test/saved_results_10/')
 DATA_URL = 'https://s3.amazonaws.com/mit-dai-delphi-datastore/downloaded/'
 BASELINE_URL = 'https://s3.amazonaws.com/mit-dai-delphi-datastore/best_so_far_multi_trial/'
 

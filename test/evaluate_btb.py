@@ -53,7 +53,6 @@ def btb_test(dataruns=None, datasets=None, processes=1, graph=False, **kwargs):
         for ds in datasets:
             run_conf.train_path = DATA_URL + ds
             run_conf.dataset_id = None
-            print('Creating datarun for', run_conf.train_path)
             print('Creating 10 dataruns for', run_conf.train_path)
             run_ids = [enter_datarun(sql_conf, run_conf) for i in range(10)]
             datarun_ids_per_dataset.append(run_ids)
