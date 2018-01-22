@@ -45,7 +45,7 @@ def btb_test(dataruns=None, datasets=None, processes=1, graph=False, **kwargs):
 
     db = Database(**vars(sql_conf))
     datarun_ids = dataruns or []
-    datarun_ids_per_dataset = []
+    datarun_ids_per_dataset = [[each] for each in dataruns] if dataruns else []
     datasets = datasets or DATASETS_MAX_FIRST
 
     # if necessary, generate datasets and dataruns
