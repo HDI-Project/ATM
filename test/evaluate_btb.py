@@ -45,6 +45,7 @@ def btb_test(dataruns=None, datasets=None, processes=1, graph=False, **kwargs):
 
     db = Database(**vars(sql_conf))
     datarun_ids = dataruns or []
+    datarun_ids_per_dataset = [[each] for each in dataruns] if dataruns else []
     datasets = datasets or DATASETS_MAX_FIRST
 
     # if necessary, generate datasets and dataruns
@@ -52,8 +53,10 @@ def btb_test(dataruns=None, datasets=None, processes=1, graph=False, **kwargs):
         for ds in datasets:
             run_conf.train_path = DATA_URL + ds
             run_conf.dataset_id = None
-            print('Creating datarun for', run_conf.train_path)
-            datarun_ids.append(enter_datarun(sql_conf, run_conf))
+            print('Creating 10 dataruns for', run_conf.train_path)
+            run_ids = [enter_datarun(sql_conf, run_conf) for i in range(10)]
+            datarun_ids_per_dataset.append(run_ids)
+            datarun_ids.extend(run_ids)
 
     # work on the dataruns til they're done
     print('Working on %d dataruns' % len(datarun_ids))
@@ -62,10 +65,10 @@ def btb_test(dataruns=None, datasets=None, processes=1, graph=False, **kwargs):
 
     results = {}
 
-    # compute and maybe graph the results
-    for rid in datarun_ids:
-        res = report_auc_vs_baseline(db, rid, graph=graph)
-        results[rid] = {'test': res[0], 'baseline': res[1]}
+    # compute and maybe graph the results for each dataset
+    for rids in datarun_ids_per_dataset:
+        res = report_auc_vs_baseline(db, rids, graph=graph)
+        results[tuple(rids)] = {'test': res[0], 'baseline': res[1]}
 
     return results
 
