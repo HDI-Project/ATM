@@ -1,0 +1,16 @@
+# This is heavily based on the featuretools test setup. Most of the logic is
+# pushed to pytest and tox.
+# 
+# See https://github.com/Featuretools/featuretools
+#
+version: 2
+jobs:
+  build:
+    working_directory: ~/
+    docker:
+        - image: themattrix/tox
+    steps:
+      - checkout
+      - run: pyenv local 2.7.13 # 3.5.2 3.6.0
+      - run: make installdeps
+      - run: make lint && tox && codecov

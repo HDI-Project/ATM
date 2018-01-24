@@ -17,30 +17,32 @@ from atm.utilities import ensure_directory, hash_nested_tuple, download_data
 warnings.filterwarnings("ignore")
 
 
-def create_dataset(db, label_column, train_path, test_path=None,
-                   data_description=None):
+def create_dataset(db, run_config, aws_config=None):
     """
     Create a dataset and add it to the ModelHub database.
 
     db: initialized Database object
-    label_column: name of csv column representing the label
-    train_path: path to raw training data
-    test_path: path to raw test data
-    data_description: description of the dataset (max 1000 chars)
+    run_config: RunConfig object describing the dataset to create
+    aws_config: optional. AWS credentials for downloading data from S3.
     """
+    # download data to the local filesystem to extract metadata
+    train_local, test_local = download_data(run_config.train_path,
+                                            run_config.test_path,
+                                            aws_config)
+
     # create the name of the dataset from the path to the data
-    name = os.path.basename(train_path)
+    name = os.path.basename(train_local)
     name = name.replace("_train.csv", "").replace(".csv", "")
 
     # process the data into the form ATM needs and save it to disk
-    meta = MetaData(label_column, train_path, test_path)
+    meta = MetaData(run_config.label_column, train_local, test_local)
 
     # enter dataset into database
     dataset = db.create_dataset(name=name,
-                                description=data_description,
-                                train_path=train_path,
-                                test_path=test_path,
-                                label_column=label_column,
+                                description=run_config.data_description,
+                                train_path=run_config.train_path,
+                                test_path=run_config.test_path,
+                                label_column=run_config.label_column,
                                 n_examples=meta.n_examples,
                                 k_classes=meta.k_classes,
                                 d_features=meta.d_features,
@@ -56,7 +58,7 @@ def create_datarun(db, dataset, run_config):
 
     db: initialized Database object
     dataset: Dataset SQLAlchemy ORM object
-    run_config: configuration describing the datarun to create
+    run_config: RunConfig object describing the datarun to create
     """
     # describe the datarun by its tuner and selector
     run_description =  '__'.join([run_config.tuner, run_config.selector])
@@ -88,30 +90,8 @@ def create_datarun(db, dataset, run_config):
     return datarun
 
 
-def enter_dataset(db, run_config, aws_config=None):
-    """
-    Generate a dataset, and update run_config with the dataset ID.
-
-    db: Database object with active connection to ModelHub
-    run_config: all attributes necessary to initialize a Datarun, including
-        Dataset info
-    aws_config: all attributes necessary to connect to an S3 bucket.
-
-    Returns: the generated dataset object
-    """
-    print('downloading data...')
-    train_path, test_path = download_data(run_config.train_path,
-                                          run_config.test_path, aws_config)
-    print('creating dataset...')
-    dataset = create_dataset(db, run_config.label_column, train_path, test_path,
-                             run_config.data_description)
-    run_config.dataset_id = dataset.id
-
-    return dataset
-
-
-def enter_datarun(sql_config, run_config, aws_config=None,
-                  run_per_partition=False):
+def enter_data(sql_config, run_config, aws_config=None,
+               run_per_partition=False):
     """
     Generate a datarun, including a dataset if necessary.
 
@@ -130,7 +110,8 @@ def enter_datarun(sql_config, run_config, aws_config=None,
     # if the user has provided a dataset id, use that. Otherwise, create a new
     # dataset based on the arguments we were passed.
     if run_config.dataset_id is None:
-        dataset = enter_dataset(db, run_config, aws_config=aws_config)
+        dataset = create_dataset(db, run_config, aws_config=aws_config)
+        run_config.dataset_id = dataset.id
     else:
         dataset = db.get_dataset(run_config.dataset_id)
 
@@ -208,4 +189,4 @@ folder for more information. """)
                                                      aws_path=args.aws_config,
                                                      **vars(args))
     # create and save the dataset and datarun
-    enter_datarun(sql_config, run_config, aws_config, args.run_per_partition)
+    enter_data(sql_config, run_config, aws_config, args.run_per_partition)

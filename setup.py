@@ -19,7 +19,7 @@ setup(
     # https://packaging.python.org/en/latest/single_source_version.html
     version='0.0.1',
 
-    description='A multi user, multi data, model exploration system',
+    description='a multi-user, multi-data model exploration system',
 
     # The project's main homepage.
     url='https://github.com/HDI-project/ATM',
@@ -56,11 +56,20 @@ setup(
     # simple. Or you can use find_packages().
     packages=find_packages(),
 
+    # for now, we only support python 2.7.*
+    python_requires='>=2.7, <3',
+
     # List run-time dependencies here.  These will be installed by pip when
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    # TODO
-    #install_requires=[],
+    # TODO: don't pull in requirements! this is bad practice
+    install_requires=open('requirements.txt').readlines(),
+
+    # This variable is used to specify requirements for *this file* to run.
+    setup_requires=[],
+
+    test_suite='test/tests',
+    tests_require=open('test-requirements.txt').readlines(),
 )
 

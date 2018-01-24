@@ -22,6 +22,9 @@ DATARUN_STATUS = ['pending', 'running', 'complete']
 CLASSIFIER_STATUS = ['running', 'errored', 'complete']
 PARTITION_STATUS = ['incomplete', 'errored', 'gridding_done']
 
+S3_PREFIX = '^s3://'
+HTTP_PREFIX = '^https?://'
+
 TIME_FMT = '%Y-%m-%d %H:%M'
 DATA_DL_PATH = os.path.join(PROJECT_ROOT, 'data/downloads')
 METHOD_PATH = os.path.join(PROJECT_ROOT, 'methods')
@@ -79,9 +82,6 @@ class PartitionStatus:
     INCOMPLETE = 'incomplete'
     GRIDDING_DONE = 'gridding_done'
     ERRORED = 'errored'
-
-S3_PREFIX = '^s3://'
-HTTP_PREFIX = '^https?://'
 
 class FileType:
     LOCAL = 'local'

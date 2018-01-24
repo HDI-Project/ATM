@@ -270,7 +270,8 @@ class Worker(object):
 
         # Get previously-used parameters: every classifier should either be
         # completed or have thrown an error
-        classifiers = [l for l in self.db.get_classifiers(hyperpartition_id=hyperpartition.id)
+        all_clfs = self.db.get_classifiers(hyperpartition_id=hyperpartition.id)
+        classifiers = [l for l in all_clfs
                        if l.status == ClassifierStatus.COMPLETE]
 
         # Extract parameters and scores as numpy arrays from classifiers
@@ -329,7 +330,7 @@ class Worker(object):
     def test_classifier(self, method, params):
         """
         Given a set of fully-qualified hyperparameters, create and test a
-        classification model.
+        classifier model.
         Returns: Model object and metrics dictionary
         """
         model = Model(method=method, params=params,
@@ -366,7 +367,7 @@ class Worker(object):
 
         return model, metrics
 
-    def run_classifier(self):
+    def run_classifier(self, hyperpartition_id=None):
         """
         Choose hyperparameters, then use them to test and save a Classifier.
         """
@@ -379,9 +380,13 @@ class Worker(object):
 
         try:
             _log('Choosing hyperparameters...')
-            # use the multi-arm bandit to choose which hyperpartition to use next
-            hyperpartition = self.select_hyperpartition()
-            # use our tuner to choose a set of parameters for the hyperpartition
+            if hyperpartition_id is not None:
+                hyperpartition = self.db.get_hyperpartition(hyperpartition_id)
+            else:
+                # use the multi-arm bandit to choose which hyperpartition to use next
+                hyperpartition = self.select_hyperpartition()
+
+            # use tuner to choose a set of parameters for the hyperpartition
             params = self.tune_parameters(hyperpartition)
         except Exception as e:
             _log('Error choosing hyperparameters: datarun=%s' % str(self.datarun))
