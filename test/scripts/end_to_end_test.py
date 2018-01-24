@@ -70,8 +70,8 @@ print('creating dataruns...')
 datarun_ids = []
 for ds in DATASETS:
     run_config.train_path = join(DATA_DIR, ds)
-    datarun_ids.append(enter_datarun(sql_config=sql_config,
-                                     run_config=run_config))
+    datarun_ids.append(enter_data(sql_config=sql_config,
+                                  run_config=run_config))
 
 work_parallel(db=db, datarun_ids=datarun_ids, n_procs=args.processes)
 
