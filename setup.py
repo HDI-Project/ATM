@@ -64,7 +64,7 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     # TODO: don't pull in requirements! this is bad practice
-    install_requires=open('requirements.txt').readlines(),
+    #install_requires=open('requirements.txt').readlines(),
 
     # This variable is used to specify requirements for *this file* to run.
     setup_requires=[],
