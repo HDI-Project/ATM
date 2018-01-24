@@ -8,7 +8,7 @@ from os.path import join
 
 from atm.config import *
 from atm.database import Database
-from atm.enter_data import enter_datarun, enter_dataset
+from atm.enter_data import enter_data
 from atm.utilities import download_file_s3
 from atm.worker import work
 
@@ -48,9 +48,8 @@ for ds in DATASETS:
         run_config.methods = [args.method]
     else:
         run_config.methods = METHODS
-    dataset = enter_dataset(db, run_config, aws_config)
-    datarun_ids.extend(enter_datarun(sql_config, run_config, aws_config,
-                                     run_per_partition=True))
+    datarun_ids.extend(enter_data(sql_config, run_config, aws_config,
+                                  run_per_partition=True))
 
 print('computing on dataruns', datarun_ids)
 work_parallel(db=db, datarun_ids=datarun_ids, aws_config=aws_config,

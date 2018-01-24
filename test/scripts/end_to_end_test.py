@@ -8,7 +8,7 @@ from os.path import join
 
 from atm.config import *
 from atm.database import Database
-from atm.enter_data import enter_datarun, enter_dataset
+from atm.enter_data import enter_data
 from atm.utilities import download_file_s3
 from atm.worker import work
 
@@ -70,7 +70,6 @@ print('creating dataruns...')
 datarun_ids = []
 for ds in DATASETS:
     run_config.train_path = join(DATA_DIR, ds)
-    dataset = enter_dataset(db=db, run_config=run_config)
     datarun_ids.append(enter_datarun(sql_config=sql_config,
                                      run_config=run_config))
 

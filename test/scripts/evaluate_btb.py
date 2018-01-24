@@ -7,7 +7,7 @@ from os.path import join
 from atm import PROJECT_ROOT
 from atm.config import *
 from atm.database import Database
-from atm.enter_data import enter_datarun
+from atm.enter_data import enter_data
 
 from utilities import *
 
@@ -54,7 +54,7 @@ def btb_test(dataruns=None, datasets=None, processes=1, graph=False, **kwargs):
             run_conf.train_path = DATA_URL + ds
             run_conf.dataset_id = None
             print('Creating 10 dataruns for', run_conf.train_path)
-            run_ids = [enter_datarun(sql_conf, run_conf) for i in range(10)]
+            run_ids = [enter_data(sql_conf, run_conf) for i in range(10)]
             datarun_ids_per_dataset.append(run_ids)
             datarun_ids.extend(run_ids)
 
