@@ -12,6 +12,7 @@ jobs:
       - image: mysql:5.7
         environment:
             MYSQL_USER: ubuntu
+            MYSQL_ROOT_PASSWORD: ubuntu
             MYSQL_DATABASE: atm
     steps:
       - checkout
