@@ -11,7 +11,8 @@ jobs:
         - image: themattrix/tox
     steps:
       - checkout
-      - run: apt-get install sqlite3 mysql-server mysql-client libmysqlclient-dev
+      - run: sudo apt-get update
+      - run: sudo apt-get install sqlite3 mysql-server mysql-client libmysqlclient-dev
       - run: pyenv local 2.7.13 # 3.5.2 3.6.0
       - run: make installdeps
       - run: make lint && tox && codecov
