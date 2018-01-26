@@ -1,13 +1,9 @@
-from sklearn.model_selection import StratifiedKFold
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-from sklearn.metrics import f1_score, precision_recall_curve, auc, roc_curve,\
-                            accuracy_score, cohen_kappa_score, roc_auc_score,\
-                            average_precision_score, matthews_corrcoef
-
 import numpy as np
 import pandas as pd
-import itertools
-import pdb
+from sklearn.metrics import (accuracy_score, average_precision_score,
+                             cohen_kappa_score, f1_score, matthews_corrcoef,
+                             precision_recall_curve, roc_auc_score, roc_curve)
+from sklearn.model_selection import StratifiedKFold
 
 from atm.constants import *
 
@@ -25,7 +21,8 @@ def rank_n_accuracy(y_true, y_prob_mat, n=0.33):
         # round to nearest int before casting
         n = int(round(n_classes * n))
 
-    rankings = np.argsort(-y_prob_mat) # negative because we want highest value first
+    # sort the rankings in descending order, then take the top n
+    rankings = np.argsort(-y_prob_mat)
     rankings = rankings[:, :n]
 
     num_samples = len(y_true)
@@ -125,7 +122,6 @@ def get_metrics_multiclass(y_true, y_pred, y_pred_probs,
     # TODO: make the rank parameter configurable
     results[Metrics.RANK_ACCURACY] = rank_n_accuracy(y_true=y_true,
                                                      y_prob_mat=y_pred_probs)
-
 
     # if possible, compute multi-label AUC metrics
     present_classes = np.unique(y_true)
@@ -231,4 +227,3 @@ def cross_validate_pipeline(pipeline, X, y, binary=True,
         results.append(split_results)
 
     return df, results
-

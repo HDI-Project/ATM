@@ -1,17 +1,19 @@
 from __future__ import print_function
-import json
-import pickle
-import urllib2
-import hashlib
-import numpy as np
-import os
-import base64
-import re
 
-from boto.s3.connection import S3Connection, Key
+import base64
+import hashlib
+import json
+import os
+import pickle
+import re
+import urllib2
+
+import numpy as np
+from boto.s3.connection import Key, S3Connection
+
+from atm.constants import *
 
 from btb import ParamTypes
-from atm.constants import *
 
 # global variable storing this machine's public IP address
 # (so we only have to fetch it once)
@@ -239,7 +241,6 @@ def get_local_data_path(data_path):
     m = re.match(S3_PREFIX, data_path)
     if m:
         path = data_path[len(m.group()):].split('/')
-        bucket = path.pop(0)
         return os.path.join(DATA_DL_PATH, path[-1]), FileType.S3
 
     m = re.match(HTTP_PREFIX, data_path)

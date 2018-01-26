@@ -1,22 +1,16 @@
 from __future__ import print_function
-from sqlalchemy import (create_engine, Column,  String, ForeignKey, Integer,
-                        Boolean, DateTime, Enum, MetaData, Numeric, Table, Text)
-from sqlalchemy.orm import sessionmaker, relationship
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.engine.url import URL
-from sqlalchemy import func, and_
 
-import traceback
-import random, sys
-import os
-import warnings
-import pdb
 from datetime import datetime
 from operator import attrgetter
 
+from sqlalchemy import (Column, DateTime, Enum, ForeignKey, Integer, MetaData,
+                        Numeric, String, Text, and_, create_engine, func)
+from sqlalchemy.engine.url import URL
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, sessionmaker
+
 from atm.constants import *
 from atm.utilities import *
-
 
 MAX_HYPERPARTITION_ERRORS = 3
 
@@ -90,9 +84,8 @@ class Database(object):
         exist, it will not be updated with new schema -- after schema changes,
         the database must be destroyed and reinialized.
         """
-
         metadata = MetaData(bind=self.engine)
-        Base = declarative_base()
+        Base = declarative_base(metadata=metadata)
 
         class Dataset(Base):
             __tablename__ = 'datasets'
@@ -541,8 +534,8 @@ class Database(object):
         classifier.error_msg = error_msg
         classifier.status = ClassifierStatus.ERRORED
         classifier.completed = datetime.now()
-        if (self.get_number_of_hyperpartition_errors(classifier.hyperpartition_id)
-                > MAX_HYPERPARTITION_ERRORS):
+        if (self.get_number_of_hyperpartition_errors(classifier.hyperpartition_id) >
+                MAX_HYPERPARTITION_ERRORS):
             self.mark_hyperpartition_errored(classifier.hyperpartition_id)
 
     @try_with_session(commit=True)

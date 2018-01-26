@@ -9,4 +9,3 @@ mysql-python==1.2.5
 pyyaml==3.12
 joblib==0.11
 -e git+https://github.com/hdi-project/btb.git#egg=btb
--e .

@@ -63,13 +63,32 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    # TODO: don't pull in requirements! this is bad practice
-    #install_requires=open('requirements.txt').readlines(),
+    install_requires=[
+        'sqlalchemy>=1.1',
+        'numpy>=1.13',
+        'boto>=2.48',
+        'pandas>=0.20',
+        'scikit-learn>=0.18',
+        'scipy>=0.19',
+        'sklearn-pandas>=1.5',
+        'mysql-python>=1.2',
+        'pyyaml>=3.12',
+        'joblib>=0.11',
+        'btb',
+    ],
+    dependency_links=[
+        'git+https://github.com/hdi-project/btb.git#egg=btb',
+    ],
 
     # This variable is used to specify requirements for *this file* to run.
     setup_requires=[],
 
     test_suite='test/tests',
-    tests_require=open('test-requirements.txt').readlines(),
+    tests_require=[
+        'pytest>=3.2',
+        'mock>=2',
+        'pytest-xdist>=1.20',
+        'pytest-runner>=3',
+    ]
 )
 

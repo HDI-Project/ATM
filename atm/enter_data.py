@@ -1,18 +1,16 @@
 from __future__ import print_function
+
 import argparse
 import os
 import warnings
-import yaml
-
 from datetime import datetime, timedelta
-from boto.s3.connection import S3Connection, Key as S3Key
 
 from atm.config import *
 from atm.constants import *
 from atm.database import Database
 from atm.encoder import MetaData
 from atm.method import Method
-from atm.utilities import ensure_directory, hash_nested_tuple, download_data
+from atm.utilities import download_data
 
 warnings.filterwarnings("ignore")
 
@@ -61,7 +59,7 @@ def create_datarun(db, dataset, run_config):
     run_config: RunConfig object describing the datarun to create
     """
     # describe the datarun by its tuner and selector
-    run_description =  '__'.join([run_config.tuner, run_config.selector])
+    run_description = '__'.join([run_config.tuner, run_config.selector])
 
     # set the deadline, if applicable
     deadline = run_config.deadline

@@ -1,13 +1,6 @@
-import pandas as pd
 import numpy as np
-import os
-
-from sklearn.feature_extraction import DictVectorizer
+import pandas as pd
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-from sklearn.pipeline import Pipeline
-from sklearn.model_selection import train_test_split
-from sklearn_pandas import DataFrameMapper
-from atm.utilities import ensure_directory
 
 
 class MetaData(object):
@@ -108,8 +101,18 @@ class DataEncoder(object):
 
         return X, y
 
-    def inverse_transform(self, data):
+    def inverse_transform(self, X, y):
+        """
+        Convert an encoded feature matrix and label array to the original,
+        human-readable data format.
+        """
         data = pd.DataFrame(columns=self.feature_columns)
+        features = self.feature_encoder.inverse_transform(X)
+        for i, (column, encoder) in self.column_encoders.items():
+            data[column] = encoder.transform(features[i])
+
+        data[self.label_column] = self.label_encoder.inverse_transform(y)
+        return data
 
     def fit_transform(self, data):
         """ Process data into a form that ATM can use. """

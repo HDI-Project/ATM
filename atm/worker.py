@@ -1,32 +1,27 @@
 #!/usr/bin/python2.7
 from __future__ import print_function
-from atm.config import *
-from atm.constants import *
-from atm.utilities import *
-from atm.model import Model
-from atm.database import Database, ClassifierStatus, db_session
-from btb.tuning.constants import Tuners
 
 import argparse
-import ast
 import datetime
 import imp
 import os
-import pdb
 import random
 import socket
-import sys
 import time
 import traceback
 import warnings
-import joblib
 from collections import defaultdict
-from decimal import Decimal
 from operator import attrgetter
 
 import numpy as np
-import pandas as pd
-from boto.s3.connection import S3Connection, Key as S3Key
+from boto.s3.connection import Key as S3Key
+from boto.s3.connection import S3Connection
+
+from atm.config import *
+from atm.constants import *
+from atm.database import ClassifierStatus, Database, db_session
+from atm.model import Model
+from atm.utilities import *
 
 # shhh
 warnings.filterwarnings('ignore')
@@ -236,7 +231,7 @@ class Worker(object):
         # that haven't been scored yet.
         hyperpartition_scores = {fs.id: [] for fs in hyperpartitions}
         classifiers = self.db.get_classifiers(datarun_id=self.datarun.id)
-                                              #status=ClassifierStatus.COMPLETE)
+
         for c in classifiers:
             # ignore hyperpartitions for which gridding is done
             if c.hyperpartition_id not in hyperpartition_scores:
@@ -388,7 +383,7 @@ class Worker(object):
 
             # use tuner to choose a set of parameters for the hyperpartition
             params = self.tune_parameters(hyperpartition)
-        except Exception as e:
+        except Exception:
             _log('Error choosing hyperparameters: datarun=%s' % str(self.datarun))
             _log(traceback.format_exc())
             raise ClassifierError()
@@ -413,7 +408,7 @@ class Worker(object):
             model, metrics = self.test_classifier(hyperpartition.method, params)
             _log('Saving classifier...')
             self.save_classifier(classifier.id, model, metrics)
-        except Exception as e:
+        except Exception:
             msg = traceback.format_exc()
             _log('Error testing classifier: datarun=%s' % str(self.datarun))
             _log(msg)
@@ -484,7 +479,7 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
                         verbose_metrics=verbose_metrics)
         try:
             worker.run_classifier()
-        except ClassifierError as e:
+        except ClassifierError:
             # the exception has already been handled; just wait a sec so we
             # don't go out of control reporting errors
             _log('Something went wrong. Sleeping %d seconds.' % LOOP_WAIT)
