@@ -15,10 +15,10 @@ from atm.worker import work
 from utilities import *
 
 
-CONF_DIR = os.path.join(PROJECT_ROOT, 'config/test/method/')
+CONF_DIR = os.path.join(PROJECT_ROOT, 'config/test/')
 DATA_DIR = os.path.join(PROJECT_ROOT, 'data/test/')
-RUN_CONFIG = join(CONF_DIR, 'run.yaml')
-SQL_CONFIG = join(CONF_DIR, 'sql.yaml')
+RUN_CONFIG = join(CONF_DIR, 'run-default.yaml')
+SQL_CONFIG = join(CONF_DIR, 'sql-sqlite.yaml')
 DATASETS = [
     'iris.data.csv',
     'pollution_1.csv',
