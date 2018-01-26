@@ -40,7 +40,7 @@ This section describes the quickest way to get started with ATM on a modern mach
 
    - for MySQL: 
    ```
-   $ sudo apt install mysql-server mysql-client
+   $ sudo apt install mysql-server mysql-client libmysqlclient-dev
    ```
 
 3. **Install python dependencies**
