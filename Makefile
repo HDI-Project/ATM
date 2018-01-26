@@ -12,6 +12,7 @@ test: lint
 	python $(TEST_CMD)
 
 installdeps:
+	apt install sqlite3 mysql-server mysql-client libmysqlclient-dev
 	pip install --upgrade pip
 	pip install -e .
 	pip install -r dev-requirements.txt

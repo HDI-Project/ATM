@@ -76,6 +76,9 @@ setup(
         'joblib>=0.11',
         'future>=0.16',
     ],
+    # TODO: this is deprecated. Figure out how to accomplish the same thing with
+    # the proper tools.
+    # https://www.python.org/dev/peps/pep-0440/#direct-references
     dependency_links=[
         'git+ssh://git@github.com/hdi-project/btb.git#egg=btb',
     ],
