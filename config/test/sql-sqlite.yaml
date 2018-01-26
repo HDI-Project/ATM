@@ -1,0 +1,14 @@
+# SQL dialect
+dialect: sqlite
+# Name of the database
+database: test/atm.db
+# Username to gain access to the database
+username: 
+# Password to gain access to the database
+password:
+# Host name of the device hosting the database
+host: 
+# Port on host listening for database connections
+port:
+# Optional field for specifying login details
+query: 
