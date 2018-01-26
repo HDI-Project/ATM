@@ -74,10 +74,10 @@ setup(
         'mysql-python>=1.2',
         'pyyaml>=3.12',
         'joblib>=0.11',
-        'btb',
+        'future>=0.16',
     ],
     dependency_links=[
-        'git+https://github.com/hdi-project/btb.git#egg=btb',
+        'git+ssh://git@github.com/hdi-project/btb.git#egg=btb',
     ],
 
     # This variable is used to specify requirements for *this file* to run.
