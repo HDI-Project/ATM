@@ -16,6 +16,8 @@ jobs:
             MYSQL_DATABASE: atm
     steps:
       - checkout
+      - run: apt-get -qq update
+      - run: apt-get -qq -y install mysql-client libmysqlclient-dev
       - run: pyenv local 2.7.13 # 3.5.2 3.6.0
       - run: make installdeps
       - run: make lint && tox && codecov
