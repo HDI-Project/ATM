@@ -75,7 +75,7 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
    ```
    $ python atm/enter_data.py
    ```
-   This command will create a ``datarun``. In ATM, a *datarun* is a single logical machine learning task. If you run the above command without any arguments, it will use the default settings found in the `config/templates/\*_config.yaml` files to create a new SQLite3 database at `./atm.db`, create a new `dataset` instance which refers to the data above, and create a `datarun` instance which points to that dataset. More about what is stored in this database and what is it used for can be found [here](https://cyphe.rs/static/atm.pdf).
+   This command will create a ``datarun``. In ATM, a *datarun* is a single logical machine learning task. If you run the above command without any arguments, it will use the default settings found in the `config/templates/\*.yaml` files to create a new SQLite3 database at `./atm.db`, create a new `dataset` instance which refers to the data above, and create a `datarun` instance which points to that dataset. More about what is stored in this database and what is it used for can be found [here](https://cyphe.rs/static/atm.pdf).
 
    The command should produce a lot of output, the end of which looks something like this:
   
@@ -147,9 +147,9 @@ That means there are two ways to pass configuration to the command.
    $ vim config/*.yaml
    ```
 
-   `run_config.yaml` contains all the settings for a single Dataset and Datarun.  Specify the `train_path` to point to your own dataset.
+   `run.yaml` contains all the settings for a single Dataset and Datarun.  Specify the `train_path` to point to your own dataset.
 
-   `sql_config.yaml` contains the settings for the ModelHub SQL database. The default configuration will connect to (and create if necessary) a SQLite database at `./atm.db` relative to the directory from which `enter_data.py` is run. If you are using a MySQL database, you will need to change the file to something like this: 
+   `sql.yaml` contains the settings for the ModelHub SQL database. The default configuration will connect to (and create if necessary) a SQLite database at `./atm.db` relative to the directory from which `enter_data.py` is run. If you are using a MySQL database, you will need to change the file to something like this: 
    ```
    dialect: mysql
    database: atm
@@ -160,13 +160,13 @@ That means there are two ways to pass configuration to the command.
    query:
    ```
 
-   `aws_config.yaml` should contain the settings for running ATM in the cloud.  This is not necessary for local operation.
+   `aws.yaml` should contain the settings for running ATM in the cloud.  This is not necessary for local operation.
 
   Once your YAML files have been updated, run the datarun creation script and pass it the paths to your new config files:
    ```
-   $ python atm/enter_data.py --sql-config config/sql_config.yaml \
-   > --aws-config config/aws_config.yaml \
-   > --run-config config/run_config.yaml
+   $ python atm/enter_data.py --sql-config config/sql.yaml \
+   > --aws-config config/aws.yaml \
+   > --run-config config/run.yaml
    ```
 
 2. **Using command line arguments**
@@ -183,8 +183,8 @@ That means there are two ways to pass configuration to the command.
 
 Once you've created your custom datarun, start a worker, specifying your config files and the datarun(s) you'd like to compute on.
 ```
-$ python atm/worker.py --sql-config config/sql_config.yaml \
-> --aws-config config/aws_config.yaml --dataruns 1
+$ python atm/worker.py --sql-config config/sql.yaml \
+> --aws-config config/aws.yaml --dataruns 1
 ```
 
 It's important that the SQL configuration used by the worker matches the configuration you passed to `enter_data.py` -- otherwise, the worker will be looking in the wrong ModelHub database for its datarun!
