@@ -1,16 +1,16 @@
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import argparse
 import os
 import warnings
 from datetime import datetime, timedelta
 
-from atm.config import *
-from atm.constants import *
-from atm.database import Database
-from atm.encoder import MetaData
-from atm.method import Method
-from atm.utilities import download_data
+from .config import *
+from .constants import *
+from .database import Database
+from .encoder import MetaData
+from .method import Method
+from .utilities import download_data
 
 warnings.filterwarnings("ignore")
 

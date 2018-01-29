@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import base64
 import hashlib
@@ -11,7 +11,7 @@ import urllib2
 import numpy as np
 from boto.s3.connection import Key, S3Connection
 
-from atm.constants import *
+from .constants import *
 
 from btb import ParamTypes
 

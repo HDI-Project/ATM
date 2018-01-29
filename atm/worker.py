@@ -1,5 +1,5 @@
 #!/usr/bin/python2.7
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import argparse
 import datetime
@@ -17,11 +17,11 @@ import numpy as np
 from boto.s3.connection import Key as S3Key
 from boto.s3.connection import S3Connection
 
-from atm.config import *
-from atm.constants import *
-from atm.database import ClassifierStatus, Database, db_session
-from atm.model import Model
-from atm.utilities import *
+from .config import *
+from .constants import *
+from .database import ClassifierStatus, Database, db_session
+from .model import Model
+from .utilities import *
 
 # shhh
 warnings.filterwarnings('ignore')

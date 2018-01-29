@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 from datetime import datetime
 from operator import attrgetter
@@ -9,8 +9,8 @@ from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
-from atm.constants import *
-from atm.utilities import *
+from .constants import *
+from .utilities import *
 
 MAX_HYPERPARTITION_ERRORS = 3
 

@@ -1,6 +1,7 @@
+from __future__ import absolute_import
 import os
 
-from atm import PROJECT_ROOT
+from . import PROJECT_ROOT
 
 from btb.selection import Uniform as UniformSelector
 from btb.selection import (UCB1, BestKReward, BestKVelocity,

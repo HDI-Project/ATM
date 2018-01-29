@@ -1,9 +1,10 @@
+from __future__ import absolute_import
 import json
 from builtins import str as newstr
 from builtins import object
 from os.path import join
 
-from atm.constants import METHOD_PATH, METHODS_MAP
+from .constants import METHOD_PATH, METHODS_MAP
 
 import btb
 

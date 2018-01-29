@@ -3,7 +3,7 @@
    :synopsis: Model around classification method.
 
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import re
 import time
@@ -20,10 +20,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
-from atm.constants import *
-from atm.encoder import DataEncoder, MetaData
-from atm.method import Method
-from atm.metrics import cross_validate_pipeline, test_pipeline
+from .constants import *
+from .encoder import DataEncoder, MetaData
+from .method import Method
+from .metrics import cross_validate_pipeline, test_pipeline
 
 
 class Model(object):

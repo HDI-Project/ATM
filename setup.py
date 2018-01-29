@@ -71,7 +71,7 @@ setup(
         'scikit-learn>=0.18',
         'scipy>=0.19',
         'sklearn-pandas>=1.5',
-        'mysql-python>=1.2',
+        'mysqlclient>=1.2',
         'pyyaml>=3.12',
         'joblib>=0.11',
         'future>=0.16',
@@ -92,6 +92,7 @@ setup(
         'mock>=2',
         'pytest-xdist>=1.20',
         'pytest-runner>=3',
+        'pytest-cov>=2.5',
     ]
 )
 
