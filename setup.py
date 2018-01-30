@@ -1,5 +1,5 @@
 """
-Stripped down from the example at:
+Stripped down and modified from the example at:
 https://github.com/pypa/sampleproject
 """
 
@@ -75,18 +75,19 @@ setup(
         'pyyaml>=3.12',
         'joblib>=0.11',
         'future>=0.16',
+        'btb>=0.0.1',
     ],
     # TODO: this is deprecated. Figure out how to accomplish the same thing with
     # the proper tools.
     # https://www.python.org/dev/peps/pep-0440/#direct-references
     dependency_links=[
-        'git+ssh://git@github.com/hdi-project/btb.git#egg=btb',
+        'git+ssh://git@github.com/hdi-project/btb.git#egg=btb-0.0.1',
     ],
 
     # This variable is used to specify requirements for *this file* to run.
     setup_requires=[],
 
-    test_suite='test/tests',
+    test_suite='atm/tests',
     tests_require=[
         'pytest>=3.2',
         'mock>=2',

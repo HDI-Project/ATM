@@ -4,6 +4,7 @@ clean:
 	find . -name '*.pyc' -delete
 	find . -name __pycache__ -delete
 	find . -name '*~' -delete
+	find . -name '*.egg-info' -delete
 
 lint:
 	flake8 atm && isort --check-only --recursive atm
@@ -13,6 +14,6 @@ test: lint
 
 installdeps:
 	pip install --upgrade pip
-	pip install -e .
+	pip install -e . --process-dependency-links
 	pip install -r requirements-dev.txt
 
