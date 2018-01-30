@@ -147,8 +147,8 @@ class Database(object):
                                          SCORE_TARGETS]))
 
             # variables that store the status of the datarun
-            started = Column(DateTime)
-            completed = Column(DateTime)
+            start_time = Column(DateTime)
+            end_time = Column(DateTime)
             status = Column(Enum(*DATARUN_STATUS), default=RunStatus.PENDING)
 
             def __repr__(self):
@@ -241,8 +241,8 @@ class Database(object):
             cv_judgment_metric_stdev = Column(Numeric(precision=20, scale=10))
             test_judgment_metric = Column(Numeric(precision=20, scale=10))
 
-            started = Column(DateTime)
-            completed = Column(DateTime)
+            start_time = Column(DateTime)
+            end_time = Column(DateTime)
             status = Column(Enum(*CLASSIFIER_STATUS), nullable=False)
             error_msg = Column(Text)
 
@@ -505,7 +505,7 @@ class Database(object):
                                      datarun_id=datarun_id,
                                      host=host,
                                      params=params,
-                                     started=datetime.now(),
+                                     start_time=datetime.now(),
                                      status=ClassifierStatus.RUNNING)
         self.session.add(classifier)
         return classifier
@@ -527,7 +527,7 @@ class Database(object):
         classifier.cv_judgment_metric = cv_score
         classifier.cv_judgment_metric_stdev = cv_stdev
         classifier.test_judgment_metric = test_score
-        classifier.completed = datetime.now()
+        classifier.end_time = datetime.now()
         classifier.status = ClassifierStatus.COMPLETE
 
     @try_with_session(commit=True)
@@ -540,7 +540,7 @@ class Database(object):
         classifier = self.session.query(self.Classifier).get(classifier_id)
         classifier.error_msg = error_msg
         classifier.status = ClassifierStatus.ERRORED
-        classifier.completed = datetime.now()
+        classifier.end_time = datetime.now()
         if (self.get_number_of_hyperpartition_errors(classifier.hyperpartition_id)
                 > MAX_HYPERPARTITION_ERRORS):
             self.mark_hyperpartition_errored(classifier.hyperpartition_id)
@@ -566,20 +566,20 @@ class Database(object):
     @try_with_session(commit=True)
     def mark_datarun_running(self, datarun_id):
         """
-        Set the status of the Datarun to RUNNING and set the 'started' field to
-        the current datetime.
+        Set the status of the Datarun to RUNNING and set the 'start_time' field
+        to the current datetime.
         """
         datarun = self.get_datarun(datarun_id)
         if datarun.status == RunStatus.PENDING:
             datarun.status = RunStatus.RUNNING
-            datarun.started = datetime.now()
+            datarun.start_time = datetime.now()
 
     @try_with_session(commit=True)
     def mark_datarun_complete(self, datarun_id):
         """
-        Set the status of the Datarun to COMPLETE and set the 'completed' field
+        Set the status of the Datarun to COMPLETE and set the 'end_time' field
         to the current datetime.
         """
         datarun = self.get_datarun(datarun_id)
         datarun.status = RunStatus.COMPLETE
-        datarun.completed = datetime.now()
+        datarun.end_time = datetime.now()
