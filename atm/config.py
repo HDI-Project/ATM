@@ -1,7 +1,9 @@
 from __future__ import absolute_import
 
+import logging
 import os
 import re
+import sys
 from argparse import ArgumentError, ArgumentTypeError, RawTextHelpFormatter
 
 import yaml
@@ -12,11 +14,11 @@ from .constants import *
 class Config(object):
     """
     Class which stores configuration for one aspect of ATM. Subclasses of
-    Config should define, in PARAMETERS and DEFAULTS, respectively, the list of
-    all configurable parameters and any default values for those parameters
-    other than None. The object can be initialized with any number of keyword
-    arguments; only kwargs that are in PARAMETERS will be used. This means you
-    can (relatively) safely do things like
+    Config should define the list of all configurable parameters and any
+    default values for those parameters other than None (in PARAMETERS and
+    DEFAULTS, respectively). The object can be initialized with any number of
+    keyword arguments; only kwargs that are in PARAMETERS will be used. This
+    means you can (relatively) safely do things like
         args = parser.parse_args()
         conf = Config(**vars(args))
     and only relevant parameters will be set.
@@ -127,6 +129,58 @@ class RunConfig(Config):
         'metric': 'f1',
         'score_target': 'cv',
     }
+
+
+class LoggingConfig(Config):
+    PARAMETERS = [
+        'stdout_level',
+        'file_level',
+        'log_dir',
+        'model_dir',
+        'metric_dir',
+    ]
+
+    DEFAULTS = {
+        'log_level_file': 'INFO',
+        'log_level_stdout': 'INFO',
+        'log_dir': 'logs',
+        'model_dir': 'models',
+        'metric_dir': 'metrics',
+    }
+
+
+def initialize_logging(config):
+    err_levels = ['WARNING', 'ERROR', 'CRITICAL']
+    logger = logging.getLogger('atm')
+
+    if config.log_level_file:
+        level = config.log_level_file.upper()
+        fmt = '%(asctime)-15s %(name)s - %(levelname)s    %(message)s'
+        handler = logging.FileHandler(config.log_dir.stdout)
+        handler.setFormatter(logging.Formatter(fmt))
+    else:
+        logger.
+
+    if config.log_level_stdout:
+        level = config.log_level_stdout.upper()
+        fmt = '%(message)s'
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setFormatter(logging.Formatter(fmt))
+
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    log_handler = logging.StreamHandler(sys.stdout)
+    err_handler.setFormatter(logging.Formatter(fmt))
+
+    logger.setLevel(level)
+    for _handler in logger.handlers:
+        logger.removeHandler(_handler)
+
+    if level in err_levels:
+        logger.addHandler(stdout_handler)
+    else:
+        logger.addHandler(out_handler)
+    logger.propagate = False
+
 
 
 def option_or_path(options, regex=CUSTOM_CLASS_REGEX):

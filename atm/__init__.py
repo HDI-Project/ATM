@@ -10,3 +10,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 __all__ = ['config', 'constants', 'database', 'enter_data', 'method', 'metrics',
            'model', 'utilities', 'worker']
+
+from .config import initialize_logging
+
+initialize_logging(config)
