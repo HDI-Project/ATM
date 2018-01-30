@@ -46,7 +46,7 @@ class Model(object):
     # number of folds for cross-validation (arbitrary, for speed)
     N_FOLDS = 5
 
-    def __init__(self, method, params, judgment_metric, label_column,
+    def __init__(self, method, params, judgment_metric, class_column,
                  testing_ratio=0.3, verbose_metrics=False):
         """
         Parameters:
@@ -61,7 +61,7 @@ class Model(object):
         self.method = method
         self.params = params
         self.judgment_metric = judgment_metric
-        self.label_column = label_column
+        self.class_column = class_column
         self.testing_ratio = testing_ratio
         self.verbose_metrics = verbose_metrics
 
@@ -178,7 +178,7 @@ class Model(object):
 
     def train_test(self, train_path, test_path=None):
         # load train and (maybe) test data
-        metadata = MetaData(label_column=self.label_column,
+        metadata = MetaData(class_column=self.class_column,
                             train_path=train_path,
                             test_path=test_path)
         self.num_classes = metadata.k_classes
@@ -209,7 +209,7 @@ class Model(object):
                                                      random_state=self.random_state)
 
         # extract feature matrix and labels from raw data
-        self.encoder = DataEncoder(label_column=self.label_column)
+        self.encoder = DataEncoder(class_column=self.class_column)
         X_train, y_train = self.encoder.fit_transform(train_data)
         X_test, y_test = self.encoder.transform(test_data)
 

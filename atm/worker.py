@@ -335,7 +335,7 @@ class Worker(object):
         """
         model = Model(method=method, params=params,
                       judgment_metric=self.datarun.metric,
-                      label_column=self.dataset.label_column,
+                      class_column=self.dataset.class_column,
                       verbose_metrics=self.verbose_metrics)
         train_path, test_path = download_data(self.dataset.train_path,
                                               self.dataset.test_path,

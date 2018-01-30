@@ -35,14 +35,14 @@ def create_dataset(db, run_config, aws_config=None):
     name = name.replace("_train.csv", "").replace(".csv", "")
 
     # process the data into the form ATM needs and save it to disk
-    meta = MetaData(run_config.label_column, train_local, test_local)
+    meta = MetaData(run_config.class_column, train_local, test_local)
 
     # enter dataset into database
     dataset = db.create_dataset(name=name,
                                 description=run_config.data_description,
                                 train_path=run_config.train_path,
                                 test_path=run_config.test_path,
-                                label_column=run_config.label_column,
+                                class_column=run_config.class_column,
                                 n_examples=meta.n_examples,
                                 k_classes=meta.k_classes,
                                 d_features=meta.d_features,

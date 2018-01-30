@@ -91,7 +91,7 @@ class RunConfig(Config):
         'train_path',
         'test_path',
         'data_description',
-        'label_column',
+        'class_column',
 
         # datarun config
         'dataset_id',
@@ -111,7 +111,7 @@ class RunConfig(Config):
 
     DEFAULTS = {
         'train_path': 'data/test/pollution_1.csv',
-        'label_column': 'class',
+        'class_column': 'class',
         'methods': ['logreg', 'dt', 'knn'],
         'priority': 1,
         'budget_type': 'classifier',
