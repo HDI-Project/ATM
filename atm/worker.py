@@ -30,26 +30,14 @@ warnings.filterwarnings('ignore')
 os.environ['GNUMPY_IMPLICIT_CONVERSION'] = 'allow'
 
 # get the file system in order
-DEFAULT_MODEL_DIR = os.path.join(PROJECT_ROOT, 'models')
-DEFAULT_METRIC_DIR = os.path.join(PROJECT_ROOT, 'metrics')
-
-# make sure we have directories where we need them
-ensure_directory(LOG_PATH)
-
-# name log file after the local hostname
-LOG_FILE = os.path.join(LOG_PATH, '%s.txt' % socket.gethostname())
+DEFAULT_MODEL_DIR = 'models'
+DEFAULT_METRIC_DIR = 'metrics'
+DEFAULT_LOG_DIR = 'logs'
 
 # how long to sleep between loops while waiting for new dataruns to be added
 LOOP_WAIT = 1
 
-
-# TODO: use python's logging module instead of this
-def _log(msg, stdout=True):
-    with open(LOG_FILE, 'a') as lf:
-        lf.write(msg + '\n')
-    if stdout:
-        print(msg)
-
+logger = logging.getLogger('atm')
 
 # Exception thrown when something goes wrong for the worker, but the worker
 # handles the error.
@@ -60,7 +48,8 @@ class ClassifierError(Exception):
 class Worker(object):
     def __init__(self, database, datarun, save_files=True, cloud_mode=False,
                  aws_config=None, model_dir=DEFAULT_MODEL_DIR,
-                 metric_dir=DEFAULT_METRIC_DIR, verbose_metrics=False):
+                 metric_dir=DEFAULT_METRIC_DIR,
+                 log_dir=DEFAULT_LOG_DIR, verbose_metrics=False):
         """
         database: Database object with connection information
         datarun: Datarun ORM object to work on.
@@ -75,6 +64,10 @@ class Worker(object):
         self.aws_config = aws_config
         self.verbose_metrics = verbose_metrics
 
+        ensure_directory(log_dir)
+        # name log file after the local hostname
+        self.log_file = os.path.join(self.log_dir, '%s.txt' % socket.gethostname())
+
         self.model_dir = model_dir
         self.metric_dir = metric_dir
         ensure_directory(self.model_dir)
@@ -86,6 +79,13 @@ class Worker(object):
         # load the Selector and Tuner classes specified by our datarun
         self.load_selector()
         self.load_tuner()
+
+    # TODO: use python's logging module instead of this
+    def _log(self, log_file, msg, stdout=True):
+        with open(log_file, 'a') as lf:
+            lf.write(msg + '\n')
+        if stdout:
+            print(msg)
 
     def load_selector(self):
         """
@@ -418,7 +418,8 @@ class Worker(object):
 
 def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
          cloud_mode=False, aws_config=None, total_time=None, wait=True,
-         model_dir='models', metric_dir='metrics', verbose_metrics=False):
+         model_dir=DEFAULT_MODEL_DIR, metric_dir=DEFAULT_METRIC_DIR,
+         log_dir=DEFAULT_LOG_DIR, verbose_metrics=False):
     """
     Check the ModelHub database for unfinished dataruns, and spawn workers to
     work on them as they are added. This process will continue to run until it
@@ -476,7 +477,7 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         worker = Worker(db, run, save_files=save_files,
                         cloud_mode=cloud_mode, aws_config=aws_config,
                         model_dir=model_dir, metric_dir=metric_dir,
-                        verbose_metrics=verbose_metrics)
+                        log_dir=log_dir, verbose_metrics=verbose_metrics)
         try:
             worker.run_classifier()
         except ClassifierError:
@@ -507,12 +508,12 @@ if __name__ == '__main__':
     parser.add_argument('--no-save', dest='save_files', default=True,
                         action='store_const', const=False,
                         help="don't save models and metrics for later")
-    parser.add_argument('--model-dir', dest='model_persist_dir',
-                        default=DEFAULT_MODEL_DIR,
+    parser.add_argument('--model-dir', default=DEFAULT_MODEL_DIR,
                         help='Directory where computed models will be saved')
-    parser.add_argument('--metric-dir', dest='metric_persist_dir',
-                        default=DEFAULT_METRIC_DIR,
+    parser.add_argument('--metric-dir', default=DEFAULT_METRIC_DIR,
                         help='Directory where model metrics will be saved')
+    parser.add_argument('--log-dir', default=DEFAULT_LOG_DIR,
+                        help='Directory where logs will be saved')
     parser.add_argument('--verbose-metrics', default=False, action='store_true',
                         help='If set, compute full ROC and PR curves and '
                         'per-label metrics for each classifier')
@@ -530,6 +531,7 @@ if __name__ == '__main__':
          aws_config=aws_config,
          total_time=args.time,
          wait=False,
-         model_dir=args.model_persist_dir,
-         metric_dir=args.metric_persist_dir,
+         model_dir=args.model_dir,
+         metric_dir=args.metric_dir,
+         log_dir=args.log_dir,
          verbose_metrics=args.verbose_metrics)

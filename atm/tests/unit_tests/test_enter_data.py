@@ -11,7 +11,7 @@ from atm.utilities import get_local_data_path
 
 DB_PATH = '/tmp/atm.db'
 DATA_URL = 'https://s3.amazonaws.com/mit-dai-delphi-datastore/downloaded/'
-BASELINE_PATH = os.path.join(PROJECT_ROOT, 'test/baselines/best_so_far/')
+BASELINE_PATH = os.path.join(PROJECT_ROOT, 'data/baselines/best_so_far/')
 BASELINE_URL = 'https://s3.amazonaws.com/mit-dai-delphi-datastore/best_so_far/'
 
 METHOD_HYPERPARTS = {
