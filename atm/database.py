@@ -167,11 +167,21 @@ class Database(object):
             datarun_id = Column(Integer, ForeignKey('dataruns.id'))
             datarun = relationship('Datarun', back_populates='hyperpartitions')
 
-            # these columns define the partition
+            # name of or path to a configured classification method
             method = Column(String(255))
-            categoricals64 = Column(Text)
-            tunables64 = Column(Text)
-            constants64 = Column(Text)
+
+            # list of categorical parameters whose values are fixed to define
+            # this hyperpartition
+            categorical_hyperparameters_64 = Column(Text)
+
+            # list of continuous parameters which are not fixed; their values
+            # must be selected by a Tuner
+            tunable_hyperparameters_64 = Column(Text)
+
+            # list of categorical or continuous parameters whose values are
+            # always fixed. These do not define the hyperpartition, but their
+            # values must be passed on to the method. Here for convenience.
+            constant_hyperparameters_64 = Column(Text)
 
             # has the partition had too many errors, or is gridding done?
             status = Column(Enum(*PARTITION_STATUS),
@@ -181,14 +191,14 @@ class Database(object):
             def categoricals(self):
                 """
                 A list of categorical variables along with the fixed values
-                which define the hyperpartition.
+                which define this hyperpartition.
                 Each element is a ('name', HyperParameter) tuple.
                 """
-                return base_64_to_object(self.categoricals64)
+                return json.loads(self.categorical_hyperparameters_64)
 
             @categoricals.setter
             def categoricals(self, value):
-                self.categoricals64 = object_to_base_64(value)
+                self.categorical_hyperparameters_64 = object_to_base_64(value)
 
             @property
             def tunables(self):
@@ -196,19 +206,19 @@ class Database(object):
                 A list of parameters which are unspecified and must be selected
                 with a Tuner. Each element is a ('name', HyperParameter) tuple.
                 """
-                return base_64_to_object(self.tunables64)
+                return base_64_to_object(self.tunable_hyperparameters_64)
 
             @tunables.setter
             def tunables(self, value):
-                self.tunables64 = object_to_base_64(value)
+                self.tunable_hyperparameters_64 = object_to_base_64(value)
 
             @property
             def constants(self):
-                return base_64_to_object(self.constants64)
+                return base_64_to_object(self.constant_hyperparameters_64)
 
             @constants.setter
             def constants(self, value):
-                self.constants64 = object_to_base_64(value)
+                self.constant_hyperparameters_64 = object_to_base_64(value)
 
             def __repr__(self):
                 return "<%s: %s>" % (self.method, self.categoricals)
