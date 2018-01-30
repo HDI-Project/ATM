@@ -134,7 +134,7 @@ class Database(object):
             k_window = Column(Integer)
             tuner = Column(String(200), nullable=False)
             gridding = Column(Integer, nullable=False)
-            r_min = Column(Integer)
+            r_minimum = Column(Integer)
 
             # budget settings
             budget_type = Column(Enum(*BUDGET_TYPES))

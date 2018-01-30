@@ -284,7 +284,7 @@ class Worker(object):
         # need to do it fresh for each classifier (not in load_tuner)
         tuner = self.Tuner(tunables=tunables,
                            gridding=self.datarun.gridding,
-                           r_min=self.datarun.r_min)
+                           r_minimum=self.datarun.r_minimum)
         tuner.fit(X, y)
         vector = tuner.propose()
 

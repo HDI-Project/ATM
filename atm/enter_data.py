@@ -86,7 +86,7 @@ def create_datarun(db, dataset, run_config):
                                 metric=run_config.metric,
                                 score_target=target,
                                 k_window=run_config.k_window,
-                                r_min=run_config.r_min)
+                                r_minimum=run_config.r_minimum)
     return datarun
 
 

@@ -101,7 +101,7 @@ class RunConfig(Config):
         'budget',
         'deadline',
         'tuner',
-        'r_min',
+        'r_minimum',
         'gridding',
         'selector',
         'k_window',
@@ -118,7 +118,7 @@ class RunConfig(Config):
         'budget': 100,
         'tuner': 'uniform',
         'selector': 'uniform',
-        'r_min': 2,
+        'r_minimum': 2,
         'k_window': 3,
         'gridding': 0,
         'metric': 'f1',
@@ -293,7 +293,7 @@ def add_arguments_datarun(parser):
                         help='Value of the budget, either in classifiers or minutes')
     parser.add_argument('--deadline',
                         help='Deadline for datarun completion. If provided, this '
-                        'overrides the walltime budget.\nFormat: ' +
+                        'overrides the configured walltime budget.\nFormat: ' +
                         TIME_FMT.replace('%', '%%'))
 
     # Which field to use to judge performance, for the sake of AutoML
@@ -362,18 +362,18 @@ def add_arguments_datarun(parser):
                         'custom tuner in the form "/path/to/selector.py:ClassName".'
                         '\n\nOptions: [%s]' % ', '.join(str(s) for s in SELECTORS))
 
-    # r_min is the number of random runs performed in each hyperpartition before
+    # r_minimum is the number of random runs performed in each hyperpartition before
     # allowing bayesian opt to select parameters. Consult the thesis to
     # understand what those mean, but essentially:
     #
-    #  if (num_classifiers_trained_in_hyperpartition >= r_min)
+    #  if (num_classifiers_trained_in_hyperpartition >= r_minimum)
     #    # train using sample criteria
     #  else
     #    # train using uniform (baseline)
-    parser.add_argument('--r-min',  type=int,
+    parser.add_argument('--r-minimum',  type=int,
                         help='number of random runs to perform before tuning can occur')
 
-    # k is number that xxx-k methods use. It is similar to r_min, except it is
+    # k is number that xxx-k methods use. It is similar to r_minimum, except it is
     # called k_window and determines how much "history" ATM considers for certain
     # partition selection logics.
     parser.add_argument('--k-window', type=int,
