@@ -101,7 +101,7 @@ class Database(object):
             name = Column(String(100), nullable=False)
 
             # columns necessary for loading/processing data
-            label_column = Column(String(100), nullable=False)
+            class_column = Column(String(100), nullable=False)
             train_path = Column(String(200), nullable=False)
             test_path = Column(String(200))
             description = Column(String(1000))
@@ -134,7 +134,7 @@ class Database(object):
             k_window = Column(Integer)
             tuner = Column(String(200), nullable=False)
             gridding = Column(Integer, nullable=False)
-            r_min = Column(Integer)
+            r_minimum = Column(Integer)
 
             # budget settings
             budget_type = Column(Enum(*BUDGET_TYPES))
@@ -147,8 +147,8 @@ class Database(object):
                                          SCORE_TARGETS]))
 
             # variables that store the status of the datarun
-            started = Column(DateTime)
-            completed = Column(DateTime)
+            start_time = Column(DateTime)
+            end_time = Column(DateTime)
             status = Column(Enum(*DATARUN_STATUS), default=RunStatus.PENDING)
 
             def __repr__(self):
@@ -167,11 +167,21 @@ class Database(object):
             datarun_id = Column(Integer, ForeignKey('dataruns.id'))
             datarun = relationship('Datarun', back_populates='hyperpartitions')
 
-            # these columns define the partition
+            # name of or path to a configured classification method
             method = Column(String(255))
-            categoricals64 = Column(Text)
-            tunables64 = Column(Text)
-            constants64 = Column(Text)
+
+            # list of categorical parameters whose values are fixed to define
+            # this hyperpartition
+            categorical_hyperparameters_64 = Column(Text)
+
+            # list of continuous parameters which are not fixed; their values
+            # must be selected by a Tuner
+            tunable_hyperparameters_64 = Column(Text)
+
+            # list of categorical or continuous parameters whose values are
+            # always fixed. These do not define the hyperpartition, but their
+            # values must be passed on to the method. Here for convenience.
+            constant_hyperparameters_64 = Column(Text)
 
             # has the partition had too many errors, or is gridding done?
             status = Column(Enum(*PARTITION_STATUS),
@@ -181,14 +191,14 @@ class Database(object):
             def categoricals(self):
                 """
                 A list of categorical variables along with the fixed values
-                which define the hyperpartition.
+                which define this hyperpartition.
                 Each element is a ('name', HyperParameter) tuple.
                 """
-                return base_64_to_object(self.categoricals64)
+                return base_64_to_object(self.categorical_hyperparameters_64)
 
             @categoricals.setter
             def categoricals(self, value):
-                self.categoricals64 = object_to_base_64(value)
+                self.categorical_hyperparameters_64 = object_to_base_64(value)
 
             @property
             def tunables(self):
@@ -196,19 +206,19 @@ class Database(object):
                 A list of parameters which are unspecified and must be selected
                 with a Tuner. Each element is a ('name', HyperParameter) tuple.
                 """
-                return base_64_to_object(self.tunables64)
+                return base_64_to_object(self.tunable_hyperparameters_64)
 
             @tunables.setter
             def tunables(self, value):
-                self.tunables64 = object_to_base_64(value)
+                self.tunable_hyperparameters_64 = object_to_base_64(value)
 
             @property
             def constants(self):
-                return base_64_to_object(self.constants64)
+                return base_64_to_object(self.constant_hyperparameters_64)
 
             @constants.setter
             def constants(self, value):
-                self.constants64 = object_to_base_64(value)
+                self.constant_hyperparameters_64 = object_to_base_64(value)
 
             def __repr__(self):
                 return "<%s: %s>" % (self.method, self.categoricals)
@@ -228,39 +238,33 @@ class Database(object):
             hyperpartition = relationship('Hyperpartition',
                                           back_populates='classifiers')
 
-            # these columns point to where the output is stored
-            model_path = Column(String(300))
-            metric_path = Column(String(300))
-            params64 = Column(Text, nullable=False)
-
-            trainable_params64 = Column(Text)
+            # name of the host where the model was trained
             host = Column(String(50))
-            dimensions = Column(Integer)
 
+            # these columns point to where the output is stored
+            model_location = Column(String(300))
+            metrics_location = Column(String(300))
+
+            # base 64 encoding of the hyperparameter names and values
+            hyperparameter_values_64 = Column(Text, nullable=False)
+
+            # performance metrics
             cv_judgment_metric = Column(Numeric(precision=20, scale=10))
             cv_judgment_metric_stdev = Column(Numeric(precision=20, scale=10))
             test_judgment_metric = Column(Numeric(precision=20, scale=10))
 
-            started = Column(DateTime)
-            completed = Column(DateTime)
+            start_time = Column(DateTime)
+            end_time = Column(DateTime)
             status = Column(Enum(*CLASSIFIER_STATUS), nullable=False)
-            error_msg = Column(Text)
+            error_message = Column(Text)
 
             @property
-            def params(self):
-                return base_64_to_object(self.params64)
+            def hyperparameter_values(self):
+                return base_64_to_object(self.hyperparameter_values_64)
 
-            @params.setter
-            def params(self, value):
-                self.params64 = object_to_base_64(value)
-
-            @property
-            def trainable_params(self):
-                return base_64_to_object(self.trainable_params64)
-
-            @trainable_params.setter
-            def trainable_params(self, value):
-                self.trainable_params64 = object_to_base_64(value)
+            @hyperparameter_values.setter
+            def hyperparameter_values(self, value):
+                self.hyperparameter_values_64 = object_to_base_64(value)
 
             @property
             def mu_sigma_judgment_metric(self):
@@ -272,7 +276,8 @@ class Database(object):
                         self.cv_judgment_metric_stdev)
 
             def __repr__(self):
-                params = ', '.join(['%s: %s' % i for i in self.params.items()])
+                params = ', '.join(['%s: %s' % i for i in
+                                    self.hyperparameter_values.items()])
                 return "<id=%d, params=(%s)>" % (self.id, params)
 
         Datarun.classifiers = relationship('Classifier',
@@ -496,7 +501,8 @@ class Database(object):
         return part
 
     @try_with_session(commit=True)
-    def create_classifier(self, hyperpartition_id, datarun_id, host, params):
+    def create_classifier(self, hyperpartition_id, datarun_id, host,
+                          hyperparameter_values):
         """
         Save a new, fully qualified classifier object to the database.
         Returns: the ID of the newly-created classifier
@@ -504,43 +510,40 @@ class Database(object):
         classifier = self.Classifier(hyperpartition_id=hyperpartition_id,
                                      datarun_id=datarun_id,
                                      host=host,
-                                     params=params,
-                                     started=datetime.now(),
+                                     hyperparameter_values=hyperparameter_values,
+                                     start_time=datetime.now(),
                                      status=ClassifierStatus.RUNNING)
         self.session.add(classifier)
         return classifier
 
     @try_with_session(commit=True)
-    def complete_classifier(self, classifier_id, trainable_params, dimensions,
-                            model_path, metric_path, cv_score, cv_stdev,
-                            test_score):
+    def complete_classifier(self, classifier_id, model_location,
+                            metrics_location, cv_score, cv_stdev, test_score):
         """
         Set all the parameters on a classifier that haven't yet been set, and mark
         it as complete.
         """
         classifier = self.session.query(self.Classifier).get(classifier_id)
 
-        classifier.trainable_params = trainable_params
-        classifier.dimensions = dimensions
-        classifier.model_path = model_path
-        classifier.metric_path = metric_path
+        classifier.model_location = model_location
+        classifier.metrics_location = metrics_location
         classifier.cv_judgment_metric = cv_score
         classifier.cv_judgment_metric_stdev = cv_stdev
         classifier.test_judgment_metric = test_score
-        classifier.completed = datetime.now()
+        classifier.end_time = datetime.now()
         classifier.status = ClassifierStatus.COMPLETE
 
     @try_with_session(commit=True)
-    def mark_classifier_errored(self, classifier_id, error_msg):
+    def mark_classifier_errored(self, classifier_id, error_message):
         """
         Mark an existing classifier as having errored and set the error message. If
         the classifier's hyperpartiton has produced too many erring classifiers, mark it
         as errored as well.
         """
         classifier = self.session.query(self.Classifier).get(classifier_id)
-        classifier.error_msg = error_msg
+        classifier.error_message = error_message
         classifier.status = ClassifierStatus.ERRORED
-        classifier.completed = datetime.now()
+        classifier.end_time = datetime.now()
         if (self.get_number_of_hyperpartition_errors(classifier.hyperpartition_id)
                 > MAX_HYPERPARTITION_ERRORS):
             self.mark_hyperpartition_errored(classifier.hyperpartition_id)
@@ -566,20 +569,20 @@ class Database(object):
     @try_with_session(commit=True)
     def mark_datarun_running(self, datarun_id):
         """
-        Set the status of the Datarun to RUNNING and set the 'started' field to
-        the current datetime.
+        Set the status of the Datarun to RUNNING and set the 'start_time' field
+        to the current datetime.
         """
         datarun = self.get_datarun(datarun_id)
         if datarun.status == RunStatus.PENDING:
             datarun.status = RunStatus.RUNNING
-            datarun.started = datetime.now()
+            datarun.start_time = datetime.now()
 
     @try_with_session(commit=True)
     def mark_datarun_complete(self, datarun_id):
         """
-        Set the status of the Datarun to COMPLETE and set the 'completed' field
+        Set the status of the Datarun to COMPLETE and set the 'end_time' field
         to the current datetime.
         """
         datarun = self.get_datarun(datarun_id)
         datarun.status = RunStatus.COMPLETE
-        datarun.completed = datetime.now()
+        datarun.end_time = datetime.now()

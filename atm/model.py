@@ -46,7 +46,7 @@ class Model(object):
     # number of folds for cross-validation (arbitrary, for speed)
     N_FOLDS = 5
 
-    def __init__(self, method, params, judgment_metric, label_column,
+    def __init__(self, method, params, judgment_metric, class_column,
                  testing_ratio=0.3, verbose_metrics=False):
         """
         Parameters:
@@ -61,7 +61,7 @@ class Model(object):
         self.method = method
         self.params = params
         self.judgment_metric = judgment_metric
-        self.label_column = label_column
+        self.class_column = class_column
         self.testing_ratio = testing_ratio
         self.verbose_metrics = verbose_metrics
 
@@ -100,23 +100,18 @@ class Model(object):
 
         # do special conversions
         hyperparameters = self.special_conversions(hyperparameters)
-        self.trainable_params = hyperparameters
         classifier = self.class_(**hyperparameters)
 
-        self.dimensions = self.num_features
         if Model.PCA in atm_params and atm_params[Model.PCA]:
-            whiten = (Model.WHITEN in atm_params and
-                        atm_params[Model.WHITEN])
+            whiten = (Model.WHITEN in atm_params and atm_params[Model.WHITEN])
             pca_dims = atm_params[Model.PCA_DIMS]
             # PCA dimension in atm_params is a float reprsenting percentages of
             # features to use
-            if pca_dims >= 1:
-                self.dimensions = int(pca_dims)
-            else:
-                self.dimensions = int(pca_dims * float(self.num_features))
+            if pca_dims < 1:
+                dimensions = int(pca_dims * float(self.num_features))
                 print("*** Using PCA to reduce %d features to %d dimensions" %
-                      (self.num_features, self.dimensions))
-                pca = decomposition.PCA(n_components=self.dimensions, whiten=whiten)
+                      (self.num_features, dimensions))
+                pca = decomposition.PCA(n_components=dimensions, whiten=whiten)
                 steps.append(('pca', pca))
 
         # should we scale the data?
@@ -178,7 +173,7 @@ class Model(object):
 
     def train_test(self, train_path, test_path=None):
         # load train and (maybe) test data
-        metadata = MetaData(label_column=self.label_column,
+        metadata = MetaData(class_column=self.class_column,
                             train_path=train_path,
                             test_path=test_path)
         self.num_classes = metadata.k_classes
@@ -209,7 +204,7 @@ class Model(object):
                                                      random_state=self.random_state)
 
         # extract feature matrix and labels from raw data
-        self.encoder = DataEncoder(label_column=self.label_column)
+        self.encoder = DataEncoder(class_column=self.class_column)
         X_train, y_train = self.encoder.fit_transform(train_data)
         X_test, y_test = self.encoder.transform(test_data)
 
