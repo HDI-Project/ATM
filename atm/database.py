@@ -256,7 +256,7 @@ class Database(object):
             start_time = Column(DateTime)
             end_time = Column(DateTime)
             status = Column(Enum(*CLASSIFIER_STATUS), nullable=False)
-            error_msg = Column(Text)
+            error_message = Column(Text)
 
             @property
             def hyperparameter_values(self):
@@ -535,14 +535,14 @@ class Database(object):
         classifier.status = ClassifierStatus.COMPLETE
 
     @try_with_session(commit=True)
-    def mark_classifier_errored(self, classifier_id, error_msg):
+    def mark_classifier_errored(self, classifier_id, error_message):
         """
         Mark an existing classifier as having errored and set the error message. If
         the classifier's hyperpartiton has produced too many erring classifiers, mark it
         as errored as well.
         """
         classifier = self.session.query(self.Classifier).get(classifier_id)
-        classifier.error_msg = error_msg
+        classifier.error_message = error_message
         classifier.status = ClassifierStatus.ERRORED
         classifier.end_time = datetime.now()
         if (self.get_number_of_hyperpartition_errors(classifier.hyperpartition_id)

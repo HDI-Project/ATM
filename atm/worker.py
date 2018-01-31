@@ -165,7 +165,8 @@ class Worker(object):
                 except Exception:
                     msg = traceback.format_exc()
                     _log('Error in save_classifier_cloud()')
-                    self.db.mark_classifier_errored(classifier_id, error_msg=msg)
+                    self.db.mark_classifier_errored(classifier_id,
+                                                    error_message=msg)
         else:
             model_path = None
             metric_path = None
@@ -415,7 +416,7 @@ class Worker(object):
             msg = traceback.format_exc()
             _log('Error testing classifier: datarun=%s' % str(self.datarun))
             _log(msg)
-            self.db.mark_classifier_errored(classifier.id, error_msg=msg)
+            self.db.mark_classifier_errored(classifier.id, error_message=msg)
             raise ClassifierError()
 
 
