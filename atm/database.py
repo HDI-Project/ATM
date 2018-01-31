@@ -238,15 +238,17 @@ class Database(object):
             hyperpartition = relationship('Hyperpartition',
                                           back_populates='classifiers')
 
+            # name of the host where the model was trained
+            host = Column(String(50))
+
             # these columns point to where the output is stored
             model_location = Column(String(300))
             metrics_location = Column(String(300))
 
             # base 64 encoding of the hyperparameter names and values
             hyperparameter_values_64 = Column(Text, nullable=False)
-            host = Column(String(50))
-            dimensions = Column(Integer)
 
+            # performance metrics
             cv_judgment_metric = Column(Numeric(precision=20, scale=10))
             cv_judgment_metric_stdev = Column(Numeric(precision=20, scale=10))
             test_judgment_metric = Column(Numeric(precision=20, scale=10))

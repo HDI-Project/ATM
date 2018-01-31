@@ -102,19 +102,16 @@ class Model(object):
         hyperparameters = self.special_conversions(hyperparameters)
         classifier = self.class_(**hyperparameters)
 
-        self.dimensions = self.num_features
         if Model.PCA in atm_params and atm_params[Model.PCA]:
             whiten = (Model.WHITEN in atm_params and atm_params[Model.WHITEN])
             pca_dims = atm_params[Model.PCA_DIMS]
             # PCA dimension in atm_params is a float reprsenting percentages of
             # features to use
-            if pca_dims >= 1:
-                self.dimensions = int(pca_dims)
-            else:
-                self.dimensions = int(pca_dims * float(self.num_features))
+            if pca_dims < 1:
+                dimensions = int(pca_dims * float(self.num_features))
                 print("*** Using PCA to reduce %d features to %d dimensions" %
-                      (self.num_features, self.dimensions))
-                pca = decomposition.PCA(n_components=self.dimensions, whiten=whiten)
+                      (self.num_features, dimensions))
+                pca = decomposition.PCA(n_components=dimensions, whiten=whiten)
                 steps.append(('pca', pca))
 
         # should we scale the data?

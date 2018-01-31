@@ -172,7 +172,6 @@ class Worker(object):
 
         # update the classifier in the database
         self.db.complete_classifier(classifier_id=classifier_id,
-                                    dimensions=model.dimensions,
                                     model_path=model_path,
                                     metric_path=metric_path,
                                     cv_score=model.cv_judgment_metric,
