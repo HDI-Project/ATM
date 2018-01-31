@@ -100,13 +100,11 @@ class Model(object):
 
         # do special conversions
         hyperparameters = self.special_conversions(hyperparameters)
-        self.trainable_params = hyperparameters
         classifier = self.class_(**hyperparameters)
 
         self.dimensions = self.num_features
         if Model.PCA in atm_params and atm_params[Model.PCA]:
-            whiten = (Model.WHITEN in atm_params and
-                        atm_params[Model.WHITEN])
+            whiten = (Model.WHITEN in atm_params and atm_params[Model.WHITEN])
             pca_dims = atm_params[Model.PCA_DIMS]
             # PCA dimension in atm_params is a float reprsenting percentages of
             # features to use

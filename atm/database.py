@@ -239,11 +239,11 @@ class Database(object):
                                           back_populates='classifiers')
 
             # these columns point to where the output is stored
-            model_path = Column(String(300))
-            metric_path = Column(String(300))
-            params64 = Column(Text, nullable=False)
+            model_location = Column(String(300))
+            metrics_location = Column(String(300))
 
-            trainable_params64 = Column(Text)
+            # base 64 encoding of the hyperparameter names and values
+            hyperparameter_values_64 = Column(Text, nullable=False)
             host = Column(String(50))
             dimensions = Column(Integer)
 
@@ -257,20 +257,12 @@ class Database(object):
             error_msg = Column(Text)
 
             @property
-            def params(self):
-                return base_64_to_object(self.params64)
+            def hyperparameter_values(self):
+                return base_64_to_object(self.hyperparameter_values_64)
 
-            @params.setter
-            def params(self, value):
-                self.params64 = object_to_base_64(value)
-
-            @property
-            def trainable_params(self):
-                return base_64_to_object(self.trainable_params64)
-
-            @trainable_params.setter
-            def trainable_params(self, value):
-                self.trainable_params64 = object_to_base_64(value)
+            @hyperparameter_values.setter
+            def hyperparameter_values(self, value):
+                self.hyperparameter_values_64 = object_to_base_64(value)
 
             @property
             def mu_sigma_judgment_metric(self):
@@ -506,7 +498,8 @@ class Database(object):
         return part
 
     @try_with_session(commit=True)
-    def create_classifier(self, hyperpartition_id, datarun_id, host, params):
+    def create_classifier(self, hyperpartition_id, datarun_id, host,
+                          hyperparameter_values):
         """
         Save a new, fully qualified classifier object to the database.
         Returns: the ID of the newly-created classifier
@@ -514,26 +507,24 @@ class Database(object):
         classifier = self.Classifier(hyperpartition_id=hyperpartition_id,
                                      datarun_id=datarun_id,
                                      host=host,
-                                     params=params,
+                                     hyperparameter_values=hyperparameter_values,
                                      start_time=datetime.now(),
                                      status=ClassifierStatus.RUNNING)
         self.session.add(classifier)
         return classifier
 
     @try_with_session(commit=True)
-    def complete_classifier(self, classifier_id, trainable_params, dimensions,
-                            model_path, metric_path, cv_score, cv_stdev,
-                            test_score):
+    def complete_classifier(self, classifier_id, dimensions, model_location,
+                            metrics_location, cv_score, cv_stdev, test_score):
         """
         Set all the parameters on a classifier that haven't yet been set, and mark
         it as complete.
         """
         classifier = self.session.query(self.Classifier).get(classifier_id)
 
-        classifier.trainable_params = trainable_params
         classifier.dimensions = dimensions
-        classifier.model_path = model_path
-        classifier.metric_path = metric_path
+        classifier.model_location = model_location
+        classifier.metrics_location = metrics_location
         classifier.cv_judgment_metric = cv_score
         classifier.cv_judgment_metric_stdev = cv_stdev
         classifier.test_judgment_metric = test_score

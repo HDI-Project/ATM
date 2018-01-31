@@ -172,7 +172,6 @@ class Worker(object):
 
         # update the classifier in the database
         self.db.complete_classifier(classifier_id=classifier_id,
-                                    trainable_params=model.trainable_params,
                                     dimensions=model.dimensions,
                                     model_path=model_path,
                                     metric_path=metric_path,
@@ -406,7 +405,7 @@ class Worker(object):
         classifier = self.db.create_classifier(hyperpartition_id=hyperpartition.id,
                                                datarun_id=self.datarun.id,
                                                host=get_public_ip(),
-                                               params=params)
+                                               hyperparameters=params)
 
         try:
             _log('Testing classifier...')
