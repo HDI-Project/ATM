@@ -173,8 +173,8 @@ class Worker(object):
 
         # update the classifier in the database
         self.db.complete_classifier(classifier_id=classifier_id,
-                                    model_path=model_path,
-                                    metric_path=metric_path,
+                                    model_location=model_path,
+                                    metrics_location=metric_path,
                                     cv_score=model.cv_judgment_metric,
                                     cv_stdev=model.cv_judgment_metric_stdev,
                                     test_score=model.test_judgment_metric)
@@ -274,7 +274,8 @@ class Worker(object):
                        if l.status == ClassifierStatus.COMPLETE]
 
         # Extract parameters and scores as numpy arrays from classifiers
-        X = params_to_vectors([l.params for l in classifiers], tunables)
+        X = params_to_vectors([l.hyperparameter_values for l in classifiers],
+                              tunables)
         y = np.array([float(getattr(l, self.datarun.score_target))
                       for l in classifiers])
 
@@ -405,7 +406,7 @@ class Worker(object):
         classifier = self.db.create_classifier(hyperpartition_id=hyperpartition.id,
                                                datarun_id=self.datarun.id,
                                                host=get_public_ip(),
-                                               hyperparameters=params)
+                                               hyperparameter_values=params)
 
         try:
             _log('Testing classifier...')

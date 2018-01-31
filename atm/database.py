@@ -194,7 +194,7 @@ class Database(object):
                 which define this hyperpartition.
                 Each element is a ('name', HyperParameter) tuple.
                 """
-                return json.loads(self.categorical_hyperparameters_64)
+                return base_64_to_object(self.categorical_hyperparameters_64)
 
             @categoricals.setter
             def categoricals(self, value):
@@ -517,7 +517,7 @@ class Database(object):
         return classifier
 
     @try_with_session(commit=True)
-    def complete_classifier(self, classifier_id, dimensions, model_location,
+    def complete_classifier(self, classifier_id, model_location,
                             metrics_location, cv_score, cv_stdev, test_score):
         """
         Set all the parameters on a classifier that haven't yet been set, and mark
@@ -525,7 +525,6 @@ class Database(object):
         """
         classifier = self.session.query(self.Classifier).get(classifier_id)
 
-        classifier.dimensions = dimensions
         classifier.model_location = model_location
         classifier.metrics_location = metrics_location
         classifier.cv_judgment_metric = cv_score
