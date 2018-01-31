@@ -1,0 +1,3 @@
+id,dataset_id,description,priority,selector,k_window,tuner,gridding,r_minimum,budget_type,budget,deadline,metric,score_target,start_time,end_time,status
+1,1,uniform__uniform,1,uniform,3,uniform,0,2,classifier,100,,f1,cv_judgment_metric,2018-01-31 15:09:41.912935,2018-01-31 15:10:55.234515,complete
+2,1,uniform__uniform,1,uniform,3,uniform,0,2,classifier,100,,f1,cv_judgment_metric,2018-01-31 15:30:44.770449,,running

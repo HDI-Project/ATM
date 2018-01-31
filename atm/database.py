@@ -303,7 +303,7 @@ class Database(object):
         """
         for table in ['datasets', 'dataruns', 'hyperpartitions', 'classifiers']:
             df = pd.read_sql('SELECT * FROM %s' % table, self.session.bind)
-            df.to_csv(os.path.join(path, '%s.csv' % table))
+            df.to_csv(os.path.join(path, '%s.csv' % table), index=False)
 
     @try_with_session(commit=True)
     def from_csv(self, path):

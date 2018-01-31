@@ -1,10 +1,13 @@
+import os
 import pytest
 
+from atm import PROJECT_ROOT
 from atm.worker import Worker
 
 from btb.tuning import GCP
 from btb.selection import HierarchicalByAlgorithm
 
+DB_CACHE_PATH = os.path.join(PROJECT_ROOT, 'data/modelhub/test/')
 DB_PATH = '/tmp/atm.db'
 
 DT_PARAMS = {'criterion': 'gini', 'max_features': 0.5, 'max_depth': 3,
@@ -14,7 +17,9 @@ DT_PARAMS = {'criterion': 'gini', 'max_features': 0.5, 'max_depth': 3,
 @pytest.fixture
 def db():
     os.remove(DB_PATH)
-    return Database(dialect='sqlite', database=DB_PATH)
+    db = Database(dialect='sqlite', database=DB_PATH)
+    # load cached ModelHub state
+    db.read_csv(DB_CACHE_PATH)
 
 
 @pytest.fixture
@@ -23,8 +28,8 @@ def dataset(db):
 
 
 @pytest.fixture
-def datarun():
-    return db.get_datarun(1)
+def datarun(db):
+    return db.get_datarun(2)
 
 
 @pytest.fixture
@@ -34,7 +39,12 @@ def model(datarun):
                  label_column=datarun.label_column)
 
 
-def get_worker(db, dataset, **kwargs):
+@pytest.fixture
+def worker(db, datarun):
+    return Worker(db, datarun)
+
+
+def get_new_worker(db, dataset, **kwargs):
     kwargs['methods'] = kwargs.get('methods', ['logreg', 'dt'])
     run_conf = RunConfig(**kwargs)
     datarun = create_datarun(db, dataset, run_conf)
@@ -42,8 +52,8 @@ def get_worker(db, dataset, **kwargs):
 
 
 def test_load_selector_and_tuner(db, dataset):
-    worker = get_worker(db, dataset, selector='hieralg', k_window=7,
-                        tuner='gcp', r_minimum=7, gridding=3)
+    worker = get_new_worker(db, dataset, selector='hieralg', k_window=7,
+                            tuner='gcp', r_minimum=7, gridding=3)
     assert type(worker.selector) == HierarchicalByAlgorithm
     assert len(worker.selector.choices) == 6
     assert worker.selector.k == 7
@@ -54,18 +64,17 @@ def test_load_selector_and_tuner(db, dataset):
 def test_load_custom_selector_and_tuner(db, dataset):
     tuner_path = './mytuner.py'
     selector_path = './myselector.py'
-    worker = get_worker(db, dataset, selector=selector_path + ':MySelector',
-                        tuner=tuner_path + ':MyTuner')
+    worker = get_new_worker(db, dataset, selector=selector_path + ':MySelector',
+                            tuner=tuner_path + ':MyTuner')
     assert isinstance(worker.selector, CustomSelector)
     assert issubclass(worker.Tuner, CustomTuner)
 
 
-def test_select_and_tune():
+def test_select_and_tune(worker):
     """
     This won't test that BTB is working correctly, just that the ATM-BTB
     connection is working.
     """
-    worker = get_worker(db, dataset, selector='BestK', k_window=5)
     part = worker.select_hyperpartition()
     params = worker.tune_hyperparameters(part)
 
