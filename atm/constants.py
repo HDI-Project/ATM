@@ -29,6 +29,7 @@ S3_PREFIX = '^s3://'
 HTTP_PREFIX = '^https?://'
 
 TIME_FMT = '%Y-%m-%d %H:%M'
+DATA_TEST_PATH = os.path.join(PROJECT_ROOT, 'data/test')
 DATA_DL_PATH = os.path.join(PROJECT_ROOT, 'data/downloads')
 METHOD_PATH = os.path.join(PROJECT_ROOT, 'methods')
 

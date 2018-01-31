@@ -479,7 +479,7 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         worker = Worker(db, run, save_files=save_files,
                         cloud_mode=cloud_mode, aws_config=aws_config,
                         model_dir=model_dir, metric_dir=metric_dir,
-                        log_dir=log_dir, verbose_metrics=verbose_metrics)
+                        verbose_metrics=verbose_metrics)
         try:
             worker.run_classifier()
         except ClassifierError:

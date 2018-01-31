@@ -113,7 +113,7 @@ class RunConfig(Config):
     ]
 
     DEFAULTS = {
-        'train_path': 'data/test/pollution_1.csv',
+        'train_path': os.path.join(DATA_TEST_PATH, 'pollution_1.csv'),
         'class_column': 'class',
         'methods': ['logreg', 'dt', 'knn'],
         'priority': 1,

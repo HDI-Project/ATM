@@ -170,7 +170,7 @@ def _make_save_path_old(dir, classifier, suffix):
     based on the classifier's dataset name and hyperparameters.
     """
     run_hash = hash_string(classifier.datarun.dataset.name)
-    params_hash = hash_dict(classifier.params)
+    params_hash = hash_dict(classifier.hyperparameter_values)
     filename = "%s-%s-%s.%s" % (run_hash, params_hash,
                                 classifier.datarun.description, suffix)
     return os.path.join(dir, filename)
@@ -183,7 +183,7 @@ def make_save_path(dir, classifier, suffix):
     """
     run_name = "".join([c for c in classifier.datarun.dataset.name
                         if c.isalnum() or c in (' ', '-', '_')]).rstrip()
-    params_hash = hash_dict(classifier.params)[:8]
+    params_hash = hash_dict(classifier.hyperparameter_values)[:8]
     filename = "%s-%s.%s" % (run_name, params_hash, suffix)
     return os.path.join(dir, filename)
 
