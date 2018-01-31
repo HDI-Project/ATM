@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+import pandas as pd
 from datetime import datetime
 from operator import attrgetter
 
@@ -12,6 +13,9 @@ from sqlalchemy.orm import relationship, sessionmaker
 from .constants import *
 from .utilities import *
 
+# The maximum number of errors allowed in a single hyperpartition. If more than
+# this many classifiers using a hyperpartition error, the hyperpartition will be
+# considered broken and ignored for the rest of the datarun.
 MAX_HYPERPARTITION_ERRORS = 3
 
 
@@ -107,7 +111,7 @@ class Database(object):
             size_kb = Column(Integer, nullable=False)
 
             def __repr__(self):
-                base = "<%s: %s, %d classes, %d features, %d examples>"
+                base = "<%s: %s, %d classes, %d features, %d rows>"
                 return base % (self.name, self.description, self.k_classes,
                                self.d_features, self.n_examples)
 
@@ -281,6 +285,32 @@ class Database(object):
         self.Classifier = Classifier
 
         Base.metadata.create_all(bind=self.engine)
+
+    ###########################################################################
+    ##  Save/load the database  ###############################################
+    ###########################################################################
+
+    @try_with_session()
+    def to_csv(self, path):
+        """
+        Save the entire ModelHub database as a set of CSVs in the given
+        directory.
+        """
+        for table in ['datasets', 'dataruns', 'hyperpartitions', 'classifiers']:
+            df = pd.read_sql('SELECT * FROM %s' % table, self.session.bind)
+            df.to_csv(os.path.join(path, '%s.csv' % table))
+
+    @try_with_session(commit=True)
+    def from_csv(self, path):
+        """
+        Load a snapshot of the ModelHub database from a set of CSVs in the given
+        directory.
+        """
+        for table in ['datasets', 'dataruns', 'hyperpartitions', 'classifiers']:
+            df = pd.read_csv(os.path.join(path, '%s.csv' % table))
+            for _, r in df.iterrows():
+                create_func = getattr(self, 'create_%s' % table)
+                create_func(**r)
 
     ###########################################################################
     ##  Standard query methods  ###############################################
@@ -484,12 +514,18 @@ class Database(object):
 
     @try_with_session(commit=True)
     def create_hyperpartition(self, **kwargs):
-        part = self.Hyperpartition(**kwargs)
-        self.session.add(part)
-        return part
+        partition = self.Hyperpartition(**kwargs)
+        self.session.add(partition)
+        return partition
 
     @try_with_session(commit=True)
-    def create_classifier(self, hyperpartition_id, datarun_id, host, params):
+    def create_classifier(self, **kwargs):
+        classifier = self.Classifier(**kwargs)
+        self.session.add(classifier)
+        return classifier
+
+    @try_with_session(commit=True)
+    def start_classifier(self, hyperpartition_id, datarun_id, host, params):
         """
         Save a new, fully qualified classifier object to the database.
         Returns: the ID of the newly-created classifier
