@@ -252,7 +252,7 @@ def add_arguments_datarun(parser):
     parser.add_argument('--train-path', help='Path to raw training data')
     parser.add_argument('--test-path', help='Path to raw test data (if applicable)')
     parser.add_argument('--data-description', help='Description of dataset')
-    parser.add_argument('--label-column', help='Name of the label column in the input data')
+    parser.add_argument('--class-column', help='Name of the class column in the input data')
 
     ##  Datarun Arguments  #####################################################
     ############################################################################
