@@ -274,7 +274,8 @@ class Database(object):
                         self.cv_judgment_metric_stdev)
 
             def __repr__(self):
-                params = ', '.join(['%s: %s' % i for i in self.params.items()])
+                params = ', '.join(['%s: %s' % i for i in
+                                    self.hyperparameter_values.items()])
                 return "<id=%d, params=(%s)>" % (self.id, params)
 
         Datarun.classifiers = relationship('Classifier',
