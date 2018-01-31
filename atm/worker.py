@@ -183,7 +183,8 @@ class Worker(object):
                        if l.status == ClassifierStatus.COMPLETE]
 
         # Extract parameters and scores as numpy arrays from classifiers
-        X = params_to_vectors([l.params for l in classifiers], tunables)
+        X = params_to_vectors([l.hyperparameter_values for l in classifiers],
+                              tunables)
         y = np.array([float(getattr(l, self.datarun.score_target))
                       for l in classifiers])
 
@@ -192,7 +193,7 @@ class Worker(object):
         # need to do it fresh for each classifier (not in load_tuner)
         tuner = self.Tuner(tunables=tunables,
                            gridding=self.datarun.gridding,
-                           r_min=self.datarun.r_min)
+                           r_minimum=self.datarun.r_minimum)
         tuner.fit(X, y)
         vector = tuner.propose()
 
@@ -216,7 +217,7 @@ class Worker(object):
         """
         model = Model(method=method, params=params,
                       judgment_metric=self.datarun.metric,
-                      label_column=self.dataset.label_column,
+                      class_column=self.dataset.class_column,
                       verbose_metrics=self.verbose_metrics)
         train_path, test_path = download_data(self.dataset.train_path,
                                               self.dataset.test_path,
@@ -275,17 +276,16 @@ class Worker(object):
                 except Exception:
                     msg = traceback.format_exc()
                     _log('Error in save_classifier_cloud()')
-                    self.db.mark_classifier_errored(classifier_id, error_msg=msg)
+                    self.db.mark_classifier_errored(classifier_id,
+                                                    error_message=msg)
         else:
             model_path = None
             metric_path = None
 
         # update the classifier in the database
         self.db.complete_classifier(classifier_id=classifier_id,
-                                    trainable_params=model.trainable_params,
-                                    dimensions=model.dimensions,
-                                    model_path=model_path,
-                                    metric_path=metric_path,
+                                    model_location=model_path,
+                                    metrics_location=metric_path,
                                     cv_score=model.cv_judgment_metric,
                                     cv_stdev=model.cv_judgment_metric_stdev,
                                     test_score=model.test_judgment_metric)
@@ -398,7 +398,7 @@ class Worker(object):
         classifier = self.db.start_classifier(hyperpartition_id=hyperpartition.id,
                                               datarun_id=self.datarun.id,
                                               host=get_public_ip(),
-                                              params=params)
+                                              hyperparameter_values=params)
 
         try:
             _log('Testing classifier...')
@@ -409,7 +409,7 @@ class Worker(object):
             msg = traceback.format_exc()
             _log('Error testing classifier: datarun=%s' % str(self.datarun))
             _log(msg)
-            self.db.mark_classifier_errored(classifier.id, error_msg=msg)
+            self.db.mark_classifier_errored(classifier.id, error_message=msg)
             raise ClassifierError()
 
 

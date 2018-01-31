@@ -4,11 +4,11 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
 
 class MetaData(object):
-    def __init__(self, label_column, train_path, test_path=None):
+    def __init__(self, class_column, train_path, test_path=None):
         """
         Compute a bunch of metadata about the dataset.
 
-        label_column: name of dataframe column containing labels
+        class_column: name of dataframe column containing labels
         data_paths: paths to csvs with the same columns
         """
         data = pd.read_csv(train_path)
@@ -16,7 +16,7 @@ class MetaData(object):
             data = data.append(pd.read_csv(test_path))
 
         # compute the portion of labels that are the most common value
-        counts = data[label_column].value_counts()
+        counts = data[class_column].value_counts()
         total_features = data.shape[1] - 1
         for c in data.columns:
             if data[c].dtype == 'object':
@@ -25,14 +25,14 @@ class MetaData(object):
 
         self.n_examples = data.shape[0]
         self.d_features = total_features
-        self.k_classes = len(np.unique(data[label_column]))
+        self.k_classes = len(np.unique(data[class_column]))
         self.majority = majority_percentage
         self.size = np.array(data).nbytes
 
 
 class DataEncoder(object):
-    def __init__(self, label_column='class', feature_columns=None):
-        self.label_column = label_column
+    def __init__(self, class_column='class', feature_columns=None):
+        self.class_column = class_column
         self.feature_columns = feature_columns
 
         # these will be trained with fit_encoders()
@@ -50,7 +50,7 @@ class DataEncoder(object):
         """
         cat_cols = []
         if self.feature_columns is None:
-            features = data.drop([self.label_column], axis=1)
+            features = data.drop([self.class_column], axis=1)
             self.feature_columns = features.columns
         else:
             features = data[self.feature_columns]
@@ -73,7 +73,7 @@ class DataEncoder(object):
         self.feature_encoder.fit(features)
 
         # Train an encoder for the label as well
-        labels = np.array(data[[self.label_column]])
+        labels = np.array(data[[self.class_column]])
         self.label_encoder = LabelEncoder()
         self.label_encoder.fit(labels)
 
@@ -82,9 +82,9 @@ class DataEncoder(object):
         Convert a DataFrame of labeled data to a feature matrix in the form
         that ATM can use.
         """
-        if self.label_column in data:
+        if self.class_column in data:
             # pull labels into a separate series and transform them to integers
-            labels = np.array(data[[self.label_column]])
+            labels = np.array(data[[self.class_column]])
             y = self.label_encoder.transform(labels)
             # drop the label column and transform the remaining features
         else:
