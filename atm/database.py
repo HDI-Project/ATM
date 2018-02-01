@@ -5,10 +5,12 @@ from datetime import datetime
 from operator import attrgetter
 
 from sqlalchemy import (Column, DateTime, Enum, ForeignKey, Integer, MetaData,
-                        Numeric, String, Text, and_, create_engine, func)
+                        Numeric, String, Text, and_, create_engine, func,
+                        inspect)
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm.properties import ColumnProperty
 
 from .constants import *
 from .utilities import *
@@ -311,9 +313,30 @@ class Database(object):
         Load a snapshot of the ModelHub database from a set of CSVs in the given
         directory.
         """
-        for table in ['datasets', 'dataruns', 'hyperpartitions', 'classifiers']:
-            df = pd.read_csv(os.path.join(path, '%s.csv' % table))
+        for model, table in [(self.Dataset, 'dataset'),
+                             (self.Datarun, 'datarun'),
+                             (self.Hyperpartition, 'hyperpartition'),
+                             (self.Classifier, 'classifier')]:
+            df = pd.read_csv(os.path.join(path, '%ss.csv' % table))
+
+            # parse datetime columns. This is necessary because SQLAlchemy can't
+            # interpret strings as datetimes on its own.
+            # yes, this is the easiest way to do it
+            for c in inspect(model).attrs:
+                if type(c) != ColumnProperty:
+                    continue
+                col = c.columns[0]
+                if type(col.type) == DateTime:
+                    df[c.key] = pd.to_datetime(df[c.key],
+                                               infer_datetime_format=True)
+
             for _, r in df.iterrows():
+                # replace NaN and NaT with None
+                for k, v in r.items():
+                    if pd.isnull(v):
+                        r[k] = None
+
+                # insert the row into the database
                 create_func = getattr(self, 'create_%s' % table)
                 create_func(**r)
 
