@@ -179,14 +179,14 @@ class Worker(object):
         # Get previously-used parameters: every classifier should either be
         # completed or have thrown an error
         all_clfs = self.db.get_classifiers(hyperpartition_id=hyperpartition.id)
-        classifiers = [l for l in all_clfs
-                       if l.status == ClassifierStatus.COMPLETE]
+        classifiers = [c for c in all_clfs
+                       if c.status == ClassifierStatus.COMPLETE]
 
         # Extract parameters and scores as numpy arrays from classifiers
-        X = params_to_vectors([l.hyperparameter_values for l in classifiers],
+        X = params_to_vectors([c.hyperparameter_values for c in classifiers],
                               tunables)
-        y = np.array([float(getattr(l, self.datarun.score_target))
-                      for l in classifiers])
+        y = np.array([float(getattr(c, self.datarun.score_target))
+                      for c in classifiers])
 
         # Initialize the tuner and propose a new set of parameters
         # this has to be initialized with information from the hyperpartition, so we
