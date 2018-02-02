@@ -56,8 +56,9 @@ class ClassifierError(Exception):
 
 class Worker(object):
     def __init__(self, database, datarun, save_files=True, cloud_mode=False,
-                 aws_config=None, model_dir=DEFAULT_MODEL_DIR,
-                 metric_dir=DEFAULT_METRIC_DIR, verbose_metrics=False):
+                 aws_config=None, public_ip='localhost',
+                 model_dir=DEFAULT_MODEL_DIR, metric_dir=DEFAULT_METRIC_DIR,
+                 verbose_metrics=False):
         """
         database: Database object with connection information
         datarun: Datarun ORM object to work on.
@@ -70,6 +71,7 @@ class Worker(object):
         self.save_files = save_files
         self.cloud_mode = cloud_mode
         self.aws_config = aws_config
+        self.public_ip = public_ip
         self.verbose_metrics = verbose_metrics
 
         self.model_dir = model_dir
@@ -374,6 +376,10 @@ class Worker(object):
             _log('Choosing hyperparameters...')
             if hyperpartition_id is not None:
                 hyperpartition = self.db.get_hyperpartition(hyperpartition_id)
+                if hyperpartition.datarun_id != self.datarun.id:
+                    _log('Hyperpartition %d is not a part of datarun %d' %
+                         (hyperpartition_id, self.datarun.id))
+                    return
             else:
                 # use the multi-arm bandit to choose which hyperpartition to use next
                 hyperpartition = self.select_hyperpartition()
@@ -397,7 +403,7 @@ class Worker(object):
         _log('Creating classifier...')
         classifier = self.db.start_classifier(hyperpartition_id=hyperpartition.id,
                                               datarun_id=self.datarun.id,
-                                              host=get_public_ip(),
+                                              host=self.public_ip,
                                               hyperparameter_values=params)
 
         try:
@@ -439,6 +445,7 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         complete.
     """
     start_time = datetime.datetime.now()
+    public_ip = get_public_ip()
 
     ensure_directory(log_dir)
     # name log file after the local hostname
@@ -478,8 +485,8 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         # actual work happens here
         worker = Worker(db, run, save_files=save_files,
                         cloud_mode=cloud_mode, aws_config=aws_config,
-                        model_dir=model_dir, metric_dir=metric_dir,
-                        verbose_metrics=verbose_metrics)
+                        public_ip=public_ip, model_dir=model_dir,
+                        metric_dir=metric_dir, verbose_metrics=verbose_metrics)
         try:
             worker.run_classifier()
         except ClassifierError:
