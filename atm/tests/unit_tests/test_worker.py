@@ -14,7 +14,7 @@ from atm.constants import METRICS_BINARY, TIME_FMT
 from atm.database import ClassifierStatus, Database, db_session
 from atm.enter_data import enter_data
 from atm.model import Model
-from atm.utilities import get_local_data_path, load_metrics, load_model
+from atm.utilities import download_data, load_metrics, load_model
 from atm.worker import ClassifierError, Worker
 
 from btb.selection import BestKReward, BestKVelocity, Selector
