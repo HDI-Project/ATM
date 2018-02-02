@@ -1,12 +1,15 @@
+from __future__ import absolute_import
+
 import os
-from atm import PROJECT_ROOT
-# sample tuners
-from btb.tuning import Uniform as UniformTuner, GP, GPEi, GPEiVelocity
-# hyperpartition selectors
-from btb.selection import Uniform as UniformSelector, UCB1,\
-                          BestKReward, BestKVelocity, RecentKReward,\
-                          RecentKVelocity, HierarchicalByAlgorithm,\
-                          PureBestKVelocity
+
+from . import PROJECT_ROOT
+
+from btb.selection import Uniform as UniformSelector
+from btb.selection import (UCB1, BestKReward, BestKVelocity,
+                           HierarchicalByAlgorithm, PureBestKVelocity,
+                           RecentKReward, RecentKVelocity)
+from btb.tuning import Uniform as UniformTuner
+from btb.tuning import GP, GPEi, GPEiVelocity
 
 # A bunch of constants which are used throughout the project, mostly for config.
 # TODO: convert these lists and classes to something more elegant, like enums
@@ -26,12 +29,14 @@ S3_PREFIX = '^s3://'
 HTTP_PREFIX = '^https?://'
 
 TIME_FMT = '%Y-%m-%d %H:%M'
+DATA_TEST_PATH = os.path.join(PROJECT_ROOT, 'data/test')
 DATA_DL_PATH = os.path.join(PROJECT_ROOT, 'data/downloads')
 METHOD_PATH = os.path.join(PROJECT_ROOT, 'methods')
-LOG_PATH = os.path.join(PROJECT_ROOT, 'logs')
 
 CUSTOM_CLASS_REGEX = '(.*\.py):(\w+)$'
 JSON_REGEX = '(.*\.json)$'
+
+N_FOLDS_DEFAULT = 10
 
 TUNERS_MAP = {
     'uniform': UniformTuner,
@@ -68,25 +73,30 @@ METHODS_MAP = {
     'ada': 'adaboost.json'
 }
 
+
 class ClassifierStatus:
     RUNNING = 'running'
     ERRORED = 'errored'
     COMPLETE = 'complete'
+
 
 class RunStatus:
     PENDING = 'pending'
     RUNNING = 'running'
     COMPLETE = 'complete'
 
+
 class PartitionStatus:
     INCOMPLETE = 'incomplete'
     GRIDDING_DONE = 'gridding_done'
     ERRORED = 'errored'
 
+
 class FileType:
     LOCAL = 'local'
     S3 = 's3'
     HTTP = 'http'
+
 
 # these are the strings that are used to index into results dictionaries
 class Metrics:
@@ -103,6 +113,7 @@ class Metrics:
     MCC = 'mcc'             # matthews correlation coefficient
     PR_CURVE = 'pr_curve'
     ROC_CURVE = 'roc_curve'
+
 
 METRICS_BINARY = [
     Metrics.ACCURACY,
@@ -124,5 +135,3 @@ METRICS_MULTICLASS = [
 ]
 
 METRICS = list(set(METRICS_BINARY + METRICS_MULTICLASS))
-
-N_FOLDS_DEFAULT = 10

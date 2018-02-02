@@ -1,0 +1,2 @@
+id,name,class_column,train_path,test_path,description,n_examples,k_classes,d_features,majority,size_kb
+1,pollution_1,class,https://s3.amazonaws.com/mit-dai-delphi-datastore/downloaded/pollution_1.csv,,,60,2,15,0.5166666666666667,7

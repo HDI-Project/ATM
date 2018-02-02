@@ -1,10 +1,13 @@
-from builtins import object, str as newstr
+from __future__ import absolute_import
 
 import json
+from builtins import str as newstr
+from builtins import object
 from os.path import join
 
+from .constants import METHOD_PATH, METHODS_MAP
+
 import btb
-from atm.constants import METHODS_MAP, METHOD_PATH
 
 
 class HyperParameter(object):
@@ -155,7 +158,6 @@ class Method(object):
 
         # create hyperparameters from the parameter config
         self.parameters = {}
-        lists = []
         for k, v in config['hyperparameters'].items():
             param_type = HYPERPARAMETER_TYPES[v['type']]
             self.parameters[k] = param_type(name=k, **v)

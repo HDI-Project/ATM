@@ -1,23 +1,23 @@
-from __future__ import print_function
-from sqlalchemy import (create_engine, Column,  String, ForeignKey, Integer,
-                        Boolean, DateTime, Enum, MetaData, Numeric, Table, Text)
-from sqlalchemy.orm import sessionmaker, relationship
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.engine.url import URL
-from sqlalchemy import func, and_
+from __future__ import absolute_import, print_function
 
-import traceback
-import random, sys
-import os
-import warnings
-import pdb
 from datetime import datetime
 from operator import attrgetter
 
-from atm.constants import *
-from atm.utilities import *
+import pandas as pd
+from sqlalchemy import (Column, DateTime, Enum, ForeignKey, Integer, MetaData,
+                        Numeric, String, Text, and_, create_engine, func,
+                        inspect)
+from sqlalchemy.engine.url import URL
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm.properties import ColumnProperty
 
+from .constants import *
+from .utilities import *
 
+# The maximum number of errors allowed in a single hyperpartition. If more than
+# this many classifiers using a hyperpartition error, the hyperpartition will be
+# considered broken and ignored for the rest of the datarun.
 MAX_HYPERPARTITION_ERRORS = 3
 
 
@@ -90,9 +90,8 @@ class Database(object):
         exist, it will not be updated with new schema -- after schema changes,
         the database must be destroyed and reinialized.
         """
-
         metadata = MetaData(bind=self.engine)
-        Base = declarative_base()
+        Base = declarative_base(metadata=metadata)
 
         class Dataset(Base):
             __tablename__ = 'datasets'
@@ -114,7 +113,7 @@ class Database(object):
             size_kb = Column(Integer, nullable=False)
 
             def __repr__(self):
-                base = "<%s: %s, %d classes, %d features, %d examples>"
+                base = "<%s: %s, %d classes, %d features, %d rows>"
                 return base % (self.name, self.description, self.k_classes,
                                self.d_features, self.n_examples)
 
@@ -293,6 +292,53 @@ class Database(object):
         self.Classifier = Classifier
 
         Base.metadata.create_all(bind=self.engine)
+
+    ###########################################################################
+    ##  Save/load the database  ###############################################
+    ###########################################################################
+
+    @try_with_session()
+    def to_csv(self, path):
+        """
+        Save the entire ModelHub database as a set of CSVs in the given
+        directory.
+        """
+        for table in ['datasets', 'dataruns', 'hyperpartitions', 'classifiers']:
+            df = pd.read_sql('SELECT * FROM %s' % table, self.session.bind)
+            df.to_csv(os.path.join(path, '%s.csv' % table), index=False)
+
+    @try_with_session(commit=True)
+    def from_csv(self, path):
+        """
+        Load a snapshot of the ModelHub database from a set of CSVs in the given
+        directory.
+        """
+        for model, table in [(self.Dataset, 'dataset'),
+                             (self.Datarun, 'datarun'),
+                             (self.Hyperpartition, 'hyperpartition'),
+                             (self.Classifier, 'classifier')]:
+            df = pd.read_csv(os.path.join(path, '%ss.csv' % table))
+
+            # parse datetime columns. This is necessary because SQLAlchemy can't
+            # interpret strings as datetimes on its own.
+            # yes, this is the easiest way to do it
+            for c in inspect(model).attrs:
+                if type(c) != ColumnProperty:
+                    continue
+                col = c.columns[0]
+                if type(col.type) == DateTime:
+                    df[c.key] = pd.to_datetime(df[c.key],
+                                               infer_datetime_format=True)
+
+            for _, r in df.iterrows():
+                # replace NaN and NaT with None
+                for k, v in r.items():
+                    if pd.isnull(v):
+                        r[k] = None
+
+                # insert the row into the database
+                create_func = getattr(self, 'create_%s' % table)
+                create_func(**r)
 
     ###########################################################################
     ##  Standard query methods  ###############################################
@@ -496,13 +542,19 @@ class Database(object):
 
     @try_with_session(commit=True)
     def create_hyperpartition(self, **kwargs):
-        part = self.Hyperpartition(**kwargs)
-        self.session.add(part)
-        return part
+        partition = self.Hyperpartition(**kwargs)
+        self.session.add(partition)
+        return partition
 
     @try_with_session(commit=True)
-    def create_classifier(self, hyperpartition_id, datarun_id, host,
-                          hyperparameter_values):
+    def create_classifier(self, **kwargs):
+        classifier = self.Classifier(**kwargs)
+        self.session.add(classifier)
+        return classifier
+
+    @try_with_session(commit=True)
+    def start_classifier(self, hyperpartition_id, datarun_id, host,
+                         hyperparameter_values):
         """
         Save a new, fully qualified classifier object to the database.
         Returns: the ID of the newly-created classifier
@@ -544,8 +596,8 @@ class Database(object):
         classifier.error_message = error_message
         classifier.status = ClassifierStatus.ERRORED
         classifier.end_time = datetime.now()
-        if (self.get_number_of_hyperpartition_errors(classifier.hyperpartition_id)
-                > MAX_HYPERPARTITION_ERRORS):
+        if (self.get_number_of_hyperpartition_errors(classifier.hyperpartition_id) >
+                MAX_HYPERPARTITION_ERRORS):
             self.mark_hyperpartition_errored(classifier.hyperpartition_id)
 
     @try_with_session(commit=True)

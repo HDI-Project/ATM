@@ -1,9 +1,12 @@
-import re
+from __future__ import absolute_import
+
 import os
-import yaml
+import re
 from argparse import ArgumentError, ArgumentTypeError, RawTextHelpFormatter
 
-from atm.constants import *
+import yaml
+
+from .constants import *
 
 
 class Config(object):
@@ -110,7 +113,7 @@ class RunConfig(Config):
     ]
 
     DEFAULTS = {
-        'train_path': 'data/test/pollution_1.csv',
+        'train_path': os.path.join(DATA_TEST_PATH, 'pollution_1.csv'),
         'class_column': 'class',
         'methods': ['logreg', 'dt', 'knn'],
         'priority': 1,
@@ -192,14 +195,14 @@ def add_arguments_aws_ec2(parser):
         pass
 
     # AWS EC2 configurations
-    parser.add-argument('--num-instances', help='Number of EC2 instances to start')
-    parser.add-argument('--num-workers-per-instance', help='Number of ATM workers per instances')
-    parser.add-argument('--ec2-region', help='Region to start instances in')
-    parser.add-argument('--ec2-ami', help='Name of ATM AMI')
-    parser.add-argument('--ec2-key-pair', help='AWS key pair to use for EC2 instances')
-    parser.add-argument('--ec2-keyfile', help='Local path to key file (must match ec2-key-pair)')
-    parser.add-argument('--ec2-instance-type', help='Type of EC2 instance to start')
-    parser.add-argument('--ec2-username', help='Username to log into EC2 instance')
+    parser.add_argument('--num-instances', help='Number of EC2 instances to start')
+    parser.add_argument('--num-workers-per-instance', help='Number of ATM workers per instances')
+    parser.add_argument('--ec2-region', help='Region to start instances in')
+    parser.add_argument('--ec2-ami', help='Name of ATM AMI')
+    parser.add_argument('--ec2-key-pair', help='AWS key pair to use for EC2 instances')
+    parser.add_argument('--ec2-keyfile', help='Local path to key file (must match ec2-key-pair)')
+    parser.add_argument('--ec2-instance-type', help='Type of EC2 instance to start')
+    parser.add_argument('--ec2-username', help='Username to log into EC2 instance')
 
     return parser
 
@@ -327,7 +330,7 @@ def add_arguments_datarun(parser):
                         'performance on a test dataset, and "mu_sigma" will use '
                         'the lower confidence bound on the CV performance.')
 
-    ##  AutoML Arguments #######################################################
+    ##  AutoML Arguments  ######################################################
     ############################################################################
     # hyperparameter selection strategy
     # How should ATM sample hyperparameters from a given hyperpartition?
@@ -370,7 +373,7 @@ def add_arguments_datarun(parser):
     #    # train using sample criteria
     #  else
     #    # train using uniform (baseline)
-    parser.add_argument('--r-minimum',  type=int,
+    parser.add_argument('--r-minimum', type=int,
                         help='number of random runs to perform before tuning can occur')
 
     # k is number that xxx-k methods use. It is similar to r_minimum, except it is

@@ -1,32 +1,27 @@
 #!/usr/bin/python2.7
-from __future__ import print_function
-from atm.config import *
-from atm.constants import *
-from atm.utilities import *
-from atm.model import Model
-from atm.database import Database, ClassifierStatus, db_session
-from btb.tuning.constants import Tuners
+from __future__ import absolute_import, print_function
 
 import argparse
-import ast
 import datetime
 import imp
 import os
-import pdb
 import random
 import socket
-import sys
 import time
 import traceback
 import warnings
-import joblib
 from collections import defaultdict
-from decimal import Decimal
 from operator import attrgetter
 
 import numpy as np
-import pandas as pd
-from boto.s3.connection import S3Connection, Key as S3Key
+from boto.s3.connection import Key as S3Key
+from boto.s3.connection import S3Connection
+
+from .config import *
+from .constants import *
+from .database import ClassifierStatus, Database, db_session
+from .model import Model
+from .utilities import *
 
 # shhh
 warnings.filterwarnings('ignore')
@@ -35,23 +30,21 @@ warnings.filterwarnings('ignore')
 os.environ['GNUMPY_IMPLICIT_CONVERSION'] = 'allow'
 
 # get the file system in order
-DEFAULT_MODEL_DIR = os.path.join(PROJECT_ROOT, 'models')
-DEFAULT_METRIC_DIR = os.path.join(PROJECT_ROOT, 'metrics')
-
-# make sure we have directories where we need them
-ensure_directory(LOG_PATH)
-
-# name log file after the local hostname
-LOG_FILE = os.path.join(LOG_PATH, '%s.txt' % socket.gethostname())
+DEFAULT_MODEL_DIR = 'models'
+DEFAULT_METRIC_DIR = 'metrics'
+DEFAULT_LOG_DIR = 'logs'
 
 # how long to sleep between loops while waiting for new dataruns to be added
 LOOP_WAIT = 1
 
-
 # TODO: use python's logging module instead of this
+LOG_FILE = None
+
+
 def _log(msg, stdout=True):
-    with open(LOG_FILE, 'a') as lf:
-        lf.write(msg + '\n')
+    if LOG_FILE:
+        with open(LOG_FILE, 'a') as lf:
+            lf.write(msg + '\n')
     if stdout:
         print(msg)
 
@@ -64,8 +57,9 @@ class ClassifierError(Exception):
 
 class Worker(object):
     def __init__(self, database, datarun, save_files=True, cloud_mode=False,
-                 aws_config=None, model_dir=DEFAULT_MODEL_DIR,
-                 metric_dir=DEFAULT_METRIC_DIR, verbose_metrics=False):
+                 aws_config=None, public_ip='localhost',
+                 model_dir=DEFAULT_MODEL_DIR, metric_dir=DEFAULT_METRIC_DIR,
+                 verbose_metrics=False):
         """
         database: Database object with connection information
         datarun: Datarun ORM object to work on.
@@ -78,6 +72,7 @@ class Worker(object):
         self.save_files = save_files
         self.cloud_mode = cloud_mode
         self.aws_config = aws_config
+        self.public_ip = public_ip
         self.verbose_metrics = verbose_metrics
 
         self.model_dir = model_dir
@@ -137,6 +132,125 @@ class Worker(object):
             mod = imp.load_source('btb.tuning.custom', path)
             self.Tuner = getattr(mod, classname)
         _log('Tuner: %s' % self.Tuner)
+
+    def select_hyperpartition(self):
+        """
+        Use the hyperpartition selection method specified by our datarun to choose a
+        hyperpartition of hyperparameters from the ModelHub. Only consider
+        partitions for which gridding is not complete.
+        """
+        hyperpartitions = self.db.get_hyperpartitions(datarun_id=self.datarun.id)
+
+        # load classifiers and build scores lists
+        # make sure all hyperpartitions are present in the dict, even ones that
+        # don't have any classifiers. That way the selector can choose hyperpartitions
+        # that haven't been scored yet.
+        hyperpartition_scores = {fs.id: [] for fs in hyperpartitions}
+        classifiers = self.db.get_classifiers(datarun_id=self.datarun.id)
+
+        for c in classifiers:
+            # ignore hyperpartitions for which gridding is done
+            if c.hyperpartition_id not in hyperpartition_scores:
+                continue
+
+            # the cast to float is necessary because the score is a Decimal;
+            # doing Decimal-float arithmetic throws errors later on.
+            score = float(getattr(c, self.datarun.score_target) or 0)
+            hyperpartition_scores[c.hyperpartition_id].append(score)
+
+        hyperpartition_id = self.selector.select(hyperpartition_scores)
+        return self.db.get_hyperpartition(hyperpartition_id)
+
+    def tune_hyperparameters(self, hyperpartition):
+        """
+        Use the hyperparameter tuning method specified by our datarun to choose
+        a set of hyperparameters from the potential space.
+        """
+        # Get parameter metadata for this hyperpartition
+        tunables = hyperpartition.tunables
+
+        # If there aren't any tunable parameters, we're done. Return the vector
+        # of values in the hyperpartition and mark the set as finished.
+        if not len(tunables):
+            _log('No tunables for hyperpartition %d' % hyperpartition.id)
+            self.db.mark_hyperpartition_gridding_done(hyperpartition.id)
+            return vector_to_params(vector=[],
+                                    tunables=tunables,
+                                    categoricals=hyperpartition.categoricals,
+                                    constants=hyperpartition.constants)
+
+        # Get previously-used parameters: every classifier should either be
+        # completed or have thrown an error
+        all_clfs = self.db.get_classifiers(hyperpartition_id=hyperpartition.id)
+        classifiers = [c for c in all_clfs
+                       if c.status == ClassifierStatus.COMPLETE]
+
+        # Extract parameters and scores as numpy arrays from classifiers
+        X = params_to_vectors([c.hyperparameter_values for c in classifiers],
+                              tunables)
+        y = np.array([float(getattr(c, self.datarun.score_target))
+                      for c in classifiers])
+
+        # Initialize the tuner and propose a new set of parameters
+        # this has to be initialized with information from the hyperpartition, so we
+        # need to do it fresh for each classifier (not in load_tuner)
+        tuner = self.Tuner(tunables=tunables,
+                           gridding=self.datarun.gridding,
+                           r_minimum=self.datarun.r_minimum)
+        tuner.fit(X, y)
+        vector = tuner.propose()
+
+        if vector is None and self.datarun.gridding:
+            _log('Gridding done for hyperpartition %d' % hyperpartition.id)
+            self.db.mark_hyperpartition_gridding_done(hyperpartition.id)
+            return None
+
+        # Convert the numpy array of parameters to a form that can be
+        # interpreted by ATM, then return.
+        return vector_to_params(vector=vector,
+                                tunables=tunables,
+                                categoricals=hyperpartition.categoricals,
+                                constants=hyperpartition.constants)
+
+    def test_classifier(self, method, params):
+        """
+        Given a set of fully-qualified hyperparameters, create and test a
+        classifier model.
+        Returns: Model object and metrics dictionary
+        """
+        model = Model(method=method, params=params,
+                      judgment_metric=self.datarun.metric,
+                      class_column=self.dataset.class_column,
+                      verbose_metrics=self.verbose_metrics)
+        train_path, test_path = download_data(self.dataset.train_path,
+                                              self.dataset.test_path,
+                                              self.aws_config)
+        metrics = model.train_test(train_path=train_path,
+                                   test_path=test_path)
+        target = self.datarun.score_target
+
+        def metric_string(model):
+            if 'cv' in target or 'mu_sigma' in target:
+                return '%.3f +- %.3f' % (model.cv_judgment_metric,
+                                         2 * model.cv_judgment_metric_stdev)
+            else:
+                return '%.3f' % model.test_judgment_metric
+
+        _log('Judgment metric (%s, %s): %s' % (self.datarun.metric,
+                                               target[:-len('_judgment_metric')],
+                                               metric_string(model)))
+
+        old_best = self.db.get_best_classifier(datarun_id=self.datarun.id,
+                                               score_target=target)
+        if old_best is not None:
+            if getattr(model, target) > getattr(old_best, target):
+                _log('New best score! Previous best (classifier %s): %s' %
+                     (old_best.id, metric_string(old_best)))
+            else:
+                _log('Best so far (classifier %s): %s' % (old_best.id,
+                                                          metric_string(old_best)))
+
+        return model, metrics
 
     def save_classifier(self, classifier_id, model, metrics):
         """
@@ -221,85 +335,6 @@ class Worker(object):
         os.remove(local_model_path)
         os.remove(local_metric_path)
 
-    def select_hyperpartition(self):
-        """
-        Use the hyperpartition selection method specified by our datarun to choose a
-        hyperpartition of hyperparameters from the ModelHub. Only consider
-        partitions for which gridding is not complete.
-        """
-        hyperpartitions = self.db.get_hyperpartitions(datarun_id=self.datarun.id)
-
-        # load classifiers and build scores lists
-        # make sure all hyperpartitions are present in the dict, even ones that
-        # don't have any classifiers. That way the selector can choose hyperpartitions
-        # that haven't been scored yet.
-        hyperpartition_scores = {fs.id: [] for fs in hyperpartitions}
-        classifiers = self.db.get_classifiers(datarun_id=self.datarun.id)
-                                              #status=ClassifierStatus.COMPLETE)
-        for c in classifiers:
-            # ignore hyperpartitions for which gridding is done
-            if c.hyperpartition_id not in hyperpartition_scores:
-                continue
-
-            # the cast to float is necessary because the score is a Decimal;
-            # doing Decimal-float arithmetic throws errors later on.
-            score = float(getattr(c, self.datarun.score_target) or 0)
-            hyperpartition_scores[c.hyperpartition_id].append(score)
-
-        hyperpartition_id = self.selector.select(hyperpartition_scores)
-        return self.db.get_hyperpartition(hyperpartition_id)
-
-    def tune_parameters(self, hyperpartition):
-        """
-        Use the hyperparameter tuning method specified by our datarun to choose
-        a set of hyperparameters from the potential space.
-        """
-        # Get parameter metadata for this hyperpartition
-        tunables = hyperpartition.tunables
-
-        # If there aren't any tunable parameters, we're done. Return the vector
-        # of values in the hyperpartition and mark the set as finished.
-        if not len(tunables):
-            _log('No tunables for hyperpartition %d' % hyperpartition.id)
-            self.db.mark_hyperpartition_gridding_done(hyperpartition.id)
-            return vector_to_params(vector=[],
-                                    tunables=tunables,
-                                    categoricals=hyperpartition.categoricals,
-                                    constants=hyperpartition.constants)
-
-        # Get previously-used parameters: every classifier should either be
-        # completed or have thrown an error
-        all_clfs = self.db.get_classifiers(hyperpartition_id=hyperpartition.id)
-        classifiers = [l for l in all_clfs
-                       if l.status == ClassifierStatus.COMPLETE]
-
-        # Extract parameters and scores as numpy arrays from classifiers
-        X = params_to_vectors([l.hyperparameter_values for l in classifiers],
-                              tunables)
-        y = np.array([float(getattr(l, self.datarun.score_target))
-                      for l in classifiers])
-
-        # Initialize the tuner and propose a new set of parameters
-        # this has to be initialized with information from the hyperpartition, so we
-        # need to do it fresh for each classifier (not in load_tuner)
-        tuner = self.Tuner(tunables=tunables,
-                           gridding=self.datarun.gridding,
-                           r_minimum=self.datarun.r_minimum)
-        tuner.fit(X, y)
-        vector = tuner.propose()
-
-        if vector is None and self.datarun.gridding:
-            _log('Gridding done for hyperpartition %d' % hyperpartition.id)
-            self.db.mark_hyperpartition_gridding_done(hyperpartition.id)
-            return None
-
-        # Convert the numpy array of parameters to a form that can be
-        # interpreted by ATM, then return.
-        return vector_to_params(vector=vector,
-                                tunables=tunables,
-                                categoricals=hyperpartition.categoricals,
-                                constants=hyperpartition.constants)
-
     def is_datarun_finished(self):
         """
         Check to see whether the datarun is finished. This could be due to the
@@ -327,46 +362,6 @@ class Worker(object):
 
         return False
 
-    def test_classifier(self, method, params):
-        """
-        Given a set of fully-qualified hyperparameters, create and test a
-        classifier model.
-        Returns: Model object and metrics dictionary
-        """
-        model = Model(method=method, params=params,
-                      judgment_metric=self.datarun.metric,
-                      class_column=self.dataset.class_column,
-                      verbose_metrics=self.verbose_metrics)
-        train_path, test_path = download_data(self.dataset.train_path,
-                                              self.dataset.test_path,
-                                              self.aws_config)
-        metrics = model.train_test(train_path=train_path,
-                                   test_path=test_path)
-        target = self.datarun.score_target
-
-        def metric_string(model):
-            if 'cv' in target or 'mu_sigma' in target:
-                return '%.3f +- %.3f' % (model.cv_judgment_metric,
-                                         2 * model.cv_judgment_metric_stdev)
-            else:
-                return '%.3f' % model.test_judgment_metric
-
-        _log('Judgment metric (%s, %s): %s' % (self.datarun.metric,
-                                               target[:-len('_judgment_metric')],
-                                               metric_string(model)))
-
-        old_best = self.db.get_best_classifier(datarun_id=self.datarun.id,
-                                               score_target=target)
-        if old_best is not None:
-            if getattr(model, target) > getattr(old_best, target):
-                _log('New best score! Previous best (classifier %s): %s' %
-                     (old_best.id, metric_string(old_best)))
-            else:
-                _log('Best so far (classifier %s): %s' % (old_best.id,
-                                                          metric_string(old_best)))
-
-        return model, metrics
-
     def run_classifier(self, hyperpartition_id=None):
         """
         Choose hyperparameters, then use them to test and save a Classifier.
@@ -382,13 +377,17 @@ class Worker(object):
             _log('Choosing hyperparameters...')
             if hyperpartition_id is not None:
                 hyperpartition = self.db.get_hyperpartition(hyperpartition_id)
+                if hyperpartition.datarun_id != self.datarun.id:
+                    _log('Hyperpartition %d is not a part of datarun %d' %
+                         (hyperpartition_id, self.datarun.id))
+                    return
             else:
                 # use the multi-arm bandit to choose which hyperpartition to use next
                 hyperpartition = self.select_hyperpartition()
 
             # use tuner to choose a set of parameters for the hyperpartition
-            params = self.tune_parameters(hyperpartition)
-        except Exception as e:
+            params = self.tune_hyperparameters(hyperpartition)
+        except Exception:
             _log('Error choosing hyperparameters: datarun=%s' % str(self.datarun))
             _log(traceback.format_exc())
             raise ClassifierError()
@@ -403,17 +402,17 @@ class Worker(object):
             _log('\t%s = %s' % (k, params[k]))
 
         _log('Creating classifier...')
-        classifier = self.db.create_classifier(hyperpartition_id=hyperpartition.id,
-                                               datarun_id=self.datarun.id,
-                                               host=get_public_ip(),
-                                               hyperparameter_values=params)
+        classifier = self.db.start_classifier(hyperpartition_id=hyperpartition.id,
+                                              datarun_id=self.datarun.id,
+                                              host=self.public_ip,
+                                              hyperparameter_values=params)
 
         try:
             _log('Testing classifier...')
             model, metrics = self.test_classifier(hyperpartition.method, params)
             _log('Saving classifier...')
             self.save_classifier(classifier.id, model, metrics)
-        except Exception as e:
+        except Exception:
             msg = traceback.format_exc()
             _log('Error testing classifier: datarun=%s' % str(self.datarun))
             _log(msg)
@@ -423,7 +422,8 @@ class Worker(object):
 
 def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
          cloud_mode=False, aws_config=None, total_time=None, wait=True,
-         model_dir='models', metric_dir='metrics', verbose_metrics=False):
+         model_dir=DEFAULT_MODEL_DIR, metric_dir=DEFAULT_METRIC_DIR,
+         log_dir=DEFAULT_LOG_DIR, verbose_metrics=False):
     """
     Check the ModelHub database for unfinished dataruns, and spawn workers to
     work on them as they are added. This process will continue to run until it
@@ -446,6 +446,12 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         complete.
     """
     start_time = datetime.datetime.now()
+    public_ip = get_public_ip()
+
+    ensure_directory(log_dir)
+    # name log file after the local hostname
+    global LOG_FILE
+    LOG_FILE = os.path.join(log_dir, '%s.txt' % socket.gethostname())
 
     # main loop
     while True:
@@ -480,11 +486,11 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         # actual work happens here
         worker = Worker(db, run, save_files=save_files,
                         cloud_mode=cloud_mode, aws_config=aws_config,
-                        model_dir=model_dir, metric_dir=metric_dir,
-                        verbose_metrics=verbose_metrics)
+                        public_ip=public_ip, model_dir=model_dir,
+                        metric_dir=metric_dir, verbose_metrics=verbose_metrics)
         try:
             worker.run_classifier()
-        except ClassifierError as e:
+        except ClassifierError:
             # the exception has already been handled; just wait a sec so we
             # don't go out of control reporting errors
             _log('Something went wrong. Sleeping %d seconds.' % LOOP_WAIT)
@@ -512,12 +518,12 @@ if __name__ == '__main__':
     parser.add_argument('--no-save', dest='save_files', default=True,
                         action='store_const', const=False,
                         help="don't save models and metrics for later")
-    parser.add_argument('--model-dir', dest='model_persist_dir',
-                        default=DEFAULT_MODEL_DIR,
+    parser.add_argument('--model-dir', default=DEFAULT_MODEL_DIR,
                         help='Directory where computed models will be saved')
-    parser.add_argument('--metric-dir', dest='metric_persist_dir',
-                        default=DEFAULT_METRIC_DIR,
+    parser.add_argument('--metric-dir', default=DEFAULT_METRIC_DIR,
                         help='Directory where model metrics will be saved')
+    parser.add_argument('--log-dir', default=DEFAULT_LOG_DIR,
+                        help='Directory where logs will be saved')
     parser.add_argument('--verbose-metrics', default=False, action='store_true',
                         help='If set, compute full ROC and PR curves and '
                         'per-label metrics for each classifier')
@@ -535,6 +541,7 @@ if __name__ == '__main__':
          aws_config=aws_config,
          total_time=args.time,
          wait=False,
-         model_dir=args.model_persist_dir,
-         metric_dir=args.metric_persist_dir,
+         model_dir=args.model_dir,
+         metric_dir=args.metric_dir,
+         log_dir=args.log_dir,
          verbose_metrics=args.verbose_metrics)

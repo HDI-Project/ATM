@@ -1,17 +1,19 @@
-from __future__ import print_function
-import json
-import pickle
-import urllib2
-import hashlib
-import numpy as np
-import os
-import base64
-import re
+from __future__ import absolute_import, print_function
 
-from boto.s3.connection import S3Connection, Key
+import base64
+import hashlib
+import json
+import os
+import pickle
+import re
+import urllib2
+
+import numpy as np
+from boto.s3.connection import Key, S3Connection
+
+from .constants import *
 
 from btb import ParamTypes
-from atm.constants import *
 
 # global variable storing this machine's public IP address
 # (so we only have to fetch it once)
@@ -168,7 +170,7 @@ def _make_save_path_old(dir, classifier, suffix):
     based on the classifier's dataset name and hyperparameters.
     """
     run_hash = hash_string(classifier.datarun.dataset.name)
-    params_hash = hash_dict(classifier.params)
+    params_hash = hash_dict(classifier.hyperparameter_values)
     filename = "%s-%s-%s.%s" % (run_hash, params_hash,
                                 classifier.datarun.description, suffix)
     return os.path.join(dir, filename)
@@ -181,7 +183,7 @@ def make_save_path(dir, classifier, suffix):
     """
     run_name = "".join([c for c in classifier.datarun.dataset.name
                         if c.isalnum() or c in (' ', '-', '_')]).rstrip()
-    params_hash = hash_dict(classifier.params)[:8]
+    params_hash = hash_dict(classifier.hyperparameter_values)[:8]
     filename = "%s-%s.%s" % (run_name, params_hash, suffix)
     return os.path.join(dir, filename)
 
@@ -239,7 +241,6 @@ def get_local_data_path(data_path):
     m = re.match(S3_PREFIX, data_path)
     if m:
         path = data_path[len(m.group()):].split('/')
-        bucket = path.pop(0)
         return os.path.join(DATA_DL_PATH, path[-1]), FileType.S3
 
     m = re.match(HTTP_PREFIX, data_path)

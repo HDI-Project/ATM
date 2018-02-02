@@ -12,9 +12,9 @@ from atm.enter_data import enter_data
 from utilities import *
 
 
-CONF_DIR = os.path.join(PROJECT_ROOT, 'config/test/btb/')
-RUN_CONFIG = join(CONF_DIR, 'run.yaml')
-SQL_CONFIG = join(CONF_DIR, 'sql.yaml')
+CONF_DIR = os.path.join(PROJECT_ROOT, 'config/test/')
+RUN_CONFIG = join(CONF_DIR, 'run-default.yaml')
+SQL_CONFIG = join(CONF_DIR, 'sql-sqlite.yaml')
 
 DATASETS_MAX_FIRST = [
     'collins_1.csv',

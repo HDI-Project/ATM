@@ -1,5 +1,5 @@
 ## Dataset arguments
-train_path: data/test/pollution_1.csv
+train_path: atm/data/test/pollution_1.csv
 # if test_path is not supplied, train_path is assumed to point to train/test data
 test_path: 
 data_description: "Example dataset description"
@@ -27,9 +27,9 @@ gridding: 0
 # How should ATM select a particular hyperpartition (frozen set) from the 
 # set of all hyperpartitions? 
 selector: bestk
-# k is number that xxx_k methods use. It is similar to r_minimum, except it is 
-# called k_window and determines how much "history" ATM considers for certain
-# frozen selection logics.
+# k is number that xxx_k methods use. It is similar to r_minimum, except it
+# determines how much "history" ATM considers for certain hyperpartition
+# selection logic.
 k_window: 5
 # Which field to use for judgment of performance
 # options: f1, roc_auc, accuracy

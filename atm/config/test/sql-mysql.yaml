@@ -1,14 +1,14 @@
 # SQL dialect
-dialect: sqlite
+dialect: mysql
 # Name of the database
-database: test/atm.db
+database: atm
 # Username to gain access to the database
-username: 
+username: ubuntu
 # Password to gain access to the database
-password:
+password: ubuntu
 # Host name of the device hosting the database
-host: 
+host: 127.0.0.1
 # Port on host listening for database connections
-port:
+port: 3306
 # Optional field for specifying login details
 query: 

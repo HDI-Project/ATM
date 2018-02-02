@@ -1,5 +1,5 @@
-# This is heavily based on the featuretools test setup. Most of the logic is
-# pushed to pytest and tox.
+# This is heavily based on the featuretools test setup. Most of the setup logic
+# is punted to pytest and tox.
 # 
 # See https://github.com/Featuretools/featuretools
 #
@@ -8,9 +8,16 @@ jobs:
   build:
     working_directory: ~/atm
     docker:
-        - image: themattrix/tox
+      - image: themattrix/tox
+      - image: mysql:5.7
+        environment:
+            MYSQL_USER: ubuntu
+            MYSQL_ROOT_PASSWORD: ubuntu
+            MYSQL_DATABASE: atm
     steps:
       - checkout
+      - run: apt-get -qq update
+      - run: apt-get -qq -y install git mysql-client libmysqlclient-dev
       - run: pyenv local 2.7.13 # 3.5.2 3.6.0
       - run: make installdeps
       - run: make lint && tox && codecov

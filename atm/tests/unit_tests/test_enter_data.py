@@ -1,17 +1,18 @@
-import os
 import json
+import os
+
 import pytest
 
-from atm import constants, PROJECT_ROOT
-from atm.config import SQLConfig, RunConfig
+from atm import PROJECT_ROOT, constants
+from atm.config import RunConfig, SQLConfig
 from atm.database import Database, db_session
-from atm.enter_data import enter_data, create_dataset, create_datarun
+from atm.enter_data import create_datarun, create_dataset, enter_data
 from atm.utilities import get_local_data_path
 
-
-DB_PATH = os.path.join(PROJECT_ROOT, 'test/atm.db')
+DB_PATH = '/tmp/atm.db'
+DB_CACHE_PATH = os.path.join(PROJECT_ROOT, 'data/modelhub/test/')
 DATA_URL = 'https://s3.amazonaws.com/mit-dai-delphi-datastore/downloaded/'
-BASELINE_PATH = os.path.join(PROJECT_ROOT, 'test/baselines/best_so_far/')
+BASELINE_PATH = os.path.join(PROJECT_ROOT, 'data/baselines/best_so_far/')
 BASELINE_URL = 'https://s3.amazonaws.com/mit-dai-delphi-datastore/best_so_far/'
 
 METHOD_HYPERPARTS = {
@@ -33,17 +34,19 @@ METHOD_HYPERPARTS = {
 
 @pytest.fixture
 def db():
-    return Database(dialect='sqlite', database=DB_PATH)
+    if os.path.exists(DB_PATH):
+        os.remove(DB_PATH)
+    db = Database(dialect='sqlite', database=DB_PATH)
+    # load cached ModelHub state. This database snapshot has one dataset
+    # (pollution_1.csv) and two dataruns, one complete and one with 33/100
+    # classifiers finished.
+    db.from_csv(DB_CACHE_PATH)
+    return db
 
 
 @pytest.fixture
 def dataset(db):
-    ds = db.get_dataset(1)
-    if ds:
-        return ds
-    else:
-        data_path = os.path.join(PROJECT_ROOT, 'data/test/pollution_1.csv')
-        return create_dataset(db, 'class', data_path)
+    return db.get_dataset(1)
 
 
 def test_create_dataset(db):

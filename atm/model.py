@@ -3,26 +3,27 @@
    :synopsis: Model around classification method.
 
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
+import re
+import time
+from collections import defaultdict
+from importlib import import_module
+
 import numpy as np
 import pandas as pd
-import time
-import pdb
-import re
-from importlib import import_module
-from collections import defaultdict
-
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from sklearn.model_selection import train_test_split
 from sklearn import decomposition
-from sklearn.gaussian_process.kernels import ConstantKernel, RBF, Matern, \
-                                             ExpSineSquared, RationalQuadratic
+from sklearn.gaussian_process.kernels import (RBF, ConstantKernel,
+                                              ExpSineSquared, Matern,
+                                              RationalQuadratic)
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
-from atm.constants import *
-from atm.encoder import MetaData, DataEncoder
-from atm.method import Method
-from atm.metrics import cross_validate_pipeline, test_pipeline
+from .constants import *
+from .encoder import DataEncoder, MetaData
+from .method import Method
+from .metrics import cross_validate_pipeline, test_pipeline
 
 
 class Model(object):
@@ -151,7 +152,6 @@ class Model(object):
         """
         # time the prediction
         start_time = time.time()
-        y_preds = self.pipeline.predict(X)
         total = time.time() - start_time
         self.avg_predict_time = total / float(len(y))
 
@@ -224,7 +224,7 @@ class Model(object):
         """
         X, _ = self.encoder.transform(data)
         predictions = self.pipeline.predict(X)
-        return self.encoder
+        return self.encoder.inverse_transform(X, predictions)
 
     def special_conversions(self, params):
         """

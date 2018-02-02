@@ -1,5 +1,5 @@
 """
-Stripped down from the example at:
+Stripped down and modified from the example at:
 https://github.com/pypa/sampleproject
 """
 
@@ -63,13 +63,37 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    # TODO: don't pull in requirements! this is bad practice
-    #install_requires=open('requirements.txt').readlines(),
+    install_requires=[
+        'sqlalchemy>=1.1',
+        'numpy>=1.13',
+        'boto>=2.48',
+        'pandas>=0.20',
+        'scikit-learn>=0.18',
+        'scipy>=0.19',
+        'sklearn-pandas>=1.5',
+        'mysqlclient>=1.2',
+        'pyyaml>=3.12',
+        'joblib>=0.11',
+        'future>=0.16',
+        'btb>=0.0.1',
+    ],
+    # TODO: this is deprecated. Figure out how to accomplish the same thing with
+    # the proper tools.
+    # https://www.python.org/dev/peps/pep-0440/#direct-references
+    dependency_links=[
+        'git+ssh://git@github.com/hdi-project/btb.git#egg=btb-0.0.1',
+    ],
 
     # This variable is used to specify requirements for *this file* to run.
     setup_requires=[],
 
-    test_suite='test/tests',
-    tests_require=open('test-requirements.txt').readlines(),
+    test_suite='atm/tests',
+    tests_require=[
+        'pytest>=3.2',
+        'mock>=2',
+        'pytest-xdist>=1.20',
+        'pytest-runner>=3',
+        'pytest-cov>=2.5',
+    ]
 )
 
