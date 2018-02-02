@@ -14,6 +14,7 @@ test: lint
 
 installdeps:
 	pip install --upgrade pip
-	yes | pip install -e . --process-dependency-links --quiet
+	ssh-keyscan -H github.com > /etc/ssh/ssh_known_hosts
+	pip install -e . --process-dependency-links --quiet
 	pip install -r requirements-dev.txt
 
