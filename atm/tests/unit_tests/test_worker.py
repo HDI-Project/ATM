@@ -1,23 +1,24 @@
 import datetime
+import os
+import random
+
 import mock
 import numpy as np
-import os
 import pytest
-import random
-from mock import patch, Mock, ANY
+from mock import ANY, Mock, patch
 
 import atm
 from atm import PROJECT_ROOT
 from atm.config import RunConfig, SQLConfig
-from atm.constants import TIME_FMT, METRICS_BINARY
+from atm.constants import METRICS_BINARY, TIME_FMT
 from atm.database import ClassifierStatus, Database, db_session
 from atm.enter_data import enter_data
 from atm.model import Model
-from atm.utilities import get_local_data_path, load_model, load_metrics
+from atm.utilities import get_local_data_path, load_metrics, load_model
 from atm.worker import ClassifierError, Worker
 
-from btb.tuning import GP, GPEi, Tuner
 from btb.selection import BestKReward, BestKVelocity, Selector
+from btb.tuning import GP, GPEi, Tuner
 
 DB_CACHE_PATH = os.path.join(PROJECT_ROOT, 'data/modelhub/test/')
 DB_PATH = '/tmp/atm.db'

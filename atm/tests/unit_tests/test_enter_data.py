@@ -1,13 +1,13 @@
-import os
 import json
+import os
+
 import pytest
 
-from atm import constants, PROJECT_ROOT
-from atm.config import SQLConfig, RunConfig
+from atm import PROJECT_ROOT, constants
+from atm.config import RunConfig, SQLConfig
 from atm.database import Database, db_session
-from atm.enter_data import enter_data, create_dataset, create_datarun
+from atm.enter_data import create_datarun, create_dataset, enter_data
 from atm.utilities import get_local_data_path
-
 
 DB_PATH = '/tmp/atm.db'
 DB_CACHE_PATH = os.path.join(PROJECT_ROOT, 'data/modelhub/test/')
