@@ -16,5 +16,5 @@ installdeps:
 	pip install --upgrade pip
 	ssh-keyscan -H github.com > /etc/ssh/ssh_known_hosts
 	pip install -e . --process-dependency-links --quiet
-	pip install -r requirements-dev.txt
+	pip install -r requirements-dev.txt --quiet
 
