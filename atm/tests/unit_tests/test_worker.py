@@ -85,10 +85,10 @@ def hyperpartition(db):
 
 @pytest.fixture
 def model(dataset):
+    train_path, _ = download_data(dataset.train_path)
     model = Model(method='dt', params=DT_PARAMS,
                   judgment_metric='roc_auc',
                   class_column=dataset.class_column)
-    train_path, _ = get_local_data_path(dataset.train_path)
     model.train_test(train_path=train_path)
     return model
 
