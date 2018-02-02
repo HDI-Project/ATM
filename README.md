@@ -75,7 +75,7 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
    ```
    $ python atm/enter_data.py
    ```
-   This command will create a ``datarun``. In ATM, a *datarun* is a single logical machine learning task. If you run the above command without any arguments, it will use the default settings found in the `config/templates/\*.yaml` files to create a new SQLite3 database at `./atm.db`, create a new `dataset` instance which refers to the data above, and create a `datarun` instance which points to that dataset. More about what is stored in this database and what is it used for can be found [here](https://cyphe.rs/static/atm.pdf).
+   This command will create a ``datarun``. In ATM, a *datarun* is a single logical machine learning task. If you run the above command without any arguments, it will use the default settings found in the `atm/config/templates/\*.yaml` files to create a new SQLite3 database at `./atm.db`, create a new `dataset` instance which refers to the data above, and create a `datarun` instance which points to that dataset. More about what is stored in this database and what is it used for can be found [here](https://cyphe.rs/static/atm.pdf).
 
    The command should produce a lot of output, the end of which looks something like this:
   
@@ -119,7 +119,7 @@ AND that's it! You can break out of the worker with Ctrl+C and restart it with t
  
 ## Customizing ATM's configuration and using your own data
 
-ATM's default configuration is fully controlled by the yaml files in ``conig/templates/``. Our documentation will cover the configuration in more detail, but this section provides a brief overview of how to specify the most important values.
+ATM's default configuration is fully controlled by the yaml files in ``atm/conig/templates/``. Our documentation will cover the configuration in more detail, but this section provides a brief overview of how to specify the most important values.
 
 ### Running ATM on your own data
 If you want to use the system for your own dataset, convert your data to a csv file similar to the example shown above. The format is:
@@ -141,9 +141,10 @@ That means there are two ways to pass configuration to the command.
    
    Saving configuration as YAML files is an easy way to save complicated setups or share them with team members. 
 
-   You should start with the templates provided in `config/templates` and modify them to suit your own needs.
+   You should start with the templates provided in `atm/config/templates` and modify them to suit your own needs.
    ```
-   $ cp config/templates/*.yaml config/
+   $ mkdir config
+   $ cp atm/config/templates/*.yaml config/
    $ vim config/*.yaml
    ```
 
