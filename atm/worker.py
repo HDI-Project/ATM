@@ -40,6 +40,7 @@ LOOP_WAIT = 1
 # TODO: use python's logging module instead of this
 LOG_FILE = None
 
+
 def _log(msg, stdout=True):
     if LOG_FILE:
         with open(LOG_FILE, 'a') as lf:

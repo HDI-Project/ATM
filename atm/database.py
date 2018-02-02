@@ -554,7 +554,7 @@ class Database(object):
 
     @try_with_session(commit=True)
     def start_classifier(self, hyperpartition_id, datarun_id, host,
-                          hyperparameter_values):
+                         hyperparameter_values):
         """
         Save a new, fully qualified classifier object to the database.
         Returns: the ID of the newly-created classifier
