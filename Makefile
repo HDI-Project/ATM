@@ -14,6 +14,6 @@ test: lint
 
 installdeps:
 	pip install --upgrade pip
-	pip install -e . --process-dependency-links
+	yes | pip install -e . --process-dependency-links
 	pip install -r requirements-dev.txt
 
