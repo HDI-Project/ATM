@@ -73,7 +73,7 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
    
 1. **Create a datarun** 
    ```
-   $ python atm/enter_data.py
+   $ python scripts/enter_data.py
    ```
    This command will create a ``datarun``. In ATM, a *datarun* is a single logical machine learning task. If you run the above command without any arguments, it will use the default settings found in the `atm/config/templates/\*.yaml` files to create a new SQLite3 database at `./atm.db`, create a new `dataset` instance which refers to the data above, and create a `datarun` instance which points to that dataset. More about what is stored in this database and what is it used for can be found [here](https://cyphe.rs/static/atm.pdf).
 
@@ -95,7 +95,7 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
  
 2. **Start a worker**
    ```
-   $ python atm/worker.py 
+   $ python scripts/worker.py 
    ```
 
    This will start a process that builds classifiers, tests them, and saves them to the `./models/` directory. The output should show which hyperparameters are being tested and the performance of each classifier (the "judgment metric"), plus the best overall performance so far.
@@ -165,7 +165,7 @@ That means there are two ways to pass configuration to the command.
 
   Once your YAML files have been updated, run the datarun creation script and pass it the paths to your new config files:
    ```
-   $ python atm/enter_data.py --sql-config config/sql.yaml \
+   $ python scripts/enter_data.py --sql-config config/sql.yaml \
    > --aws-config config/aws.yaml \
    > --run-config config/run.yaml
    ```
@@ -177,14 +177,14 @@ That means there are two ways to pass configuration to the command.
    Using command line arguments is convenient for quick experiments, or for cases where you need to change just a couple of values from the default configuration. For example: 
 
    ```
-   $ python atm/enter_data.py --train-path ./data/my-custom-data.csv --selector bestkvel
+   $ python scripts/enter_data.py --train-path ./data/my-custom-data.csv --selector bestkvel
    ```
 
    You can also use a mixture of config files and command line args; any command line arguments you specify will override the values found in config files.
 
 Once you've created your custom datarun, start a worker, specifying your config files and the datarun(s) you'd like to compute on.
 ```
-$ python atm/worker.py --sql-config config/sql.yaml \
+$ python scripts/worker.py --sql-config config/sql.yaml \
 > --aws-config config/aws.yaml --dataruns 1
 ```
 
