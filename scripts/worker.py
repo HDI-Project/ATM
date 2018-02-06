@@ -5,7 +5,8 @@ import argparse
 import datetime
 import warnings
 
-from atm.config import *
+from atm.config import (add_arguments_aws_s3, add_arguments_logging,
+                        add_arguments_sql, load_config, initialize_logging)
 from atm.database import Database
 from atm.worker import (DEFAULT_LOG_DIR, DEFAULT_METRIC_DIR, DEFAULT_MODEL_DIR,
                         Worker, work)
@@ -17,6 +18,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Add more classifiers to database')
     add_arguments_sql(parser)
     add_arguments_aws_s3(parser)
+    add_arguments_logging(parser)
 
     # add worker-specific arguments
     parser.add_argument('--cloud-mode', action='store_true', default=False,
@@ -28,20 +30,12 @@ if __name__ == '__main__':
                         help='Choose dataruns to work on randomly (default = sequential order)')
     parser.add_argument('--no-save', dest='save_files', default=True,
                         action='store_const', const=False,
-                        help="don't save models and metrics for later")
-    parser.add_argument('--model-dir', default=DEFAULT_MODEL_DIR,
-                        help='Directory where computed models will be saved')
-    parser.add_argument('--metric-dir', default=DEFAULT_METRIC_DIR,
-                        help='Directory where model metrics will be saved')
-    parser.add_argument('--log-dir', default=DEFAULT_LOG_DIR,
-                        help='Directory where logs will be saved')
-    parser.add_argument('--verbose-metrics', default=False, action='store_true',
-                        help='If set, compute full ROC and PR curves and '
-                        'per-label metrics for each classifier')
+                        help="don't save models and metrics at all")
 
     # parse arguments and load configuration
     args = parser.parse_args()
-    sql_config, _, aws_config = load_config(**vars(args))
+    sql_config, _, aws_config, log_config = load_config(**vars(args))
+    initialize_logging(log_config)
 
     # let's go
     work(db=Database(**vars(sql_config)),
@@ -52,7 +46,7 @@ if __name__ == '__main__':
          aws_config=aws_config,
          total_time=args.time,
          wait=False,
-         model_dir=args.model_dir,
-         metric_dir=args.metric_dir,
-         log_dir=args.log_dir,
-         verbose_metrics=args.verbose_metrics)
+         model_dir=log_config.model_dir,
+         metric_dir=log_config.metric_dir,
+         log_dir=log_config.log_dir,
+         verbose_metrics=log_config.verbose_metrics)

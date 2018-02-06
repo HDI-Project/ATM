@@ -3,7 +3,9 @@ from __future__ import print_function
 import argparse
 import warnings
 
-from atm.config import *
+from atm.config import (add_arguments_aws_s3, add_arguments_sql,
+                        add_arguments_datarun, add_arguments_logging,
+                        load_config, initialize_logging)
 from atm.enter_data import enter_data
 
 warnings.filterwarnings("ignore")
@@ -24,15 +26,19 @@ folder for more information. """)
     add_arguments_aws_s3(parser)
     add_arguments_sql(parser)
     add_arguments_datarun(parser)
+    add_arguments_logging(parser)
     parser.add_argument('--run-per-partition', default=False, action='store_true',
                         help='if set, generate a new datarun for each hyperpartition')
 
     args = parser.parse_args()
 
     # create config objects from the config files and/or command line args
-    sql_config, run_config, aws_config = load_config(sql_path=args.sql_config,
-                                                     run_path=args.run_config,
-                                                     aws_path=args.aws_config,
-                                                     **vars(args))
+    sql_conf, run_conf, aws_conf, log_conf = load_config(sql_path=args.sql_config,
+                                                         run_path=args.run_config,
+                                                         aws_path=args.aws_config,
+                                                         log_path=args.log_config,
+                                                         **vars(args))
+    initialize_logging(log_conf)
+
     # create and save the dataset and datarun
-    enter_data(sql_config, run_config, aws_config, args.run_per_partition)
+    enter_data(sql_conf, run_conf, aws_conf, args.run_per_partition)

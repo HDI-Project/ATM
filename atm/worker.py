@@ -1,11 +1,11 @@
 #!/usr/bin/python2.7
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import
 
 import datetime
 import imp
+import logging
 import os
 import random
-import socket
 import time
 import traceback
 import warnings
@@ -27,24 +27,11 @@ warnings.filterwarnings('ignore')
 # for garrays
 os.environ['GNUMPY_IMPLICIT_CONVERSION'] = 'allow'
 
-# get the file system in order
-DEFAULT_MODEL_DIR = 'models'
-DEFAULT_METRIC_DIR = 'metrics'
-DEFAULT_LOG_DIR = 'logs'
-
 # how long to sleep between loops while waiting for new dataruns to be added
 LOOP_WAIT = 1
 
-# TODO: use python's logging module instead of this
-LOG_FILE = None
-
-
-def _log(msg, stdout=True):
-    if LOG_FILE:
-        with open(LOG_FILE, 'a') as lf:
-            lf.write(msg + '\n')
-    if stdout:
-        print(msg)
+# load the library-wide logger
+logger = logging.getLogger('atm')
 
 
 # Exception thrown when something goes wrong for the worker, but the worker
@@ -55,9 +42,8 @@ class ClassifierError(Exception):
 
 class Worker(object):
     def __init__(self, database, datarun, save_files=True, cloud_mode=False,
-                 aws_config=None, public_ip='localhost',
-                 model_dir=DEFAULT_MODEL_DIR, metric_dir=DEFAULT_METRIC_DIR,
-                 verbose_metrics=False):
+                 aws_config=None, public_ip='localhost', model_dir=None,
+                 metric_dir=None, verbose_metrics=False):
         """
         database: Database object with connection information
         datarun: Datarun ORM object to work on.
@@ -99,7 +85,7 @@ class Worker(object):
                                        self.datarun.selector).groups()
             mod = imp.load_source('btb.selection.custom', path)
             Selector = getattr(mod, classname)
-        _log('Selector: %s' % Selector)
+        logger.info('Selector: %s' % Selector)
 
         # generate the arguments we need to initialize the selector
         hyperpartitions = self.db.get_hyperpartitions(datarun_id=self.datarun.id)
@@ -129,7 +115,7 @@ class Worker(object):
                                        self.datarun.tuner).groups()
             mod = imp.load_source('btb.tuning.custom', path)
             self.Tuner = getattr(mod, classname)
-        _log('Tuner: %s' % self.Tuner)
+        logger.info('Tuner: %s' % self.Tuner)
 
     def select_hyperpartition(self):
         """
@@ -170,7 +156,7 @@ class Worker(object):
         # If there aren't any tunable parameters, we're done. Return the vector
         # of values in the hyperpartition and mark the set as finished.
         if not len(tunables):
-            _log('No tunables for hyperpartition %d' % hyperpartition.id)
+            logger.warning('No tunables for hyperpartition %d' % hyperpartition.id)
             self.db.mark_hyperpartition_gridding_done(hyperpartition.id)
             return vector_to_params(vector=[],
                                     tunables=tunables,
@@ -199,7 +185,7 @@ class Worker(object):
         vector = tuner.propose()
 
         if vector is None and self.datarun.gridding:
-            _log('Gridding done for hyperpartition %d' % hyperpartition.id)
+            logger.info('Gridding done for hyperpartition %d' % hyperpartition.id)
             self.db.mark_hyperpartition_gridding_done(hyperpartition.id)
             return None
 
@@ -234,19 +220,19 @@ class Worker(object):
             else:
                 return '%.3f' % model.test_judgment_metric
 
-        _log('Judgment metric (%s, %s): %s' % (self.datarun.metric,
-                                               target[:-len('_judgment_metric')],
-                                               metric_string(model)))
+        logger.info('Judgment metric (%s, %s): %s' % (self.datarun.metric,
+                                                      target[:-len('_judgment_metric')],
+                                                      metric_string(model)))
 
         old_best = self.db.get_best_classifier(datarun_id=self.datarun.id,
                                                score_target=target)
         if old_best is not None:
             if getattr(model, target) > getattr(old_best, target):
-                _log('New best score! Previous best (classifier %s): %s' %
-                     (old_best.id, metric_string(old_best)))
+                logger.info('New best score! Previous best (classifier %s): %s'
+                            % (old_best.id, metric_string(old_best)))
             else:
-                _log('Best so far (classifier %s): %s' % (old_best.id,
-                                                          metric_string(old_best)))
+                logger.info('Best so far (classifier %s): %s' % (old_best.id,
+                                                                 metric_string(old_best)))
 
         return model, metrics
 
@@ -276,7 +262,7 @@ class Worker(object):
                     self.save_classifier_cloud(model_path, metric_path)
                 except Exception:
                     msg = traceback.format_exc()
-                    _log('Error in save_classifier_cloud()')
+                    logger.error('Error in save_classifier_cloud()')
                     self.db.mark_classifier_errored(classifier_id,
                                                     error_message=msg)
         else:
@@ -292,7 +278,7 @@ class Worker(object):
                                     test_score=model.test_judgment_metric)
 
         # update this session's hyperpartition entry
-        _log('Saved classifier %d.' % classifier_id)
+        logger.info('Saved classifier %d.' % classifier_id)
 
     def save_classifier_cloud(self, local_model_path, local_metric_path):
         """
@@ -317,19 +303,19 @@ class Worker(object):
         kmodel = S3Key(bucket)
         kmodel.key = aws_model_path
         kmodel.set_contents_from_filename(local_model_path)
-        _log('Uploading model at %s to S3 bucket %s' % (s3_bucket,
-                                                        local_model_path))
+        logger.info('Uploading model at %s to S3 bucket %s' % (s3_bucket,
+                                                               local_model_path))
 
         kmodel = S3Key(bucket)
         kmodel.key = aws_metric_path
         kmodel.set_contents_from_filename(local_metric_path)
-        _log('Uploading metrics at %s to S3 bucket %s' % (s3_bucket,
-                                                          local_metric_path))
+        logger.info('Uploading metrics at %s to S3 bucket %s' % (s3_bucket,
+                                                                 local_metric_path))
 
         # delete the local copy of the model & metrics so that they don't fill
         # up the worker instance's hard drive
-        _log('Deleting local copies of %s and %s' % (local_model_path,
-                                                     local_metric_path))
+        logger.info('Deleting local copies of %s and %s' % (local_model_path,
+                                                            local_metric_path))
         os.remove(local_model_path)
         os.remove(local_metric_path)
 
@@ -340,8 +326,8 @@ class Worker(object):
         """
         hyperpartitions = self.db.get_hyperpartitions(datarun_id=self.datarun.id)
         if not hyperpartitions:
-            _log('No incomplete hyperpartitions for datarun %d present in database.'
-                 % self.datarun.id)
+            logger.warning('No incomplete hyperpartitions for datarun %d present in database.'
+                           % self.datarun.id)
             return True
 
         if self.datarun.budget_type == 'classifier':
@@ -349,13 +335,13 @@ class Worker(object):
             # is created, so this will count running, errored, and complete.
             n_completed = len(self.db.get_classifiers(datarun_id=self.datarun.id))
             if n_completed >= self.datarun.budget:
-                _log('Classifier budget has run out!')
+                logger.warning('Classifier budget has run out!')
                 return True
 
         elif self.datarun.budget_type == 'walltime':
             deadline = self.datarun.deadline
             if datetime.datetime.now() > deadline:
-                _log('Walltime budget has run out!')
+                logger.warning('Walltime budget has run out!')
                 return True
 
         return False
@@ -368,16 +354,16 @@ class Worker(object):
         if self.is_datarun_finished():
             # marked the run as done successfully
             self.db.mark_datarun_complete(self.datarun.id)
-            _log('Datarun %d has ended.' % self.datarun.id)
+            logger.warning('Datarun %d has ended.' % self.datarun.id)
             return
 
         try:
-            _log('Choosing hyperparameters...')
+            logger.debug('Choosing hyperparameters...')
             if hyperpartition_id is not None:
                 hyperpartition = self.db.get_hyperpartition(hyperpartition_id)
                 if hyperpartition.datarun_id != self.datarun.id:
-                    _log('Hyperpartition %d is not a part of datarun %d' %
-                         (hyperpartition_id, self.datarun.id))
+                    logger.error('Hyperpartition %d is not a part of datarun %d'
+                                 % (hyperpartition_id, self.datarun.id))
                     return
             else:
                 # use the multi-arm bandit to choose which hyperpartition to use next
@@ -386,42 +372,42 @@ class Worker(object):
             # use tuner to choose a set of parameters for the hyperpartition
             params = self.tune_hyperparameters(hyperpartition)
         except Exception:
-            _log('Error choosing hyperparameters: datarun=%s' % str(self.datarun))
-            _log(traceback.format_exc())
+            logger.error('Error choosing hyperparameters: datarun=%s' % str(self.datarun))
+            logger.error(traceback.format_exc())
             raise ClassifierError()
 
         if params is None:
-            _log('No parameters chosen: hyperpartition %d is finished.' %
-                 hyperpartition.id)
+            logger.warning('No parameters chosen: hyperpartition %d is finished.'
+                           % hyperpartition.id)
             return
 
-        _log('Chose parameters for method "%s":' % hyperpartition.method)
+        param_info = 'Chose parameters for method "%s":' % hyperpartition.method
         for k in sorted(params.keys()):
-            _log('\t%s = %s' % (k, params[k]))
+            param_info += '\n\t%s = %s' % (k, params[k])
+        logger.info(param_info)
 
-        _log('Creating classifier...')
+        logger.debug('Creating classifier...')
         classifier = self.db.start_classifier(hyperpartition_id=hyperpartition.id,
                                               datarun_id=self.datarun.id,
                                               host=self.public_ip,
                                               hyperparameter_values=params)
 
         try:
-            _log('Testing classifier...')
+            logger.debug('Testing classifier...')
             model, metrics = self.test_classifier(hyperpartition.method, params)
-            _log('Saving classifier...')
+            logger.debug('Saving classifier...')
             self.save_classifier(classifier.id, model, metrics)
         except Exception:
             msg = traceback.format_exc()
-            _log('Error testing classifier: datarun=%s' % str(self.datarun))
-            _log(msg)
+            logger.error('Error testing classifier: datarun=%s' % str(self.datarun))
+            logger.error(msg)
             self.db.mark_classifier_errored(classifier.id, error_message=msg)
             raise ClassifierError()
 
 
 def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
          cloud_mode=False, aws_config=None, total_time=None, wait=True,
-         model_dir=DEFAULT_MODEL_DIR, metric_dir=DEFAULT_METRIC_DIR,
-         log_dir=DEFAULT_LOG_DIR, verbose_metrics=False):
+         model_dir=None, metric_dir=None, verbose_metrics=False):
     """
     Check the ModelHub database for unfinished dataruns, and spawn workers to
     work on them as they are added. This process will continue to run until it
@@ -446,11 +432,6 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
     start_time = datetime.datetime.now()
     public_ip = get_public_ip()
 
-    ensure_directory(log_dir)
-    # name log file after the local hostname
-    global LOG_FILE
-    LOG_FILE = os.path.join(log_dir, '%s.txt' % socket.gethostname())
-
     # main loop
     while True:
         # get all pending and running dataruns, or all pending/running dataruns
@@ -459,12 +440,12 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
                                    ignore_complete=True)
         if not dataruns:
             if wait:
-                _log('No dataruns found. Sleeping %d seconds and trying again.' %
-                     LOOP_WAIT)
+                logger.warning('No dataruns found. Sleeping %d seconds and trying again.'
+                               % LOOP_WAIT)
                 time.sleep(LOOP_WAIT)
                 continue
             else:
-                _log('No dataruns found. Exiting.')
+                logger.warning('No dataruns found. Exiting.')
                 break
 
         max_priority = max([r.priority for r in dataruns])
@@ -479,8 +460,7 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         # say we've started working on this datarun, if we haven't already
         db.mark_datarun_running(run.id)
 
-        _log('=' * 25)
-        _log('Computing on datarun %d' % run.id)
+        logger.info('Computing on datarun %d' % run.id)
         # actual work happens here
         worker = Worker(db, run, save_files=save_files,
                         cloud_mode=cloud_mode, aws_config=aws_config,
@@ -491,10 +471,10 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         except ClassifierError:
             # the exception has already been handled; just wait a sec so we
             # don't go out of control reporting errors
-            _log('Something went wrong. Sleeping %d seconds.' % LOOP_WAIT)
+            logger.warning('Something went wrong. Sleeping %d seconds.' % LOOP_WAIT)
             time.sleep(LOOP_WAIT)
 
         elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
         if total_time is not None and elapsed_time >= total_time:
-            _log('Total run time for worker exceeded; exiting.')
+            logger.warning('Total run time for worker exceeded; exiting.')
             break

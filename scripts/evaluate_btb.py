@@ -39,9 +39,9 @@ def btb_test(dataruns=None, datasets=None, processes=1, graph=False, **kwargs):
     Tuner and selector will be specified in **kwargs, along with the rest of the
     standard datarun arguments.
     """
-    sql_conf, run_conf, _ = load_config(sql_path=SQL_CONFIG,
-                                        run_path=RUN_CONFIG,
-                                        **kwargs)
+    sql_conf, run_conf, _, _ = load_config(sql_path=SQL_CONFIG,
+                                           run_path=RUN_CONFIG,
+                                           **kwargs)
 
     db = Database(**vars(sql_conf))
     datarun_ids = dataruns or []

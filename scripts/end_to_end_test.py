@@ -61,8 +61,8 @@ parser.add_argument('--processes', help='number of processes to run concurrently
                     type=int, default=4)
 
 args = parser.parse_args()
-sql_config, run_config, _ = load_config(sql_path=SQL_CONFIG,
-                                        run_path=RUN_CONFIG)
+sql_config, run_config, _, _ = load_config(sql_path=SQL_CONFIG,
+                                           run_path=RUN_CONFIG)
 
 db = Database(**vars(sql_config))
 
