@@ -1,7 +1,6 @@
 #!/usr/bin/python2.7
 from __future__ import absolute_import, print_function
 
-import argparse
 import datetime
 import imp
 import os
@@ -18,7 +17,7 @@ from boto.s3.connection import Key as S3Key
 from boto.s3.connection import S3Connection
 
 from .constants import *
-from .database import ClassifierStatus, Database, db_session
+from .database import ClassifierStatus, db_session
 from .model import Model
 from .utilities import *
 
