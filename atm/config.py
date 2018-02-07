@@ -144,7 +144,7 @@ class LogConfig(Config):
     ]
 
     DEFAULTS = {
-        'log_level_stdout': 'INFO',
+        'log_level_stdout': 'ERROR',
         'log_level_file': 'INFO',
         'log_dir': 'logs',
         'model_dir': 'models',
@@ -154,8 +154,6 @@ class LogConfig(Config):
 
 
 def initialize_logging(config):
-    logger = logging.getLogger('atm')
-
     LEVELS = {
         'CRITICAL': logging.CRITICAL,
         'ERROR': logging.ERROR,
@@ -166,11 +164,8 @@ def initialize_logging(config):
 
     file_level = LEVELS.get(config.log_level_file.upper(), logging.CRITICAL)
     stdout_level = LEVELS.get(config.log_level_stdout.upper(), logging.CRITICAL)
-    logger.setLevel(min(file_level, stdout_level))
 
-    for h in logger.handlers:
-        logger.removeHandler(h)
-
+    handlers = []
     if config.log_level_file:
         fmt = '%(asctime)-15s %(name)s - %(levelname)s  %(message)s'
         ensure_directory(config.log_dir)
@@ -178,20 +173,30 @@ def initialize_logging(config):
         handler = logging.FileHandler(path)
         handler.setFormatter(logging.Formatter(fmt))
         handler.setLevel(file_level)
-        logger.addHandler(handler)
+        handlers.append(handler)
 
     if config.log_level_stdout:
         fmt = '%(message)s'
         handler = logging.StreamHandler(sys.stdout)
         handler.setFormatter(logging.Formatter(fmt))
         handler.setLevel(stdout_level)
-        logger.addHandler(handler)
+        handlers.append(handler)
 
-    if not len(logger.handlers):
-        logger.addHandler(logging.NullHandler())
+    if not len(handlers):
+        handlers.append(logging.NullHandler())
 
-    logger.propagate = False
-    logger.debug('Logging set up.')
+    for lib in ['atm', 'btb']:
+        logger = logging.getLogger(lib)
+        logger.setLevel(min(file_level, stdout_level))
+
+        for h in logger.handlers:
+            logger.removeHandler(h)
+
+        for h in handlers:
+            logger.addHandler(h)
+
+        logger.propagate = False
+        logger.debug('Logging is active.')
 
 
 def option_or_path(options, regex=CUSTOM_CLASS_REGEX):
