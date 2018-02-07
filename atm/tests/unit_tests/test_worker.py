@@ -9,7 +9,7 @@ from mock import ANY, Mock, patch
 
 import atm
 from atm import PROJECT_ROOT
-from atm.config import RunConfig, SQLConfig, LogConfig
+from atm.config import LogConfig, RunConfig, SQLConfig
 from atm.constants import METRICS_BINARY, TIME_FMT
 from atm.database import ClassifierStatus, Database, db_session
 from atm.enter_data import enter_data
