@@ -9,11 +9,11 @@ jobs:
     working_directory: ~/atm
     docker:
       - image: themattrix/tox
-      - image: mysql:5.7
-        environment:
-            MYSQL_USER: ubuntu
-            MYSQL_ROOT_PASSWORD: ubuntu
-            MYSQL_DATABASE: atm
+      #- image: mysql:5.7
+        #environment:
+            #MYSQL_USER: ubuntu
+            #MYSQL_ROOT_PASSWORD: ubuntu
+            #MYSQL_DATABASE: atm
     steps:
       - checkout
       - run: apt-get -qq update
