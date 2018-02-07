@@ -1,0 +1,340 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Extending and contributing to ATM &mdash; atm 0.9 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="atm 0.9 documentation" href="index.html"/>
+        <link rel="prev" title="Tutorial" href="tutorial.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> atm
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.9
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Extending and contributing to ATM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#adding-a-classification-method">Adding a classification method</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#creating-the-json-file">1. Creating the JSON file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optional-adding-a-method-to-the-atm-library">2. (Optional) Adding a method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-a-new-hyperpartition-selector">Adding a new hyperpartition Selector</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#changing-the-acquisition-function">Changing the Acquisition Function</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-a-new-hyperparameter-tuner">Adding a new hyperparameter Tuner</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">atm</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Extending and contributing to ATM</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/code.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="extending-and-contributing-to-atm">
+<h1>Extending and contributing to ATM<a class="headerlink" href="#extending-and-contributing-to-atm" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="adding-a-classification-method">
+<h2>Adding a classification method<a class="headerlink" href="#adding-a-classification-method" title="Permalink to this headline">¶</a></h2>
+<p>ATM includes several classification methods out of the box, but it’s possible to add new methods as well.</p>
+<p>The method must be implemented by a python class that has the following instance methods:</p>
+<ol class="arabic simple">
+<li><code class="docutils literal"><span class="pre">fit</span></code>: accepts training data and labels (X and y) and trains a predictive model.</li>
+<li><code class="docutils literal"><span class="pre">predict</span></code>: accepts a matrix of unlabeled feature vectors (X) and returns predictions for the corresponding labels (y).</li>
+</ol>
+<p>This follows the convention used by <a class="reference external" href="http://scikit-learn.org/stable/">scikit-learn</a>, and most of the classifier methods already included with ATM are <code class="docutils literal"><span class="pre">sklearn</span></code> classes. However, any custom python class that implements the fit/predict interface can be used with ATM.</p>
+<p>Once you have a class, you need to configure the relevant hyperparameters and tell ATM about your class.</p>
+<div class="section" id="creating-the-json-file">
+<h3>1. Creating the JSON file<a class="headerlink" href="#creating-the-json-file" title="Permalink to this headline">¶</a></h3>
+<p>All configuration for a classification method must be described in a json file with the following format:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;bnb&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;class&quot;</span><span class="o">:</span> <span class="s2">&quot;sklearn.naive_bayes.BernoulliNB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;parameters&quot;</span><span class="o">:</span> <span class="p">{...},</span>
+    <span class="s2">&quot;root_parameters&quot;</span><span class="o">:</span> <span class="p">[...],</span>
+    <span class="s2">&quot;conditions&quot;</span><span class="o">:</span> <span class="p">{...}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>“name” is a short string (or “code”) which ATM uses to refer to the method.
+“class” is an import path to the class which Python can interpret.
+“parameters” is a list of hyperparameters which ATM will attempt to tune. Each parameter has two fields: “type” and “range”. The type is one of [“float”, “float_exp”, “float_cat”, “int”, “int_exp”, “int_cat”, “string”, “bool”]. Types ending in “_cat” are categorical types, and those ending in “_exp” are exponential types. The range is a list of values which define the range of the variable.</p>
+<p>For categorical types (“bool”, “string”, “int_cat”, and “float_cat”), “range” is an explicit list of all possible values. For non-categorical numeric types, the range defines lower and upper bounds, respectively, for the parameter. Numeric ranges are inclusive (i.e. [0.0, 1.0] includes both 0.0 and 1.0).</p>
+<p>Example categorical types:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span></span><span class="s2">&quot;nu&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="s2">&quot;float_cat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;range&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">]</span>  <span class="c1">// will select one of the listed values</span>
+<span class="p">}</span>
+
+<span class="s2">&quot;kernel&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;range&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="s2">&quot;rbf&quot;</span><span class="p">,</span> <span class="s2">&quot;matern&quot;</span><span class="p">]</span>  <span class="c1">// will select one of the listed strings</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Example numeric type:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span></span><span class="s2">&quot;max_depth&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;range&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>   <span class="c1">// will select integer values uniformly at random between 2 and 10, inclusive</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Example exponential type:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span></span><span class="s2">&quot;length_scale&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="s2">&quot;float_exp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;range&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="nx">e</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="nx">e5</span><span class="p">]</span>  <span class="c1">// will select floating-point values from an exponential distribution between 10^-5 and 10^5, inclusive</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>There are two kinds of hyperparameters: root parameters (also referred to as method parameters in the paper) and conditional parameters. Root parameters must be passed to the method class’s constructor no matter what, and conditional parameters must only be passed if specific values for other parameters are set. For example, the GaussianProcessClassifier configuration has a single root parameter: <code class="docutils literal"><span class="pre">kernel</span></code>. This must be set no matter what. Depending on how it’s set, other parameters might need to be set as well. The format for conditions is as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;root_parameter&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;root_param_value&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;conditional_parameters&quot;</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In <code class="docutils literal"><span class="pre">gaussian_process.json</span></code>, there are three sets of parameters which are conditioned on the value of the root parameter <code class="docutils literal"><span class="pre">kernel</span></code>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span></span><span class="s2">&quot;root_parameters&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">],</span>
+
+<span class="s2">&quot;conditions&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;kernel&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;matern&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;nu&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;rational_quadratic&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;length_scale&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;exp_sine_squared&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;length_scale&quot;</span><span class="p">,</span> <span class="s2">&quot;periodicity&quot;</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal"><span class="pre">kernel</span></code> is set to “matern”, it means <code class="docutils literal"><span class="pre">nu</span></code> must also be set. If it’s set to “rational_quadratic” instead, <code class="docutils literal"><span class="pre">length_scale</span></code> and <code class="docutils literal"><span class="pre">alpha</span></code> must be set instead. Conditions can overlap – for instance, <code class="docutils literal"><span class="pre">length_scale</span></code> must be set if kernel is either “rational_quadratic” or “exp_sine_squared”, so it’s included in both conditional lists. The only constraint is that any parameter which is set as a result of a condition (i.e. a conditional parameter) must not be listed in “root_parameters”.</p>
+</div>
+<div class="section" id="optional-adding-a-method-to-the-atm-library">
+<h3>2. (Optional) Adding a method to the ATM library<a class="headerlink" href="#optional-adding-a-method-to-the-atm-library" title="Permalink to this headline">¶</a></h3>
+<p>We welcome contributions of new methods! If your method is implemented as part of a publicly-available Python library which is compatible with ATM’s other dependencies, you can submit it for permanent inclusion in the library.</p>
+<p>Save a copy of your configuration json in the <code class="docutils literal"><span class="pre">methods/</span></code> directory. Then, in <code class="docutils literal"><span class="pre">atm/constants.py</span></code>, enter a mapping from the method’s name to the name of its json file in the <code class="docutils literal"><span class="pre">METHODS_MAP</span></code> dictionary. If necessary, add the library where your method lives to <code class="docutils literal"><span class="pre">requirements.txt</span></code>.</p>
+<p>Test out your method with <code class="docutils literal"><span class="pre">python</span> <span class="pre">test/method_test.py</span> <span class="pre">--method</span> <span class="pre">&lt;your</span> <span class="pre">method</span> <span class="pre">code&gt;</span></code>.  If all hyperpartitions run error-free, you’re probably good to go. Commit your changes to a separate branch, then open up a pull request in the main repository. Explain why your method is a useful addition to ATM, and we’ll incorporate it if we agree!</p>
+</div>
+</div>
+<div class="section" id="adding-a-new-hyperpartition-selector">
+<h2>Adding a new hyperpartition Selector<a class="headerlink" href="#adding-a-new-hyperpartition-selector" title="Permalink to this headline">¶</a></h2>
+<p>A parameter selector can be created by creating a class which inherits the <code class="docutils literal"><span class="pre">btb.Selector</span></code> class. The class must have a <code class="docutils literal"><span class="pre">select</span></code> function which returns the chose parameters.</p>
+<div class="section" id="changing-the-acquisition-function">
+<h3>Changing the Acquisition Function<a class="headerlink" href="#changing-the-acquisition-function" title="Permalink to this headline">¶</a></h3>
+<p>The Gaussian Process Expected Improvement selection scheme makes use of an acquisition function to decide which parameter set will offer the best performance improvement.  The current acquisition function (seen below) uses the predicted performance and the confidence in that prediction to decide which hyperpartition to try next. This metric can be altered depending on the needs of a particular problem by modifying.</p>
+</div>
+</div>
+<div class="section" id="adding-a-new-hyperparameter-tuner">
+<h2>Adding a new hyperparameter Tuner<a class="headerlink" href="#adding-a-new-hyperparameter-tuner" title="Permalink to this headline">¶</a></h2>
+<p>A parameter selector can be created by creating a class which inherits the <code class="docutils literal"><span class="pre">btb.Tuner</span></code> class. The class must have a <code class="docutils literal"><span class="pre">select</span></code> function which returns the chose parameters.  An example which uses the UCB1 algorithm to choose the hyperpartition is shown below.</p>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="tutorial.html" class="btn btn-neutral" title="Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright MIT Data to AI Lab.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.9',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
