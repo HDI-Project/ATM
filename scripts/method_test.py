@@ -36,8 +36,8 @@ parser.add_argument('--method', help='code for method to test')
 parser.add_argument('--method-path', help='path to JSON config for method to test')
 
 args = parser.parse_args()
-sql_config, run_config, aws_config = load_config(sql_path=SQL_CONFIG,
-                                                 run_path=RUN_CONFIG)
+sql_config, run_config, aws_config, _ = load_config(sql_path=SQL_CONFIG,
+                                                    run_path=RUN_CONFIG)
 db = Database(**vars(sql_config))
 
 print('creating dataruns...')

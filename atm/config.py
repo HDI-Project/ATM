@@ -1,22 +1,26 @@
 from __future__ import absolute_import
 
+import logging
 import os
 import re
+import socket
+import sys
 from argparse import ArgumentError, ArgumentTypeError, RawTextHelpFormatter
 
 import yaml
 
 from .constants import *
+from .utilities import ensure_directory
 
 
 class Config(object):
     """
     Class which stores configuration for one aspect of ATM. Subclasses of
-    Config should define, in PARAMETERS and DEFAULTS, respectively, the list of
-    all configurable parameters and any default values for those parameters
-    other than None. The object can be initialized with any number of keyword
-    arguments; only kwargs that are in PARAMETERS will be used. This means you
-    can (relatively) safely do things like
+    Config should define the list of all configurable parameters and any
+    default values for those parameters other than None (in PARAMETERS and
+    DEFAULTS, respectively). The object can be initialized with any number of
+    keyword arguments; only kwargs that are in PARAMETERS will be used. This
+    means you can (relatively) safely do things like
         args = parser.parse_args()
         conf = Config(**vars(args))
     and only relevant parameters will be set.
@@ -129,6 +133,72 @@ class RunConfig(Config):
     }
 
 
+class LogConfig(Config):
+    PARAMETERS = [
+        'log_level_stdout',
+        'log_level_file',
+        'log_dir',
+        'model_dir',
+        'metric_dir',
+        'verbose_metrics',
+    ]
+
+    DEFAULTS = {
+        'log_level_stdout': 'ERROR',
+        'log_level_file': 'INFO',
+        'log_dir': 'logs',
+        'model_dir': 'models',
+        'metric_dir': 'metrics',
+        'verbose_metrics': False,
+    }
+
+
+def initialize_logging(config):
+    LEVELS = {
+        'CRITICAL': logging.CRITICAL,
+        'ERROR': logging.ERROR,
+        'WARNING': logging.WARNING,
+        'INFO': logging.INFO,
+        'DEBUG': logging.DEBUG
+    }
+
+    file_level = LEVELS.get(config.log_level_file.upper(), logging.CRITICAL)
+    stdout_level = LEVELS.get(config.log_level_stdout.upper(), logging.CRITICAL)
+
+    handlers = []
+    if config.log_level_file:
+        fmt = '%(asctime)-15s %(name)s - %(levelname)s  %(message)s'
+        ensure_directory(config.log_dir)
+        path = os.path.join(config.log_dir, socket.gethostname() + '.txt')
+        handler = logging.FileHandler(path)
+        handler.setFormatter(logging.Formatter(fmt))
+        handler.setLevel(file_level)
+        handlers.append(handler)
+
+    if config.log_level_stdout:
+        fmt = '%(message)s'
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setFormatter(logging.Formatter(fmt))
+        handler.setLevel(stdout_level)
+        handlers.append(handler)
+
+    if not len(handlers):
+        handlers.append(logging.NullHandler())
+
+    for lib in ['atm', 'btb']:
+        logger = logging.getLogger(lib)
+        logger.setLevel(min(file_level, stdout_level))
+
+        for h in logger.handlers:
+            logger.removeHandler(h)
+
+        for h in handlers:
+            logger.addHandler(h)
+
+        logger.propagate = False
+        logger.debug('Logging is active.')
+
+
 def option_or_path(options, regex=CUSTOM_CLASS_REGEX):
     def type_check(s):
         # first, check whether the argument is one of the preconfigured options
@@ -145,6 +215,33 @@ def option_or_path(options, regex=CUSTOM_CLASS_REGEX):
         raise ArgumentTypeError('%s is not a valid option or path!' % s)
 
     return type_check
+
+
+def add_arguments_logging(parser):
+    """
+    Add all argparse arguments needed to parse logging configuration from the
+    command line.
+    parser: an argparse.ArgumentParser object
+    """
+    # Config file
+    parser.add_argument('--log-config', help='path to yaml logging config file')
+
+    parser.add_argument('--model-dir',
+                        help='Directory where computed models will be saved')
+    parser.add_argument('--metric-dir',
+                        help='Directory where model metrics will be saved')
+    parser.add_argument('--log-dir',
+                        help='Directory where logs will be saved')
+
+    parser.add_argument('--verbose-metrics', default=False, action='store_true',
+                        help='If set, compute full ROC and PR curves and '
+                        'per-label metrics for each classifier')
+    parser.add_argument('--log-level-file',
+                        help='minimum log level to write to the log file')
+    parser.add_argument('--log-level-stdout',
+                        help='minimum log level to write to stdout')
+
+    return parser
 
 
 def add_arguments_aws_s3(parser):
@@ -394,25 +491,26 @@ def add_arguments_datarun(parser):
     return parser
 
 
-def load_config(sql_path=None, run_path=None, aws_path=None, **kwargs):
+def load_config(sql_path=None, run_path=None, aws_path=None, log_path=None, **kwargs):
     """
     Load config objects from yaml files and command line arguments. Command line
     args override yaml files where applicable.
 
     Args:
-        sql_path: path to .yaml file with SQL config info
-        run_path: path to .yaml file with Dataset and Datarun config info
-        aws_path: path to .yaml file with AWS config info
+        sql_path: path to .yaml file with SQL configuration
+        run_path: path to .yaml file with Dataset and Datarun configuration
+        aws_path: path to .yaml file with AWS configuration
+        log_path: path to .yaml file with logging configuration
         **kwargs: miscellaneous arguments specifying individual configuration
             parameters. Any kwargs beginning with sql_ are SQL config
-            arguments, any beginning with aws_ are AWS config, and the rest are
-            assumed to be dataset or datarun config.
+            arguments, any beginning with aws_ are AWS config.
 
-    Returns: sql_conf, run_conf, aws_conf
+    Returns: sql_conf, run_conf, aws_conf, log_conf
     """
     sql_args = {}
     run_args = {}
     aws_args = {}
+    log_args = {}
 
     # kwargs are most likely generated by argparse.
     # Any unspecified argparse arguments will be None, so ignore those. We only
@@ -437,13 +535,19 @@ def load_config(sql_path=None, run_path=None, aws_path=None, **kwargs):
         with open(aws_path) as f:
             aws_args = yaml.load(f)
 
+    if log_path:
+        with open(log_path) as f:
+            log_args = yaml.load(f)
+
     # Use keyword args to override yaml config values
     sql_args.update({k.replace('sql_', ''): v for k, v in kwargs.items()
                      if 'sql_' in k})
     aws_args.update({k.replace('aws_', ''): v for k, v in kwargs.items()
                      if 'aws_' in k})
-    run_args.update({k: v for k, v in kwargs.items()
-                     if 'sql_' not in k and 'aws_' not in k})
+    run_args.update({k: v for k, v in kwargs.items() if k in
+                     RunConfig.PARAMETERS})
+    log_args.update({k: v for k, v in kwargs.items() if k in
+                     LogConfig.PARAMETERS})
 
     # It's ok if there are some extra arguments that get passed in here; only
     # kwargs that correspond to real config values will be stored on the config
@@ -451,5 +555,6 @@ def load_config(sql_path=None, run_path=None, aws_path=None, **kwargs):
     sql_conf = SQLConfig(**sql_args)
     aws_conf = AWSConfig(**aws_args)
     run_conf = RunConfig(**run_args)
+    log_conf = LogConfig(**run_args)
 
-    return sql_conf, run_conf, aws_conf
+    return sql_conf, run_conf, aws_conf, log_conf

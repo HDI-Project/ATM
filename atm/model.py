@@ -3,8 +3,9 @@
    :synopsis: Model around classification method.
 
 """
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import
 
+import logging
 import re
 import time
 from collections import defaultdict
@@ -24,6 +25,9 @@ from .constants import *
 from .encoder import DataEncoder, MetaData
 from .method import Method
 from .metrics import cross_validate_pipeline, test_pipeline
+
+# load the library-wide logger
+logger = logging.getLogger('atm')
 
 
 class Model(object):
@@ -110,8 +114,8 @@ class Model(object):
             # features to use
             if pca_dims < 1:
                 dimensions = int(pca_dims * float(self.num_features))
-                print("*** Using PCA to reduce %d features to %d dimensions" %
-                      (self.num_features, dimensions))
+                logger.info("Using PCA to reduce %d features to %d dimensions"
+                            % (self.num_features, dimensions))
                 pca = decomposition.PCA(n_components=dimensions, whiten=whiten)
                 steps.append(('pca', pca))
 

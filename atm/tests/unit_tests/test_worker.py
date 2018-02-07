@@ -9,7 +9,7 @@ from mock import ANY, Mock, patch
 
 import atm
 from atm import PROJECT_ROOT
-from atm.config import RunConfig, SQLConfig
+from atm.config import LogConfig, RunConfig, SQLConfig
 from atm.constants import METRICS_BINARY, TIME_FMT
 from atm.database import ClassifierStatus, Database, db_session
 from atm.enter_data import enter_data
@@ -183,7 +183,8 @@ def test_test_classifier(db, dataset):
 
 
 def test_save_classifier(db, datarun, model, metrics):
-    worker = Worker(db, datarun, model_dir=MODEL_DIR, metric_dir=METRIC_DIR)
+    log_conf = LogConfig(model_dir=MODEL_DIR, metric_dir=METRIC_DIR)
+    worker = Worker(db, datarun, log_config=log_conf)
     hp = db.get_hyperpartitions(datarun_id=worker.datarun.id)[0]
     classifier = worker.db.start_classifier(hyperpartition_id=hp.id,
                                             datarun_id=worker.datarun.id,

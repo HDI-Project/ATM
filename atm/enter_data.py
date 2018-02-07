@@ -1,5 +1,6 @@
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import
 
+import logging
 import os
 from datetime import datetime, timedelta
 
@@ -9,6 +10,9 @@ from .database import Database
 from .encoder import MetaData
 from .method import Method
 from .utilities import download_data
+
+# load the library-wide logger
+logger = logging.getLogger('atm')
 
 
 def create_dataset(db, run_config, aws_config=None):
@@ -114,15 +118,16 @@ def enter_data(sql_config, run_config, aws_config=None,
         # enumerate all combinations of categorical variables for this method
         method = Method(m)
         method_parts[m] = method.get_hyperpartitions()
-        print('method', m, 'has', len(method_parts[m]), 'hyperpartitions')
+        logger.info('method %s has %d hyperpartitions' %
+                    (m, len(method_parts[m])))
 
     # create hyperpartitions and datarun(s)
     run_ids = []
     if not run_per_partition:
-        print('saving datarun...')
+        logger.debug('saving datarun...')
         datarun = create_datarun(db, dataset, run_config)
 
-    print('saving hyperpartions...')
+    logger.debug('saving hyperpartions...')
     for method, parts in method_parts.items():
         for part in parts:
             # if necessary, create a new datarun for each hyperpartition.
@@ -139,19 +144,16 @@ def enter_data(sql_config, run_config, aws_config=None,
                                      categoricals=part.categoricals,
                                      status=PartitionStatus.INCOMPLETE)
 
-    print('done!')
-    print()
-    print('========== Summary ==========')
-    print('Dataset ID:', dataset.id)
-    print('Training data:', dataset.train_path)
-    print('Test data:', (dataset.test_path or '(None)'))
+    logger.info('Data entry complete. Summary:')
+    logger.info('\tDataset ID: %d' % dataset.id)
+    logger.info('\tTraining data: %s' % dataset.train_path)
+    logger.info('\tTest data: %s' % (dataset.test_path or 'None'))
     if run_per_partition:
-        print('Datarun IDs:', ', '.join(map(str, run_ids)))
+        logger.info('\tDatarun IDs: %s' % ', '.join(map(str, run_ids)))
     else:
-        print('Datarun ID:', datarun.id)
-    print('Hyperpartition selection strategy:', datarun.selector)
-    print('Parameter tuning strategy:', datarun.tuner)
-    print('Budget: %d (%s)' % (datarun.budget, datarun.budget_type))
-    print()
+        logger.info('\tDatarun ID: %d' % datarun.id)
+    logger.info('\tHyperpartition selection strategy: %s' % datarun.selector)
+    logger.info('\tParameter tuning strategy: %s' % datarun.tuner)
+    logger.info('\tBudget: %d (%s)' % (datarun.budget, datarun.budget_type))
 
     return run_ids or datarun.id
