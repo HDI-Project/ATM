@@ -16,6 +16,7 @@ import numpy as np
 from boto.s3.connection import Key as S3Key
 from boto.s3.connection import S3Connection
 
+from .config import LogConfig
 from .constants import *
 from .database import ClassifierStatus, db_session
 from .model import Model
@@ -42,8 +43,7 @@ class ClassifierError(Exception):
 
 class Worker(object):
     def __init__(self, database, datarun, save_files=True, cloud_mode=False,
-                 aws_config=None, public_ip='localhost', model_dir=None,
-                 metric_dir=None, verbose_metrics=False):
+                 aws_config=None, log_config=None, public_ip='localhost'):
         """
         database: Database object with connection information
         datarun: Datarun ORM object to work on.
@@ -57,10 +57,11 @@ class Worker(object):
         self.cloud_mode = cloud_mode
         self.aws_config = aws_config
         self.public_ip = public_ip
-        self.verbose_metrics = verbose_metrics
 
-        self.model_dir = model_dir
-        self.metric_dir = metric_dir
+        log_config = log_config or LogConfig()
+        self.model_dir = log_config.model_dir
+        self.metric_dir = log_config.metric_dir
+        self.verbose_metrics = log_config.verbose_metrics
         ensure_directory(self.model_dir)
         ensure_directory(self.metric_dir)
 

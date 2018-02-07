@@ -144,7 +144,7 @@ class LogConfig(Config):
     ]
 
     DEFAULTS = {
-        'log_level_stdout': 'ERROR',
+        'log_level_stdout': 'INFO',
         'log_level_file': 'INFO',
         'log_dir': 'logs',
         'model_dir': 'models',

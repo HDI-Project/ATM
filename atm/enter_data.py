@@ -144,7 +144,7 @@ def enter_data(sql_config, run_config, aws_config=None,
                                      categoricals=part.categoricals,
                                      status=PartitionStatus.INCOMPLETE)
 
-    logger.info('Summary:')
+    logger.info('Data entry complete. Summary:')
     logger.info('\tDataset ID: %d' % dataset.id)
     logger.info('\tTraining data: %s' % dataset.train_path)
     logger.info('\tTest data: %s' % (dataset.test_path or 'None'))
