@@ -407,8 +407,8 @@ class Worker(object):
 
 
 def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
-         cloud_mode=False, aws_config=None, total_time=None, wait=True,
-         model_dir=None, metric_dir=None, verbose_metrics=False):
+         cloud_mode=False, aws_config=None, log_config=None, total_time=None,
+         wait=True):
     """
     Check the ModelHub database for unfinished dataruns, and spawn workers to
     work on them as they are added. This process will continue to run until it
@@ -421,7 +421,7 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         order. If False, work on them in sequential order (by ID)
     cloud_mode: if True, save processed datasets to AWS. If this option is set,
         aws_config must be supplied.
-    aws_config (optional): if cloud_mode is set, this myst be an AWSConfig
+    aws_config (optional): if cloud_mode is set, this must be an AWSConfig
         object with connection details for an S3 bucket.
     total_time (optional): if set to an integer, this worker will only work for
         total_time seconds. Otherwise, it will continue working until all
@@ -465,8 +465,7 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
         # actual work happens here
         worker = Worker(db, run, save_files=save_files,
                         cloud_mode=cloud_mode, aws_config=aws_config,
-                        public_ip=public_ip, model_dir=model_dir,
-                        metric_dir=metric_dir, verbose_metrics=verbose_metrics)
+                        log_config=log_config, public_ip=public_ip)
         try:
             worker.run_classifier()
         except ClassifierError:

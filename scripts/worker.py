@@ -8,8 +8,7 @@ import warnings
 from atm.config import (add_arguments_aws_s3, add_arguments_logging,
                         add_arguments_sql, load_config, initialize_logging)
 from atm.database import Database
-from atm.worker import (DEFAULT_LOG_DIR, DEFAULT_METRIC_DIR, DEFAULT_MODEL_DIR,
-                        Worker, work)
+from atm.worker import Worker, work
 
 warnings.filterwarnings('ignore')
 
@@ -44,9 +43,6 @@ if __name__ == '__main__':
          save_files=args.save_files,
          cloud_mode=args.cloud_mode,
          aws_config=aws_config,
+         log_config=log_config,
          total_time=args.time,
-         wait=False,
-         model_dir=log_config.model_dir,
-         metric_dir=log_config.metric_dir,
-         log_dir=log_config.log_dir,
-         verbose_metrics=log_config.verbose_metrics)
+         wait=False)
