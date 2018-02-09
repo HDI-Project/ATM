@@ -7,9 +7,10 @@ ATM will try to build the best model it can. ATM is based on a `paper
 <https://cyphe.rs/static/atm.pdf>`_ of the same name, and the project is part of
 the `Human-Data Interaction (HDI) Project <https://dai.lids.mit.edu/>`_ at MIT.
 
-To download ATM and get started right away, head over to the `setup
-<setup.html>`_ section.
+To download ATM and get started quickly, head over to the `setup <setup.html>`_ section.
 
+Background
+----------
 `AutoML <http://www.ml4aad.org/automl/>`_ systems attempt to automate part or all
 of the machine learning pipeline, from data cleaning to feature extraction to
 model selection and tuning. ATM focuses on the last part of the machine-learning
@@ -21,6 +22,9 @@ performs an intelligent search over the space of classification algorithms and
 hyperparameters in order to find the best model for a given prediction problem.
 Essentially, you provide a dataset with features and labels, and ATM does the
 rest.
+
+Our goal: flexibility and power
+-------------------------------
 
 Nearly every part of ATM is configurable. For example, you can specify which
 machine-learning algorithms ATM should try, which metrics it computes (such as
