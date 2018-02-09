@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import logging
 import os
 
 from . import PROJECT_ROOT
@@ -37,6 +38,15 @@ CUSTOM_CLASS_REGEX = '(.*\.py):(\w+)$'
 JSON_REGEX = '(.*\.json)$'
 
 N_FOLDS_DEFAULT = 10
+
+LOG_LEVELS = {
+    'CRITICAL': logging.CRITICAL,
+    'ERROR': logging.ERROR,
+    'WARNING': logging.WARNING,
+    'INFO': logging.INFO,
+    'DEBUG': logging.DEBUG,
+    'NONE': logging.NOTSET
+}
 
 TUNERS_MAP = {
     'uniform': UniformTuner,

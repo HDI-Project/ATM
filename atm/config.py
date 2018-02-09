@@ -154,17 +154,10 @@ class LogConfig(Config):
 
 
 def initialize_logging(config):
-    LEVELS = {
-        'CRITICAL': logging.CRITICAL,
-        'ERROR': logging.ERROR,
-        'WARNING': logging.WARNING,
-        'INFO': logging.INFO,
-        'DEBUG': logging.DEBUG,
-        'NONE': logging.NOTSET
-    }
-
-    file_level = LEVELS.get(config.log_level_file.upper(), logging.CRITICAL)
-    stdout_level = LEVELS.get(config.log_level_stdout.upper(), logging.CRITICAL)
+    file_level = LOG_LEVELS.get(config.log_level_file.upper(),
+                                logging.CRITICAL)
+    stdout_level = LOG_LEVELS.get(config.log_level_stdout.upper(),
+                                  logging.CRITICAL)
 
     handlers = []
     if file_level > logging.NOTSET:
@@ -197,7 +190,7 @@ def initialize_logging(config):
             logger.addHandler(h)
 
         logger.propagate = False
-        logger.debug('Logging is active.')
+        logger.debug('Logging is active for module %s.' % lib)
 
 
 def option_or_path(options, regex=CUSTOM_CLASS_REGEX):
@@ -239,9 +232,14 @@ def add_arguments_logging(parser):
     parser.add_argument('--verbose-metrics', default=False, action='store_true',
                         help='If set, compute full ROC and PR curves and '
                         'per-label metrics for each classifier')
-    parser.add_argument('--log-level-file',
+
+    log_levels = map(str.lower, LOG_LEVELS.keys())
+    parser.add_argument('--log-level-file', choices=log_levels,
                         help='minimum log level to write to the log file')
-    parser.add_argument('--log-level-stdout',
+    # if this is being called from the command line, print more information to
+    # stdout by default
+    parser.add_argument('--log-level-stdout', choices=log_levels,
+                        default='info',
                         help='minimum log level to write to stdout')
 
     return parser
