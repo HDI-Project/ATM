@@ -13,8 +13,10 @@ Contents:
 
    introduction
    setup
-   quickstart 
+   database
    contributing
+   add_method
+   add_to_btb
 
 Indices and tables
 ==================

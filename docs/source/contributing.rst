@@ -4,14 +4,16 @@ Contributing to ATM and BTB
 Ways to contribute
 ------------------
 ATM is a research project under active development, and there's a *ton* of work
-to do. To get started helping out, you can browse the `issues <>`_ page on
-Github and look for issues tagged with "`help wanted <>`_" or "`good first issue
-<>`_." An easy first pull request might flesh out the documentation for a
+to do. To get started helping out, you can browse the `issues
+<https://github.com/hdi-project/atm/issues>`_ page on
+Github and look for issues tagged with "`help wanted
+<https://github.com/hdi-project/atm/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22>`_" or "`good first issue
+<https://github.com/hdi-project/atm/issues?q=is%3Aissue+is%3Aopen+label%3A"good+first+issue">`_." An easy first pull request might flesh out the documentation for a
 confusing feature or just fix a typo. You can also file an issue to report a
 bug, suggest a feature, or ask a question. 
 
-Check out our guides on `Adding classification method`_ and `Adding a BTB Tuner
-or Selector`_.
+If you're looking to make a more in-depth contribution, check out our guides on
+`adding a classification method <add_method.html>`_ and `adding a BTB Tuner or Selector <add_to_btb.html>`_.
 
 Requirements
 ------------

@@ -2,8 +2,8 @@ Setup
 =====
 This page will guide you though downloading and installing ATM.
 
-Requirements
-------------
+0. Requirements
+---------------
 Currently, ATM is only compatible with Python 2.7 and \*NIX systems, and `git
 <https://git-scm.com/>`_ is required to download and update the software.
 
