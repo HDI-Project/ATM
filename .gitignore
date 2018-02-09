@@ -1,19 +1,31 @@
-*.pyc
-*.pem
+# ignore csv files except for test data
 *.csv
-*.yaml
-logs/*
-# ignore raw data except for samples
-data/*
-!data/samples/*.csv
+atm/data/
+!atm/data/test/*.csv
+!atm/data/modelhub/test/*.csv
+!atm/data/baselines/best_so_far/*.csv
+
+# ignore log files and saved models/metrics
 models/*
 metrics/*
+logs/*
+
 # ignore configuration files except templates
-!config/templates/*.yaml
+*.yaml
+!atm/config/test/*.yaml
+!atm/config/templates/*.yaml
+atm/config/templates/aws.yaml
+
+# ignore compiled docs
+docs/build/*
+
+# ignore virtualenv and other binary files
+atm-env/*
+*.pyc
+*.pem
 .DS_Store
 .idea/*
-atm-env/*
 *.pickle
 *.tsv
 *.db
-tm.egg-info/*
+atm.egg-info/*

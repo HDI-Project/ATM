@@ -1,0 +1,6 @@
+log_level_stdout: 'ERROR'
+log_level_file: 'INFO'
+log_dir: 'logs'
+model_dir: 'models'
+metric_dir: 'metrics'
+verbose_metrics: False
