@@ -63,5 +63,5 @@ it as a package. This will install the requirements as well::
 
     (atm-env) $ pip install -e . --process-dependency-links
 
-You're all set. Head over to the `tutorial <tutorial>`_ section to create and
+You're all set. Head over to the `quick-start <quickstart.html>`_ section to create and
 execute your first job with ATM.

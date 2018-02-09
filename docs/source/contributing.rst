@@ -26,7 +26,8 @@ Style
 -----
 We try to stick to the `Google style guide
 <https://google.github.io/styleguide/pyguide.html>`_ where possible. We also use
-`flake8` (for Python best practices) and `isort` (for organizing imports) to
+`flake8 <http://flake8.pycqa.org/en/latest/>`_ (for Python best practices) and
+`isort <https://pypi.python.org/pypi/isort>`_ (for organizing imports) to
 enforce general consistency.
 
 To check if your code passes a style sanity check, run ``make lint`` from the
@@ -40,12 +41,12 @@ most of ATM is working correctly. You can run the tests locally with ``pytest``
 new one from scratch); All tests should pass for every commit on master -- this 
 means you'll have to update the code in ``atm/tests/unit_tests`` if you modify
 the way anything works. In addition, you should create new tests for any new 
-features or functionalities you add. See the pytest `documentation
+features or functionalities you add. See the `pytest documentation
 <https://pytest.link>`_ and the existing tests for more information.
 
 All unit and integration tests are run automatically for each pull request and
-each commit on master with CircleCI. We won't merge anything that doesn't pass
-all the tests and style checks.
+each commit on master with `CircleCI <https://circleci.com/>`_. We won't merge
+anything that doesn't pass all the tests and style checks.
 
 Docs
 ----

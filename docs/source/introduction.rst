@@ -3,13 +3,12 @@ ATM: Scalable model selection and tuning
 
 Auto Tune Models (ATM) is an AutoML system designed with ease of use in mind. In
 short, you give ATM a classification problem and a dataset as a CSV file, and
-ATM will try to build the best model it can. ATM is part of the `Human-Data
-Interaction (HDI) Project <https://dai.lids.mit.edu/>`_ at MIT.
+ATM will try to build the best model it can. ATM is based on a `paper
+<https://cyphe.rs/static/atm.pdf>`_ of the same name, and the project is part of
+the `Human-Data Interaction (HDI) Project <https://dai.lids.mit.edu/>`_ at MIT.
 
-To download ATM and get started quickly, head over to the `setup <setup.html>`_ section.
-
-Background
-~~~~~~~~~~
+To download ATM and get started right away, head over to the `setup
+<setup.html>`_ section.
 
 `AutoML <http://www.ml4aad.org/automl/>`_ systems attempt to automate part or all
 of the machine learning pipeline, from data cleaning to feature extraction to

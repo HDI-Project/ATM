@@ -20,17 +20,19 @@ define a subclass of ``btb.Selector`` or ``btb.Tuner`` in a new python file and
 create a new datarun with the 'selector' or 'tuner' set to
 "path/to/your_file.py:YourClassName".
 
-Creating a hyperpartition Selector
-----------------------------------
-A parameter selector can be created by creating a class which inherits the ``btb.Selector`` class. The class must have a ``select`` method which returns the chose parameters. 
+*More to come... stay tuned!*
+
+.. Creating a hyperpartition Selector
+   ----------------------------------
+   A parameter selector can be created by creating a class which inherits the ``btb.Selector`` class. The class must have a ``select`` method which returns the chose parameters. 
 
 
-Changing the acquisition function
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The Gaussian Process Expected Improvement selection scheme makes use of an acquisition function to decide which parameter set will offer the best performance improvement.  The current acquisition function (seen below) uses the predicted performance and the confidence in that prediction to decide which hyperpartition to try next. This metric can be altered depending on the needs of a particular problem by modifying.
+.. Changing the acquisition function
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   The Gaussian Process Expected Improvement selection scheme makes use of an acquisition function to decide which parameter set will offer the best performance improvement.  The current acquisition function (seen below) uses the predicted performance and the confidence in that prediction to decide which hyperpartition to try next. This metric can be altered depending on the needs of a particular problem by modifying.
 
 
-Creating a hyperparameter Tuner
--------------------------------
-A parameter selector can be created by creating a class which inherits the ``btb.Tuner`` class. The class must have a ``select()`` method which returns the chose parameters.  An example which uses the UCB1 algorithm to choose the hyperpartition is shown below.
+.. Creating a hyperparameter Tuner
+   -------------------------------
+   A parameter selector can be created by creating a class which inherits the ``btb.Tuner`` class. The class must have a ``select()`` method which returns the chose parameters.  An example which uses the UCB1 algorithm to choose the hyperpartition is shown below.
 

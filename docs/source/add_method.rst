@@ -50,7 +50,7 @@ Defining hyperparameters
 ^^^^^^^^^^^^^^^^^^^^^^^^
 Most parameter definitions have two fields: "type" and either "range" or "values". 
 The "type" is one of ["float", "float_exp", "float_cat", "int", "int_exp",
-"int_cat", "string", "bool", "list"]. Types ending in "_cat" are categorical
+"int_cat", "string", "bool"]. Types ending in "_cat" are categorical
 types, and those ending in "_exp" are exponential types. 
 
 - If the type is ordinal or continuous (e.g. "int" or "float"), "range"
@@ -91,8 +91,6 @@ Example exponential numeric type:
         "range": [1e-5, 1e5]  // will select floating-point values from an exponential distribution between 10^-5 and 10^5, inclusive
     }
 
-List hyperparameters are special.
-
 
 Defining the Conditional Parameter Tree
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -132,9 +130,7 @@ In ``gaussian_process.json``, there are three sets of parameters which are condi
 If ``kernel`` is set to "matern", it means ``nu`` must also be set. If it's set to "rational_quadratic" instead, ``length_scale`` and ``alpha`` must be set instead. Conditions can overlap -- for instance, ``length_scale`` must be set if kernel is either "rational_quadratic" or "exp_sine_squared", so it's included in both conditional lists. The only constraint is that any parameter which is set as a result of a condition (i.e. a conditional parameter) must not be listed in "root_parameters".
 
 The example above defines a conditional parameter tree that looks something like
-this: 
-
-::
+this::
     kernel-----------------------  
     |        \                   \ 
     matern    rational_quadratic  exp_sine_squared
