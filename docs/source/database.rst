@@ -20,12 +20,13 @@ well as metadata to help with analysis.
 - ``dataset_id`` (Int): Unique identifier for the dataset. 
 - ``name`` (String): Identifier string for a classification technique.
 - ``description`` (String): Human-readable description of the dataset.
-  - not described in the paper
+    - not described in the paper
 - ``train_path`` (String): Location of the dataset train file.
 - ``test_path`` (String): Location of the dataset test file.
 - ``class_column`` (String): Name of the class label column.
 
 The metadata fields below are not described in the paper.
+
 - ``n_examples`` (Int): Number of samples (rows) in the dataset. 
 - ``k_classes`` (Int): Number of classes in the dataset. 
 - ``d_features`` (Int): Number of features in the dataset.
@@ -43,27 +44,29 @@ state information.
 - ``datarun_id`` (Int): Unique identifier for the datarun.
 - ``dataset_id`` (Int): ID of the dataset associated with this datarun.
 - ``description`` (String): Human-readable description of the datarun.
-  - not in the paper
+    - not in the paper
 
 BTB configuration:
+
 - ``selector`` (String): Selection technique for hyperpartitions.
-  - called "hyperpartition_selection_scheme" in the paper
+    - called "hyperpartition_selection_scheme" in the paper
 - ``k_window`` (Int): The number of previous classifiers the selector will
   consider, for selection techniques that set a limit of the number of
   historical runs to use.
-  - called "t\ :sub:`s`" in the paper
+    - called "t\ :sub:`s`" in the paper
 - ``tuner`` (String): The technique that BTB will use to choose new continuous
   hyperparameters.
-  - called "hyperparameters_tuning_scheme" in the paper
+    - called "hyperparameters_tuning_scheme" in the paper
 - ``r_minimum`` (Int): The number of random runs that must be performed in each
   hyperpartition before allowing Bayesian optimization to select parameters.
 - ``gridding`` (Int): If this value is set to a positive integer, each
   numeric hyperparameter will be chosen from a set of ``gridding`` discrete,
   evenly-spaced values. If set to 0 or NULL, values will be chosen from the
   full, continuous space of possibilities.
-  - not in the paper
+    - not in the paper
 
 ATM configuration:
+
 - ``priority`` (Int): Run priority for the datarun. If multiple unfinished
   dataruns are in the ModelHub at once, workers will process higher-priority
   runs first.
@@ -72,17 +75,17 @@ ATM configuration:
   only be trained for ``budget`` minutes total.
 - ``budget`` (Int): The maximum number of classifiers to build, or the maximum
   amount of time to train classifiers (in minutes).
-  - called "budget_amount" in the paper
+    - called "budget_amount" in the paper
 - ``deadline`` (DateTime): If provided, and if ``budget_type`` is set to
   "walltime", the datarun will run until this absolute time. This overrides the
   ``budget`` column.
-  - not in the paper
+    - not in the paper
 - ``metric`` (String): The metric by which to score each classifier for
   comparison purposes. Can be one of ["accuracy", "cohen_kappa", "f1",
   "roc_auc", "ap", "mcc"] for binary problems, or ["accuracy", "rank_accuracy",
   "cohen_kappa", "f1_micro", "f1_macro", "roc_auc_micro", "roc_auc_macro"] for
   multiclass problems
-  - not in the paper
+    - not in the paper
 - ``score_target`` (Enum): One of ["cv", "test", "mu_sigma"]. Determines how the
   final comparative metric (the *judgment metric*) is calculated. 
     - "cv" (cross-validation): the judgment metric is the average of a 5-fold
@@ -93,11 +96,12 @@ ATM configuration:
   - not in the paper
 
 State information:
+
 - ``start_time`` (DateTime): Time the DataRun began.
 - ``end_time`` (DateTime): Time the DataRun was completed.
 - ``status`` (Enum): Indicates whether the run is pending, in progress, or has
   been finished. One of ["pending", "running", "complete"].
-  - not in the paper
+    - not in the paper
 
 
 Hyperpartitions
@@ -115,19 +119,19 @@ performance in the future.
   hyperpartition's classification method (e.g. "svm", "knn").
 - ``categoricals`` (Base64-encoded object): List of categorical hyperparameters
   whose values are fixed to define this hyperpartition.
-  - called "partition_hyperparameter_values" in the paper
+    - called "partition_hyperparameter_values" in the paper
 - ``tunables`` (Base64-encoded object): List of continuous hyperparameters which
   are free; their values must be selected by a Tuner.
-  - called "conditional_hyperparameters" in the paper
+    - called "conditional_hyperparameters" in the paper
 - ``constants`` (Base64-encoded object): List of categorical or continuous
   parameters whose values are always fixed. These do not define the
   hyperpartition, but their values must be passed to the classification method
   to fully parameterize it.
-  - not in the paper
+    - not in the paper
 - ``status`` (Enum): Indicates whether the hyperpartition has caused too many
   classifiers to error, or whether the grid for this partition has been fully
   explored. One of ["incomplete", "gridding_done", "errored"].
-  - not in the paper
+    - not in the paper
 
 
 Classifiers
@@ -140,7 +144,7 @@ A Classifier represents a single train/test run using a method and a set of hype
   classifier.
 - ``host`` (String): IP address or name of the host machine where the classifier
   was tested.
-  - not in the paper
+    - not in the paper
 - ``model_location`` (String): Path to the serialized model object for this
   classifier.
 - ``metrics_location`` (String): Path to the full set of metrics computed during
