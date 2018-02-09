@@ -5,11 +5,11 @@ Creating a Dataset
 ------------------
 A Dataset in ATM is defined by the following fields:
 
-
 Data format
 ^^^^^^^^^^^
 
-ATM takes data in CSV format where each CSV file needs to:
+ATM works with data in CSV format. For ATM to interpret it, each CSV file needs
+the following
 
 * Have the first line of the file be headers with strings as the feature names, and the class column named "class" (or configured otherwise in run_config.yaml). If the features aren't named (ie, image or SVD or PCA data), then anything will do (but see below for a small script to generate nice feature names).
 * Should have N + 1 rows (1 header + N examples)
@@ -18,7 +18,7 @@ ATM takes data in CSV format where each CSV file needs to:
 Here's a handy Python script to create a CSV header line for data that doesn't have feature names::
 
 
-    def CreateCSVHeader(n_features, name, class_label_name):
+    def create_csv_header(n_features, name, class_label_name):
         """
             Creates a CSV header like:
                 "<class_label_name>, <name>1, <name>2, ..., <name><n_features>"
@@ -27,20 +27,20 @@ Here's a handy Python script to create a CSV header line for data that doesn't h
                 print CreateCSVHeader(64, "pixel", "class")
         """
         separator = ","
+        zip([name for i in range(n_features)], range(1, n_features + 1, 1))
         header_row_string = separator.join(
-            [x + str(y) for (x, y) in
-                zip([name for i in range(n_features)], range(1, n_features + 1, 1))])
+            [x + str(y) for (x, y) in 
+            ])
         return separator.join([class_label_name, header_row_string])
 
 
-Creating a DataRun in the DataHub
----------------------------------
+Creating a Datarun in the ModelHub
+----------------------------------
 
-Once your data in the proper format, you can upload it to the DataHub for processing.
+Once your data in the proper format, you can upload it to the ModelHub for processing.
 
 Configuration File
 ^^^^^^^^^^^^^^^^^^
-
 To run ATM, you must create a configuration file.
 A configuration file template is included in ``config/atm.cnf.template`` (and shown below).
 Since the configuration file contains passwords, it's best to rename it to ``atm.cnf`` so that it will be ignored by git.
@@ -53,20 +53,20 @@ For example if the configuration file is called ``atm.cnf`` in the ``config`` di
 
     (atm-env) $ export ATM_CONFIG_FILE=/path_to_atm_root/config/atm.cnf
 
-DataRun Creation
+Datarun Creation
 ^^^^^^^^^^^^^^^^
 
-Now we need to add the `datarun` to the DataHub (database).
+Now we need to add the `datarun` to the ModelHub (database).
 A datarun consists of all the parameters for a single experiment run, including where the find the data, what the budget is for number of learners to train, the majoirty class benchmark, and other things.
 The datarun ID in the database also ties together the `hyperpartitions` (frozen sets) which delineate how ATM can explore different subtypes of classifiers to maximize their performance.
-Once the configuration file is filled out, we can enter it in DataHub with::
+Once the configuration file is filled out, we can enter it in ModelHub with::
 
     (atm-env) $ python enter_data.py
 
 Workers
 -------
 
-Once at least one datarun is in the DataHub, workers can be started to run classification routines.
+Once at least one datarun is in the ModelHub, workers can be started to run classification routines.
 
 On a Local Machine
 ^^^^^^^^^^^^^^^^^^
