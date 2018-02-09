@@ -159,14 +159,15 @@ def initialize_logging(config):
         'ERROR': logging.ERROR,
         'WARNING': logging.WARNING,
         'INFO': logging.INFO,
-        'DEBUG': logging.DEBUG
+        'DEBUG': logging.DEBUG,
+        'NONE': logging.NOTSET
     }
 
     file_level = LEVELS.get(config.log_level_file.upper(), logging.CRITICAL)
     stdout_level = LEVELS.get(config.log_level_stdout.upper(), logging.CRITICAL)
 
     handlers = []
-    if config.log_level_file:
+    if file_level > logging.NOTSET:
         fmt = '%(asctime)-15s %(name)s - %(levelname)s  %(message)s'
         ensure_directory(config.log_dir)
         path = os.path.join(config.log_dir, socket.gethostname() + '.txt')
@@ -175,7 +176,7 @@ def initialize_logging(config):
         handler.setLevel(file_level)
         handlers.append(handler)
 
-    if config.log_level_stdout:
+    if stdout_level > logging.NOTSET:
         fmt = '%(message)s'
         handler = logging.StreamHandler(sys.stdout)
         handler.setFormatter(logging.Formatter(fmt))
@@ -223,9 +224,10 @@ def add_arguments_logging(parser):
     command line.
     parser: an argparse.ArgumentParser object
     """
-    # Config file
+    # Config file path
     parser.add_argument('--log-config', help='path to yaml logging config file')
 
+    # paths to saved files
     parser.add_argument('--model-dir',
                         help='Directory where computed models will be saved')
     parser.add_argument('--metric-dir',
@@ -233,6 +235,7 @@ def add_arguments_logging(parser):
     parser.add_argument('--log-dir',
                         help='Directory where logs will be saved')
 
+    # hoe much information to log or save
     parser.add_argument('--verbose-metrics', default=False, action='store_true',
                         help='If set, compute full ROC and PR curves and '
                         'per-label metrics for each classifier')
@@ -555,6 +558,6 @@ def load_config(sql_path=None, run_path=None, aws_path=None, log_path=None, **kw
     sql_conf = SQLConfig(**sql_args)
     aws_conf = AWSConfig(**aws_args)
     run_conf = RunConfig(**run_args)
-    log_conf = LogConfig(**run_args)
+    log_conf = LogConfig(**log_args)
 
     return sql_conf, run_conf, aws_conf, log_conf
