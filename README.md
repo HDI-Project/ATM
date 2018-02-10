@@ -1,5 +1,8 @@
 ATM - Auto Tune Models
 ====
+![test status](https://circleci.com/gh/hdi-project/atm.svg?style=shield&circle-token=:circle-token)
+![docs](https://readthedocs.org/projects/atm/badge/?version=latest)
+
 ATM is an open source software library under ["The human data interaction project"](https://hdi-dai.lids.mit.edu/) at MIT. It is a distributed, scalable AutoML system designed with ease of use in mind. 
 
 ## Summary
