@@ -13,15 +13,16 @@ Contents:
 
    introduction
    setup
+   quickstart
    database
    contributing
    add_method
    add_to_btb
 
-Indices and tables
-==================
+.. Indices and tables
+.. ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. * :ref:`genindex`
+.. * :ref:`modindex`
+.. * :ref:`search`
 
