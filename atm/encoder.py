@@ -105,19 +105,6 @@ class DataEncoder(object):
 
         return X, y
 
-    #def inverse_transform(self, X, y):
-        #"""
-        #Convert an encoded feature matrix and label array to the original,
-        #human-readable data format.
-        #"""
-        #data = pd.DataFrame(columns=self.feature_columns)
-        #features = self.feature_encoder.inverse_transform(X)
-        #for i, (column, encoder) in self.column_encoders.items():
-            #data[column] = encoder.transform(features[i])
-
-        #data[self.label_column] = self.label_encoder.inverse_transform(y)
-        #return data
-
     def fit_transform(self, data):
         """ Process data into a form that ATM can use. """
         self.fit(data)
