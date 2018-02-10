@@ -48,6 +48,10 @@ class DataEncoder(object):
 
         data: pd.DataFrame of unprocessed data
         """
+        if self.class_column not in data.columns:
+            raise KeyError('Class column "%s" not found in dataset!' %
+                           self.class_column)
+
         cat_cols = []
         if self.feature_columns is None:
             features = data.drop([self.class_column], axis=1)

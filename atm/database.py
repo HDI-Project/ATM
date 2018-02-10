@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+import json
+import pickle
 from datetime import datetime
 from operator import attrgetter
 
@@ -523,6 +525,18 @@ class Database(object):
         if not classifiers:
             return None
         return max(classifiers, key=attrgetter(score_target))
+
+    @try_with_session()
+    def load_model(self, classifier_id):
+        clf = self.get_classifier(classifier_id)
+        with open(clf.model_location, 'rb') as f:
+            return pickle.load(f)
+
+    @try_with_session()
+    def load_metrics(self, classifier_id):
+        clf = self.get_classifier(classifier_id)
+        with open(clf.metrics_location, 'r') as f:
+            return json.load(f)
 
     ###########################################################################
     ##  Methods to update the database  #######################################

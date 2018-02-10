@@ -202,14 +202,17 @@ class Model(object):
         # if necessary, generate permanent train/test split
         if test_path is not None:
             test_data = self.load_data(test_path)
+            all_data = pd.concat(train_data, test_data)
         else:
+            all_data = train_data
             train_data, test_data = train_test_split(train_data,
                                                      test_size=self.testing_ratio,
                                                      random_state=self.random_state)
 
         # extract feature matrix and labels from raw data
         self.encoder = DataEncoder(class_column=self.class_column)
-        X_train, y_train = self.encoder.fit_transform(train_data)
+        self.encoder.fit(all_data)
+        X_train, y_train = self.encoder.transform(train_data)
         X_test, y_test = self.encoder.transform(test_data)
 
         # create and cross-validate pipeline
@@ -225,6 +228,8 @@ class Model(object):
         """
         Use the trained encoder and pipeline to transform training data into
         predicted labels
+
+        data: pd.DataFrame of data for which to predict classes
         """
         X, _ = self.encoder.transform(data)
         predictions = self.pipeline.predict(X)
