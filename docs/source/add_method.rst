@@ -65,7 +65,7 @@ Example categorical types:
 
     "nu": {
         "type": "float_cat",
-        "values": [0.5, 1.5, 2.5]  // will select one of the listed values
+        "values": [0.5, 1.5, 3.5]  // will select one of the listed values
     }
 
     "kernel": {
