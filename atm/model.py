@@ -230,10 +230,14 @@ class Model(object):
         predicted labels
 
         data: pd.DataFrame of data for which to predict classes
+
+        returns: pd.Series populated with predictions, with index matching data.
         """
         X, _ = self.encoder.transform(data)
         predictions = self.pipeline.predict(X)
-        return self.encoder.inverse_transform(X, predictions)
+        labels = self.encoder.label_encoder.inverse_transform(predictions)
+        labels = pd.Series(labels, index=data.index)
+        return labels
 
     def special_conversions(self, params):
         """
