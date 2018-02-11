@@ -1,8 +1,10 @@
 ATM - Auto Tune Models
 ====
-[![docs](https://readthedocs.org/projects/atm/badge/?version=latest)](http://atm.readthedocs.io/en/latest/)
 
-Tests: [![CircleCI](https://circleci.com/gh/HDI-Project/ATM.svg?style=svg)](https://circleci.com/gh/HDI-Project/ATM)
+[![CircleCI](https://circleci.com/gh/HDI-Project/ATM.svg?style=shield)](https://circleci.com/gh/HDI-Project/ATM)
+[![Coverage
+status](https://codecov.io/gh/HDI-project/ATM/branch/master/graph/badge.svg)](https://codecov.io/gh/HDI-project/ATM)
+[![Documentation](https://readthedocs.org/projects/atm/badge/?version=latest)](http://atm.readthedocs.io/en/latest/)
 
 ATM is an open source software library under ["The human data interaction project"](https://hdi-dai.lids.mit.edu/) at MIT. It is a distributed, scalable AutoML system designed with ease of use in mind. 
 
@@ -10,7 +12,8 @@ ATM is an open source software library under ["The human data interaction projec
 For a given classification problem, ATM's goal is to find 
 1. a classification *method*, like "decision tree," "support vector machine," or “random forest”, and 
 2. a set of *hyperparameters* for that method
-which generates the best classifier possible.
+
+which generate the best classifier possible.
 
 ATM takes in a dataset with pre-extracted feature vectors and labels as a CSV file. It then begins training and testing classifiers (machine learning models) in parallel. As time goes on, ATM will use the results of previous classifiers to intelligently select which methods and hyperparameters to try next. Along the way, ATM saves data about each classifier it trains, including the hyperparameters used to train it, extensive performace metrics, and a serialized version of the model itself.
 
