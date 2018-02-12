@@ -1,7 +1,8 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import json
 import pickle
+from builtins import object
 from datetime import datetime
 from operator import attrgetter
 
@@ -278,7 +279,7 @@ class Database(object):
 
             def __repr__(self):
                 params = ', '.join(['%s: %s' % i for i in
-                                    self.hyperparameter_values.items()])
+                                    list(self.hyperparameter_values.items())])
                 return "<id=%d, params=(%s)>" % (self.id, params)
 
         Datarun.classifiers = relationship('Classifier',
@@ -334,7 +335,7 @@ class Database(object):
 
             for _, r in df.iterrows():
                 # replace NaN and NaT with None
-                for k, v in r.items():
+                for k, v in list(r.items()):
                     if pd.isnull(v):
                         r[k] = None
 

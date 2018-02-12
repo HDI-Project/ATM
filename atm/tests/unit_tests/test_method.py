@@ -32,7 +32,7 @@ def test_enumerate():
     hps = Method(config_path).get_hyperpartitions()
 
     assert len(hps) == 12
-    assert all('a' in zip(*hp.categoricals)[0] for hp in hps)
+    assert all('a' in list(zip(*hp.categoricals))[0] for hp in hps)
     assert all(('f', 0.5) in hp.constants for hp in hps)
     assert len([hp for hp in hps if hp.tunables
-                and 'b' in zip(*hp.tunables)[0]]) == 1
+                and 'b' in list(zip(*hp.tunables))[0]]) == 1

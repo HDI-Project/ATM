@@ -56,8 +56,7 @@ setup(
     # simple. Or you can use find_packages().
     packages=find_packages(),
 
-    # for now, we only support python 2.7.*
-    python_requires='>=2.7, <3',
+    python_requires='>=2.7',
 
     # List run-time dependencies here.  These will be installed by pip when
     # your project is installed. For an analysis of "install_requires" vs pip's

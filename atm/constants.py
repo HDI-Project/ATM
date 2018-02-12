@@ -1,16 +1,17 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
 import os
+from builtins import object
 
 from . import PROJECT_ROOT
 
-from btb.selection import Uniform as UniformSelector
 from btb.selection import (UCB1, BestKReward, BestKVelocity,
                            HierarchicalByAlgorithm, PureBestKVelocity,
                            RecentKReward, RecentKVelocity)
-from btb.tuning import Uniform as UniformTuner
+from btb.selection import Uniform as UniformSelector
 from btb.tuning import GP, GPEi, GPEiVelocity
+from btb.tuning import Uniform as UniformTuner
 
 # A bunch of constants which are used throughout the project, mostly for config.
 # TODO: convert these lists and classes to something more elegant, like enums
@@ -84,32 +85,32 @@ METHODS_MAP = {
 }
 
 
-class ClassifierStatus:
+class ClassifierStatus(object):
     RUNNING = 'running'
     ERRORED = 'errored'
     COMPLETE = 'complete'
 
 
-class RunStatus:
+class RunStatus(object):
     PENDING = 'pending'
     RUNNING = 'running'
     COMPLETE = 'complete'
 
 
-class PartitionStatus:
+class PartitionStatus(object):
     INCOMPLETE = 'incomplete'
     GRIDDING_DONE = 'gridding_done'
     ERRORED = 'errored'
 
 
-class FileType:
+class FileType(object):
     LOCAL = 'local'
     S3 = 's3'
     HTTP = 'http'
 
 
 # these are the strings that are used to index into results dictionaries
-class Metrics:
+class Metrics(object):
     ACCURACY = 'accuracy'
     RANK_ACCURACY = 'rank_accuracy'
     COHEN_KAPPA = 'cohen_kappa'

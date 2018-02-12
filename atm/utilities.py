@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import base64
 import hashlib
@@ -7,14 +7,21 @@ import logging
 import os
 import pickle
 import re
-import urllib2
+import urllib.error
+import urllib.parse
+import urllib.request
+from builtins import str
 
 import numpy as np
 from boto.s3.connection import Key, S3Connection
+from future import standard_library
 
 from .constants import *
 
 from btb import ParamTypes
+
+standard_library.install_aliases()
+
 
 # global variable storing this machine's public IP address
 # (so we only have to fetch it once)
@@ -34,17 +41,17 @@ def hash_dict(dictionary, ignored_keys=None):
     dictionary = dict(dictionary)  # copy dictionary
     for key in (ignored_keys or []):
         del dictionary[key]
-    return hashlib.md5(repr(sorted(dictionary.items()))).hexdigest()
+    return hashlib.md5(repr(sorted(dictionary.items())).encode('utf8')).hexdigest()
 
 
 def hash_nested_tuple(tup):
     """ Hash a nested tuple to hexadecimal """
-    return hashlib.md5(repr(sorted(tup))).hexdigest()
+    return hashlib.md5(repr(sorted(tup)).encode('utf8')).hexdigest()
 
 
 def hash_string(s):
     """ Hash a string to hexadecimal """
-    return hashlib.md5(str(s)).hexdigest()
+    return hashlib.md5(str(s).encode('utf8')).hexdigest()
 
 
 def ensure_directory(directory):
@@ -61,7 +68,7 @@ def get_public_ip():
     global public_ip
     if public_ip is None:
         try:
-            response = urllib2.urlopen(PUBLIC_IP_URL, timeout=2)
+            response = urllib.request.urlopen(PUBLIC_IP_URL, timeout=2)
             data = response.read().strip()
             # pull an ip-looking set of numbers from the response
             match = re.search('\d+\.\d+\.\d+\.\d+', data)
@@ -305,7 +312,7 @@ def download_file_http(url, local_folder=DATA_DL_PATH):
         return path
 
     logger.debug('downloading data from %s...' % url)
-    f = urllib2.urlopen(url)
+    f = urllib.request.urlopen(url)
     data = f.read()
     with open(path, 'wb') as outfile:
         outfile.write(data)

@@ -1,5 +1,10 @@
+from __future__ import division, unicode_literals
+
+from builtins import object
+
 import numpy as np
 import pandas as pd
+from past.utils import old_div
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
 
@@ -21,7 +26,7 @@ class MetaData(object):
         for c in data.columns:
             if data[c].dtype == 'object':
                 total_features += len(np.unique(data[c])) - 1
-        majority_percentage = float(max(counts)) / float(sum(counts))
+        majority_percentage = old_div(float(max(counts)), float(sum(counts)))
 
         self.n_examples = data.shape[0]
         self.d_features = total_features
@@ -97,7 +102,7 @@ class DataEncoder(object):
         features = data[self.feature_columns]
 
         # encode each categorical feature as an integer
-        for column, encoder in self.column_encoders.items():
+        for column, encoder in list(self.column_encoders.items()):
             features[column] = encoder.transform(features[column])
 
         # one-hot encode the categorical features
