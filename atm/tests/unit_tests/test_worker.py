@@ -7,9 +7,6 @@ import numpy as np
 import pytest
 from mock import ANY, Mock, patch
 
-from btb.selection import BestKReward, BestKVelocity, Selector
-from btb.tuning import GP, GPEi, Tuner
-
 import atm
 from atm import PROJECT_ROOT
 from atm.config import LogConfig, RunConfig, SQLConfig
@@ -19,6 +16,9 @@ from atm.enter_data import enter_data
 from atm.model import Model
 from atm.utilities import download_data, load_metrics, load_model
 from atm.worker import ClassifierError, Worker
+
+from btb.selection import BestKReward, BestKVelocity, Selector
+from btb.tuning import GP, GPEi, Tuner
 
 DB_CACHE_PATH = os.path.join(PROJECT_ROOT, 'data/modelhub/test/')
 DB_PATH = '/tmp/atm.db'

@@ -1,8 +1,8 @@
 from __future__ import absolute_import, unicode_literals
 
 import json
-from builtins import object, range
 from builtins import str as newstr
+from builtins import object, range
 from os.path import join
 
 from .constants import METHOD_PATH, METHODS_MAP

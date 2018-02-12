@@ -1,6 +1,4 @@
 from __future__ import absolute_import, unicode_literals
-from future import standard_library  # isort:skip to keep 'install_aliases()'
-standard_library.install_aliases()
 
 import base64
 import hashlib
@@ -9,9 +7,6 @@ import logging
 import os
 import pickle
 import re
-import urllib.error
-import urllib.parse
-import urllib.request
 from builtins import str
 
 import numpy as np
@@ -20,6 +15,11 @@ from boto.s3.connection import Key, S3Connection
 from .constants import *
 
 from btb import ParamTypes
+
+from future import standard_library  # isort:skip
+standard_library.install_aliases()
+
+import urllib  # isort:skip
 
 
 # global variable storing this machine's public IP address
