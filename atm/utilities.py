@@ -68,13 +68,13 @@ def get_public_ip():
     if public_ip is None:
         try:
             response = urllib.request.urlopen(PUBLIC_IP_URL, timeout=2)
-            data = response.read().strip()
+            data = str(response.read().strip())
             # pull an ip-looking set of numbers from the response
             match = re.search('\d+\.\d+\.\d+\.\d+', data)
             if match:
                 public_ip = match.group()
         except Exception as e:  # any exception, doesn't matter what
-            logger.error('could not get public IP:', e)
+            logger.error('could not get public IP: %s' % e)
             public_ip = 'localhost'
 
     return public_ip
