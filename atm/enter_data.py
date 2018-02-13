@@ -1,8 +1,11 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import os
+from builtins import map
 from datetime import datetime, timedelta
+
+from past.utils import old_div
 
 from .config import *
 from .constants import *
@@ -45,7 +48,7 @@ def create_dataset(db, run_config, aws_config=None):
                                 k_classes=meta.k_classes,
                                 d_features=meta.d_features,
                                 majority=meta.majority,
-                                size_kb=meta.size / 1000)
+                                size_kb=old_div(meta.size, 1000))
     return dataset
 
 
@@ -128,7 +131,7 @@ def enter_data(sql_config, run_config, aws_config=None,
         datarun = create_datarun(db, dataset, run_config)
 
     logger.debug('saving hyperpartions...')
-    for method, parts in method_parts.items():
+    for method, parts in list(method_parts.items()):
         for part in parts:
             # if necessary, create a new datarun for each hyperpartition.
             # This setting is useful for debugging.

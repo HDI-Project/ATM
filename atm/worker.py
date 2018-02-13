@@ -1,5 +1,5 @@
 #!/usr/bin/python2.7
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import imp
@@ -9,6 +9,7 @@ import random
 import time
 import traceback
 import warnings
+from builtins import object, str
 from collections import defaultdict
 from operator import attrgetter
 

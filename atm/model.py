@@ -3,16 +3,18 @@
    :synopsis: Model around classification method.
 
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import re
 import time
+from builtins import object
 from collections import defaultdict
 from importlib import import_module
 
 import numpy as np
 import pandas as pd
+from past.utils import old_div
 from sklearn import decomposition
 from sklearn.gaussian_process.kernels import (RBF, ConstantKernel,
                                               ExpSineSquared, Matern,
@@ -98,9 +100,9 @@ class Model(object):
         steps = []
 
         # create a classifier with specified parameters
-        hyperparameters = {k: v for k, v in self.params.iteritems()
+        hyperparameters = {k: v for k, v in list(self.params.items())
                            if k not in Model.ATM_KEYS}
-        atm_params = {k: v for k, v in self.params.iteritems()
+        atm_params = {k: v for k, v in list(self.params.items())
                       if k in Model.ATM_KEYS}
 
         # do special conversions
@@ -157,7 +159,7 @@ class Model(object):
         # time the prediction
         start_time = time.time()
         total = time.time() - start_time
-        self.avg_predict_time = total / float(len(y))
+        self.avg_predict_time = old_div(total, float(len(y)))
 
         # TODO: this is hacky. See https://github.com/HDI-Project/ATM/issues/48
         binary = self.num_classes == 2
@@ -246,7 +248,7 @@ class Model(object):
         # create list parameters
         lists = defaultdict(list)
         element_regex = re.compile('(.*)\[(\d)\]')
-        for name, param in params.items():
+        for name, param in list(params.items()):
             # look for variables of the form "param_name[1]"
             match = element_regex.match(name)
             if match:
@@ -259,7 +261,7 @@ class Model(object):
                 # drop the element parameter from our list
                 del params[name]
 
-        for lname, items in lists.items():
+        for lname, items in list(lists.items()):
             # drop the list size parameter
             del params['len(%s)' % lname]
 

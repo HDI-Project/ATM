@@ -1,7 +1,10 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
+from builtins import range
 
 import numpy as np
 import pandas as pd
+from past.utils import old_div
 from sklearn.metrics import (accuracy_score, average_precision_score,
                              cohen_kappa_score, f1_score, matthews_corrcoef,
                              precision_recall_curve, roc_auc_score, roc_curve)
@@ -34,7 +37,7 @@ def rank_n_accuracy(y_true, y_prob_mat, n=0.33):
         if y_true[i] in rankings[i, :]:
             correct_sample_count += 1
 
-    return correct_sample_count / num_samples
+    return old_div(correct_sample_count, num_samples)
 
 
 def get_per_class_matrix(y, classes=None):
@@ -94,7 +97,7 @@ def get_metrics_binary(y_true, y_pred, y_pred_probs, include_curves=False):
     any_probs_nan = np.any(np.isnan(y_pred_probs))
     if not any_probs_nan:
         # AP can be computed even if all labels are the same
-        y_true_bin = get_per_class_matrix(y_true, range(2))
+        y_true_bin = get_per_class_matrix(y_true, list(range(2)))
         results[Metrics.AP] = average_precision_score(y_true_bin, y_pred_probs)
 
         if not all_labels_same:

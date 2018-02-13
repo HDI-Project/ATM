@@ -1,8 +1,8 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import json
 from builtins import str as newstr
-from builtins import object
+from builtins import object, range
 from os.path import join
 
 from .constants import METHOD_PATH, METHODS_MAP
@@ -158,14 +158,14 @@ class Method(object):
 
         # create hyperparameters from the parameter config
         self.parameters = {}
-        for k, v in config['hyperparameters'].items():
+        for k, v in list(config['hyperparameters'].items()):
             param_type = HYPERPARAMETER_TYPES[v['type']]
             self.parameters[k] = param_type(name=k, **v)
 
         # List hyperparameters are special. These are replaced in the
         # CPT with a size hyperparameter and sets of element hyperparameters
         # conditioned on the size.
-        for name, param in self.parameters.items():
+        for name, param in list(self.parameters.items()):
             if type(param) == List:
                 elements, conditions = param.get_elements()
                 for e in elements:
@@ -182,8 +182,8 @@ class Method(object):
                     self.root_params.remove(param.name)
 
                 # if this is a conditional param, replace it there instead
-                for var, cond in self.conditions.items():
-                    for val, deps in cond.items():
+                for var, cond in list(self.conditions.items()):
+                    for val, deps in list(cond.items()):
                         if param.name in deps:
                             deps.append(param.length.name)
                             deps.remove(param.name)

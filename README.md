@@ -50,7 +50,7 @@ This section describes the quickest way to get started with ATM on a modern mach
    ```
 
 3. **Install python dependencies**
-   - python=2.7
+  ATM is tested with Python 2.7+ and Python 3.5+.
    ```
    $ virtualenv venv
    $ . venv/bin/activate
