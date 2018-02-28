@@ -335,7 +335,7 @@ class Database(object):
 
             for _, r in df.iterrows():
                 # replace NaN and NaT with None
-                for k, v in list(r.items()):
+                for k, v in list(r.iteritems()):
                     if pd.isnull(v):
                         r[k] = None
 
