@@ -21,6 +21,8 @@ docs/build/*
 
 # ignore virtualenv and other binary files
 atm-env/*
+venv*/*
+src/*
 *.pyc
 *.pem
 .DS_Store

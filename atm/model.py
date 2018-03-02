@@ -204,7 +204,7 @@ class Model(object):
         # if necessary, generate permanent train/test split
         if test_path is not None:
             test_data = self.load_data(test_path)
-            all_data = pd.concat(train_data, test_data)
+            all_data = pd.concat([train_data, test_data])
         else:
             all_data = train_data
             train_data, test_data = train_test_split(train_data,
