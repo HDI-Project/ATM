@@ -230,7 +230,7 @@ def add_arguments_logging(parser):
                         help='Directory where logs will be saved')
 
     # hoe much information to log or save
-    parser.add_argument('--verbose-metrics', default=False, action='store_true',
+    parser.add_argument('--verbose-metrics', action='store_true',
                         help='If set, compute full ROC and PR curves and '
                         'per-label metrics for each classifier')
 
@@ -240,7 +240,6 @@ def add_arguments_logging(parser):
     # if this is being called from the command line, print more information to
     # stdout by default
     parser.add_argument('--log-level-stdout', choices=log_levels,
-                        default='info',
                         help='minimum log level to write to stdout')
 
     return parser
@@ -523,6 +522,7 @@ def load_config(sql_path=None, run_path=None, aws_path=None, log_path=None, **kw
     sql_path = sql_path or kwargs.get('sql_config')
     run_path = run_path or kwargs.get('run_config')
     aws_path = aws_path or kwargs.get('aws_config')
+    log_path = log_path or kwargs.get('log_config')
 
     # load any yaml config files for which paths were provided
     if sql_path:
