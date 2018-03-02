@@ -66,7 +66,7 @@ setup(
         'sqlalchemy>=1.1',
         'numpy>=1.13',
         'boto>=2.48',
-        'pandas>=0.20',
+        'pandas>=0.22',
         'scikit-learn>=0.18',
         'scipy>=0.19',
         'sklearn-pandas>=1.5',
