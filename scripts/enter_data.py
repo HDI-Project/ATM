@@ -1,8 +1,10 @@
 from __future__ import print_function
 
 import argparse
+import os
 import warnings
 
+from atm import PROJECT_ROOT
 from atm.config import (add_arguments_aws_s3, add_arguments_sql,
                         add_arguments_datarun, add_arguments_logging,
                         load_config, initialize_logging)
@@ -31,6 +33,11 @@ folder for more information. """)
                         help='if set, generate a new datarun for each hyperpartition')
 
     args = parser.parse_args()
+
+    # default logging config is different if initialized from the command line
+    if args.log_config is None:
+        args.log_config = os.path.join(PROJECT_ROOT,
+                                       'config/templates/log-script.yaml')
 
     # create config objects from the config files and/or command line args
     sql_conf, run_conf, aws_conf, log_conf = load_config(sql_path=args.sql_config,

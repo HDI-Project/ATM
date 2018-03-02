@@ -3,8 +3,10 @@ from __future__ import print_function
 
 import argparse
 import datetime
+import os
 import warnings
 
+from atm import PROJECT_ROOT
 from atm.config import (add_arguments_aws_s3, add_arguments_logging,
                         add_arguments_sql, load_config, initialize_logging)
 from atm.database import Database
@@ -33,6 +35,12 @@ if __name__ == '__main__':
 
     # parse arguments and load configuration
     args = parser.parse_args()
+
+    # default logging config is different if initialized from the command line
+    if args.log_config is None:
+        args.log_config = os.path.join(PROJECT_ROOT,
+                                       'config/templates/log-script.yaml')
+
     sql_config, _, aws_config, log_config = load_config(**vars(args))
     initialize_logging(log_config)
 

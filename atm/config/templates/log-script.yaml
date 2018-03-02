@@ -1,4 +1,4 @@
-log_level_stdout: 'error'
+log_level_stdout: 'info'
 log_level_file: 'info'
 log_dir: 'logs'
 model_dir: 'models'
