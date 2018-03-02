@@ -39,6 +39,12 @@ This section describes the quickest way to get started with ATM on a modern mach
    ```
 
 2. **Install a database**
+  You will need to install the libmysqlclient-dev package (for sqlalchemy) and at least one of the following databases.
+
+  ```
+  $ sudo apt install libmysqlclient-dev
+  ```
+
    - for SQLite (simpler):
    ```
    $ sudo apt install sqlite3
@@ -46,7 +52,7 @@ This section describes the quickest way to get started with ATM on a modern mach
 
    - for MySQL: 
    ```
-   $ sudo apt install mysql-server mysql-client libmysqlclient-dev
+   $ sudo apt install mysql-server mysql-client
    ```
 
 3. **Install python dependencies**
