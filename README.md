@@ -190,7 +190,7 @@ That means there are two ways to pass configuration to the command.
    $ python scripts/enter_data.py --train-path ./data/my-custom-data.csv --selector bestkvel
    ```
 
-   You can also use a mixture of config files and command line argumentss; any command line arguments you specify will override the values found in config files.
+   You can also use a mixture of config files and command line arguments; any command line arguments you specify will override the values found in config files.
 
 Once you've created your custom datarun, start a worker, specifying your config files and the datarun(s) you'd like to compute on.
 ```
