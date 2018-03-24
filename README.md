@@ -5,32 +5,34 @@ ATM - Auto Tune Models
 [![Coverage status](https://codecov.io/gh/HDI-project/ATM/branch/master/graph/badge.svg)](https://codecov.io/gh/HDI-project/ATM)
 [![Documentation](https://readthedocs.org/projects/atm/badge/?version=latest)](http://atm.readthedocs.io/en/latest/)
 
-ATM is an open source software library under ["The human data interaction project"](https://hdi-dai.lids.mit.edu/) at MIT. It is a distributed, scalable AutoML system designed with ease of use in mind. 
+ATM is an open source software library under the [*Human Data Interaction* project](https://hdi-dai.lids.mit.edu/) (HDI) at MIT. It is a distributed, scalable AutoML system designed with ease of use in mind.
 
 ## Summary
-For a given classification problem, ATM's goal is to find 
-1. a classification *method*, like "decision tree," "support vector machine," or “random forest”, and 
+For a given classification problem, ATM's goal is to find
+1. a classification *method*, such as *decision tree*, *support vector machine*, or *random forest*, and
 2. a set of *hyperparameters* for that method
 
 which generate the best classifier possible.
 
-ATM takes in a dataset with pre-extracted feature vectors and labels as a CSV file. It then begins training and testing classifiers (machine learning models) in parallel. As time goes on, ATM will use the results of previous classifiers to intelligently select which methods and hyperparameters to try next. Along the way, ATM saves data about each classifier it trains, including the hyperparameters used to train it, extensive performace metrics, and a serialized version of the model itself.
+ATM takes in a dataset with pre-extracted feature vectors and labels as a CSV file. It then begins training and testing classifiers (machine learning models) in parallel. As time goes on, ATM will use the results of previous classifiers to intelligently select which methods and hyperparameters to try next. Along the way, ATM saves data about each classifier it trains, including the hyperparameters used to train it, extensive performance metrics, and a serialized version of the model itself.
 
 ATM has the following features:
 * It allows users to run the system for multiple datasets and multiple problem configurations in parallel.
-* It can be run locally, on AWS\*, or on a custom compute cluster\* 
+* It can be run locally, on AWS\*, or on a custom compute cluster\*
 * It can be configured to use a variety of AutoML approaches for hyperparameter tuning and selection, available in the accompanying library [btb](https://github.com/hdi-project/btb)
-* It stores models, metrics and cross validated accuracy information about each classifier it has trained. 
+* It stores models, metrics and cross validated accuracy information about each classifier it has trained.
 
 \**work in progress! See issue [#40](https://github.com/HDI-Project/ATM/issues/40)*
 
 ## Current status
-ATM and the accompanying library BTB are under active development (transitioning from an older system to a new one). In the coming weeks we intend to update ATM's documentation, build out testing infrastructure, stablize its APIs, and establish a framework for the community to contribute. In the meantime, ATM's API and its conventions will be *highly volatile*. In particular, the ModelHub database schema and the code used to save and load models and performance data are likely to change. If you save data with one version of ATM and then pull the latest version of the code, there is **no guarantee** that the new code will be compatible with the old data. If you intend to build a long-term project on ATM starting right now, you should be comfortable doing your own data/database migrations in order to receive new features and bug fixes. It may be advisable to fork this repository and pull in changes manually. 
+ATM and the accompanying library BTB are under active development (transitioning from an older system to a new one). We are working on updating ATM's documentation, building out testing infrastructure, stabilizing APIs, and establishing a framework for the community to contribute. In the meantime, ATM's API and its conventions will be *highly volatile*. In particular, the ModelHub database schema and the code used to save and load models and performance data are likely to change. If you save data with one version of ATM and then pull the latest version of the code, there is **no guarantee** that the new code will be compatible with the old data. If you intend to build a long-term project on ATM starting right now, you should be comfortable doing your own data/database migrations in order to receive new features and bug fixes. It may be advisable to fork this repository and pull in changes manually.
 
 Stay tuned for updates. If you have any questions or you would like to stay informed about the status of the project, **please email dailabmit@gmail.com.**
 
-## Setup/Installation 
-This section describes the quickest way to get started with ATM on a modern machine running Ubuntu Linux. We hope to have more in-depth guides in the future, but for now, you should be able to substitute commands for the package manager of your choice to get ATM up and running on most modern Unix-based systems.
+## Setup/Installation
+This section describes the quickest way to get started with ATM on a machine running Ubuntu Linux. We hope to have more in-depth guides in the future, but for now, you should be able to substitute commands for the package manager of your choice to get ATM up and running on most modern Unix-based systems.
+
+ATM is compatible with and has been tested on Python 2.7, 3.5, and 3.6.
 
 1. **Clone the project**
    ```
@@ -50,22 +52,23 @@ This section describes the quickest way to get started with ATM on a modern mach
    $ sudo apt install sqlite3
    ```
 
-   - for MySQL: 
+   - for MySQL:
    ```
    $ sudo apt install mysql-server mysql-client
    ```
 
-3. **Install python dependencies**
-  ATM is tested with Python 2.7+ and Python 3.5+.
+3. **Install python dependencies**.
+   This will also install [btb](https://github.com/hdi-project/btb), the core AutoML library in development under the HDI project, as an egg which will track changes to the git repository.
+   Here, usage of `virtualenv` is shown, but you can substitute `conda` or your preferred environment manager as well.
    ```
    $ virtualenv venv
    $ . venv/bin/activate
    $ pip install -r requirements.txt
+   $ python setup.py install
    ```
-   This will also install [btb](https://github.com/hdi-project/btb), the core AutoML library in development under the HDI project, as an egg which will track changes to the git repository.
 
 ## Quick Usage
-Below we will give a quick tutorial of how to run atm on your desktop. We will use a featurized dataset, already saved in ``data/test/pollution_1.csv``. This is one of the datasets available on [openml.org](https://www.openml.org). More details can be found [here](https://www.openml.org/d/542). In this problem the goal is predict ``mortality`` using the metrics associated with the air pollution. Below we show a snapshot of the ``csv`` file.  The data has 15 features and the last column is the ``class`` label. 
+Below we will give a quick tutorial of how to run ATM on your desktop. We will use a featurized dataset, already saved in ``data/test/pollution_1.csv``. This is one of the datasets available on [openml.org](https://www.openml.org). More details can be found [here](https://www.openml.org/d/542). In this problem the goal is predict ``mortality`` using the metrics associated with the air pollution. Below we show a snapshot of the ``csv`` file.  The data has 15 features and the last column is the ``class`` label.
 
   |PREC | JANT |  JULT |  OVR65 |	POPN|	EDUC|	HOUS| DENS|	NONW|	WWDRK	|POOR| HC	| NOX |	SO@	| HUMID |	class|
   |:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
@@ -82,15 +85,15 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
   | 37	|   31|	   75	 |  8	 |    3.26|	11.9	|78.4	 |    4259|	  13.1	|49.6|	13.9|	23	|   9	|   15|	   58	 |    1|
   | 35	|   46|	   85	 |  7.1	 |  3.22|	  11.8	|79.9	|   1441	|  14.8	|51.2	|16.1|	1	|   1	 |  1	|   54	|      0|
 
-   
-1. **Create a datarun** 
+
+1. **Create a datarun**
    ```
    $ python scripts/enter_data.py
    ```
-   This command will create a ``datarun``. In ATM, a *datarun* is a single logical machine learning task. If you run the above command without any arguments, it will use the default settings found in the `atm/config/templates/\*.yaml` files to create a new SQLite3 database at `./atm.db`, create a new `dataset` instance which refers to the data above, and create a `datarun` instance which points to that dataset. More about what is stored in this database and what is it used for can be found [here](https://cyphe.rs/static/atm.pdf).
+   This command will create a ``datarun``. In ATM, a "datarun" is a single logical machine learning task. If you run the above command without any arguments, it will use the default settings found in `atm/config.py` to create a new SQLite3 database at `./atm.db`, create a new `dataset` instance which refers to the data above, and create a `datarun` instance which points to that dataset. More about what is stored in this database and what is it used for can be found [here](https://cyphe.rs/static/atm.pdf).
 
    The command should produce a lot of output, the end of which looks something like this:
-  
+
    ```
    ========== Summary ==========
    Training data: data/test/pollution_1.csv
@@ -103,11 +106,11 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
    ```
 
    The most important piece of information is the datarun ID.
- 
- 
+
+
 2. **Start a worker**
    ```
-   $ python scripts/worker.py 
+   $ python scripts/worker.py
    ```
 
    This will start a process that builds classifiers, tests them, and saves them to the `./models/` directory. The output should show which hyperparameters are being tested and the performance of each classifier (the "judgment metric"), plus the best overall performance so far.
@@ -125,18 +128,19 @@ Below we will give a quick tutorial of how to run atm on your desktop. We will u
    Judgment metric (f1): 0.536 +- 0.067
    Best so far (classifier 21): 0.716 +- 0.035
    ```
-   Occassionally, a worker will encounter an error in the process of building and testing a classifier. When this happens, the worker will print error data to the terminal, log the error in the database, and move on to the next classifier. 
+   Occasionally, a worker will encounter an error in the process of building and testing a classifier. When this happens, the worker will print error data to the terminal, log the error in the database, and move on to the next classifier.
 
-AND that's it! You can break out of the worker with Ctrl+C and restart it with the same command; it will pick up right where it left off. You can also run the command simultaneously in different terminals to parallelize the work -- all workers will refer to the same ModelHub database. When all 100 classifiers in your budget have been built, all workers will exit gracefully.
- 
+And that's it! You can break out of the worker with <kbd>Ctrl</kbd>+<kbd>c</kbd> and restart it with the same command; it will pick up right where it left off. You can also run the command simultaneously in different terminals to parallelize the work -- all workers will refer to the same ModelHub database. When all 100 classifiers in your budget have been built, all workers will exit gracefully.
+
 ## Customizing ATM's configuration and using your own data
 
-ATM's default configuration is fully controlled by the yaml files in ``atm/conig/templates/``. Our documentation will cover the configuration in more detail, but this section provides a brief overview of how to specify the most important values.
+ATM's default configuration is fully controlled by `atm/config.py`. Our documentation will cover the configuration in more detail, but this section provides a brief overview of how to specify the most important values.
 
 ### Running ATM on your own data
-If you want to use the system for your own dataset, convert your data to a csv file similar to the example shown above. The format is:
+
+If you want to use the system for your own dataset, convert your data to a CSV file similar to the example shown above. The format is:
  * Each column is a feature (or the label)
- * Each row is a training example 
+ * Each row is a training example
  * The first row is the header row, which contains names for each column of data
  * A single column (the *target* or *label*) is named ``class``
 
@@ -144,14 +148,14 @@ Next, you'll need to use `enter_data.py` to create a `dataset` and `datarun` for
 
 The script will look for values for each configuration variable in the following places, in order:
 1. Command line arguments
-2. Configuration files 
+2. Configuration files
 3. Defaults specified in `atm/config.py`
 
 That means there are two ways to pass configuration to the command.
-    
+
 1. **Using YAML configuration files**
-   
-   Saving configuration as YAML files is an easy way to save complicated setups or share them with team members. 
+
+   Saving configuration as YAML files is an easy way to save complicated setups or share them with team members.
 
    You should start with the templates provided in `atm/config/templates` and modify them to suit your own needs.
    ```
@@ -160,9 +164,9 @@ That means there are two ways to pass configuration to the command.
    $ vim config/*.yaml
    ```
 
-   `run.yaml` contains all the settings for a single Dataset and Datarun.  Specify the `train_path` to point to your own dataset.
+   `run.yaml` contains all the settings for a single dataset and datarun.  Specify the `train_path` to point to your own dataset.
 
-   `sql.yaml` contains the settings for the ModelHub SQL database. The default configuration will connect to (and create if necessary) a SQLite database at `./atm.db` relative to the directory from which `enter_data.py` is run. If you are using a MySQL database, you will need to change the file to something like this: 
+   `sql.yaml` contains the settings for the ModelHub SQL database. The default configuration will connect to (and create if necessary) a SQLite database at `./atm.db` relative to the directory from which `enter_data.py` is run. If you are using a MySQL database, you will need to change the file to something like this:
    ```
    dialect: mysql
    database: atm
@@ -183,16 +187,16 @@ That means there are two ways to pass configuration to the command.
    ```
 
 2. **Using command line arguments**
-   
+
    You can also specify each argument individually on the command line. The names of the variables are the same as those in the YAML files. SQL configuration variables must be prepended by `sql-`, and AWS config variables must be prepended by `aws-`.
 
-   Using command line arguments is convenient for quick experiments, or for cases where you need to change just a couple of values from the default configuration. For example: 
+   Using command line arguments is convenient for quick experiments, or for cases where you need to change just a couple of values from the default configuration. For example:
 
    ```
    $ python scripts/enter_data.py --train-path ./data/my-custom-data.csv --selector bestkvel
    ```
 
-   You can also use a mixture of config files and command line args; any command line arguments you specify will override the values found in config files.
+   You can also use a mixture of config files and command line arguments; any command line arguments you specify will override the values found in config files.
 
 Once you've created your custom datarun, start a worker, specifying your config files and the datarun(s) you'd like to compute on.
 ```
@@ -251,5 +255,4 @@ It's important that the SQL configuration used by the worker matches the configu
 [BTB](https://github.com/hdi-project/btb), for Bayesian Tuning and Bandits, is the core AutoML library in development under the HDI project. BTB exposes several methods for hyperparameter selection and tuning through a common API. It allows domain experts to extend existing methods and add new ones easily. BTB is a central part of ATM, and the two projects were developed in tandem, but it is designed to be implementation-agnostic and should be useful for a wide range of hyperparameter selection tasks.
 
 ### Featuretools
-[Featuretools](https://github.com/featuretools/featuretools) is a python library for automated feature engineering. It can be used to prepare raw transactional and relational datasets for ATM. It is created and maintaned by [Feature Labs](https://www.featurelabs.com) and is also a part of the [Human Data Interaction Project](https://hdi-dai.lids.mit.edu/).
-
+[Featuretools](https://github.com/featuretools/featuretools) is a python library for automated feature engineering. It can be used to prepare raw transactional and relational datasets for ATM. It is created and maintained by [Feature Labs](https://www.featurelabs.com) and is also a part of the [Human Data Interaction Project](https://hdi-dai.lids.mit.edu/).
