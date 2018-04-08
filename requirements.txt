@@ -8,4 +8,4 @@ sklearn-pandas==1.5.0
 mysqlclient>=1.2
 pyyaml==3.12
 joblib==0.11
--e git+https://github.com/hdi-project/btb.git#egg=btb
+-e git+https://github.com/hdi-project/btb.git@v0.1.0#egg=btb
