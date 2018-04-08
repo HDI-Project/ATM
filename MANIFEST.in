@@ -1,0 +1,5 @@
+include LICENSE
+include README.md
+recursive-include atm/config *
+recursive-include atm/data *
+recursive-include atm/methods *

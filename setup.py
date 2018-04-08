@@ -93,6 +93,7 @@ setup(
         'pytest-xdist>=1.20',
         'pytest-runner>=3',
         'pytest-cov>=2.5',
-    ]
+    ],
+    include_package_data=True
 )
 
