@@ -74,13 +74,7 @@ setup(
         'pyyaml>=3.12',
         'joblib>=0.11',
         'future>=0.16',
-        'btb>=0.0.1',
-    ],
-    # TODO: this is deprecated. Figure out how to accomplish the same thing with
-    # the proper tools.
-    # https://www.python.org/dev/peps/pep-0440/#direct-references
-    dependency_links=[
-        'git+https://git@github.com/hdi-project/btb.git@v0.1.0#egg=btb-0.1.0',
+        'baytune==0.1.1',
     ],
 
     # This variable is used to specify requirements for *this file* to run.
