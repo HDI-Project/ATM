@@ -19,6 +19,11 @@ atm/config/templates/aws.yaml
 # ignore compiled docs
 docs/build/*
 
+# ignore build folders
+build/
+dist/
+
+
 # ignore virtualenv and other binary files
 atm-env/*
 venv*/*
