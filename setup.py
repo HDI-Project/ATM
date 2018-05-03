@@ -63,18 +63,18 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'sqlalchemy>=1.1',
-        'numpy>=1.13',
-        'boto>=2.48',
-        'pandas>=0.22',
-        'scikit-learn>=0.18',
-        'scipy>=0.19',
-        'sklearn-pandas>=1.5',
-        'mysqlclient>=1.2',
-        'pyyaml>=3.12',
+        'baytune==0.1.2',  # This one needs to be exact
+        'boto>=2.48.0',
+        'future>=0.16.0',
         'joblib>=0.11',
-        'future>=0.16',
-        'baytune==0.1.1',
+        'mysqlclient>=1.2',
+        'numpy>=1.13.1',
+        'pandas>=0.22.0',
+        'pyyaml>=3.12',
+        'scikit-learn>=0.18.2',
+        'scipy>=0.19.1',
+        'sklearn-pandas>=1.5.0',
+        'sqlalchemy>=1.1.14',
     ],
 
     # This variable is used to specify requirements for *this file* to run.
@@ -82,11 +82,11 @@ setup(
 
     test_suite='atm/tests',
     tests_require=[
-        'pytest>=3.2',
-        'mock>=2',
-        'pytest-xdist>=1.20',
-        'pytest-runner>=3',
-        'pytest-cov>=2.5',
+        'mock>=2.0.0',
+        'pytest-cov>=2.5.1',
+        'pytest-runner>=3.0',
+        'pytest-xdist>=1.20.1',
+        'pytest>=3.2.3',
     ],
     include_package_data=True
 )
