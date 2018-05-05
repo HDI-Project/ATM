@@ -268,7 +268,7 @@ class Model(object):
             # sort the list by index
             params[lname] = [val for idx, val in sorted(items)]
 
-        ## Gaussian process classifier
+        # Gaussian process classifier
         if self.method == "gp":
             if params["kernel"] == "constant":
                 params["kernel"] = ConstantKernel()

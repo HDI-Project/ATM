@@ -90,7 +90,7 @@ def obj_has_method(obj, method):
     return hasattr(obj, method) and callable(getattr(obj, method))
 
 
-## Converting hyperparameters to and from BTB-compatible formats
+# Converting hyperparameters to and from BTB-compatible formats
 
 def vector_to_params(vector, tunables, categoricals, constants):
     """
@@ -161,7 +161,7 @@ def params_to_vectors(params, tunables):
     return vectors
 
 
-## Serializing and deserializing data on disk
+# Serializing and deserializing data on disk
 
 def _make_save_path_old(dir, classifier, suffix):
     """
@@ -227,7 +227,7 @@ def load_metrics(classifier, metric_dir):
         return json.load(f)
 
 
-## Downloading data from the web
+# Downloading data from the web
 
 def get_local_data_path(data_path):
     """
