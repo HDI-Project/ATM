@@ -113,7 +113,8 @@ class HyperPartition(object):
             cons = '[%s]' % ', '.join(['%s=%s' % c for c in self.constants])
         if self.tunables:
             tuns = '[%s]' % ', '.join(['%s' % t for t, _ in self.tunables])
-        return '<HyperPartition: categoricals: %s; constants: %s; tunables: %s>' % (cats, cons, tuns)
+        return ('<HyperPartition: categoricals: %s; constants: %s; tunables: %s>'
+                % (cats, cons, tuns))
 
 
 HYPERPARAMETER_TYPES = {
