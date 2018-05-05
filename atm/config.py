@@ -9,9 +9,11 @@ from argparse import ArgumentError, ArgumentTypeError, RawTextHelpFormatter
 from builtins import map, object, str
 
 import yaml
-
-from .constants import *
-from .utilities import ensure_directory
+from atm.constants import (BUDGET_TYPES, CUSTOM_CLASS_REGEX, DATA_TEST_PATH,
+                           JSON_REGEX, LOG_LEVELS, METHODS, METRICS,
+                           SCORE_TARGETS, SELECTORS, SQL_DIALECTS, TIME_FMT,
+                           TUNERS)
+from atm.utilities import ensure_directory
 
 
 class Config(object):

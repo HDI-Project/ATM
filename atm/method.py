@@ -7,7 +7,7 @@ from os.path import join
 
 import btb
 
-from .constants import METHOD_PATH, METHODS_MAP
+from atm.constants import METHOD_PATH, METHODS_MAP
 
 
 class HyperParameter(object):

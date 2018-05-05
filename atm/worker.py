@@ -6,6 +6,7 @@ import imp
 import logging
 import os
 import random
+import re
 import time
 import traceback
 import warnings
@@ -17,11 +18,13 @@ import numpy as np
 from boto.s3.connection import Key as S3Key
 from boto.s3.connection import S3Connection
 
-from .config import LogConfig
-from .constants import *
-from .database import ClassifierStatus, db_session
-from .model import Model
-from .utilities import *
+from atm.config import LogConfig
+from atm.constants import CUSTOM_CLASS_REGEX, SELECTORS_MAP, TUNERS_MAP
+from atm.database import ClassifierStatus, db_session
+from atm.model import Model
+from atm.utilities import (download_data, ensure_directory, get_public_ip,
+                           params_to_vectors, save_metrics, save_model,
+                           vector_to_params)
 
 # shhh
 warnings.filterwarnings('ignore')
@@ -293,11 +296,11 @@ class Worker(object):
         """
         # TODO: This does not work
         conn = S3Connection(self.aws_config.access_key, self.aws_config.secret_key)
-        bucket = conn.get_bucket(s3_bucket)
+        bucket = conn.get_bucket(self.aws_config.s3_bucket)
 
-        if aws_folder:
-            aws_model_path = os.path.join(aws_folder, local_model_path)
-            aws_metric_path = os.path.join(aws_folder, local_metric_path)
+        if self.aws_config.aws_folder:
+            aws_model_path = os.path.join(self.aws_config.aws_folder, local_model_path)
+            aws_metric_path = os.path.join(self.aws_config.aws_folder, local_metric_path)
         else:
             aws_model_path = local_model_path
             aws_metric_path = local_metric_path
@@ -305,19 +308,19 @@ class Worker(object):
         kmodel = S3Key(bucket)
         kmodel.key = aws_model_path
         kmodel.set_contents_from_filename(local_model_path)
-        logger.info('Uploading model at %s to S3 bucket %s' % (s3_bucket,
-                                                               local_model_path))
+        logger.info('Uploading model at %s to S3 bucket %s',
+                    self.aws_config.s3_bucket, local_model_path)
 
         kmodel = S3Key(bucket)
         kmodel.key = aws_metric_path
         kmodel.set_contents_from_filename(local_metric_path)
-        logger.info('Uploading metrics at %s to S3 bucket %s' % (s3_bucket,
-                                                                 local_metric_path))
+        logger.info('Uploading metrics at %s to S3 bucket %s',
+                    self.aws_config.s3_bucket, local_metric_path)
 
         # delete the local copy of the model & metrics so that they don't fill
         # up the worker instance's hard drive
-        logger.info('Deleting local copies of %s and %s' % (local_model_path,
-                                                            local_metric_path))
+        logger.info('Deleting local copies of %s and %s',
+                    local_model_path, local_metric_path)
         os.remove(local_model_path)
         os.remove(local_metric_path)
 

@@ -7,12 +7,11 @@ from datetime import datetime, timedelta
 
 from past.utils import old_div
 
-from .config import *
-from .constants import *
-from .database import Database
-from .encoder import MetaData
-from .method import Method
-from .utilities import download_data
+from atm.constants import TIME_FMT, PartitionStatus
+from atm.database import Database
+from atm.encoder import MetaData
+from atm.method import Method
+from atm.utilities import download_data
 
 # load the library-wide logger
 logger = logging.getLogger('atm')
@@ -72,7 +71,7 @@ def create_datarun(db, dataset, run_config):
         # TODO: why not walltime and classifiers budget simultaneously?
         run_config.budget_type = 'walltime'
     elif run_config.budget_type == 'walltime':
-        deadline = datetime.now() + timedelta(minutes=budget)
+        deadline = datetime.now() + timedelta(minutes=run_config.budget)
 
     target = run_config.score_target + '_judgment_metric'
     datarun = db.create_datarun(dataset_id=dataset.id,

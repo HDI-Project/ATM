@@ -14,7 +14,7 @@ import requests
 from boto.s3.connection import Key, S3Connection
 from btb import ParamTypes
 
-from .constants import *
+from atm.constants import DATA_DL_PATH, HTTP_PREFIX, S3_PREFIX, FileType
 
 # global variable storing this machine's public IP address
 # (so we only have to fetch it once)

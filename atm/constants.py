@@ -11,7 +11,7 @@ from btb.selection import Uniform as UniformSelector
 from btb.tuning import GP, GPEi, GPEiVelocity
 from btb.tuning import Uniform as UniformTuner
 
-from . import PROJECT_ROOT
+from atm import PROJECT_ROOT
 
 # A bunch of constants which are used throughout the project, mostly for config.
 # TODO: convert these lists and classes to something more elegant, like enums
