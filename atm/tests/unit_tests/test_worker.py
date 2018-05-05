@@ -4,8 +4,6 @@ import random
 
 import numpy as np
 import pytest
-from mock import ANY, Mock, patch
-
 from atm import PROJECT_ROOT
 from atm.config import LogConfig, RunConfig, SQLConfig
 from atm.constants import METRICS_BINARY, TIME_FMT
@@ -14,9 +12,9 @@ from atm.enter_data import enter_data
 from atm.model import Model
 from atm.utilities import download_data, load_metrics, load_model
 from atm.worker import ClassifierError, Worker
-
 from btb.selection import BestKVelocity, Selector
 from btb.tuning import GP, Tuner
+from mock import ANY, Mock, patch
 
 DB_CACHE_PATH = os.path.join(PROJECT_ROOT, 'data/modelhub/test/')
 DB_PATH = '/tmp/atm.db'

@@ -11,10 +11,9 @@ from builtins import str
 
 import numpy as np
 from boto.s3.connection import Key, S3Connection
+from btb import ParamTypes
 
 from .constants import *
-
-from btb import ParamTypes
 
 from future import standard_library  # isort:skip
 standard_library.install_aliases()

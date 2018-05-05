@@ -5,9 +5,9 @@ from builtins import object, range
 from builtins import str as newstr
 from os.path import join
 
-from .constants import METHOD_PATH, METHODS_MAP
-
 import btb
+
+from .constants import METHOD_PATH, METHODS_MAP
 
 
 class HyperParameter(object):
