@@ -93,6 +93,9 @@ instance/
 
 # Sphinx documentation
 docs/build/
+docs/modules.rst
+docs/atm.rst
+docs/atm.*.rst
 
 # PyBuilder
 target/
