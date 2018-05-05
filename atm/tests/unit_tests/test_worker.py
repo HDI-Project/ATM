@@ -2,23 +2,21 @@ import datetime
 import os
 import random
 
-import mock
 import numpy as np
 import pytest
 from mock import ANY, Mock, patch
 
-import atm
 from atm import PROJECT_ROOT
 from atm.config import LogConfig, RunConfig, SQLConfig
 from atm.constants import METRICS_BINARY, TIME_FMT
-from atm.database import ClassifierStatus, Database, db_session
+from atm.database import Database, db_session
 from atm.enter_data import enter_data
 from atm.model import Model
 from atm.utilities import download_data, load_metrics, load_model
 from atm.worker import ClassifierError, Worker
 
-from btb.selection import BestKReward, BestKVelocity, Selector
-from btb.tuning import GP, GPEi, Tuner
+from btb.selection import BestKVelocity, Selector
+from btb.tuning import GP, Tuner
 
 DB_CACHE_PATH = os.path.join(PROJECT_ROOT, 'data/modelhub/test/')
 DB_PATH = '/tmp/atm.db'
@@ -30,6 +28,7 @@ DATARUN_ID = 2
 HYPERPART_ID = 34
 DT_PARAMS = {'criterion': 'gini', 'max_features': 0.5, 'max_depth': 3,
              'min_samples_split': 2, 'min_samples_leaf': 1}
+
 
 # helper class to allow fuzzy arg matching
 class StringWith(object):
@@ -157,7 +156,7 @@ def test_tune_hyperparameters(worker, hyperpartition):
     worker.Tuner = Mock(return_value=mock_tuner)
 
     with patch('atm.worker.vector_to_params') as vtp_mock:
-        params = worker.tune_hyperparameters(hyperpartition)
+        worker.tune_hyperparameters(hyperpartition)
         vtp_mock.assert_called()
 
     approximate_tunables = [(k, ObjWithAttrs(range=v.range))

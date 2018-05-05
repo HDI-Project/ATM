@@ -7,6 +7,7 @@ from datetime import datetime
 from operator import attrgetter
 
 import pandas as pd
+
 from sqlalchemy import (Column, DateTime, Enum, ForeignKey, Integer, MetaData,
                         Numeric, String, Text, and_, create_engine, func,
                         inspect)
