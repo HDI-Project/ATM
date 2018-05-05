@@ -71,6 +71,7 @@ setup(
         'numpy>=1.13.1',
         'pandas>=0.22.0',
         'pyyaml>=3.12',
+        'requests>=2.18.4',
         'scikit-learn>=0.18.2',
         'scipy>=0.19.1',
         'sklearn-pandas>=1.5.0',

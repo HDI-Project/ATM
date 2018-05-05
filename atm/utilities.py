@@ -10,23 +10,19 @@ import re
 from builtins import str
 
 import numpy as np
+import requests
 from boto.s3.connection import Key, S3Connection
 from btb import ParamTypes
 
 from .constants import *
-
-from future import standard_library  # isort:skip
-standard_library.install_aliases()
-
-import urllib  # isort:skip
-
 
 # global variable storing this machine's public IP address
 # (so we only have to fetch it once)
 public_ip = None
 
 # URL which should give us our public-facing IP address
-PUBLIC_IP_URL = 'http://ip.42.pl/raw'
+# PUBLIC_IP_URL = 'http://ip.42.pl/raw'
+PUBLIC_IP_URL = 'http://ipinfo.io'
 
 logger = logging.getLogger('atm')
 
@@ -66,12 +62,7 @@ def get_public_ip():
     global public_ip
     if public_ip is None:
         try:
-            response = urllib.request.urlopen(PUBLIC_IP_URL, timeout=2)
-            data = str(response.read().strip())
-            # pull an ip-looking set of numbers from the response
-            match = re.search('\d+\.\d+\.\d+\.\d+', data)
-            if match:
-                public_ip = match.group()
+            public_ip = requests.get(PUBLIC_IP_URL).json()['ip']
         except Exception as e:  # any exception, doesn't matter what
             logger.error('could not get public IP: %s' % e)
             public_ip = 'localhost'
@@ -310,8 +301,7 @@ def download_file_http(url, local_folder=DATA_DL_PATH):
         return path
 
     logger.debug('downloading data from %s...' % url)
-    f = urllib.request.urlopen(url)
-    data = f.read()
+    data = requests.get(url).text
     with open(path, 'wb') as outfile:
         outfile.write(data)
     logger.info('file saved at %s' % path)
