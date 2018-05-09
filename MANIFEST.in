@@ -1,5 +1,13 @@
+include AUTHORS.rst
+include HISTORY.md
 include LICENSE
 include README.md
+
+recursive-include tests *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+
+recursive-include docs *.md *.rst conf.py Makefile make.bat *.jpg *.png *.gif
 recursive-include atm/config *
 recursive-include atm/data *
 recursive-include atm/methods *

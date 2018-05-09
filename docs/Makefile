@@ -46,13 +46,7 @@ help:
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILDDIR)/*.html
-	rm -rf $(BUILDDIR)/*.js
-	rm -rf $(BUILDDIR)/*.inv
-	rm -rf $(BUILDDIR)/.buildinfo
-	rm -rf $(BUILDDIR)/.nojekyll
-	rm -rf $(BUILDDIR)/doctrees
-	rm -rf $(BUILDDIR)/_*
+	rm -rf $(BUILDDIR)
 
 .PHONY: html
 html:
