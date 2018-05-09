@@ -303,7 +303,7 @@ def download_file_http(url, local_folder=DATA_DL_PATH):
     logger.debug('downloading data from %s...' % url)
     data = requests.get(url).text
     with open(path, 'wb') as outfile:
-        outfile.write(data)
+        outfile.write(data.encode())
     logger.info('file saved at %s' % path)
 
     return path
