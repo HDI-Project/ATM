@@ -343,6 +343,36 @@ database for its datarun!
 <!--```-->
 
 <!--Note: Any dataset with less than 30 samples will fail for the DBN classifier unless the DBN `minibatch_size` constant is changed to match the number of samples.-->
+## Citing ATM
+
+If you use ATM, please consider citing the following paper:
+
+Thomas Swearingen, Will Drevo, Bennett Cyphers, Alfredo Cuesta-Infante, Arun Ross, Kalyan Veeramachaneni. [ATM: A distributed, collaborative, scalable system for automated machine learning.](https://cyphe.rs/static/atm.pdf) *IEEE BigData 2017*, 151-162
+
+BibTeX entry:
+
+```bibtex
+@inproceedings{DBLP:conf/bigdataconf/SwearingenDCCRV17,
+  author    = {Thomas Swearingen and
+               Will Drevo and
+               Bennett Cyphers and
+               Alfredo Cuesta{-}Infante and
+               Arun Ross and
+               Kalyan Veeramachaneni},
+  title     = {{ATM:} {A} distributed, collaborative, scalable system for automated
+               machine learning},
+  booktitle = {2017 {IEEE} International Conference on Big Data, BigData 2017, Boston,
+               MA, USA, December 11-14, 2017},
+  pages     = {151--162},
+  year      = {2017},
+  crossref  = {DBLP:conf/bigdataconf/2017},
+  url       = {https://doi.org/10.1109/BigData.2017.8257923},
+  doi       = {10.1109/BigData.2017.8257923},
+  timestamp = {Tue, 23 Jan 2018 12:40:42 +0100},
+  biburl    = {https://dblp.org/rec/bib/conf/bigdataconf/SwearingenDCCRV17},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+```
 
 ## Related Projects
 
