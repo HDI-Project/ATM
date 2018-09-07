@@ -10,24 +10,19 @@ import re
 from builtins import str
 
 import numpy as np
+import requests
 from boto.s3.connection import Key, S3Connection
-
-from .constants import *
-
 from btb import ParamTypes
 
-from future import standard_library  # isort:skip
-standard_library.install_aliases()
-
-import urllib  # isort:skip
-
+from atm.constants import DATA_DL_PATH, HTTP_PREFIX, S3_PREFIX, FileType
 
 # global variable storing this machine's public IP address
 # (so we only have to fetch it once)
 public_ip = None
 
 # URL which should give us our public-facing IP address
-PUBLIC_IP_URL = 'http://ip.42.pl/raw'
+# PUBLIC_IP_URL = 'http://ip.42.pl/raw'
+PUBLIC_IP_URL = 'http://ipinfo.io'
 
 logger = logging.getLogger('atm')
 
@@ -67,12 +62,7 @@ def get_public_ip():
     global public_ip
     if public_ip is None:
         try:
-            response = urllib.request.urlopen(PUBLIC_IP_URL, timeout=2)
-            data = str(response.read().strip())
-            # pull an ip-looking set of numbers from the response
-            match = re.search('\d+\.\d+\.\d+\.\d+', data)
-            if match:
-                public_ip = match.group()
+            public_ip = requests.get(PUBLIC_IP_URL).json()['ip']
         except Exception as e:  # any exception, doesn't matter what
             logger.error('could not get public IP: %s' % e)
             public_ip = 'localhost'
@@ -100,7 +90,7 @@ def obj_has_method(obj, method):
     return hasattr(obj, method) and callable(getattr(obj, method))
 
 
-## Converting hyperparameters to and from BTB-compatible formats
+# Converting hyperparameters to and from BTB-compatible formats
 
 def vector_to_params(vector, tunables, categoricals, constants):
     """
@@ -171,7 +161,7 @@ def params_to_vectors(params, tunables):
     return vectors
 
 
-## Serializing and deserializing data on disk
+# Serializing and deserializing data on disk
 
 def _make_save_path_old(dir, classifier, suffix):
     """
@@ -237,7 +227,7 @@ def load_metrics(classifier, metric_dir):
         return json.load(f)
 
 
-## Downloading data from the web
+# Downloading data from the web
 
 def get_local_data_path(data_path):
     """
@@ -311,10 +301,9 @@ def download_file_http(url, local_folder=DATA_DL_PATH):
         return path
 
     logger.debug('downloading data from %s...' % url)
-    f = urllib.request.urlopen(url)
-    data = f.read()
+    data = requests.get(url).text
     with open(path, 'wb') as outfile:
-        outfile.write(data)
+        outfile.write(data.encode())
     logger.info('file saved at %s' % path)
 
     return path

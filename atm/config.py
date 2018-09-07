@@ -9,9 +9,11 @@ from argparse import ArgumentError, ArgumentTypeError, RawTextHelpFormatter
 from builtins import map, object, str
 
 import yaml
-
-from .constants import *
-from .utilities import ensure_directory
+from atm.constants import (BUDGET_TYPES, CUSTOM_CLASS_REGEX, DATA_TEST_PATH,
+                           JSON_REGEX, LOG_LEVELS, METHODS, METRICS,
+                           SCORE_TARGETS, SELECTORS, SQL_DIALECTS, TIME_FMT,
+                           TUNERS)
+from atm.utilities import ensure_directory
 
 
 class Config(object):
@@ -344,8 +346,8 @@ def add_arguments_datarun(parser):
     # Config file
     parser.add_argument('--run-config', help='path to yaml datarun config file')
 
-    ##  Dataset Arguments  #####################################################
-    ############################################################################
+    #  Dataset Arguments  #####################################################
+    # ##########################################################################
     parser.add_argument('--dataset-id', type=int,
                         help="ID of dataset, if it's already in the database")
 
@@ -355,8 +357,8 @@ def add_arguments_datarun(parser):
     parser.add_argument('--data-description', help='Description of dataset')
     parser.add_argument('--class-column', help='Name of the class column in the input data')
 
-    ##  Datarun Arguments  #####################################################
-    ############################################################################
+    #   Datarun Arguments  #####################################################
+    # ##########################################################################
     # Notes:
     # - Support vector machines (svm) can take a long time to train. It's not an
     #   error, it's just part of what happens when the method happens to explore
@@ -428,8 +430,8 @@ def add_arguments_datarun(parser):
                         'performance on a test dataset, and "mu_sigma" will use '
                         'the lower confidence bound on the CV performance.')
 
-    ##  AutoML Arguments  ######################################################
-    ############################################################################
+    #   AutoML Arguments  ######################################################
+    # ##########################################################################
     # hyperparameter selection strategy
     # How should ATM sample hyperparameters from a given hyperpartition?
     #    uniform  - pick randomly! (baseline)

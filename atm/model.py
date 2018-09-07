@@ -23,10 +23,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
-from .constants import *
-from .encoder import DataEncoder, MetaData
-from .method import Method
-from .metrics import cross_validate_pipeline, test_pipeline
+from atm.constants import Metrics
+from atm.encoder import DataEncoder, MetaData
+from atm.method import Method
+from atm.metrics import cross_validate_pipeline, test_pipeline
 
 # load the library-wide logger
 logger = logging.getLogger('atm')
@@ -268,7 +268,7 @@ class Model(object):
             # sort the list by index
             params[lname] = [val for idx, val in sorted(items)]
 
-        ## Gaussian process classifier
+        # Gaussian process classifier
         if self.method == "gp":
             if params["kernel"] == "constant":
                 params["kernel"] = ConstantKernel()

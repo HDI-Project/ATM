@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open('README.md') as readme_file:
     readme = readme_file.read()
@@ -24,7 +24,7 @@ requirements = [
     'sqlalchemy>=1.1.14',
 ]
 
-setup_requirements = [
+setup_requires = [
     'pytest-runner'
 ]
 
@@ -61,7 +61,7 @@ setup(
     name='atm',
     packages=find_packages(include=['atm', 'atm.*']),
     python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*',
-    setup_requires=setup_requirements,
+    setup_requires=setup_requires,
     test_suite='atm/tests',
     tests_require=test_requirements,
     url='https://github.com/HDI-project/ATM',

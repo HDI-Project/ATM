@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import json
+import os
 import pickle
 from builtins import object
 from datetime import datetime
@@ -15,8 +16,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.orm.properties import ColumnProperty
 
-from .constants import *
-from .utilities import *
+from atm.constants import (BUDGET_TYPES, CLASSIFIER_STATUS, DATARUN_STATUS,
+                           METRICS, PARTITION_STATUS, SCORE_TARGETS,
+                           ClassifierStatus, PartitionStatus, RunStatus)
+from atm.utilities import base_64_to_object, object_to_base_64
 
 # The maximum number of errors allowed in a single hyperpartition. If more than
 # this many classifiers using a hyperpartition error, the hyperpartition will be
@@ -296,9 +299,9 @@ class Database(object):
 
         Base.metadata.create_all(bind=self.engine)
 
-    ###########################################################################
-    ##  Save/load the database  ###############################################
-    ###########################################################################
+    # ##########################################################################
+    # #  Save/load the database  ###############################################
+    # ##########################################################################
 
     @try_with_session()
     def to_csv(self, path):
@@ -343,9 +346,9 @@ class Database(object):
                 create_func = getattr(self, 'create_%s' % table)
                 create_func(**r)
 
-    ###########################################################################
-    ##  Standard query methods  ###############################################
-    ###########################################################################
+    # ##########################################################################
+    # #  Standard query methods  ###############################################
+    # ##########################################################################
 
     @try_with_session()
     def get_dataset(self, dataset_id):
@@ -453,9 +456,9 @@ class Database(object):
 
         return query.all()
 
-    ###########################################################################
-    ##  Special-purpose queries  ##############################################
-    ###########################################################################
+    # ##########################################################################
+    # #  Special-purpose queries  ##############################################
+    # ##########################################################################
 
     @try_with_session()
     def is_datatun_gridding_done(self, datarun_id):
@@ -539,9 +542,9 @@ class Database(object):
         with open(clf.metrics_location, 'r') as f:
             return json.load(f)
 
-    ###########################################################################
-    ##  Methods to update the database  #######################################
-    ###########################################################################
+    # ##########################################################################
+    # #  Methods to update the database  #######################################
+    # ##########################################################################
 
     @try_with_session(commit=True)
     def create_dataset(self, **kwargs):

@@ -1,12 +1,11 @@
-import json
 import os
 
 import pytest
 
-from atm import PROJECT_ROOT, constants
+from atm import PROJECT_ROOT
 from atm.config import RunConfig, SQLConfig
 from atm.database import Database, db_session
-from atm.enter_data import create_datarun, create_dataset, enter_data
+from atm.enter_data import create_dataset, enter_data
 from atm.utilities import get_local_data_path
 
 DB_PATH = '/tmp/atm.db'
@@ -126,4 +125,4 @@ def test_run_per_partition(dataset):
                 runs.append(run)
 
         assert len(runs) == METHOD_HYPERPARTS['logreg']
-        assert all([len(run.hyperpartitions) == 1 for run in runs])
+        assert all([len(r.hyperpartitions) == 1 for r in runs])

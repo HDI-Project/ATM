@@ -10,7 +10,8 @@ from sklearn.metrics import (accuracy_score, average_precision_score,
                              precision_recall_curve, roc_auc_score, roc_curve)
 from sklearn.model_selection import StratifiedKFold
 
-from .constants import *
+from atm.constants import (METRICS_BINARY, METRICS_MULTICLASS, N_FOLDS_DEFAULT,
+                           Metrics)
 
 
 def rank_n_accuracy(y_true, y_prob_mat, n=0.33):
