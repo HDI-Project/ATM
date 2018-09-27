@@ -16,14 +16,16 @@ from atm.database import Database
 from atm.enter_data import enter_data
 from atm.config import (add_arguments_aws_s3, add_arguments_sql,
                         add_arguments_datarun, add_arguments_logging,
-                        load_config, initialize_logging)
+                        load_config)
 
 
 class JSONEncoder(json.JSONEncoder):
     """
-    JSONEncoder subclass that knows how to encode date/time, decimal types, and UUIDs.
-    See: https://stackoverflow.com/questions/11875770/how-to-overcome-datetime-datetime-not-json-serializable
+    JSONEncoder subclass that knows how to encode date/time, decimal types, and
+    UUIDs.
+    See: https://stackoverflow.com/questions/11875770/how-to-overcome-datetime-datetime-not-json-serializable # noqa
     """
+
     def default(self, o):
         # See "Date Time String Format" in the ECMA-262 specification.
         if isinstance(o, datetime.datetime):
@@ -82,10 +84,11 @@ def table_fetcher(table):
 
 def entity_fetcher(entity, field, one=False):
     """
-    Creates a generic controller function to filter the entity by the value of one field.
+    Creates a generic controller function to filter the entity by the value of
+    one field.
 
-    Uses simplejson (aliased to json) to parse Decimals and the custom JSONEncoder to parse
-    datetime fields.
+    Uses simplejson (aliased to json) to parse Decimals and the custom
+    JSONEncoder to parse datetime fields.
     """
 
     def inner(**args):
@@ -117,7 +120,8 @@ def allowed_file(filename):
 
 def post_enter_data():
     """
-    Receives and saves a CSV file, after which it executes the enter_data function.
+    Receives and saves a CSV file, after which it executes the enter_data
+    function.
     See: http://flask.pocoo.org/docs/0.12/patterns/fileuploads/
     """
     if 'file' not in request.files:
@@ -125,7 +129,8 @@ def post_enter_data():
 
     file = request.files['file']
 
-    # if user does not select file, browser also submits an empty part without filename
+    # if user does not select file, browser also submits an empty part without
+    # filename
     if file.filename == '':
         raise ApiError('Empty file part', status_code=400)
     if file and allowed_file(file.filename):
@@ -139,7 +144,8 @@ def post_enter_data():
         upload_run_conf = copy.deepcopy(run_conf)
         upload_run_conf.train_path = abs_filepath
 
-        enter_data(sql_conf, upload_run_conf, aws_conf, _args.run_per_partition)
+        enter_data(sql_conf, upload_run_conf,
+                   aws_conf, _args.run_per_partition)
 
         return json.dumps({'success': True})
 
@@ -149,18 +155,19 @@ def execute_in_virtualenv(virtualenv_name, script):
     Executes a Python script inside a virtualenv.
     See: https://gist.github.com/turicas/2897697
     General idea:
-    /bin/bash -c "source venv/bin/activate && python /home/jose/code/python/ATM/worker.py"
+    /bin/bash -c "source venv/bin/activate && python /home/jose/code/python/ATM/worker.py" # noqa
     """
     path = ''.join([os.path.dirname(os.path.abspath(__file__)), script])
-    command = ''.join(['/bin/bash -c "source venv/bin/activate && python ', path, '"'])
+    command = ''.join(
+        ['/bin/bash -c "source venv/bin/activate && python ', path, '"'])
     process = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
     return process
 
 
 def dispatch_worker():
     """
-    Executes the worker.py script inside a virtualenv and returns stdout and stderr
-    as response.
+    Executes the worker.py script inside a virtualenv and returns stdout and
+    stderr as response.
 
     Note: It currently only works if rest_api_server.py file is in the same
     directory as the worker.py script.
@@ -181,13 +188,17 @@ if __name__ == '__main__':
     add_arguments_sql(parser)
     add_arguments_datarun(parser)
     add_arguments_logging(parser)
-    parser.add_argument('--run-per-partition', default=False, action='store_true',
-                        help='if set, generate a new datarun for each hyperpartition')
+    parser.add_argument(
+        '--run-per-partition', default=False, action='store_true',
+        help='if set, generate a new datarun for each hyperpartition')
 
     # API flags
-    parser.add_argument('--host', default='localhost', help='Port in which to run the API')
-    parser.add_argument('--port', default=5000, help='Port in which to run the API')
-    parser.add_argument('--debug', default=False, help='If true, run Flask in debug mode')
+    parser.add_argument('--host', default='localhost',
+                        help='Port in which to run the API')
+    parser.add_argument('--port', default=5000,
+                        help='Port in which to run the API')
+    parser.add_argument('--debug', default=False,
+                        help='If true, run Flask in debug mode')
     _args = parser.parse_args()
 
     # global configuration objects
@@ -213,49 +224,73 @@ if __name__ == '__main__':
     UPLOAD_FOLDER = 'atm/data'
     ALLOWED_EXTENSIONS = set(['csv'])
 
-
     @app.errorhandler(ApiError)
     def handle_invalid_usage(error):
         response = jsonify(error.to_dict())
         response.status_code = error.status_code
         return response
 
-
     def object_as_dict(obj):
-        return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
-
+        return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}  # noqa
 
     # routes to find all records
-    app.add_url_rule('/datasets', 'all_datasets', table_fetcher('datasets'), methods=['GET'])
-    app.add_url_rule('/dataruns', 'all_dataruns', table_fetcher('dataruns'), methods=['GET'])
-    app.add_url_rule('/hyperpartitions', 'all_hyperpartitions', table_fetcher('hyperpartitions'), methods=['GET'])
-    app.add_url_rule('/classifiers', 'all_classifiers', table_fetcher('classifiers'), methods=['GET'])
+
+    # checkoff
+    app.add_url_rule('/datasets', 'all_datasets',
+                     table_fetcher('datasets'), methods=['GET'])
+    # checkoff
+    app.add_url_rule('/dataruns', 'all_dataruns',
+                     table_fetcher('dataruns'), methods=['GET'])
+    # checkoff
+    app.add_url_rule('/hyperpartitions', 'all_hyperpartitions',
+                     table_fetcher('hyperpartitions'), methods=['GET'])
+    # checkoff
+    app.add_url_rule('/classifiers', 'all_classifiers',
+                     table_fetcher('classifiers'), methods=['GET'])
 
     # routes to find entity by it's own id
+    # checkoff
     app.add_url_rule('/dataruns/<int:id>', 'datarun_by_id',
-                     entity_fetcher(db.Datarun, 'id', one=True), methods=['GET'])
+                     entity_fetcher(db.Datarun, 'id', one=True),
+                     methods=['GET'])
+
+    # checkoff
     app.add_url_rule('/datasets/<int:id>', 'dataset_by_id',
-                     entity_fetcher(db.Dataset, 'id', one=True), methods=['GET'])
+                     entity_fetcher(db.Dataset, 'id', one=True),
+                     methods=['GET'])
+    # checkoff
     app.add_url_rule('/classifiers/<int:id>', 'classifier_by_id',
-                     entity_fetcher(db.Classifier, 'id', one=True), methods=['GET'])
+                     entity_fetcher(db.Classifier, 'id', one=True),
+                     methods=['GET'])
+    # checkoff
     app.add_url_rule('/hyperpartitions/<int:id>', 'hyperpartition_by_id',
-                     entity_fetcher(db.Hyperpartition, 'id', one=True), methods=['GET'])
+                     entity_fetcher(db.Hyperpartition, 'id', one=True),
+                     methods=['GET'])
 
     # routes to find entities associated with another entity
-    app.add_url_rule('/dataruns/dataset/<int:dataset_id>', 'datarun_by_dataset_id',
-                     entity_fetcher(db.Datarun, 'dataset_id'), methods=['GET'])
-    app.add_url_rule('/hyperpartitions/datarun/<int:datarun_id>', 'hyperpartition_by_datarun_id',
-                     entity_fetcher(db.Hyperpartition, 'datarun_id'), methods=['GET'])
-    app.add_url_rule('/classifiers/datarun/<int:datarun_id>', 'classifier_by_datarun_id',
-                     entity_fetcher(db.Classifier, 'datarun_id'), methods=['GET'])
-    app.add_url_rule('/classifiers/hyperpartition/<int:hyperpartition_id>', 'classifier_by_hyperpartition_id',
-                     entity_fetcher(db.Classifier, 'hyperpartition_id'), methods=['GET'])
+    app.add_url_rule(
+        '/dataruns/dataset/<int:dataset_id>', 'datarun_by_dataset_id',
+        entity_fetcher(db.Datarun, 'dataset_id'), methods=['GET'])
+    app.add_url_rule(
+        '/hyperpartitions/datarun/<int:datarun_id>',
+        'hyperpartition_by_datarun_id',
+        entity_fetcher(db.Hyperpartition, 'datarun_id'), methods=['GET'])
+    app.add_url_rule(
+        '/classifiers/datarun/<int:datarun_id>', 'classifier_by_datarun_id',
+        entity_fetcher(db.Classifier, 'datarun_id'), methods=['GET'])
+    app.add_url_rule(
+        '/classifiers/hyperpartition/<int:hyperpartition_id>',
+        'classifier_by_hyperpartition_id',
+        entity_fetcher(db.Classifier, 'hyperpartition_id'), methods=['GET'])
 
     # route to post a new CSV file and create a datarun with enter_data
-    app.add_url_rule('/enter_data', 'enter_data', post_enter_data, methods=['POST'])
+    # checkoff
+    app.add_url_rule('/enter_data', 'enter_data',
+                     post_enter_data, methods=['POST'])
 
     # route to activate a single worker
-    app.add_url_rule('/simple_worker', 'simple_worker', dispatch_worker, methods=['GET'])
+    app.add_url_rule('/simple_worker', 'simple_worker',
+                     dispatch_worker, methods=['GET'])
 
     app.run(
         debug=_args.debug,
