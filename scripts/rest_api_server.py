@@ -235,34 +235,26 @@ if __name__ == '__main__':
 
     # routes to find all records
 
-    # checkoff
     app.add_url_rule('/datasets', 'all_datasets',
                      table_fetcher('datasets'), methods=['GET'])
-    # checkoff
     app.add_url_rule('/dataruns', 'all_dataruns',
                      table_fetcher('dataruns'), methods=['GET'])
-    # checkoff
     app.add_url_rule('/hyperpartitions', 'all_hyperpartitions',
                      table_fetcher('hyperpartitions'), methods=['GET'])
-    # checkoff
     app.add_url_rule('/classifiers', 'all_classifiers',
                      table_fetcher('classifiers'), methods=['GET'])
 
     # routes to find entity by it's own id
-    # checkoff
     app.add_url_rule('/dataruns/<int:id>', 'datarun_by_id',
                      entity_fetcher(db.Datarun, 'id', one=True),
                      methods=['GET'])
 
-    # checkoff
     app.add_url_rule('/datasets/<int:id>', 'dataset_by_id',
                      entity_fetcher(db.Dataset, 'id', one=True),
                      methods=['GET'])
-    # checkoff
     app.add_url_rule('/classifiers/<int:id>', 'classifier_by_id',
                      entity_fetcher(db.Classifier, 'id', one=True),
                      methods=['GET'])
-    # checkoff
     app.add_url_rule('/hyperpartitions/<int:id>', 'hyperpartition_by_id',
                      entity_fetcher(db.Hyperpartition, 'id', one=True),
                      methods=['GET'])
@@ -284,7 +276,6 @@ if __name__ == '__main__':
         entity_fetcher(db.Classifier, 'hyperpartition_id'), methods=['GET'])
 
     # route to post a new CSV file and create a datarun with enter_data
-    # checkoff
     app.add_url_rule('/enter_data', 'enter_data',
                      post_enter_data, methods=['POST'])
 
