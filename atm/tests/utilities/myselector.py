@@ -1,6 +1,6 @@
 import random
 
-from btb.selection import Selector
+from btb.selection.selector import Selector
 
 
 class MySelector(Selector):
