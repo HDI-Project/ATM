@@ -1,24 +1,21 @@
 #!/usr/bin/python2.7
 from __future__ import print_function
-import argparse
-import os
-import yaml
-from collections import defaultdict
-from os.path import join
 
-from atm.config import *
+import argparse
+import os.path
+
+from atm import PROJECT_ROOT
+from atm.config import load_config, METHODS
 from atm.database import Database
 from atm.enter_data import enter_data
-from atm.utilities import download_file_s3
-from atm.worker import work
 
-from utilities import *
+from utilities import print_hp_summary, work_parallel
 
 
 CONF_DIR = os.path.join(PROJECT_ROOT, 'config/test/')
 DATA_DIR = os.path.join(PROJECT_ROOT, 'data/test/')
-RUN_CONFIG = join(CONF_DIR, 'run-default.yaml')
-SQL_CONFIG = join(CONF_DIR, 'sql-sqlite.yaml')
+RUN_CONFIG = os.path.join(CONF_DIR, 'run-default.yaml')
+SQL_CONFIG = os.path.join(CONF_DIR, 'sql-sqlite.yaml')
 DATASETS = [
     'iris.data.csv',
     'pollution_1.csv',
@@ -43,7 +40,7 @@ db = Database(**vars(sql_config))
 print('creating dataruns...')
 datarun_ids = []
 for ds in DATASETS:
-    run_config.train_path = join(DATA_DIR, ds)
+    run_config.train_path = os.path.join(DATA_DIR, ds)
     if args.method:
         run_config.methods = [args.method]
     else:

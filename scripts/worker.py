@@ -2,7 +2,6 @@
 from __future__ import print_function
 
 import argparse
-import datetime
 import os
 import warnings
 
@@ -10,7 +9,7 @@ from atm import PROJECT_ROOT
 from atm.config import (add_arguments_aws_s3, add_arguments_logging,
                         add_arguments_sql, load_config, initialize_logging)
 from atm.database import Database
-from atm.worker import Worker, work
+from atm.worker import work
 
 warnings.filterwarnings('ignore')
 

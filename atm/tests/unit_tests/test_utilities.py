@@ -1,7 +1,7 @@
 import socket
 
+import btb.selection.selector
 import pytest
-from btb.selection.selector import Selector
 from mock import patch
 
 from atm import utilities
@@ -17,7 +17,7 @@ def test_make_selector():
 
     for Selector in SELECTORS_MAP.values():
         selector = utilities.make_selector(Selector, **kwargs)
-        assert isinstance(selector, Selector)
+        assert isinstance(selector, btb.selection.selector.Selector)
 
 
 

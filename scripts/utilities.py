@@ -1,14 +1,13 @@
 from __future__ import print_function
-import argparse
-import numpy as np
-import os
 
+import os.path
 from collections import defaultdict
 from multiprocessing import Process
+
+import numpy as np
 from sklearn.metrics import auc
 
 from atm import PROJECT_ROOT
-from atm.config import *
 from atm.constants import ClassifierStatus
 from atm.worker import work
 from atm.database import db_session

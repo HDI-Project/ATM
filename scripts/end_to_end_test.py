@@ -1,12 +1,11 @@
 #!/usr/bin/python2.7
-from __future__ import absolute_import
 from __future__ import print_function
 
 import argparse
-from os.path import join
+import os.path
 
 from atm import PROJECT_ROOT
-from atm.config import *
+from atm.config import load_config
 from atm.database import Database
 from atm.enter_data import enter_data
 
@@ -15,8 +14,8 @@ from utilities import print_summary, work_parallel
 
 CONF_DIR = os.path.join(PROJECT_ROOT, 'config/test/')
 DATA_DIR = os.path.join(PROJECT_ROOT, 'data/test/')
-RUN_CONFIG = join(CONF_DIR, 'run-all.yaml')
-SQL_CONFIG = join(CONF_DIR, 'sql-sqlite.yaml')
+RUN_CONFIG = os.path.join(CONF_DIR, 'run-all.yaml')
+SQL_CONFIG = os.path.join(CONF_DIR, 'sql-sqlite.yaml')
 
 DATASETS_MAX_MIN = [
     'wholesale-customers_1.csv',
@@ -69,7 +68,7 @@ db = Database(**vars(sql_config))
 print('creating dataruns...')
 datarun_ids = []
 for ds in DATASETS:
-    run_config.train_path = join(DATA_DIR, ds)
+    run_config.train_path = os.path.join(DATA_DIR, ds)
     datarun_ids.append(enter_data(sql_config=sql_config,
                                   run_config=run_config))
 

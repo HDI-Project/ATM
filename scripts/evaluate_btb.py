@@ -1,20 +1,19 @@
 from __future__ import print_function
+
 import argparse
-import os
-import random
-from os.path import join
+import os.path
 
 from atm import PROJECT_ROOT
-from atm.config import *
+from atm.config import add_arguments_datarun, load_config
 from atm.database import Database
 from atm.enter_data import enter_data
 
-from utilities import *
+from utilities import DATA_URL, report_auc_vs_baseline, work_parallel
 
 
 CONF_DIR = os.path.join(PROJECT_ROOT, 'config/test/')
-RUN_CONFIG = join(CONF_DIR, 'run-default.yaml')
-SQL_CONFIG = join(CONF_DIR, 'sql-sqlite.yaml')
+RUN_CONFIG = os.path.join(CONF_DIR, 'run-default.yaml')
+SQL_CONFIG = os.path.join(CONF_DIR, 'sql-sqlite.yaml')
 
 DATASETS_MAX_FIRST = [
     'collins_1.csv',
