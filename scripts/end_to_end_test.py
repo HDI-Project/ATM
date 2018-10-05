@@ -1,18 +1,16 @@
 #!/usr/bin/python2.7
+from __future__ import absolute_import
 from __future__ import print_function
+
 import argparse
-import os
-import yaml
-from collections import defaultdict
 from os.path import join
 
+from atm import PROJECT_ROOT
 from atm.config import *
 from atm.database import Database
 from atm.enter_data import enter_data
-from atm.utilities import download_file_s3
-from atm.worker import work
 
-from utilities import *
+from utilities import print_summary, work_parallel
 
 
 CONF_DIR = os.path.join(PROJECT_ROOT, 'config/test/')
@@ -59,6 +57,8 @@ jobs are finished.
 ''')
 parser.add_argument('--processes', help='number of processes to run concurrently',
                     type=int, default=4)
+parser.add_argument('--total-time', help='total time for each worker to work (in seconds)',
+                    type=int, default=None)
 
 args = parser.parse_args()
 sql_config, run_config, _, _ = load_config(sql_path=SQL_CONFIG,
@@ -73,7 +73,7 @@ for ds in DATASETS:
     datarun_ids.append(enter_data(sql_config=sql_config,
                                   run_config=run_config))
 
-work_parallel(db=db, datarun_ids=datarun_ids, n_procs=args.processes)
+work_parallel(db=db, datarun_ids=datarun_ids, n_procs=args.processes, total_time=args.total_time)
 
 print('workers finished.')
 
