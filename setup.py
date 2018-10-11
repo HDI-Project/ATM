@@ -10,7 +10,7 @@ with open('HISTORY.md') as history_file:
     history = history_file.read()
 
 requirements = [
-    'baytune==0.1.2',  # This one needs to be exact
+    'baytune>=0.2.2',
     'boto>=2.48.0',
     'future>=0.16.0',
     'joblib>=0.11',
@@ -18,6 +18,7 @@ requirements = [
     'numpy>=1.13.1',
     'pandas>=0.22.0',
     'pyyaml>=3.12',
+    'requests>=2.18.4',
     'scikit-learn>=0.18.2',
     'scipy>=0.19.1',
     'sklearn-pandas>=1.5.0',

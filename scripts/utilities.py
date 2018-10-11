@@ -1,13 +1,14 @@
 from __future__ import print_function
-import argparse
-import numpy as np
-import os
 
+import os.path
 from collections import defaultdict
 from multiprocessing import Process
+
+import numpy as np
 from sklearn.metrics import auc
 
-from atm.config import *
+from atm import PROJECT_ROOT
+from atm.constants import ClassifierStatus
 from atm.worker import work
 from atm.database import db_session
 from atm.utilities import download_file_http
@@ -188,11 +189,11 @@ def print_hp_summary(db, rid):
             print('\tBest: classifier %s, %s = %.3f +- %.3f' % (best, run.metric,
                                                                 score, err))
 
-def work_parallel(db, datarun_ids=None, aws_config=None, n_procs=4):
+def work_parallel(db, datarun_ids=None, aws_config=None, n_procs=4, total_time=None):
     print('starting workers...')
     kwargs = dict(db=db, datarun_ids=datarun_ids, save_files=False,
                   choose_randomly=True, cloud_mode=False,
-                  aws_config=aws_config, wait=False)
+                  aws_config=aws_config, wait=False, total_time=total_time)
 
     if n_procs > 1:
         # spawn a set of worker processes to work on the dataruns

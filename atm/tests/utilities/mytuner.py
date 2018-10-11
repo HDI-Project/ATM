@@ -1,7 +1,7 @@
-from btb.tuning import Tuner
+from btb.tuning.tuner import BaseTuner
 
 
-class MyTuner(Tuner):
+class MyTuner(BaseTuner):
     """
     Very bare_bones tuner that returns a random set of parameters each time.
     """

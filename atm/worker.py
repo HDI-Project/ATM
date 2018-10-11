@@ -23,8 +23,8 @@ from atm.constants import CUSTOM_CLASS_REGEX, SELECTORS_MAP, TUNERS_MAP
 from atm.database import ClassifierStatus, db_session
 from atm.model import Model
 from atm.utilities import (download_data, ensure_directory, get_public_ip,
-                           params_to_vectors, save_metrics, save_model,
-                           vector_to_params)
+                           make_selector, params_to_vectors, save_metrics,
+                           save_model, vector_to_params)
 
 # shhh
 warnings.filterwarnings('ignore')
@@ -100,9 +100,10 @@ class Worker(object):
         hyperpartition_ids = [hp.id for hp in hyperpartitions]
 
         # Selector classes support passing in redundant arguments
-        self.selector = Selector(choices=hyperpartition_ids,
-                                 k=self.datarun.k_window,
-                                 by_algorithm=dict(hp_by_method))
+        self.selector = make_selector(Selector,
+                                      choices=hyperpartition_ids,
+                                      k=self.datarun.k_window,
+                                      by_algorithm=dict(hp_by_method))
 
     def load_tuner(self):
         """

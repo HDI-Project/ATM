@@ -14,6 +14,7 @@ import requests
 from boto.s3.connection import Key, S3Connection
 from btb import ParamTypes
 
+from atm.compat import getargs
 from atm.constants import DATA_DL_PATH, HTTP_PREFIX, S3_PREFIX, FileType
 
 # global variable storing this machine's public IP address
@@ -127,6 +128,27 @@ def vector_to_params(vector, tunables, categoricals, constants):
         params[key] = value
 
     return params
+
+
+def make_selector(selector_class, **kwargs):
+    """Instantiate a selector of the given class with unused kwargs
+
+    BTB Selectors accept different kwargs. ATM allows all kwargs to be configured, but some will not be accepted by different Selector classes. This wrapper inspects the __init__ signature to pass the selector the relevant kwargs.
+
+    Args:
+        selector_class (type): selector class to instantiate
+        **kwargs: keyword arguments to specific selector class
+
+    Returns:
+        Selector: instate of specific selector
+    """
+    init_args = getargs(selector_class.__init__)
+    relevant_kwargs = {
+        k: kwargs[k]
+        for k in kwargs
+        if k in init_args
+    }
+    return selector_class(**relevant_kwargs)
 
 
 def params_to_vectors(params, tunables):

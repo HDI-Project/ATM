@@ -1,7 +1,7 @@
-baytune==0.1.2  # This one needs to be exact
+baytune>=0.2.2
 boto>=2.48.0
-joblib>=0.11
 future>=0.16.0
+joblib>=0.11
 mysqlclient>=1.2
 numpy>=1.13.1
 pandas>=0.22.0

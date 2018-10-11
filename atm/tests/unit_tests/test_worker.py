@@ -4,8 +4,10 @@ import random
 
 import numpy as np
 import pytest
-from btb.selection import BestKVelocity, Selector
-from btb.tuning import GP, Tuner
+from btb.selection import BestKVelocity
+from btb.selection.selector import Selector
+from btb.tuning import GP
+from btb.tuning.tuner import BaseTuner
 from mock import ANY, Mock, patch
 
 from atm import PROJECT_ROOT
@@ -127,7 +129,7 @@ def test_load_custom_selector_and_tuner(db, dataset):
     worker = get_new_worker(selector=selector_path + ':MySelector',
                             tuner=tuner_path + ':MyTuner')
     assert isinstance(worker.selector, Selector)
-    assert issubclass(worker.Tuner, Tuner)
+    assert issubclass(worker.Tuner, BaseTuner)
 
 
 def test_select_hyperpartition(worker):

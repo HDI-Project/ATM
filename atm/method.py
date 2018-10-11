@@ -31,7 +31,7 @@ class Numeric(HyperParameter):
         return len(self.range) == 1
 
     def as_tunable(self):
-        return btb.HyperParameter(typ=self.type, rang=self.range)
+        return btb.HyperParameter(param_type=self.type, param_range=self.range)
 
 
 class Categorical(HyperParameter):
@@ -63,7 +63,7 @@ class Categorical(HyperParameter):
         return len(self.values) == 1
 
     def as_tunable(self):
-        return btb.HyperParameter(typ=self.type, rang=self.values)
+        return btb.HyperParameter(param_type=self.type, param_range=self.values)
 
 
 class List(HyperParameter):
