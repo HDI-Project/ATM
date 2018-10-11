@@ -22,8 +22,8 @@ from atm.constants import (BUDGET_TYPES, CLASSIFIER_STATUS, DATARUN_STATUS,
 from atm.utilities import base_64_to_object, object_to_base_64
 
 # The maximum number of errors allowed in a single hyperpartition. If more than
-# this many classifiers using a hyperpartition error, the hyperpartition will be
-# considered broken and ignored for the rest of the datarun.
+# this many classifiers using a hyperpartition error, the hyperpartition will
+# be considered broken and ignored for the rest of the datarun.
 MAX_HYPERPARTITION_ERRORS = 3
 
 
@@ -80,6 +80,9 @@ class Database(object):
                      password=password, host=host, port=port, query=query)
         self.engine = create_engine(db_url)
         self.session = None
+
+        # sessionmaker creates a function, session, which can then be called
+        # using self.get_session()
         self.get_session = sessionmaker(bind=self.engine,
                                         expire_on_commit=False)
 
@@ -157,7 +160,7 @@ class Database(object):
             status = Column(Enum(*DATARUN_STATUS), default=RunStatus.PENDING)
 
             def __repr__(self):
-                base = "<ID = %d, dataset ID = %s, strategy = %s, budget = %s (%s), status: %s>"
+                base = "<ID = %d, dataset ID = %s, strategy = %s, budget = %s (%s), status: %s>"  # noqa
                 return base % (self.id, self.dataset_id, self.description,
                                self.budget_type, self.budget, self.status)
 
@@ -239,7 +242,7 @@ class Database(object):
             id = Column(Integer, primary_key=True, autoincrement=True)
             datarun_id = Column(Integer, ForeignKey('dataruns.id'))
             datarun = relationship('Datarun', back_populates='classifiers')
-            hyperpartition_id = Column(Integer, ForeignKey('hyperpartitions.id'))
+            hyperpartition_id = Column(Integer, ForeignKey('hyperpartitions.id'))  # noqa
             hyperpartition = relationship('Hyperpartition',
                                           back_populates='classifiers')
 
@@ -299,9 +302,9 @@ class Database(object):
 
         Base.metadata.create_all(bind=self.engine)
 
-    # ##########################################################################
-    # #  Save/load the database  ###############################################
-    # ##########################################################################
+    # #########################################################################
+    # #  Save/load the database  ##############################################
+    # #########################################################################
 
     @try_with_session()
     def to_csv(self, path):
@@ -346,9 +349,14 @@ class Database(object):
                 create_func = getattr(self, 'create_%s' % table)
                 create_func(**r)
 
-    # ##########################################################################
-    # #  Standard query methods  ###############################################
-    # ##########################################################################
+    # #########################################################################
+    # #  Standard query methods  ##############################################
+    # #########################################################################
+
+    @try_with_session()
+    def get_datasets(self):
+        """ Get all multiple datasets """
+        return self.session.query(self.Dataset).all()
 
     @try_with_session()
     def get_dataset(self, dataset_id):
