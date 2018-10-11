@@ -110,6 +110,17 @@ ATM is compatible with and has been tested on Python 2.7, 3.5, and 3.6.
    python setup.py install
    ```
 
+4. ** Testing **
+
+  To run integration tests:
+  `pytest`
+
+  To run end to end tests (must be run from project root)
+  `python end_to_end_test.py`
+
+  To run method tests (must be run from project root)
+  `python method_test.py`
+
 ## Quick Usage
 
 Below we will give a quick tutorial of how to run ATM on your desktop.
