@@ -75,7 +75,7 @@ class JSONEncoder(json.JSONEncoder):
             return super(JSONEncoder, self).default(o)
 
 
-def encode_entity(entity):
+def encode_entity(entity=[]):
     """
     Creates a generic controller function to filter the entity by the value of
     one field.
@@ -83,13 +83,7 @@ def encode_entity(entity):
     Uses simplejson (aliased to json) to parse Decimals and the custom
     JSONEncoder to parse datetime fields.
     """
-    if len(entity) > 1:
-        return json.dumps([object_as_dict(x) for x in entity], cls=JSONEncoder)
-
-    if len(entity) == 1:
-        return json.dumps((object_as_dict(entity)), cls=JSONEncoder)
-    else:
-        return json.dumps(None)
+    return json.dumps([object_as_dict(x) for x in entity], cls=JSONEncoder)
 
 
 db = set_up_db()

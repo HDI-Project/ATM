@@ -5,7 +5,7 @@ import os
 import pickle
 from builtins import object
 from datetime import datetime
-from operator import attrgetter
+import operator as op
 
 import pandas as pd
 from sqlalchemy import (Column, DateTime, Enum, ForeignKey, Integer, MetaData,
@@ -354,9 +354,47 @@ class Database(object):
     # #########################################################################
 
     @try_with_session()
-    def get_datasets(self):
+    def get_datasets(
+            self, name=None, class_column=None, train_path=None,
+            test_path=None, description=None, n_examples=None, k_classes=None,
+            d_features=None, majority=None, size_kb=None, n_examples_op=op.eq,
+            k_classes_op=op.eq, d_features_op=op.eq, majority_op=op.eq,
+            size_kb_op=op.eq):
         """ Get all multiple datasets """
-        return self.session.query(self.Dataset).all()
+        # foo.filter(self.Dataset.name.like('%poll%')).all()
+        query = self.session.query(self.Dataset)
+        n_examples = 307
+        n_examples_op = op.lt
+
+        if name:
+            query = query.filter(self.Dataset.name.like('%' + name + '%'))
+        if class_column:
+            query = query.filter(self.Dataset.class_column == class_column)
+        if train_path:
+            query = query.filter(
+                self.Dataset.train_path.like('%' + class_column + '%'))
+        if test_path:
+            query = query.filter(
+                self.Dataset.test_path.like('%' + test_path + '%'))
+        if test_path:
+            query = query.filter(
+                self.Dataset.description.like('%' + description + '%'))
+        if n_examples:
+            query = query.filter(
+                n_examples_op(self.Dataset.n_examples, n_examples))
+        if k_classes:
+            query = query.filter(
+                k_classes_op(self.Dataset.k_classes_op, k_classes_op))
+        if majority:
+            query = query.filter(
+                majority_op(self.Dataset.majority_op, majority_op))
+        if majority:
+            query = query.filter(
+                majority_op(self.Dataset.majority_op, majority_op))
+        if size_kb:
+            query = query.filter(
+                size_kb_op(self.Dataset.size_kb_op, size_kb_op))
+        return query.all()
 
     @try_with_session()
     def get_dataset(self, dataset_id):
@@ -404,7 +442,7 @@ class Database(object):
             return None
 
         if max_priority:
-            mp = max(dataruns, key=attrgetter('priority')).priority
+            mp = max(dataruns, key=op.attrgetter('priority')).priority
             dataruns = [d for d in dataruns if d.priority == mp]
 
         return dataruns
@@ -536,7 +574,7 @@ class Database(object):
 
         if not classifiers:
             return None
-        return max(classifiers, key=attrgetter(score_target))
+        return max(classifiers, key=op.attrgetter(score_target))
 
     @try_with_session()
     def load_model(self, classifier_id):
