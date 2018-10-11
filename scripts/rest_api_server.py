@@ -5,7 +5,7 @@ import simplejson as json
 import uuid
 
 from flask import Flask
-from flask_restplus import Api
+from flask_restplus import Api, Resource
 from sqlalchemy import inspect
 from werkzeug.contrib.fixers import ProxyFix
 
@@ -94,6 +94,14 @@ def encode_entity(entity):
 
 db = set_up_db()
 app, api, ns = set_up_flask()
+
+
+@ns.route('/datasets')
+class DatasetDAO(Resource):
+    @ns.doc('get_datasets')
+    def get(self):
+        res = encode_entity(db.get_datasets())
+        return json.loads(res)
 
 
 if __name__ == '__main__':
