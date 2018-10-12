@@ -3,6 +3,7 @@ import decimal
 import os
 import simplejson as json
 import uuid
+import operator
 
 from flask import Flask
 from flask_restplus import Api, Resource, reqparse
@@ -86,20 +87,53 @@ def encode_entity(entity=[]):
     return json.dumps([object_as_dict(x) for x in entity], cls=JSONEncoder)
 
 
+
+def get_operator_fn(op):
+    return {
+        '=' : operator.eq,
+        '>' : operator.gt,
+        'gt' : operator.gt,
+        '>=' : operator.ge,
+        'ge' : operator.ge,
+        '<' : operator.lt,
+        'lt' : operator.lt,
+        '<=' : operator.le,
+        'le' : operator.le,
+        }.get(op, operator.eq)
+
+
 db = set_up_db()
 app, api, ns = set_up_flask()
 
 
 dataset_parser = api.parser()
-dataset_parser.add_argument('id', type=int, help='id of the dataset')
+dataset_parser.add_argument('id', type=int, help='dataset identifier')
+dataset_parser.add_argument('name', type=str, help='partial name')
+dataset_parser.add_argument(
+    'class_column', type=str, help='partial class column')
+dataset_parser.add_argument('train_path', type=str, help='partial train_path')
+dataset_parser.add_argument('test_path', type=str, help='partial test_path')
+dataset_parser.add_argument(
+    'description', type=str, help='partial description')
+dataset_parser.add_argument('n_examples', type=int, help='number of examples')
+dataset_parser.add_argument('k_classes', type=int, help='number of clases')
+dataset_parser.add_argument(
+    'd_features', type=int, help='number of d_features')
+dataset_parser.add_argument('majority', type=float, help='majority')
+dataset_parser.add_argument('size_kb', type=int, help='size in kb')
+
+dataset_parser.add_argument(
+    'n_examples_op', type=str, help='comparison operator. i.e. =, >, >=')
+
 
 @ns.route('/datasets')
 @api.expect(dataset_parser)
 class Dataset(Resource):
-    @ns.doc('get_all_datasets')
+    @ns.doc('get some or all datasets')
     def get(self):
         args = dataset_parser.parse_args()
         args['entity_id'] = args.get('id', None)
+        args['n_examples_op'] = get_operator_fn(args.get('n_examples_op', None))
         args.pop('id', None)
 
         res = encode_entity(db.get_datasets(**args))
