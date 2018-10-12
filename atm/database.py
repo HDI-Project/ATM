@@ -302,9 +302,9 @@ class Database(object):
 
         Base.metadata.create_all(bind=self.engine)
 
-    # #########################################################################
-    # #  Save/load the database  ##############################################
-    # #########################################################################
+    # ########################################################################
+    # #  Save/load the database  #############################################
+    # ########################################################################
 
     @try_with_session()
     def to_csv(self, path):
@@ -361,39 +361,27 @@ class Database(object):
             k_classes_op=op.eq, d_features_op=op.eq, majority_op=op.eq,
             size_kb_op=op.eq):
         """ Get all multiple datasets """
-        # foo.filter(self.Dataset.name.like('%poll%')).all()
         query = self.session.query(self.Dataset)
-        n_examples = 307
-        n_examples_op = op.lt
+        d = self.Dataset
 
-        if name:
-            query = query.filter(self.Dataset.name.like('%' + name + '%'))
-        if class_column:
-            query = query.filter(self.Dataset.class_column == class_column)
-        if train_path:
-            query = query.filter(
-                self.Dataset.train_path.like('%' + class_column + '%'))
-        if test_path:
-            query = query.filter(
-                self.Dataset.test_path.like('%' + test_path + '%'))
-        if test_path:
-            query = query.filter(
-                self.Dataset.description.like('%' + description + '%'))
-        if n_examples:
-            query = query.filter(
-                n_examples_op(self.Dataset.n_examples, n_examples))
-        if k_classes:
-            query = query.filter(
-                k_classes_op(self.Dataset.k_classes_op, k_classes_op))
-        if majority:
-            query = query.filter(
-                majority_op(self.Dataset.majority_op, majority_op))
-        if majority:
-            query = query.filter(
-                majority_op(self.Dataset.majority_op, majority_op))
-        if size_kb:
-            query = query.filter(
-                size_kb_op(self.Dataset.size_kb_op, size_kb_op))
+        query = self._filter_by_like(query=query, class_to_filter=d.name, substring=name)  # noqa
+        query = self._filter_by_like(query, d.class_column, class_column)
+        query = self._filter_by_like(query, d.train_path, class_column)
+        query = self._filter_by_like(query, d.test_path, test_path)
+        query = self._filter_by_like(query, d.description, description)
+
+        query = self._filter_by_comparison(
+            query=query, class_to_filter=d.n_examples, operation=n_examples_op,
+            value=n_examples)
+        query = self._filter_by_comparison(
+            query, d.k_classes, k_classes_op, k_classes)
+        query = self._filter_by_comparison(
+            query, d.majority, majority_op, majority)
+        query = self._filter_by_comparison(
+            query, d.majority, majority_op, majority)
+        query = self._filter_by_comparison(
+            query, d.size_kb, size_kb_op, size_kb)
+
         return query.all()
 
     @try_with_session()
@@ -453,8 +441,9 @@ class Database(object):
         return self.session.query(self.Hyperpartition).get(hyperpartition_id)
 
     @try_with_session()
-    def get_hyperpartitions(self, dataset_id=None, datarun_id=None, method=None,
-                            ignore_gridding_done=True, ignore_errored=True):
+    def get_hyperpartitions(
+            self, dataset_id=None, datarun_id=None, method=None,
+            ignore_gridding_done=True, ignore_errored=True):
         """
         Return all the hyperpartitions in a given datarun by id.
         By default, only returns incomplete hyperpartitions.
@@ -502,9 +491,9 @@ class Database(object):
 
         return query.all()
 
-    # ##########################################################################
-    # #  Special-purpose queries  ##############################################
-    # ##########################################################################
+    # #########################################################################
+    # #  Special-purpose queries  #############################################
+    # #########################################################################
 
     @try_with_session()
     def is_datatun_gridding_done(self, datarun_id):
@@ -588,9 +577,9 @@ class Database(object):
         with open(clf.metrics_location, 'r') as f:
             return json.load(f)
 
-    # ##########################################################################
-    # #  Methods to update the database  #######################################
-    # ##########################################################################
+    # #########################################################################
+    # #  Methods to update the database  ######################################
+    # #########################################################################
 
     @try_with_session(commit=True)
     def create_dataset(self, **kwargs):
@@ -702,3 +691,20 @@ class Database(object):
         datarun = self.get_datarun(datarun_id)
         datarun.status = RunStatus.COMPLETE
         datarun.end_time = datetime.now()
+
+    # #########################################################################
+    # #  Utility methods  #####################################################
+    # #########################################################################
+
+    def _filter_by_like(self, query, class_to_filter, substring):
+        """Edit and return a sqlalchemy.Query, adding a LIKE statement"""
+        if substring and substring != "":
+            query = query.filter(class_to_filter.like('%' + substring + '%'))
+        return query
+
+    def _filter_by_comparison(self, query, class_to_filter, operation, value):
+        """Edit and return a sqlalchemy.Query, adding a WHERE statement"""
+        if value and value != "":
+            query = query.filter(operation(class_to_filter, value))
+
+        return query
