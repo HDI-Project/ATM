@@ -355,7 +355,7 @@ class Database(object):
 
     @try_with_session()
     def get_datasets(
-            self, name=None, class_column=None, train_path=None,
+            self, entity_id=None, name=None, class_column=None, train_path=None,
             test_path=None, description=None, n_examples=None, k_classes=None,
             d_features=None, majority=None, size_kb=None, n_examples_op=op.eq,
             k_classes_op=op.eq, d_features_op=op.eq, majority_op=op.eq,
@@ -381,6 +381,9 @@ class Database(object):
             query, d.majority, majority_op, majority)
         query = self._filter_by_comparison(
             query, d.size_kb, size_kb_op, size_kb)
+
+        # Entity ID's uses an equality comparison. No operation is passed
+        query = self._filter_by_comparison(query, d.id, op.eq, entity_id)
 
         return query.all()
 

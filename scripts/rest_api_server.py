@@ -5,7 +5,7 @@ import simplejson as json
 import uuid
 
 from flask import Flask
-from flask_restplus import Api, Resource
+from flask_restplus import Api, Resource, reqparse
 from sqlalchemy import inspect
 from werkzeug.contrib.fixers import ProxyFix
 
@@ -90,11 +90,19 @@ db = set_up_db()
 app, api, ns = set_up_flask()
 
 
+dataset_parser = api.parser()
+dataset_parser.add_argument('id', type=int, help='id of the dataset')
+
 @ns.route('/datasets')
-class DatasetDAO(Resource):
-    @ns.doc('get_datasets')
+@api.expect(dataset_parser)
+class Dataset(Resource):
+    @ns.doc('get_all_datasets')
     def get(self):
-        res = encode_entity(db.get_datasets())
+        args = dataset_parser.parse_args()
+        args['entity_id'] = args.get('id', None)
+        args.pop('id', None)
+
+        res = encode_entity(db.get_datasets(**args))
         return json.loads(res)
 
 
