@@ -1,17 +1,17 @@
 import datetime
 import decimal
 import os
+import operator
 from past.utils import old_div
 import simplejson as json
 import uuid
-import operator
+
 
 from flask import Flask
 from flask_restplus import Api, Resource, reqparse
 from sqlalchemy import inspect
 from werkzeug.contrib.fixers import ProxyFix
 
-from atm import PROJECT_ROOT
 from atm.database import Database
 from atm.config import load_config
 from atm.encoder import MetaData
@@ -89,7 +89,6 @@ def encode_entity(entity=[]):
     return json.dumps([object_as_dict(x) for x in entity], cls=JSONEncoder)
 
 
-
 def get_operator_fn(op):
     return {
         '=': operator.eq,
@@ -100,8 +99,7 @@ def get_operator_fn(op):
         '<': operator.lt,
         'lt': operator.lt,
         '<=': operator.le,
-        'le': operator.le,
-        }.get(op, operator.eq)
+        'le': operator.le}.get(op, operator.eq)
 
 
 db = set_up_db()
@@ -143,9 +141,8 @@ def return_set_dataset_parser():
 get_dataset_parser = return_get_dataset_parser()
 set_dataset_parser = return_set_dataset_parser()
 
+
 @ns.route('/datasets')
-
-
 class Dataset(Resource):
     @ns.doc('get some or all datasets')
     @api.expect(get_dataset_parser)
@@ -177,16 +174,24 @@ class Dataset(Resource):
 
         dataset = db.create_dataset(**args)
 
-        dataset = db.create_dataset(name=args.get('name'),
-                                    description=args.get('data_description'),
-                                    train_path=args.get('train_path'),
-                                    test_path=args.get('test_path'),
-                                    class_column=args.get('class_column'),
-                                    n_examples=args.get('n_examples'),
-                                    k_classes=args.get('k_classes'),
-                                    d_features=args.get('d_features'),
-                                    majority=args.get('majority'),
-                                    size_kb=old_div(meta.size, 1000))
+        try:
+            dataset = db.create_dataset(
+                name=args.get('name'),
+                description=args.get('data_description'),
+                train_path=args.get('train_path'),
+                test_path=args.get('test_path'),
+                class_column=args.get('class_column'),
+                n_examples=args.get('n_examples'),
+                k_classes=args.get('k_classes'),
+                d_features=args.get('d_features'),
+                majority=args.get('majority'),
+                size_kb=old_div(meta.size, 1000))
+
+            res = encode_entity([dataset])
+            return json.loads(res)[0]
+        except Exception as e:
+            return json.loads(e)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
