@@ -1,6 +1,7 @@
 import datetime
 import decimal
 import os
+from past.utils import old_div
 import simplejson as json
 import uuid
 import operator
@@ -13,16 +14,17 @@ from werkzeug.contrib.fixers import ProxyFix
 from atm import PROJECT_ROOT
 from atm.database import Database
 from atm.config import load_config
+from atm.encoder import MetaData
 
 
 def set_up_db():
-    sql_config_path = os.path.join(PROJECT_ROOT, '..', 'config', 'sql.yaml')
+    sql_config_path = os.path.join('config', 'sql.yaml')
     sql_conf = load_config(sql_path=sql_config_path)[0]
 
     # YOU NEED TO redo SQL_CONF path, or get database to accept somethign in a
     # higher directory
 
-    sql_conf.database = os.path.join('..', sql_conf.database)
+    sql_conf.database = os.path.join(sql_conf.database)
 
     db = Database(sql_conf.dialect, sql_conf.database, sql_conf.username,
                   sql_conf.password, sql_conf.host, sql_conf.port,
@@ -129,7 +131,7 @@ def return_set_dataset_parser():
     args = [
         ('name', str), ('description', str), ('train_path', str),
         ('test_path', str), ('class_column', str), ('n_examples', int),
-        ('k_classes', int), ('d_features', str), ('majority', str)]
+        ('k_classes', int), ('d_features', int), ('majority', float)]
 
     dataset_parser = api.parser()
     for col in args:
@@ -163,28 +165,28 @@ class Dataset(Resource):
         return json.loads(res)
 
     @ns.doc('create a dataset')
-    # @api.expect(set_dataset_parser)
-    def set(self):
+    @api.expect(set_dataset_parser)
+    def post(self):
         dataset_parser = return_set_dataset_parser()
         args = dataset_parser.parse_args()
 
         meta = MetaData(
             args['class_column'], args['train_path'], args['test_path'])
+
         args['size_kb'] = old_div(meta.size, 1000)
 
         dataset = db.create_dataset(**args)
 
-        dataset = db.create_dataset(name=name,
-                                    description=run_config.data_description,
-                                    train_path=run_config.train_path,
-                                    test_path=run_config.test_path,
-                                    class_column=run_config.class_column,
-                                    n_examples=meta.n_examples,
-                                    k_classes=meta.k_classes,
-                                    d_features=meta.d_features,
-                                    majority=meta.majority,
+        dataset = db.create_dataset(name=args.get('name'),
+                                    description=args.get('data_description'),
+                                    train_path=args.get('train_path'),
+                                    test_path=args.get('test_path'),
+                                    class_column=args.get('class_column'),
+                                    n_examples=args.get('n_examples'),
+                                    k_classes=args.get('k_classes'),
+                                    d_features=args.get('d_features'),
+                                    majority=args.get('majority'),
                                     size_kb=old_div(meta.size, 1000))
-
 
 if __name__ == '__main__':
     app.run(debug=True)
