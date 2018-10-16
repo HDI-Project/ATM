@@ -106,24 +106,26 @@ db = set_up_db()
 app, api, ns = set_up_flask()
 
 
-dataset_parser = api.parser()
-dataset_parser.add_argument('id', type=int, help='dataset identifier')
-dataset_parser.add_argument('name', type=str, help='partial name')
-dataset_parser.add_argument(
-    'class_column', type=str, help='partial class column')
-dataset_parser.add_argument('train_path', type=str, help='partial train_path')
-dataset_parser.add_argument('test_path', type=str, help='partial test_path')
-dataset_parser.add_argument(
-    'description', type=str, help='partial description')
-dataset_parser.add_argument('n_examples', type=int, help='number of examples')
-dataset_parser.add_argument('k_classes', type=int, help='number of clases')
-dataset_parser.add_argument(
-    'd_features', type=int, help='number of d_features')
-dataset_parser.add_argument('majority', type=float, help='majority')
-dataset_parser.add_argument('size_kb', type=int, help='size in kb')
+def set_up_dataset_parser():
+    dataset_parser = api.parser()
 
-dataset_parser.add_argument(
-    'n_examples_op', type=str, help='comparison operator. i.e. =, >, >=')
+    comparison_args = [
+        ('id', int), ('name', str), ('train_path', str), ('test_path', str),
+        ('description', str), ('n_examples', int), ('k_classes', int),
+        ('majority', float), ('size_kb', int)]
+    operation_args = [
+        ('n_examples_op', str), ('k_classes_op', str), ('d_features_op', str),
+        ('majority_op', str), ('size_kb_op', str)]
+    for col_tuple in comparison_args:
+        dataset_parser.add_argument(col_tuple[0], type=col_tuple[1])
+    for col_tuple in operation_args:
+        dataset_parser.add_argument(
+            col_tuple[0], type=col_tuple[1],
+            help='comparison operator. i.e. =, >, >=')
+    return dataset_parser
+
+
+dataset_parser = set_up_dataset_parser()
 
 
 @ns.route('/datasets')
