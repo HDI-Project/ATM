@@ -354,13 +354,13 @@ class Database(object):
     # #########################################################################
 
     @try_with_session()
-    def get_datasets(
-            self, entity_id=None, name=None, class_column=None, train_path=None,
-            test_path=None, description=None, n_examples=None, k_classes=None,
-            d_features=None, majority=None, size_kb=None, n_examples_op=op.eq,
+    def _prepare_get_datasets_query(
+            self, entity_id, name, class_column, train_path,
+            test_path, description, n_examples, k_classes,
+            d_features, majority, size_kb, n_examples_op=op.eq,
             k_classes_op=op.eq, d_features_op=op.eq, majority_op=op.eq,
             size_kb_op=op.eq):
-        """ Get all multiple datasets """
+
         query = self.session.query(self.Dataset)
         d = self.Dataset
 
@@ -384,6 +384,48 @@ class Database(object):
 
         # Entity ID's uses an equality comparison. No operation is passed
         query = self._filter_by_comparison(query, d.id, op.eq, entity_id)
+        return query
+
+    def get_datasets(
+            self, entity_id=None, name=None, class_column=None, train_path=None,
+            test_path=None, description=None, n_examples=None, k_classes=None,
+            d_features=None, majority=None, size_kb=None, n_examples_op=op.eq,
+            k_classes_op=op.eq, d_features_op=op.eq, majority_op=op.eq,
+            size_kb_op=op.eq):
+        """ Get multiple datasets, filtering by AND """
+
+
+        query = self._prepare_get_datasets_query(
+            entity_id, name, class_column, train_path,
+            test_path, description, n_examples, k_classes,
+            d_features, majority, size_kb, n_examples_op,
+            k_classes_op, d_features_op, majority_op,
+            size_kb_op)
+
+        return query.all()
+
+    @try_with_session()
+    def update_datasets(
+            self, entity_id=None, name=None, class_column=None,
+            train_path=None, test_path=None, description=None, n_examples=None,
+            k_classes=None, d_features=None, majority=None, size_kb=None,
+            n_examples_op=op.eq, k_classes_op=op.eq, d_features_op=op.eq,
+            majority_op=op.eq, size_kb_op=op.eq, new_name=None,
+            new_description=None, new_train_path=None, new_test_path=None,
+            new_class_column=None, new_n_examples=None, new_k_classes=None,
+            new_d_features=None, new_majority=None):
+
+        query = self._prepare_get_datasets_query(
+            entity_id, name, class_column, train_path,
+            test_path, description, n_examples, k_classes,
+            d_features, majority, size_kb, n_examples_op,
+            k_classes_op, d_features_op, majority_op,
+            size_kb_op)
+
+        update_dict = {self.Dataset.class_column: new_class_column}
+        query.update(update_dict)
+
+        self.session.commit()
 
         return query.all()
 
