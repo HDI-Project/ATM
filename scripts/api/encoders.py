@@ -52,16 +52,3 @@ def encode_entity(entity=[]):
     JSONEncoder to parse datetime fields.
     """
     return json.dumps([object_as_dict(x) for x in entity], cls=JSONEncoder)
-
-
-def get_operator_fn(op):
-    return {
-        '=': operator.eq,
-        '>': operator.gt,
-        'gt': operator.gt,
-        '>=': operator.ge,
-        'ge': operator.ge,
-        '<': operator.lt,
-        'lt': operator.lt,
-        '<=': operator.le,
-        'le': operator.le}.get(op, operator.eq)

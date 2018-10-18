@@ -1,3 +1,4 @@
+import copy
 import operator
 import os
 
@@ -37,9 +38,25 @@ class Metaparser:
         all_args = self.column_args + self.op_args
 
         for arg in all_args:
-            temp_parser.add_argument(name=arg.name, type=arg.type, help=arg.help)
+            temp_parser.add_argument(
+                name=arg.name, type=arg.type, help=arg.help)
 
         self.parser = temp_parser
+
+    def recode_op_args(self, args=None):
+        """
+        recoder operation string arguments in the parser to be of type
+        operation
+        """
+        if not args:
+            args = self.parser.parse_args()
+
+        for op_arg in self.op_args:
+            string_op = args[op_arg.name]
+            operation = op_arg.convert_to_operation(string_op)
+            args[op_arg.name] = operation
+
+        return args
 
 
 class Arg:
@@ -79,73 +96,47 @@ class OpArg(Arg):
 db = set_up_db()
 ds = db.Dataset
 
-dataset_args = [
-    Arg(target_col=ds.id, name='entity_id', input_type=int, required=False),
-    Arg(ds.name, 'name', str, False),
-    Arg(ds.description, 'description', str, False),
-    Arg(ds.train_path, 'train_path', str, False),
-    Arg(ds.test_path, 'test_path', str, False),
-    Arg(ds.class_column, 'class_column', str, False),
-    Arg(ds.n_examples, 'n_examples', int, False),
-    Arg(ds.k_classes, 'k_classes', int, False),
-    Arg(ds.d_features, 'd_features', int, False),
-    Arg(ds.majority, 'majority', float, False)]
+def return_dataset_metaparsers():
+    dataset_args = [
+        Arg(target_col=ds.id, name='entity_id', input_type=int, required=False),
+        Arg(ds.name, 'name', str, False),
+        Arg(ds.description, 'description', str, False),
+        Arg(ds.train_path, 'train_path', str, False),
+        Arg(ds.test_path, 'test_path', str, False),
+        Arg(ds.class_column, 'class_column', str, False),
+        Arg(ds.n_examples, 'n_examples', int, False),
+        Arg(ds.k_classes, 'k_classes', int, False),
+        Arg(ds.d_features, 'd_features', int, False),
+        Arg(ds.majority, 'majority', float, False)]
 
-operation_args = [
-    OpArg(ds.n_examples, 'n_examples_op', str, False),
-    OpArg(ds.k_classes, 'k_classes_op', str, False),
-    OpArg(ds.d_features, 'd_features_op', str, False),
-    OpArg(ds.majority, 'majority_op', str, False),
-    OpArg(ds.size_kb, 'size_kb_op', str, False)]
-
-metaparser_for_dataset_get = Metaparser(ds, db, dataset_args, operation_args)
-metaparser_for_dataset_post = Metaparser(ds, db, dataset_args[1:], [])
-
-
-
-
-
-
-
-
-def return_get_dataset_parser(api):
     operation_args = [
-        ('n_examples_op', str), ('k_classes_op', str), ('d_features_op', str),
-        ('majority_op', str), ('size_kb_op', str)]
+        OpArg(ds.n_examples, 'n_examples_op', str, False),
+        OpArg(ds.k_classes, 'k_classes_op', str, False),
+        OpArg(ds.d_features, 'd_features_op', str, False),
+        OpArg(ds.majority, 'majority_op', str, False),
+        OpArg(ds.size_kb, 'size_kb_op', str, False)]
 
-    dataset_parser = return_set_dataset_parser(api)
-    dataset_parser.add_argument('id', int, help='exact matches only')
+    metaparser_for_dataset_get = Metaparser(ds, db, dataset_args, operation_args)
+    metaparser_for_dataset_post = Metaparser(ds, db, dataset_args[1:], [])
 
-    for col_tuple in operation_args:
-        dataset_parser.add_argument(
-            col_tuple[0], type=col_tuple[1],
-            help='comparison operator. i.e. =, >, >=')
-    return dataset_parser
+    new_dataset_args = []
+    for arg in dataset_args:
+        new_arg = copy.copy(arg)
+        new_arg.name = 'new_' + arg.name
+        new_dataset_args.append(new_arg)
+    new_dataset_args += dataset_args
 
+    metaparser_for_dataset_put = Metaparser(
+        ds, db, new_dataset_args, operation_args)
 
-def return_set_dataset_parser(api):
-    args = [
-        ('name', str), ('description', str), ('train_path', str),
-        ('test_path', str), ('class_column', str), ('n_examples', int),
-        ('k_classes', int), ('d_features', int), ('majority', float)]
+    metaparser_for_dataset_delete = Metaparser(
+        ds, db, [Arg(ds.id, name='entity_id', input_type=int, required=True)])
 
-    dataset_parser = api.parser()
-    for col in args:
-        dataset_parser.add_argument(col[0], type=col[1])
+    return {
+        'get': metaparser_for_dataset_get,
+        'post': metaparser_for_dataset_post,
+        'put': metaparser_for_dataset_put,
+        'delete': metaparser_for_dataset_delete
+    }
 
-    return dataset_parser
-
-
-def return_put_dataset_parser(api):
-    dataset_parser = return_set_dataset_parser(api)
-    dataset_parser.add_argument('id', int, help='exact matches only')
-
-    replacement_args = [
-        ('new_name', str), ('new_description', str), ('new_train_path', str),
-        ('new_test_path', str), ('new_class_column', str), ('new_n_examples', int),
-        ('new_k_classes', int), ('new_d_features', int), ('new_majority', float)]
-
-    for col in replacement_args:
-        dataset_parser.add_argument(col[0], type=col[1])
-
-    return dataset_parser
+dataset_metaparsers = return_dataset_metaparsers()
