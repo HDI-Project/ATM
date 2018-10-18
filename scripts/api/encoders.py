@@ -1,6 +1,5 @@
 import datetime
 import decimal
-import operator
 import uuid
 
 import simplejson as json

@@ -2,7 +2,6 @@ import copy
 import operator
 import os
 
-
 from atm.config import load_config
 from atm.database import Database
 
@@ -96,9 +95,11 @@ class OpArg(Arg):
 db = set_up_db()
 ds = db.Dataset
 
+
 def return_dataset_metaparsers():
     dataset_args = [
-        Arg(target_col=ds.id, name='entity_id', input_type=int, required=False),
+        Arg(target_col=ds.id, name='entity_id', input_type=int,
+            required=False),
         Arg(ds.name, 'name', str, False),
         Arg(ds.description, 'description', str, False),
         Arg(ds.train_path, 'train_path', str, False),
@@ -116,7 +117,8 @@ def return_dataset_metaparsers():
         OpArg(ds.majority, 'majority_op', str, False),
         OpArg(ds.size_kb, 'size_kb_op', str, False)]
 
-    metaparser_for_dataset_get = Metaparser(ds, db, dataset_args, operation_args)
+    metaparser_for_dataset_get = Metaparser(
+        ds, db, dataset_args, operation_args)
     metaparser_for_dataset_post = Metaparser(ds, db, dataset_args[1:], [])
 
     new_dataset_args = []
@@ -139,4 +141,4 @@ def return_dataset_metaparsers():
         'delete': metaparser_for_dataset_delete
     }
 
-dataset_metaparsers = return_dataset_metaparsers()
+dataset_metaparsers = return_dataset_metaparsers() # noqa

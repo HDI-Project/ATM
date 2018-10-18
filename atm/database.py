@@ -1,11 +1,11 @@
 from __future__ import absolute_import, unicode_literals
 
 import json
+import operator as op
 import os
 import pickle
 from builtins import object
 from datetime import datetime
-import operator as op
 
 import pandas as pd
 from sqlalchemy import (Column, DateTime, Enum, ForeignKey, Integer, MetaData,
@@ -631,6 +631,11 @@ class Database(object):
         dataset = self.Dataset(**kwargs)
         self.session.add(dataset)
         return dataset
+
+    @try_with_session(commit=True)
+    def delete_dataset(self, id):
+        dataset = self.get_dataset(id)
+        self.session.delete(dataset)
 
     @try_with_session(commit=True)
     def create_datarun(self, **kwargs):

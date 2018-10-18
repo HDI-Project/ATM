@@ -1,6 +1,7 @@
 from past.utils import old_div
 import simplejson as json
 
+from flask import Response
 from flask_restplus import Resource
 
 from atm.encoder import MetaData
@@ -59,12 +60,20 @@ class Dataset(Resource):
             res = encode_entity(datasets)
             return json.loads(res)
         except Exception as e:
-            return json.loads(e)
+            res = json.loads(e)
+            return Response(res, status=500, mimetype='application/json')
 
-    # @ns.doc('delete a dataset')
-    # @api.expect(dataset_metaparsers['delete'].parser)
-    # def delete(self):
-    #     return json.loads({'delete': True})
+    @ns.doc('delete a dataset')
+    @api.expect(dataset_metaparsers['delete'].parser)
+    def delete(self):
+        args = dataset_metaparsers['delete'].parser.parse_args()
+        try:
+            entity_id = args['entity_id']
+            dataset_metaparsers['delete'].db.delete_dataset(id=entity_id)
+            return Response('{}', status=201, mimetype='application/json')
+        except Exception as e:
+            res = json.loads(e)
+            return Response(res, status=500, mimetype='application/json')
 
 
 if __name__ == '__main__':
