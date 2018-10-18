@@ -98,8 +98,8 @@ operation_args = [
     OpArg(ds.majority, 'majority_op', str, False),
     OpArg(ds.size_kb, 'size_kb_op', str, False)]
 
-metaparser_for_dataset_get = Metaparser(ds, db, dataset_args, operation_args,)
-metaparser_for_dataset_post = Metaparser(ds, db, dataset_args, [])
+metaparser_for_dataset_get = Metaparser(ds, db, dataset_args, operation_args)
+metaparser_for_dataset_post = Metaparser(ds, db, dataset_args[1:], [])
 
 
 
