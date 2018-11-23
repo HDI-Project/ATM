@@ -516,31 +516,34 @@ class Database(object):
         return self.session.query(self.Classifier).get(classifier_id)
 
     @try_with_session()
-    def _prepare_get_classifiers_query(
-            self, entity_id, datarun_id, hyperpartition_id, host,
-            model_location, metrics_location, cv_judgment_metric,
-            test_judgment_metric, status,
-            datarun_id_op, hyperpartition_id_op):
-
+    def get_classifiers_api(self, **kwargs):
+        """
+        Prepare and execute a query of the classifiers table in the database.
+        When relevant, allow comparison arguments. kwargs are either Classifier
+        properties, or comparison operations for those properties
+        (those variables end in _op)
+        """
         query = self.session.query(self.Classifier)
         c = self.Classifier
+        import pdb; pdb.set_trace()
 
-        query = self._filter_by_like(query=query, class_to_filter=c.host, substring=host)  # noqa
-        query = self._filter_by_like(query, c.model_location, model_location)
-        query = self._filter_by_like(query, c.metrics_location, metrics_location)  # noqa
+        query = self._filter_by_like(
+            query=query, class_to_filter=c.host, substring=kwargs['host'])  # noqa
+        query = self._filter_by_like(
+            query, c.model_location, kwargs['model_location'])
+        query = self._filter_by_like(
+            query, c.metrics_location, kwargs['metrics_location'])  # noqa
 
         query = self._filter_by_comparison(
-            query=query, class_to_filter=c.datarun_id, operation=datarun_id_op,
-            value=datarun_id)
+            query=query, class_to_filter=c.datarun_id,
+            operation=kwargs['datarun_id_op'],
+            value=kwargs['datarun_id'])
         query = self._filter_by_comparison(
-            query, c.hyperpartition_id, hyperpartition_id_op,
-            hyperpartition_id)
+            query, c.hyperpartition_id, kwargs['hyperpartition_id_op'],
+            kwargs['hyperpartition_id'])
 
-        query = self._filter_by_comparison(query, c.id, op.eq, entity_id)
-        return query
-
-    def get_classifiers_api(self, **kwargs):
-        query = self._prepare_get_classifiers_query(**kwargs)
+        query = self._filter_by_comparison(
+            query, c.id, op.eq, kwargs['entity_id'])
         return query.all()
 
     @try_with_session()
