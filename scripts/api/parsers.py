@@ -1,6 +1,7 @@
 import copy
 import operator
 import os
+from datetime import datetime
 
 from atm.config import load_config
 from atm.database import Database
@@ -117,9 +118,9 @@ def return_dataset_metaparsers():
         OpArg(ds.majority, 'majority_op', str, False),
         OpArg(ds.size_kb, 'size_kb_op', str, False)]
 
-    metaparser_for_dataset_get = Metaparser(
+    metaparser_for_classifier_get = Metaparser(
         ds, db, dataset_args, operation_args)
-    metaparser_for_dataset_post = Metaparser(ds, db, dataset_args[1:], [])
+    metaparser_for_classifier_post = Metaparser(ds, db, dataset_args[1:], [])
 
     new_dataset_args = []
     for arg in dataset_args:
@@ -128,17 +129,74 @@ def return_dataset_metaparsers():
         new_dataset_args.append(new_arg)
     new_dataset_args += dataset_args
 
-    metaparser_for_dataset_put = Metaparser(
+    metaparser_for_classifier_put = Metaparser(
         ds, db, new_dataset_args, operation_args)
 
-    metaparser_for_dataset_delete = Metaparser(
+    metaparser_for_classifier_delete = Metaparser(
         ds, db, [Arg(ds.id, name='entity_id', input_type=int, required=True)])
 
     return {
-        'get': metaparser_for_dataset_get,
-        'post': metaparser_for_dataset_post,
-        'put': metaparser_for_dataset_put,
-        'delete': metaparser_for_dataset_delete
+        'get': metaparser_for_classifier_get,
+        'post': metaparser_for_classifier_post,
+        'put': metaparser_for_classifier_put,
+        'delete': metaparser_for_classifier_delete
     }
 
-dataset_metaparsers = return_dataset_metaparsers() # noqa
+
+clf = db.Classifier
+
+def return_classifier_metaparsers():
+    args = [
+        Arg(target_col=clf.id, name='entity_id', input_type=int,
+            required=False),
+        Arg(clf.datarun_id, 'datarun_id', int, False),
+        Arg(clf.hyperpartition_id, 'hyperpartition_id', int, False),
+        Arg(clf.host, 'host', str, False),
+        Arg(clf.model_location, 'model_location', str, False),
+        Arg(clf.metrics_location, 'metrics_location', str, False),
+        # Arg(clf.hyperparameter_values_64, 'hyperparameter_values_64', 64, False),  # noqa
+        Arg(clf.cv_judgment_metric, 'cv_judgment_metric', float, False),
+        Arg(clf.test_judgment_metric, 'test_judgment_metric', float, False),
+        Arg(clf.start_time, 'majority', str, False),
+        Arg(clf.end_time, 'majority', str, False),
+        Arg(clf.status, 'str', str, False),
+        ]
+
+    operation_args = [
+        OpArg(clf.datarun_id, 'datarun_id_op', str, False),
+        OpArg(clf.hyperpartition_id, 'hyperpartition_id_op', str, False),
+        OpArg(clf.host, 'host_op', str, False),
+        OpArg(clf.model_location, 'model_location_op', str, False),
+        OpArg(clf.metrics_location, 'metrics_location_op', str, False),
+        OpArg(clf.test_judgment_metric, 'test_judgment_metric_op', str, False),
+        # OpArg(clf.start_time, 'start_time_op', str, False),
+        # OpArg(clf.end_time, 'end_time_op', str, False)
+        ]
+
+    metaparser_for_classifier_get = Metaparser(
+        ds, db, args, operation_args)
+    metaparser_for_classifier_post = Metaparser(ds, db, args[1:], [])
+
+    new_args = []
+    for arg in args:
+        new_arg = copy.copy(arg)
+        new_arg.name = 'new_' + arg.name
+        new_args.append(new_arg)
+    new_args += args
+
+    metaparser_for_classifier_put = Metaparser(
+        ds, db, new_args, operation_args)
+
+    metaparser_for_classifier_delete = Metaparser(
+        ds, db, [Arg(clf.id, name='entity_id', input_type=int, required=True)])
+
+    return {
+        'get': metaparser_for_classifier_get,
+        'post': metaparser_for_classifier_post,
+        'put': metaparser_for_classifier_put,
+        'delete': metaparser_for_classifier_delete
+    }
+
+
+dataset_metaparsers = return_dataset_metaparsers()  # noqa
+classifier_metaparsers = return_classifier_metaparsers()  # noqa
