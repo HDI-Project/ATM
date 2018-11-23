@@ -157,18 +157,15 @@ def return_classifier_metaparsers():
         # Arg(clf.hyperparameter_values_64, 'hyperparameter_values_64', 64, False),  # noqa
         Arg(clf.cv_judgment_metric, 'cv_judgment_metric', float, False),
         Arg(clf.test_judgment_metric, 'test_judgment_metric', float, False),
-        Arg(clf.start_time, 'majority', str, False),
-        Arg(clf.end_time, 'majority', str, False),
-        Arg(clf.status, 'str', str, False),
+        # Arg(clf.start_time, 'start_time', str, False),
+        # Arg(clf.end_time, 'end_time', str, False),
+        Arg(clf.status, 'status', str, False),
         ]
 
     operation_args = [
         OpArg(clf.datarun_id, 'datarun_id_op', str, False),
         OpArg(clf.hyperpartition_id, 'hyperpartition_id_op', str, False),
-        OpArg(clf.host, 'host_op', str, False),
-        OpArg(clf.model_location, 'model_location_op', str, False),
-        OpArg(clf.metrics_location, 'metrics_location_op', str, False),
-        OpArg(clf.test_judgment_metric, 'test_judgment_metric_op', str, False),
+
         # OpArg(clf.start_time, 'start_time_op', str, False),
         # OpArg(clf.end_time, 'end_time_op', str, False)
         ]
