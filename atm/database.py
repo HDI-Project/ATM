@@ -525,7 +525,6 @@ class Database(object):
         """
         query = self.session.query(self.Classifier)
         c = self.Classifier
-        import pdb; pdb.set_trace()
 
         query = self._filter_by_like(
             query=query, class_to_filter=c.host, substring=kwargs['host'])  # noqa

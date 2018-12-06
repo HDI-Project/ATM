@@ -1,7 +1,6 @@
 import copy
 import operator
 import os
-from datetime import datetime
 
 from atm.config import load_config
 from atm.database import Database
@@ -24,8 +23,11 @@ def set_up_db():
 
 
 class Metaparser:
-    def __init__(self, target_entity, db, column_args, op_args=[]):
-        self.target_entity = target_entity
+    """
+    Wraps a flaskplus parser, recoding comparison (operation) arguments
+    as standard arguments
+    """
+    def __init__(self, db, column_args, op_args=[]):
         self.column_args = column_args
         self.op_args = op_args
         self.db = db
@@ -119,8 +121,8 @@ def return_dataset_metaparsers():
         OpArg(ds.size_kb, 'size_kb_op', str, False)]
 
     metaparser_for_classifier_get = Metaparser(
-        ds, db, dataset_args, operation_args)
-    metaparser_for_classifier_post = Metaparser(ds, db, dataset_args[1:], [])
+        db, dataset_args, operation_args)
+    metaparser_for_classifier_post = Metaparser(db, dataset_args[1:], [])
 
     new_dataset_args = []
     for arg in dataset_args:
@@ -130,10 +132,10 @@ def return_dataset_metaparsers():
     new_dataset_args += dataset_args
 
     metaparser_for_classifier_put = Metaparser(
-        ds, db, new_dataset_args, operation_args)
+        db, new_dataset_args, operation_args)
 
     metaparser_for_classifier_delete = Metaparser(
-        ds, db, [Arg(ds.id, name='entity_id', input_type=int, required=True)])
+        db, [Arg(ds.id, name='entity_id', input_type=int, required=True)])
 
     return {
         'get': metaparser_for_classifier_get,
@@ -144,6 +146,7 @@ def return_dataset_metaparsers():
 
 
 clf = db.Classifier
+
 
 def return_classifier_metaparsers():
     args = [
@@ -168,11 +171,10 @@ def return_classifier_metaparsers():
 
         # OpArg(clf.start_time, 'start_time_op', str, False),
         # OpArg(clf.end_time, 'end_time_op', str, False)
-        ]
+    ]
 
-    metaparser_for_classifier_get = Metaparser(
-        ds, db, args, operation_args)
-    metaparser_for_classifier_post = Metaparser(ds, db, args[1:], [])
+    metaparser_for_classifier_get = Metaparser(db, args, operation_args)
+    metaparser_for_classifier_post = Metaparser(db, args[1:], [])
 
     new_args = []
     for arg in args:
@@ -182,10 +184,10 @@ def return_classifier_metaparsers():
     new_args += args
 
     metaparser_for_classifier_put = Metaparser(
-        ds, db, new_args, operation_args)
+        db, new_args, operation_args)
 
     metaparser_for_classifier_delete = Metaparser(
-        ds, db, [Arg(clf.id, name='entity_id', input_type=int, required=True)])
+        db, [Arg(clf.id, name='entity_id', input_type=int, required=True)])
 
     return {
         'get': metaparser_for_classifier_get,
