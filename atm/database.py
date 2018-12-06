@@ -481,6 +481,24 @@ class Database(object):
         return dataruns
 
     @try_with_session()
+    def get_hyperpartitions_for_api(
+            self, entity_id=None, datarun_id=None, method=None, status=None):
+        """ method for the REST api to use for hyperpartitions """
+
+        if entity_id:
+            return self.session.query(self.Hyperpartition).get(entity_id)
+
+        query = self.session.query(self.Hyperpartition)
+        if datarun_id:
+            query = query.filter(self.Hyperpartition.datarun_id == datarun_id)
+        if method:
+            query = query.filter(self.Hyperpartition.method == method)
+        if status:
+            query = query.filter(self.Hyperpartition.status == status)
+
+        return query.all()
+
+    @try_with_session()
     def get_hyperpartition(self, hyperpartition_id):
         """ Get a specific classifier.  """
         return self.session.query(self.Hyperpartition).get(hyperpartition_id)

@@ -6,12 +6,57 @@ from flask_restplus import Resource
 
 from atm.encoder import MetaData
 from api.encoders import encode_entity
-from api.parsers import dataset_metaparsers, classifier_metaparsers
+from api.parsers import (dataset_metaparsers, classifier_metaparsers,
+                         hyperpartition_metaparsers)
 from api.setup import set_up_flask
 
 
 # db = set_up_db()
 app, api, ns = set_up_flask()
+
+#############################################################################
+# Hyperpartition endpoint ###################################################
+#############################################################################
+
+hyperpartition_metaparsers['get'].set_flaskplus_parser(api)
+
+
+@ns.route('/hyperpartitions')
+class Hyperpartitions(Resource):
+
+    @ns.doc('get some or all hyperpartitions')
+    @api.expect(hyperpartition_metaparsers['get'].parser)
+    def get(self):
+
+        args = hyperpartition_metaparsers['get'].parser.parse_args()
+
+        try:
+            # encode response, which is from a database query
+            # get the object and turn it into a dict
+
+            # database.py has two different methods for hyperpartition access
+            # depend on
+            # arg_dict = dict(args)
+            # hyperpartition_id = arg_dict.get('entity_id', False)
+
+            # if hyperpartition_id:
+                # res = hyperpartition_metaparsers['get'].db.get_hyperpartition(
+                    # hyperpartition_id)
+            # else:
+                # dataset_id = arg_dict.get(dataset_id)
+                # datarun_id = arg_dict.get(dataset_id)
+                # method = arg_dict.get(method)
+
+            res = hyperpartition_metaparsers['get'].db.get_hyperpartitions_for_api(
+                **args)
+
+            import pdb; pdb.set_trace()
+            res = encode_entity(res)
+
+            return json.loads(res)
+        except Exception as e:
+            return json.loads(e)
+
 
 #############################################################################
 # Classifier endpoint #######################################################
@@ -55,6 +100,8 @@ dataset_metaparsers['put'].set_flaskplus_parser(api)
 dataset_metaparsers['delete'].set_flaskplus_parser(api)
 
 # make a class for each endpoint
+
+
 @ns.route('/datasets')
 class Dataset(Resource):
     # ns.doc specifies the descriiption
