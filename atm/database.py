@@ -231,6 +231,21 @@ class Database(object):
             def __repr__(self):
                 return "<%s: %s>" % (self.method, self.categoricals)
 
+            def to_json(self):
+                entity_dict = self.__dict__.copy()
+
+                # need to remove the key entirely
+                entity_dict['_sa_instance_state'] = None
+                entity_dict['constant_hyperparameters_64'] = self.constants
+                entity_dict['categorical_hyperparameters_64'] = str(
+                    entity_dict['categorical_hyperparameters_64'])
+                entity_dict['tunable_hyperparameters_64'] = str(
+                    entity_dict['tunable_hyperparameters_64'])
+
+                return json.dumps(entity_dict)
+
+
+
         Datarun.hyperpartitions = relationship('Hyperpartition',
                                                order_by='Hyperpartition.id',
                                                back_populates='datarun')
@@ -483,10 +498,12 @@ class Database(object):
     @try_with_session()
     def get_hyperpartitions_for_api(
             self, entity_id=None, datarun_id=None, method=None, status=None):
-        """ method for the REST api to use for hyperpartitions """
+        """ method for the REST api to use for hyperpartitions.
+            returns a list of hyperpartitions
+        """
 
         if entity_id:
-            return self.session.query(self.Hyperpartition).get(entity_id)
+            return [self.session.query(self.Hyperpartition).get(entity_id)]
 
         query = self.session.query(self.Hyperpartition)
         if datarun_id:
@@ -496,7 +513,14 @@ class Database(object):
         if status:
             query = query.filter(self.Hyperpartition.status == status)
 
-        return query.all()
+        res = query.all()
+
+        # make sure it's a list of res's
+        if type(res) != list:
+            res = [res]
+
+        # add it to a dict
+        return res
 
     @try_with_session()
     def get_hyperpartition(self, hyperpartition_id):

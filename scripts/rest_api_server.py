@@ -1,7 +1,7 @@
 from past.utils import old_div
 import simplejson as json
 
-from flask import Response
+from flask import Response, jsonify
 from flask_restplus import Resource
 
 from atm.encoder import MetaData
@@ -31,29 +31,14 @@ class Hyperpartitions(Resource):
         args = hyperpartition_metaparsers['get'].parser.parse_args()
 
         try:
-            # encode response, which is from a database query
-            # get the object and turn it into a dict
-
-            # database.py has two different methods for hyperpartition access
-            # depend on
-            # arg_dict = dict(args)
-            # hyperpartition_id = arg_dict.get('entity_id', False)
-
-            # if hyperpartition_id:
-                # res = hyperpartition_metaparsers['get'].db.get_hyperpartition(
-                    # hyperpartition_id)
-            # else:
-                # dataset_id = arg_dict.get(dataset_id)
-                # datarun_id = arg_dict.get(dataset_id)
-                # method = arg_dict.get(method)
-
             res = hyperpartition_metaparsers['get'].db.get_hyperpartitions_for_api(
                 **args)
 
-            import pdb; pdb.set_trace()
-            res = encode_entity(res)
+            res_dict = {}
+            for hype in res:
+                res_dict[hype.id] = json.loads(hype.to_json())
 
-            return json.loads(res)
+            return jsonify(res_dict)
         except Exception as e:
             return json.loads(e)
 
