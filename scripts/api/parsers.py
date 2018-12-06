@@ -197,5 +197,24 @@ def return_classifier_metaparsers():
     }
 
 
+hyp = db.Hyperpartition
+
+
+def return_hyperpartition_metaparser():
+    args = [
+        Arg(target_col=hyp.id, name='entity_id', input_type=int,
+            required=False),
+        Arg(hyp.datarun_id, 'datarun_id', int, False),
+        Arg(hyp.method, 'method', str, False),
+        Arg(hyp.status, 'status', str, False)]
+
+    metaparser_for_hyperpartition_get = Metaparser(db, args, [])
+
+    return {
+        'get': metaparser_for_hyperpartition_get
+    }
+
+
 dataset_metaparsers = return_dataset_metaparsers()  # noqa
 classifier_metaparsers = return_classifier_metaparsers()  # noqa
+hyperpartition_metaparsers = return_hyperpartition_metaparser()  # noqa
