@@ -2,7 +2,7 @@ import socket
 
 import btb.selection.selector
 import pytest
-from mock import patch
+from unittest.mock import patch
 
 from atm import utilities
 from atm.constants import SELECTORS_MAP

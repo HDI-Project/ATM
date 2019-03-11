@@ -8,7 +8,7 @@ from btb.selection import BestKVelocity
 from btb.selection.selector import Selector
 from btb.tuning import GP
 from btb.tuning.tuner import BaseTuner
-from mock import ANY, Mock, patch
+from unittest.mock import ANY, Mock, patch
 
 from atm import PROJECT_ROOT
 from atm.config import LogConfig, RunConfig, SQLConfig
@@ -156,16 +156,20 @@ def test_tune_hyperparameters(worker, hyperpartition):
     mock_tuner = Mock()
     worker.Tuner = Mock(return_value=mock_tuner)
 
-    with patch('atm.worker.vector_to_params') as vtp_mock:
+    with patch('atm.worker.update_params') as update_params_mock:
         worker.tune_hyperparameters(hyperpartition)
-        vtp_mock.assert_called()
+
+        update_params_mock.assert_called_once_with(
+            params=mock_tuner.propose.return_value,
+            categoricals=hyperpartition.categoricals,
+            constants=hyperpartition.constants
+        )
 
     approximate_tunables = [(k, ObjWithAttrs(range=v.range))
                             for k, v in hyperpartition.tunables]
     worker.Tuner.assert_called_with(tunables=approximate_tunables,
                                     gridding=worker.datarun.gridding,
                                     r_minimum=worker.datarun.r_minimum)
-    mock_tuner.fit.assert_called()
     mock_tuner.propose.assert_called()
 
 

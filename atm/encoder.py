@@ -77,6 +77,9 @@ class DataEncoder(object):
 
         # One-hot encode the whole feature matrix.
         # Set sparse to False so that we can test for NaNs in the output
+        if len(cat_cols) == 0:
+            cat_cols = None
+
         self.feature_encoder = OneHotEncoder(categorical_features=cat_cols,
                                              sparse=False)
         self.feature_encoder.fit(features)

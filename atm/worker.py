@@ -23,8 +23,8 @@ from atm.constants import CUSTOM_CLASS_REGEX, SELECTORS_MAP, TUNERS_MAP
 from atm.database import ClassifierStatus, db_session
 from atm.model import Model
 from atm.utilities import (download_data, ensure_directory, get_public_ip,
-                           make_selector, params_to_vectors, save_metrics,
-                           save_model, vector_to_params)
+                           get_instance, params_to_vectors, save_metrics,
+                           save_model, update_params)
 
 # shhh
 warnings.filterwarnings('ignore')
@@ -100,10 +100,10 @@ class Worker(object):
         hyperpartition_ids = [hp.id for hp in hyperpartitions]
 
         # Selector classes support passing in redundant arguments
-        self.selector = make_selector(Selector,
-                                      choices=hyperpartition_ids,
-                                      k=self.datarun.k_window,
-                                      by_algorithm=dict(hp_by_method))
+        self.selector = get_instance(Selector,
+                                     choices=hyperpartition_ids,
+                                     k=self.datarun.k_window,
+                                     by_algorithm=dict(hp_by_method))
 
     def load_tuner(self):
         """
@@ -164,10 +164,10 @@ class Worker(object):
         if not len(tunables):
             logger.warning('No tunables for hyperpartition %d' % hyperpartition.id)
             self.db.mark_hyperpartition_gridding_done(hyperpartition.id)
-            return vector_to_params(vector=[],
-                                    tunables=tunables,
-                                    categoricals=hyperpartition.categoricals,
-                                    constants=hyperpartition.constants)
+            return update_params(params=[],
+                                 tunables=tunables,
+                                 categoricals=hyperpartition.categoricals,
+                                 constants=hyperpartition.constants)
 
         # Get previously-used parameters: every classifier should either be
         # completed or have thrown an error
@@ -175,32 +175,33 @@ class Worker(object):
         classifiers = [c for c in all_clfs
                        if c.status == ClassifierStatus.COMPLETE]
 
-        # Extract parameters and scores as numpy arrays from classifiers
-        X = params_to_vectors([c.hyperparameter_values for c in classifiers],
-                              tunables)
-        y = np.array([float(getattr(c, self.datarun.score_target))
-                      for c in classifiers])
+        X = [c.hyperparameter_values for c in classifiers]
+        y = np.array([float(getattr(c, self.datarun.score_target)) for c in classifiers])
 
         # Initialize the tuner and propose a new set of parameters
         # this has to be initialized with information from the hyperpartition, so we
         # need to do it fresh for each classifier (not in load_tuner)
-        tuner = self.Tuner(tunables=tunables,
-                           gridding=self.datarun.gridding,
-                           r_minimum=self.datarun.r_minimum)
-        tuner.fit(X, y)
-        vector = tuner.propose()
+        tuner = get_instance(self.Tuner,
+                             tunables=tunables,
+                             gridding=self.datarun.gridding,
+                             r_minimum=self.datarun.r_minimum)
 
-        if vector is None and self.datarun.gridding:
+        if len(X) > 0:
+            tuner.add(X, y)
+
+        # tuner.fit(X, y)
+
+        params = tuner.propose()
+
+        if params is None and self.datarun.gridding:
             logger.info('Gridding done for hyperpartition %d' % hyperpartition.id)
             self.db.mark_hyperpartition_gridding_done(hyperpartition.id)
             return None
 
-        # Convert the numpy array of parameters to a form that can be
-        # interpreted by ATM, then return.
-        return vector_to_params(vector=vector,
-                                tunables=tunables,
-                                categoricals=hyperpartition.categoricals,
-                                constants=hyperpartition.constants)
+        # Append categorical and constants to the params.
+        return update_params(params=params,
+                             categoricals=hyperpartition.categoricals,
+                             constants=hyperpartition.constants)
 
     def test_classifier(self, method, params):
         """
@@ -212,11 +213,14 @@ class Worker(object):
                       judgment_metric=self.datarun.metric,
                       class_column=self.dataset.class_column,
                       verbose_metrics=self.verbose_metrics)
+
         train_path, test_path = download_data(self.dataset.train_path,
                                               self.dataset.test_path,
                                               self.aws_config)
+
         metrics = model.train_test(train_path=train_path,
                                    test_path=test_path)
+
         target = self.datarun.score_target
 
         def metric_string(model):
@@ -377,6 +381,7 @@ class Worker(object):
 
             # use tuner to choose a set of parameters for the hyperpartition
             params = self.tune_hyperparameters(hyperpartition)
+
         except Exception:
             logger.error('Error choosing hyperparameters: datarun=%s' % str(self.datarun))
             logger.error(traceback.format_exc())
