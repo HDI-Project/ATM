@@ -167,9 +167,6 @@ def test_tune_hyperparameters(worker, hyperpartition):
 
     approximate_tunables = [(k, ObjWithAttrs(range=v.range))
                             for k, v in hyperpartition.tunables]
-    worker.Tuner.assert_called_with(tunables=approximate_tunables,
-                                    gridding=worker.datarun.gridding,
-                                    r_minimum=worker.datarun.r_minimum)
     mock_tuner.propose.assert_called()
 
 

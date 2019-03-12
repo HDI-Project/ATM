@@ -16,7 +16,7 @@ def test_make_selector():
     }
 
     for Selector in SELECTORS_MAP.values():
-        selector = utilities.make_selector(Selector, **kwargs)
+        selector = utilities.get_instance(Selector, **kwargs)
         assert isinstance(selector, btb.selection.selector.Selector)
 
 
