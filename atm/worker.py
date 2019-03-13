@@ -90,6 +90,7 @@ class Worker(object):
                                        self.datarun.selector).groups()
             mod = imp.load_source('btb.selection.custom', path)
             Selector = getattr(mod, classname)
+
         logger.info('Selector: %s' % Selector)
 
         # generate the arguments we need to initialize the selector
@@ -97,9 +98,11 @@ class Worker(object):
         hp_by_method = defaultdict(list)
         for hp in hyperpartitions:
             hp_by_method[hp.method].append(hp.id)
+
         hyperpartition_ids = [hp.id for hp in hyperpartitions]
 
         # Selector classes support passing in redundant arguments
+        import ipdb; ipdb.set_trace()
         self.selector = get_instance(Selector,
                                      choices=hyperpartition_ids,
                                      k=self.datarun.k_window,
@@ -117,10 +120,10 @@ class Worker(object):
         if self.datarun.tuner in TUNERS_MAP:
             self.Tuner = TUNERS_MAP[self.datarun.tuner]
         else:
-            path, classname = re.match(CUSTOM_CLASS_REGEX,
-                                       self.datarun.tuner).groups()
+            path, classname = re.match(CUSTOM_CLASS_REGEX, self.datarun.tuner).groups()
             mod = imp.load_source('btb.tuning.custom', path)
             self.Tuner = getattr(mod, classname)
+
         logger.info('Tuner: %s' % self.Tuner)
 
     def select_hyperpartition(self):
@@ -148,6 +151,7 @@ class Worker(object):
             score = float(getattr(c, self.datarun.score_target) or 0)
             hyperpartition_scores[c.hyperpartition_id].append(score)
 
+        import ipdb; ipdb.set_trace()
         hyperpartition_id = self.selector.select(hyperpartition_scores)
         return self.db.get_hyperpartition(hyperpartition_id)
 
@@ -172,8 +176,7 @@ class Worker(object):
         # Get previously-used parameters: every classifier should either be
         # completed or have thrown an error
         all_clfs = self.db.get_classifiers(hyperpartition_id=hyperpartition.id)
-        classifiers = [c for c in all_clfs
-                       if c.status == ClassifierStatus.COMPLETE]
+        classifiers = [c for c in all_clfs if c.status == ClassifierStatus.COMPLETE]
 
         X = [c.hyperparameter_values for c in classifiers]
         y = np.array([float(getattr(c, self.datarun.score_target)) for c in classifiers])
@@ -185,14 +188,10 @@ class Worker(object):
                              tunables=tunables,
                              gridding=self.datarun.gridding,
                              r_minimum=self.datarun.r_minimum)
-
         if len(X) > 0:
             tuner.add(X, y)
 
-        # tuner.fit(X, y)
-
         params = tuner.propose()
-
         if params is None and self.datarun.gridding:
             logger.info('Gridding done for hyperpartition %d' % hyperpartition.id)
             self.db.mark_hyperpartition_gridding_done(hyperpartition.id)
@@ -218,8 +217,7 @@ class Worker(object):
                                               self.dataset.test_path,
                                               self.aws_config)
 
-        metrics = model.train_test(train_path=train_path,
-                                   test_path=test_path)
+        metrics = model.train_test(train_path=train_path, test_path=test_path)
 
         target = self.datarun.score_target
 
@@ -270,11 +268,11 @@ class Worker(object):
             if self.cloud_mode:
                 try:
                     self.save_classifier_cloud(model_path, metric_path)
+
                 except Exception:
                     msg = traceback.format_exc()
                     logger.error('Error in save_classifier_cloud()')
-                    self.db.mark_classifier_errored(classifier_id,
-                                                    error_message=msg)
+                    self.db.mark_classifier_errored(classifier_id, error_message=msg)
         else:
             model_path = None
             metric_path = None
@@ -408,6 +406,7 @@ class Worker(object):
             model, metrics = self.test_classifier(hyperpartition.method, params)
             logger.debug('Saving classifier...')
             self.save_classifier(classifier.id, model, metrics)
+
         except Exception:
             msg = traceback.format_exc()
             logger.error('Error testing classifier: datarun=%s' % str(self.datarun))
@@ -447,14 +446,14 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
     while True:
         # get all pending and running dataruns, or all pending/running dataruns
         # from the list we were given
-        dataruns = db.get_dataruns(include_ids=datarun_ids,
-                                   ignore_complete=True)
+        dataruns = db.get_dataruns(include_ids=datarun_ids, ignore_complete=True)
         if not dataruns:
             if wait:
                 logger.warning('No dataruns found. Sleeping %d seconds and trying again.'
                                % LOOP_WAIT)
                 time.sleep(LOOP_WAIT)
                 continue
+
             else:
                 logger.warning('No dataruns found. Exiting.')
                 break
@@ -478,6 +477,7 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
                         log_config=log_config, public_ip=public_ip)
         try:
             worker.run_classifier()
+
         except ClassifierError:
             # the exception has already been handled; just wait a sec so we
             # don't go out of control reporting errors
