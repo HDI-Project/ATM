@@ -9,10 +9,10 @@ from argparse import ArgumentError, ArgumentTypeError, RawTextHelpFormatter
 from builtins import map, object, str
 
 import yaml
-from atm.constants import (BUDGET_TYPES, CUSTOM_CLASS_REGEX, DATA_TEST_PATH,
-                           JSON_REGEX, LOG_LEVELS, METHODS, METRICS,
-                           SCORE_TARGETS, SELECTORS, SQL_DIALECTS, TIME_FMT,
-                           TUNERS)
+
+from atm.constants import (
+    BUDGET_TYPES, CUSTOM_CLASS_REGEX, DATA_TEST_PATH, JSON_REGEX, LOG_LEVELS, METHODS, METRICS,
+    SCORE_TARGETS, SELECTORS, SQL_DIALECTS, TIME_FMT, TUNERS)
 from atm.utilities import ensure_directory
 
 
@@ -386,7 +386,7 @@ def add_arguments_datarun(parser):
                         help='Method or list of methods to use for '
                         'classification. Each method can either be one of the '
                         'pre-defined method codes listed below or a path to a '
-                        'JSON file defining a custom method.' +
+                        'JSON file defining a custom method.'
                         '\n\nOptions: [%s]' % ', '.join(str(s) for s in METHODS))
     parser.add_argument('--priority', type=int,
                         help='Priority of the datarun (higher = more important')
@@ -396,8 +396,8 @@ def add_arguments_datarun(parser):
                         help='Value of the budget, either in classifiers or minutes')
     parser.add_argument('--deadline',
                         help='Deadline for datarun completion. If provided, this '
-                        'overrides the configured walltime budget.\nFormat: ' +
-                        TIME_FMT.replace('%', '%%'))
+                        'overrides the configured walltime budget.\nFormat: {}'.format(
+                            TIME_FMT.replace('%', '%%')))
 
     # Which field to use to judge performance, for the sake of AutoML
     # options:

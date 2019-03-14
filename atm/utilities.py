@@ -12,7 +12,6 @@ from builtins import str
 import numpy as np
 import requests
 from boto.s3.connection import Key, S3Connection
-from btb import ParamTypes
 
 from atm.compat import getargs
 from atm.constants import DATA_DL_PATH, HTTP_PREFIX, S3_PREFIX, FileType
@@ -328,14 +327,12 @@ def download_data(train_path, test_path=None, aws_config=None):
         if train_type == FileType.HTTP:
             assert (download_file_http(train_path) == local_train_path)
         elif train_type == FileType.S3:
-            assert (download_file_s3(train_path, aws_config=aws_config) ==
-                    local_train_path)
+            assert (download_file_s3(train_path, aws_config=aws_config) == local_train_path)
 
     if local_test_path and not os.path.isfile(local_test_path):
         if test_type == FileType.HTTP:
             assert (download_file_http(test_path) == local_test_path)
         elif test_type == FileType.S3:
-            assert (download_file_s3(test_path, aws_config=aws_config) ==
-                    local_test_path)
+            assert (download_file_s3(test_path, aws_config=aws_config) == local_test_path)
 
     return local_train_path, local_test_path

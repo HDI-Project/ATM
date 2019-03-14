@@ -22,9 +22,9 @@ from atm.config import LogConfig
 from atm.constants import CUSTOM_CLASS_REGEX, SELECTORS_MAP, TUNERS_MAP
 from atm.database import ClassifierStatus, db_session
 from atm.model import Model
-from atm.utilities import (download_data, ensure_directory, get_public_ip,
-                           get_instance, params_to_vectors, save_metrics,
-                           save_model, update_params)
+from atm.utilities import (
+    download_data, ensure_directory, get_instance, get_public_ip, save_metrics, save_model,
+    update_params)
 
 # shhh
 warnings.filterwarnings('ignore')
@@ -102,7 +102,6 @@ class Worker(object):
         hyperpartition_ids = [hp.id for hp in hyperpartitions]
 
         # Selector classes support passing in redundant arguments
-        import ipdb; ipdb.set_trace()
         self.selector = get_instance(Selector,
                                      choices=hyperpartition_ids,
                                      k=self.datarun.k_window,
@@ -151,7 +150,6 @@ class Worker(object):
             score = float(getattr(c, self.datarun.score_target) or 0)
             hyperpartition_scores[c.hyperpartition_id].append(score)
 
-        import ipdb; ipdb.set_trace()
         hyperpartition_id = self.selector.select(hyperpartition_scores)
         return self.db.get_hyperpartition(hyperpartition_id)
 
@@ -236,11 +234,11 @@ class Worker(object):
                                                score_target=target)
         if old_best is not None:
             if getattr(model, target) > getattr(old_best, target):
-                logger.info('New best score! Previous best (classifier %s): %s'
-                            % (old_best.id, metric_string(old_best)))
+                logger.info('New best score! Previous best (classifier %s): %s',
+                            old_best.id, metric_string(old_best))
             else:
-                logger.info('Best so far (classifier %s): %s' % (old_best.id,
-                                                                 metric_string(old_best)))
+                logger.info('Best so far (classifier %s): %s',
+                            old_best.id, metric_string(old_best))
 
         return model, metrics
 
@@ -393,6 +391,7 @@ class Worker(object):
         param_info = 'Chose parameters for method "%s":' % hyperpartition.method
         for k in sorted(params.keys()):
             param_info += '\n\t%s = %s' % (k, params[k])
+
         logger.info(param_info)
 
         logger.debug('Creating classifier...')

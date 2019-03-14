@@ -9,7 +9,7 @@ with open('README.md') as readme_file:
 with open('HISTORY.md') as history_file:
     history = history_file.read()
 
-requirements = [
+install_requires = [
     'baytune',
     'boto>=2.48.0',
     'future>=0.16.0',
@@ -29,14 +29,37 @@ setup_requires = [
     'pytest-runner'
 ]
 
-test_requirements = [
+development_requires = [
+    # general
+    'bumpversion>=0.5.3',
+    'pip>=9.0.1',
+    'watchdog>=0.8.3',
+
+    # docs
+    'm2r>=0.2.0',
+    'Sphinx>=1.7.1',
+    'sphinx_rtd_theme>=0.2.4',
+
+    # style check
+    'flake8>=3.5.0',
+    'isort>=4.3.4',
+
+    # fix style issues
+    'autoflake>=1.1',
+    'autopep8>=1.3.5',
+
+    # distribute on PyPI
+    'twine>=1.10.0',
+    'wheel>=0.30.0',
+]
+
+tests_require = [
     'mock>=2.0.0',
     'pytest-cov>=2.5.1',
     'pytest-runner>=3.0',
     'pytest-xdist>=1.20.1',
     'pytest>=3.2.3',
 ]
-
 
 setup(
     author="MIT Data To AI Lab",
@@ -55,18 +78,26 @@ setup(
     ],
     dependency_links=['git+https://github.com/HDI-Project/BTB.git@9da36bc61bad39346298c150e9bb93112baf48ba#egg=baytune'],
     description="Auto Tune Models",
-    install_requires=requirements,
+    entry_points={
+        'console_scripts': [
+            'atm=atm.cli:main'
+        ]
+    },
+    extras_require={
+        'dev': development_requires + tests_require,
+        'tests': tests_require,
+    },
+    include_package_data=True,
+    install_requires=install_requires,
     license="MIT license",
     long_description=readme + '\n\n' + history,
     long_description_content_type='text/markdown',
-    include_package_data=True,
     keywords='machine learning hyperparameters tuning classification',
     name='atm',
     packages=find_packages(include=['atm', 'atm.*']),
-    python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*',
     setup_requires=setup_requires,
-    test_suite='atm/tests',
-    tests_require=test_requirements,
+    test_suite='tests',
+    tests_require=tests_require,
     url='https://github.com/HDI-project/ATM',
     version='0.1.0',
     zip_safe=False,
