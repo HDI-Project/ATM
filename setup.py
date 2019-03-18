@@ -67,6 +67,6 @@ setup(
     test_suite='atm/tests',
     tests_require=test_requirements,
     url='https://github.com/HDI-project/ATM',
-    version='0.1.0',
+    version='0.1.1-dev',
     zip_safe=False,
 )
