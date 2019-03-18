@@ -12,7 +12,6 @@ from builtins import str
 import numpy as np
 import requests
 from boto.s3.connection import Key, S3Connection
-from btb import ParamTypes
 
 from atm.compat import getargs
 from atm.constants import DATA_DL_PATH, HTTP_PREFIX, S3_PREFIX, FileType

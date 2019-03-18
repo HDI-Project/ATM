@@ -10,7 +10,7 @@ with open('HISTORY.md') as history_file:
     history = history_file.read()
 
 requirements = [
-    'baytune',
+    'baytune>=0.2.5',
     'boto>=2.48.0',
     'future>=0.16.0',
     'joblib>=0.11',
@@ -53,7 +53,6 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
     ],
-    dependency_links=['git+https://github.com/HDI-Project/BTB.git@9da36bc61bad39346298c150e9bb93112baf48ba#egg=baytune'],
     description="Auto Tune Models",
     install_requires=requirements,
     license="MIT license",

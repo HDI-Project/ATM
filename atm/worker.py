@@ -22,8 +22,8 @@ from atm.config import LogConfig
 from atm.constants import CUSTOM_CLASS_REGEX, SELECTORS_MAP, TUNERS_MAP
 from atm.database import ClassifierStatus, db_session
 from atm.model import Model
-from atm.utilities import (download_data, ensure_directory, get_public_ip,
-                           get_instance, params_to_vectors, save_metrics,
+from atm.utilities import (download_data, ensure_directory, get_instance,
+                           get_public_ip, params_to_vectors, save_metrics,
                            save_model, update_params)
 
 # shhh
@@ -102,7 +102,6 @@ class Worker(object):
         hyperpartition_ids = [hp.id for hp in hyperpartitions]
 
         # Selector classes support passing in redundant arguments
-        import ipdb; ipdb.set_trace()
         self.selector = get_instance(Selector,
                                      choices=hyperpartition_ids,
                                      k=self.datarun.k_window,
@@ -151,7 +150,6 @@ class Worker(object):
             score = float(getattr(c, self.datarun.score_target) or 0)
             hyperpartition_scores[c.hyperpartition_id].append(score)
 
-        import ipdb; ipdb.set_trace()
         hyperpartition_id = self.selector.select(hyperpartition_scores)
         return self.db.get_hyperpartition(hyperpartition_id)
 

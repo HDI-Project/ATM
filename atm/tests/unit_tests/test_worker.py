@@ -1,6 +1,7 @@
 import datetime
 import os
 import random
+from unittest.mock import ANY, Mock, patch
 
 import numpy as np
 import pytest
@@ -8,7 +9,6 @@ from btb.selection import BestKVelocity
 from btb.selection.selector import Selector
 from btb.tuning import GP
 from btb.tuning.tuner import BaseTuner
-from unittest.mock import ANY, Mock, patch
 
 from atm import PROJECT_ROOT
 from atm.config import LogConfig, RunConfig, SQLConfig
@@ -117,7 +117,7 @@ def get_new_worker(**kwargs):
 
 def test_load_selector_and_tuner(db, dataset):
     worker = get_new_worker(selector='bestkvel', k_window=7, tuner='gp')
-    assert type(worker.selector) == BestKVelocity
+    assert isinstance(worker.selector, BestKVelocity)
     assert len(worker.selector.choices) == 8
     assert worker.selector.k == 7
     assert worker.Tuner == GP
@@ -177,7 +177,7 @@ def test_test_classifier(db, dataset):
     model, metrics = worker.test_classifier(method='dt', params=DT_PARAMS)
     judge_mets = [m[metric] for m in metrics['cv']]
 
-    assert type(model) == Model
+    assert isinstance(model, Model)
     assert model.judgment_metric == metric
     assert model.cv_judgment_metric == np.mean(judge_mets)
     assert model.cv_judgment_metric_stdev == np.std(judge_mets)
@@ -200,7 +200,7 @@ def test_save_classifier(db, datarun, model, metrics):
         clf = db.get_classifier(classifier.id)
 
         loaded = load_model(clf, MODEL_DIR)
-        assert type(loaded) == Model
+        assert isinstance(loaded, Model)
         assert loaded.method == model.method
         assert loaded.random_state == model.random_state
 

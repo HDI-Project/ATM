@@ -329,10 +329,10 @@ class Database(object):
             # interpret strings as datetimes on its own.
             # yes, this is the easiest way to do it
             for c in inspect(model).attrs:
-                if type(c) != ColumnProperty:
+                if not isinstance(c, ColumnProperty):
                     continue
                 col = c.columns[0]
-                if type(col.type) == DateTime:
+                if isinstance(col.type, DateTime):
                     df[c.key] = pd.to_datetime(df[c.key],
                                                infer_datetime_format=True)
 

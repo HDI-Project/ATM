@@ -35,8 +35,8 @@ DATA_TEST_PATH = os.path.join(PROJECT_ROOT, 'data/test')
 DATA_DL_PATH = os.path.join(PROJECT_ROOT, 'data/downloads')
 METHOD_PATH = os.path.join(PROJECT_ROOT, 'methods')
 
-CUSTOM_CLASS_REGEX = '(.*\.py):(\w+)$'
-JSON_REGEX = '(.*\.json)$'
+CUSTOM_CLASS_REGEX = r'(.*\.py):(\w+)$'
+JSON_REGEX = r'(.*\.json)$'
 
 N_FOLDS_DEFAULT = 10
 
