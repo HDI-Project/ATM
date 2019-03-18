@@ -1,20 +1,75 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import inspect
 import os
 
 from atm import PROJECT_ROOT
-from atm.config import (add_arguments_aws_s3, add_arguments_sql,
-                        add_arguments_datarun, add_arguments_logging,
-                        load_config, initialize_logging)
-
+from atm.config import (
+    add_arguments_aws_s3, add_arguments_datarun, add_arguments_logging, add_arguments_sql,
+    initialize_logging, load_config)
 from atm.database import Database
 from atm.enter_data import enter_data
 from atm.worker import work
 
+CONF_DIR = os.path.join(PROJECT_ROOT, 'config/test/')
+DATA_DIR = os.path.join(PROJECT_ROOT, 'data/test/')
+RUN_CONFIG = os.path.join(CONF_DIR, 'run-all.yaml')
+SQL_CONFIG = os.path.join(CONF_DIR, 'sql-sqlite.yaml')
 
-# database cli
+DATASETS_MAX_MIN = [
+    'wholesale-customers_1.csv',
+    'car_1.csv',
+    'wall-robot-navigation_1.csv',
+    'wall-robot-navigation_2.csv',
+    'wall-robot-navigation_3.csv',
+    'analcatdata_authorship_1.csv',
+    'cardiotocography_1.csv',
+    'wine_1.csv',
+    'seismic-bumps_1.csv',
+    'balance-scale_1.csv',
+]
+DATASETS_MAX_FIRST = [
+    'wine_1.csv',
+    'balance-scale_1.csv',
+    'seeds_1.csv',
+    'collins_1.csv',
+    'cpu_1.csv',
+    'vowel_1.csv',
+    'car_2.csv',
+    'hill-valley_2.csv',
+    'rabe_97_1.csv',
+    'monks-problems-2_1.csv',
+]
+DATASETS_SIMPLE = [
+    'pollution_1.csv',  # binary test data
+    'iris.data.csv',    # ternary test data
+]
+
+
+def _end_to_end_test(args):
+    """End to end test"""
+
+    db = Database(**vars(sql_config))
+
+    if args.verbose:
+        print('creating dataruns...')
+
+    datarun_ids = []
+
+    for ds in DATASETS_SIMPLE:
+        run_config.train_path = os.path.join(DATA_DIR, ds)
+        datarun_ids.append(enter_data(sql_config=sql_config, run_config=run_config))
+
+    work_parallel(
+        db=db,
+        datarun_ids=datarun_ids,
+        n_procs=args.processes,
+        total_time=args.total_time
+    )
+
+    for rid in datarun_ids:
+        print_summary(db, rid)
+
 
 # default values, user values
 def _work(args):
@@ -38,6 +93,7 @@ def _work(args):
          total_time=args.time,
          wait=False)
 
+
 def _enter_data(args):
 
     # default logging config is different if initialized from the command line
@@ -56,6 +112,7 @@ def _enter_data(args):
     # create and save the dataset and datarun
     enter_data(sql_conf, run_conf, aws_conf, args.run_per_partition)
 
+
 # load other functions from config.py
 def _add_common_arguments(parser):
     add_arguments_sql(parser)
@@ -73,7 +130,7 @@ def _get_parser():
     parser.set_defaults(action=None)
 
     # Enter Data Parser
-    enter_data = subparsers.add_parser('enter_data', parents=[parents])
+    enter_data = subparsers.add_parser('enter_data', parents=[parent])
     enter_data.set_defaults(action=_enter_data)
     _add_common_arguments(enter_data)
     add_arguments_datarun(enter_data)
@@ -81,10 +138,11 @@ def _get_parser():
                             help='if set, generate a new datarun for each hyperpartition')
 
     # Worker
-    worker = subparsers.add_parser('worker', parents=[parents])
+    worker = subparsers.add_parser('worker', parents=[parent])
     worker.set_defaults(action=_work)
     worker.add_argument('--cloud-mode', action='store_true', default=False,
                         help='Whether to run this worker in cloud mode')
+
     worker.add_argument('--dataruns', help='Only train on dataruns with these ids', nargs='+')
     worker.add_argument('--time', help='Number of seconds to run worker', type=int)
     worker.add_argument('--choose-randomly', action='store_true',
@@ -93,6 +151,17 @@ def _get_parser():
     worker.add_argument('--no-save', dest='save_files', default=True,
                         action='store_const', const=False,
                         help="don't save models and metrics at all")
+
+    # End to end test
+    end_to_end = subparser.add_parser('end_to_end', parents=[parent])
+    end_to_end.set_defaults(action=_end_to_end_test)
+    end_to_end.add_argument('--processes', help='number of processes to run concurrently',
+                            type=int, default=4)
+
+    end_to_end.add_argument('--total-time', help='Total time for each worker to work in seconds.',
+                            type=int, default=None)
+
+
 
 
 def main():
