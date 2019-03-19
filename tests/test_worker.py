@@ -11,11 +11,11 @@ from btb.tuning import GP
 from btb.tuning.tuner import BaseTuner
 
 from atm import PROJECT_ROOT
+from atm.classifier import Model
 from atm.config import LogConfig, RunConfig, SQLConfig
 from atm.constants import METRICS_BINARY, TIME_FMT
 from atm.database import Database, db_session
 from atm.enter_data import enter_data
-from atm.model import Model
 from atm.utilities import download_data, load_metrics, load_model
 from atm.worker import ClassifierError, Worker
 

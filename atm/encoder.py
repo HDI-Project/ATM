@@ -113,6 +113,9 @@ class DataEncoder(object):
 
             X = self.feature_encoder.transform(X)
 
+        else:
+            X = X.values
+
         return X, y
 
     def fit_transform(self, data):
