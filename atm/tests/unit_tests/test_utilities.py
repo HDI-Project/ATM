@@ -1,5 +1,5 @@
 import socket
-from unittest.mock import patch
+from mock import patch
 
 import btb.selection.selector
 import pytest

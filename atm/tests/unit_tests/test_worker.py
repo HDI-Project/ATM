@@ -1,7 +1,7 @@
 import datetime
 import os
 import random
-from unittest.mock import ANY, Mock, patch
+from mock import ANY, Mock, patch
 
 import numpy as np
 import pytest
