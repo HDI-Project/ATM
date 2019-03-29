@@ -6,17 +6,25 @@ from atm.config import (
     add_arguments_aws_s3, add_arguments_datarun, add_arguments_logging, add_arguments_sql)
 from atm.models import ATM
 
+
 def _end_to_end_test(args):
     """End to end test"""
 
 
 def _work(args):
-    atm = ATM(**args)
-    atm.work()
+    atm = ATM(**vars(args))
+    atm.work(
+        datarun_ids=args.dataruns,
+        choose_randomly=args.choose_randomly,
+        save_files=args.save_files,
+        cloud_mode=args.cloud_mode,
+        total_time=args.time,
+        wait=False
+    )
 
 
 def _enter_data(args):
-    atm = ATM(**args)
+    atm = ATM(**vars(args))
     atm.enter_data()
 
 
@@ -29,7 +37,6 @@ def _add_common_arguments(parser):
 
 def _get_parser():
     parent = argparse.ArgumentParser(add_help=False)
-    parent.add_argument('-v', '--verbose', action='store_true', help='Be verbose')
 
     parser = argparse.ArgumentParser(description='ATM Command Line Interface')
 
@@ -67,6 +74,8 @@ def _get_parser():
 
     end_to_end.add_argument('--total-time', help='Total time for each worker to work in seconds.',
                             type=int, default=None)
+
+    return parser
 
 
 def main():

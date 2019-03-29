@@ -10,7 +10,7 @@ from operator import attrgetter
 
 from past.utils import old_div
 
-from atm.config import load_config, initialize_login
+from atm.config import initialize_logging, load_config
 from atm.constants import PROJECT_ROOT, TIME_FMT, PartitionStatus
 from atm.database import Database
 from atm.encoder import MetaData
@@ -30,18 +30,16 @@ class ATM(object):
     LOOP_WAIT = 1
 
     def __init__(self, **kwargs):
-        self.sql_conf, self.run_conf, self.aws_conf, self.log_conf = load_config(
-            sql_path=kwargs.sql_config,
-            aws_path=kwargs.run_config,
-            log_path=kwargs.log_config,
-            **kwargs
-        )
 
-        self.db = Database(self.sql_conf)
+        if kwargs.get('log_config') is None:
+            kwargs['log_config'] = os.path.join(PROJECT_ROOT,
+                                                'config/templates/log-script.yaml')
 
-        if self.log_conf:
-            initialize_logging(self.log_conf)
+        self.sql_conf, self.run_conf, self.aws_conf, self.log_conf = load_config(**kwargs)
 
+        self.db = Database(**vars(self.sql_conf))
+
+        initialize_logging(self.log_conf)
 
     def work(self, datarun_ids=None, save_files=False, choose_randomly=True,
              cloud_mode=False, total_time=None, wait=True):
@@ -63,7 +61,7 @@ class ATM(object):
             and wait for new runs to be added. If False, exit once all dataruns are
             complete.
         """
-        start_time = datetime.datetime.now()
+        start_time = datetime.now()
         public_ip = get_public_ip()
 
         # main loop
@@ -98,7 +96,7 @@ class ATM(object):
             # actual work happens here
             worker = Worker(self.db, run, save_files=save_files,
                             cloud_mode=cloud_mode, aws_config=self.aws_conf,
-                            log_config=self.log_config, public_ip=public_ip)
+                            log_config=self.log_conf, public_ip=public_ip)
             try:
                 worker.run_classifier()
 
@@ -108,7 +106,7 @@ class ATM(object):
                 logger.warning('Something went wrong. Sleeping %d seconds.', ATM.LOOP_WAIT)
                 time.sleep(ATM.LOOP_WAIT)
 
-            elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
+            elapsed_time = (datetime.now() - start_time).total_seconds()
             if total_time is not None and elapsed_time >= total_time:
                 logger.warning('Total run time for worker exceeded; exiting.')
                 break
@@ -189,7 +187,7 @@ class ATM(object):
         # if the user has provided a dataset id, use that. Otherwise, create a new
         # dataset based on the arguments we were passed.
         if self.run_conf.dataset_id is None:
-            dataset = self.create_dataset(self.db, self.run_conf, aws_config=self.aws_conf)
+            dataset = self.create_dataset()
             self.run_conf.dataset_id = dataset.id
         else:
             dataset = self.db.get_dataset(self.run_conf.dataset_id)
@@ -206,7 +204,7 @@ class ATM(object):
         run_ids = []
         if not run_per_partition:
             logger.debug('saving datarun...')
-            datarun = self.create_datarun(self.db, dataset, self.run_conf)
+            datarun = self.create_datarun(dataset)
 
         logger.debug('saving hyperpartions...')
         for method, parts in list(method_parts.items()):
@@ -214,7 +212,7 @@ class ATM(object):
                 # if necessary, create a new datarun for each hyperpartition.
                 # This setting is useful for debugging.
                 if run_per_partition:
-                    datarun = self.create_datarun(self.db, dataset, self.run_conf)
+                    datarun = self.create_datarun(dataset)
                     run_ids.append(datarun.id)
 
                 # create a new hyperpartition in the database
@@ -238,6 +236,6 @@ class ATM(object):
 
         logger.info('\tHyperpartition selection strategy: %s', datarun.selector)
         logger.info('\tParameter tuning strategy: %s', datarun.tuner)
-        logger.info('\tBudget: %d (%s)', (datarun.budget, datarun.budget_type))
+        logger.info('\tBudget: %d (%s)', datarun.budget, datarun.budget_type)
 
         return run_ids or datarun.id
