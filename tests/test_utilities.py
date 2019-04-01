@@ -1,8 +1,8 @@
 import socket
-from mock import patch
 
-import btb.selection.selector
 import pytest
+from btb.selection.selector import Selector
+from mock import patch
 
 from atm import utilities
 from atm.constants import SELECTORS_MAP
@@ -15,9 +15,9 @@ def test_make_selector():
         'by_algorithm': {'svm': [1, 2], 'rf': [3, 4]}
     }
 
-    for Selector in SELECTORS_MAP.values():
-        selector = utilities.get_instance(Selector, **kwargs)
-        assert isinstance(selector, btb.selection.selector.Selector)
+    for selector_class in SELECTORS_MAP.values():
+        selector = utilities.get_instance(selector_class, **kwargs)
+        assert isinstance(selector, Selector)
 
 
 @patch('atm.utilities.requests')

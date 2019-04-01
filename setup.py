@@ -10,7 +10,7 @@ with open('HISTORY.md') as history_file:
     history = history_file.read()
 
 install_requires = [
-    'baytune',
+    'baytune==0.2.5',
     'boto>=2.48.0',
     'future>=0.16.0',
     'joblib>=0.11',
@@ -29,6 +29,14 @@ setup_requires = [
     'pytest-runner'
 ]
 
+tests_require = [
+    'mock>=2.0.0',
+    'pytest-cov>=2.5.1',
+    'pytest-runner>=3.0',
+    'pytest-xdist>=1.20.1',
+    'pytest>=3.2.3',
+]
+
 development_requires = [
     # general
     'bumpversion>=0.5.3',
@@ -41,24 +49,20 @@ development_requires = [
     'sphinx_rtd_theme>=0.2.4',
 
     # style check
-    'flake8>=3.5.0',
+    'flake8>=3.7.7',
     'isort>=4.3.4',
 
     # fix style issues
     'autoflake>=1.1',
-    'autopep8>=1.3.5',
+    'autopep8>=1.4.3',
 
     # distribute on PyPI
     'twine>=1.10.0',
     'wheel>=0.30.0',
-]
 
-tests_require = [
-    'mock>=2.0.0',
-    'pytest-cov>=2.5.1',
-    'pytest-runner>=3.0',
-    'pytest-xdist>=1.20.1',
-    'pytest>=3.2.3',
+    # Advanced testing
+    'coverage>=4.5.1',
+    'tox>=2.9.1',
 ]
 
 setup(
@@ -76,7 +80,6 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
     ],
-    dependency_links=['git+https://github.com/HDI-Project/BTB.git@9da36bc61bad39346298c150e9bb93112baf48ba#egg=baytune'],
     description="Auto Tune Models",
     entry_points={
         'console_scripts': [
@@ -99,6 +102,6 @@ setup(
     test_suite='tests',
     tests_require=tests_require,
     url='https://github.com/HDI-project/ATM',
-    version='0.1.0',
+    version='0.1.1-dev',
     zip_safe=False,
 )

@@ -1,7 +1,6 @@
 import datetime
 import os
 import random
-from mock import ANY, Mock, patch
 
 import numpy as np
 import pytest
@@ -9,6 +8,7 @@ from btb.selection import BestKVelocity
 from btb.selection.selector import Selector
 from btb.tuning import GP
 from btb.tuning.tuner import BaseTuner
+from mock import ANY, Mock, patch
 
 from atm import PROJECT_ROOT
 from atm.classifier import Model

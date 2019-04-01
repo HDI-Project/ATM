@@ -79,7 +79,7 @@ class DataEncoder(object):
         # Set sparse to False so that we can test for NaNs in the output
         if self.categorical_columns:
             self.feature_encoder = OneHotEncoder(
-                categorical_X=self.categorical_columns,
+                categorical_features=self.categorical_columns,
                 sparse=False
             )
             self.feature_encoder.fit(X)

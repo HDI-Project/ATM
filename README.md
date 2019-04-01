@@ -1,3 +1,10 @@
+<p align="left">
+<img width=15% src="https://dai.lids.mit.edu/wp-content/uploads/2018/06/Logo_DAI_highres.png" alt=“ATM” />
+<i>An open source project from Data to AI Lab at MIT.</i>
+</p>
+
+
+
 [![CircleCI][circleci-img]][circleci-url]
 [![Coverage status][codecov-img]][codecov-url]
 [![Documentation][rtd-img]][rtd-url]
@@ -67,12 +74,16 @@ Unix-based systems.
 
 ATM is compatible with and has been tested on Python 2.7, 3.5, and 3.6.
 
-1. **Clone the project**
+1. **Clone the project and checkout the stable branch**
 
    ```
    git clone https://github.com/hdi-project/ATM.git /path/to/atm
    cd /path/to/atm
+   git checkout stable
    ```
+
+   **WARNING:** master branch is under active development and is not guaranteed to be fully
+   functional at all times. Don't forget the `git checkout stable` step for optimal results!
 
 2. **Install a database**
 
