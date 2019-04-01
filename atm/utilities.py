@@ -12,7 +12,6 @@ from builtins import str
 import numpy as np
 import requests
 from boto.s3.connection import Key, S3Connection
-from btb import ParamTypes
 
 from atm.compat import getargs
 from atm.constants import DATA_DL_PATH, HTTP_PREFIX, S3_PREFIX, FileType
@@ -93,17 +92,13 @@ def obj_has_method(obj, method):
 
 # Converting hyperparameters to and from BTB-compatible formats
 
-def vector_to_params(vector, tunables, categoricals, constants):
+def update_params(params, categoricals, constants):
     """
-    Converts a numpy vector to a dictionary mapping keys to named parameters.
+    Update params with categoricals and constants for the fitting proces.
 
-    vector: single example to convert
+    params: params proposed by the tuner
 
     Examples of the format for SVM sigmoid hyperpartition:
-
-    tunables = [('C', HyperParameter(type='float_exp', range=(1e-05, 1e5))),
-                ('degree', HyperParameter(type='int', range=(2, 4))),
-                ('gamma', HyperParameter(type='float_exp', range=(1e-05, 1e5)))]
 
     categoricals = (('kernel', 'poly'),
                     ('probability', True),
@@ -111,44 +106,30 @@ def vector_to_params(vector, tunables, categoricals, constants):
 
     constants = [('cache_size', 15000)]
     """
-    params = {}
-
-    # add the tunables
-    for i, elt in enumerate(vector):
-        key, struct = tunables[i]
-        if struct.type in [ParamTypes.INT, ParamTypes.INT_EXP]:
-            params[key] = int(elt)
-        elif struct.type in [ParamTypes.FLOAT, ParamTypes.FLOAT_EXP]:
-            params[key] = float(elt)
-        else:
-            raise ValueError('Unknown data type: {}'.format(struct.type))
-
-    # add the fixed categorical settings and fixed constant values
     for key, value in categoricals + constants:
         params[key] = value
 
     return params
 
 
-def make_selector(selector_class, **kwargs):
-    """Instantiate a selector of the given class with unused kwargs
-
-    BTB Selectors accept different kwargs. ATM allows all kwargs to be configured, but some will not be accepted by different Selector classes. This wrapper inspects the __init__ signature to pass the selector the relevant kwargs.
+def get_instance(class_, **kwargs):
+    """Instantiate an instance of the given class with unused kwargs
 
     Args:
-        selector_class (type): selector class to instantiate
+        class_ (type): class to instantiate
         **kwargs: keyword arguments to specific selector class
 
     Returns:
-        Selector: instate of specific selector
+        instance of specific class with the args that accepts.
     """
-    init_args = getargs(selector_class.__init__)
+    init_args = getargs(class_.__init__)
     relevant_kwargs = {
         k: kwargs[k]
         for k in kwargs
         if k in init_args
     }
-    return selector_class(**relevant_kwargs)
+
+    return class_(**relevant_kwargs)
 
 
 def params_to_vectors(params, tunables):
@@ -180,6 +161,7 @@ def params_to_vectors(params, tunables):
     for i, p in enumerate(params):
         for j, k in enumerate(keys):
             vectors[i, j] = p[k]
+
     return vectors
 
 

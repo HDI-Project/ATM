@@ -1,7 +1,7 @@
 import inspect
 
-import six
 from six import PY2
+
 
 def getargs(func):
     if PY2:

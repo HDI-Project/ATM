@@ -22,9 +22,9 @@ from atm.config import LogConfig
 from atm.constants import CUSTOM_CLASS_REGEX, SELECTORS_MAP, TUNERS_MAP
 from atm.database import ClassifierStatus, db_session
 from atm.model import Model
-from atm.utilities import (download_data, ensure_directory, get_public_ip,
-                           make_selector, params_to_vectors, save_metrics,
-                           save_model, vector_to_params)
+from atm.utilities import (download_data, ensure_directory, get_instance,
+                           get_public_ip, params_to_vectors, save_metrics,
+                           save_model, update_params)
 
 # shhh
 warnings.filterwarnings('ignore')
@@ -90,6 +90,7 @@ class Worker(object):
                                        self.datarun.selector).groups()
             mod = imp.load_source('btb.selection.custom', path)
             Selector = getattr(mod, classname)
+
         logger.info('Selector: %s' % Selector)
 
         # generate the arguments we need to initialize the selector
@@ -97,13 +98,14 @@ class Worker(object):
         hp_by_method = defaultdict(list)
         for hp in hyperpartitions:
             hp_by_method[hp.method].append(hp.id)
+
         hyperpartition_ids = [hp.id for hp in hyperpartitions]
 
         # Selector classes support passing in redundant arguments
-        self.selector = make_selector(Selector,
-                                      choices=hyperpartition_ids,
-                                      k=self.datarun.k_window,
-                                      by_algorithm=dict(hp_by_method))
+        self.selector = get_instance(Selector,
+                                     choices=hyperpartition_ids,
+                                     k=self.datarun.k_window,
+                                     by_algorithm=dict(hp_by_method))
 
     def load_tuner(self):
         """
@@ -117,10 +119,10 @@ class Worker(object):
         if self.datarun.tuner in TUNERS_MAP:
             self.Tuner = TUNERS_MAP[self.datarun.tuner]
         else:
-            path, classname = re.match(CUSTOM_CLASS_REGEX,
-                                       self.datarun.tuner).groups()
+            path, classname = re.match(CUSTOM_CLASS_REGEX, self.datarun.tuner).groups()
             mod = imp.load_source('btb.tuning.custom', path)
             self.Tuner = getattr(mod, classname)
+
         logger.info('Tuner: %s' % self.Tuner)
 
     def select_hyperpartition(self):
@@ -164,43 +166,39 @@ class Worker(object):
         if not len(tunables):
             logger.warning('No tunables for hyperpartition %d' % hyperpartition.id)
             self.db.mark_hyperpartition_gridding_done(hyperpartition.id)
-            return vector_to_params(vector=[],
-                                    tunables=tunables,
-                                    categoricals=hyperpartition.categoricals,
-                                    constants=hyperpartition.constants)
+            return update_params(params=[],
+                                 tunables=tunables,
+                                 categoricals=hyperpartition.categoricals,
+                                 constants=hyperpartition.constants)
 
         # Get previously-used parameters: every classifier should either be
         # completed or have thrown an error
         all_clfs = self.db.get_classifiers(hyperpartition_id=hyperpartition.id)
-        classifiers = [c for c in all_clfs
-                       if c.status == ClassifierStatus.COMPLETE]
+        classifiers = [c for c in all_clfs if c.status == ClassifierStatus.COMPLETE]
 
-        # Extract parameters and scores as numpy arrays from classifiers
-        X = params_to_vectors([c.hyperparameter_values for c in classifiers],
-                              tunables)
-        y = np.array([float(getattr(c, self.datarun.score_target))
-                      for c in classifiers])
+        X = [c.hyperparameter_values for c in classifiers]
+        y = np.array([float(getattr(c, self.datarun.score_target)) for c in classifiers])
 
         # Initialize the tuner and propose a new set of parameters
         # this has to be initialized with information from the hyperpartition, so we
         # need to do it fresh for each classifier (not in load_tuner)
-        tuner = self.Tuner(tunables=tunables,
-                           gridding=self.datarun.gridding,
-                           r_minimum=self.datarun.r_minimum)
-        tuner.fit(X, y)
-        vector = tuner.propose()
+        tuner = get_instance(self.Tuner,
+                             tunables=tunables,
+                             gridding=self.datarun.gridding,
+                             r_minimum=self.datarun.r_minimum)
+        if len(X) > 0:
+            tuner.add(X, y)
 
-        if vector is None and self.datarun.gridding:
+        params = tuner.propose()
+        if params is None and self.datarun.gridding:
             logger.info('Gridding done for hyperpartition %d' % hyperpartition.id)
             self.db.mark_hyperpartition_gridding_done(hyperpartition.id)
             return None
 
-        # Convert the numpy array of parameters to a form that can be
-        # interpreted by ATM, then return.
-        return vector_to_params(vector=vector,
-                                tunables=tunables,
-                                categoricals=hyperpartition.categoricals,
-                                constants=hyperpartition.constants)
+        # Append categorical and constants to the params.
+        return update_params(params=params,
+                             categoricals=hyperpartition.categoricals,
+                             constants=hyperpartition.constants)
 
     def test_classifier(self, method, params):
         """
@@ -212,11 +210,13 @@ class Worker(object):
                       judgment_metric=self.datarun.metric,
                       class_column=self.dataset.class_column,
                       verbose_metrics=self.verbose_metrics)
+
         train_path, test_path = download_data(self.dataset.train_path,
                                               self.dataset.test_path,
                                               self.aws_config)
-        metrics = model.train_test(train_path=train_path,
-                                   test_path=test_path)
+
+        metrics = model.train_test(train_path=train_path, test_path=test_path)
+
         target = self.datarun.score_target
 
         def metric_string(model):
@@ -266,11 +266,11 @@ class Worker(object):
             if self.cloud_mode:
                 try:
                     self.save_classifier_cloud(model_path, metric_path)
+
                 except Exception:
                     msg = traceback.format_exc()
                     logger.error('Error in save_classifier_cloud()')
-                    self.db.mark_classifier_errored(classifier_id,
-                                                    error_message=msg)
+                    self.db.mark_classifier_errored(classifier_id, error_message=msg)
         else:
             model_path = None
             metric_path = None
@@ -377,6 +377,7 @@ class Worker(object):
 
             # use tuner to choose a set of parameters for the hyperpartition
             params = self.tune_hyperparameters(hyperpartition)
+
         except Exception:
             logger.error('Error choosing hyperparameters: datarun=%s' % str(self.datarun))
             logger.error(traceback.format_exc())
@@ -403,6 +404,7 @@ class Worker(object):
             model, metrics = self.test_classifier(hyperpartition.method, params)
             logger.debug('Saving classifier...')
             self.save_classifier(classifier.id, model, metrics)
+
         except Exception:
             msg = traceback.format_exc()
             logger.error('Error testing classifier: datarun=%s' % str(self.datarun))
@@ -442,14 +444,14 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
     while True:
         # get all pending and running dataruns, or all pending/running dataruns
         # from the list we were given
-        dataruns = db.get_dataruns(include_ids=datarun_ids,
-                                   ignore_complete=True)
+        dataruns = db.get_dataruns(include_ids=datarun_ids, ignore_complete=True)
         if not dataruns:
             if wait:
                 logger.warning('No dataruns found. Sleeping %d seconds and trying again.'
                                % LOOP_WAIT)
                 time.sleep(LOOP_WAIT)
                 continue
+
             else:
                 logger.warning('No dataruns found. Exiting.')
                 break
@@ -473,6 +475,7 @@ def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
                         log_config=log_config, public_ip=public_ip)
         try:
             worker.run_classifier()
+
         except ClassifierError:
             # the exception has already been handled; just wait a sec so we
             # don't go out of control reporting errors

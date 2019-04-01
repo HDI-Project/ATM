@@ -10,7 +10,7 @@ with open('HISTORY.md') as history_file:
     history = history_file.read()
 
 requirements = [
-    'baytune>=0.2.2',
+    'baytune>=0.2.5',
     'boto>=2.48.0',
     'future>=0.16.0',
     'joblib>=0.11',
@@ -36,6 +36,7 @@ test_requirements = [
     'pytest-xdist>=1.20.1',
     'pytest>=3.2.3',
 ]
+
 
 setup(
     author="MIT Data To AI Lab",

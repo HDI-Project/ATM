@@ -146,8 +146,8 @@ class Model(object):
 
         self.cv_judgment_metric = np.mean(df[self.judgment_metric])
         self.cv_judgment_metric_stdev = np.std(df[self.judgment_metric])
-        self.mu_sigma_judgment_metric = (self.cv_judgment_metric -
-                                         2 * self.cv_judgment_metric_stdev)
+        self.mu_sigma_judgment_metric = (self.cv_judgment_metric
+                                         - 2 * self.cv_judgment_metric_stdev)
         return cv_scores
 
     def test_final_model(self, X, y):
@@ -247,7 +247,7 @@ class Model(object):
         """
         # create list parameters
         lists = defaultdict(list)
-        element_regex = re.compile('(.*)\[(\d)\]')
+        element_regex = re.compile(r'(.*)\[(\d)\]')
         for name, param in list(params.items()):
             # look for variables of the form "param_name[1]"
             match = element_regex.match(name)
