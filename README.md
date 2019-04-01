@@ -153,7 +153,7 @@ The data has 15 features and the last column is the `class` label.
 
    This command will create a `datarun`. In ATM, a "datarun" is a single logical machine learning
    task. If you run the above command without any arguments, it will use the default settings
-   found in `atm/config.py` to create a new SQLite3 database at `./atm.db`, create a new
+   found in the code to create a new SQLite3 database at `./atm.db`, create a new
    `dataset` instance which refers to the data above, and create a `datarun` instance which
    points to that dataset. More about what is stored in this database and what is it used for
    can be found [here](https://cyphe.rs/static/atm.pdf).
@@ -212,7 +212,7 @@ all workers will exit gracefully.
 
 ## Customizing ATM's configuration and using your own data
 
-ATM's default configuration is fully controlled by `atm/config.py`. Our documentation will
+ATM's default configuration is fully controlled by the intern code. Our documentation will
 cover the configuration in more detail, but this section provides a brief overview of how
 to specify the most important values.
 
