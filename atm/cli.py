@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import glob
+import os
+import shutil
 
 from atm.config import (
     add_arguments_aws_s3, add_arguments_datarun, add_arguments_logging, add_arguments_sql)
@@ -26,6 +29,17 @@ def _work(args):
 def _enter_data(args):
     atm = ATM(**vars(args))
     atm.enter_data()
+
+
+def _make_config(args):
+    config_templates = os.path.join('config', 'templates')
+    config_dir = os.path.join(os.path.dirname(__file__), config_templates)
+    target_dir = os.path.join(os.getcwd(), config_templates)
+    os.makedirs(target_dir, exist_ok=True)
+    for template in glob.glob(os.path.join(config_dir, '*.yaml')):
+        target_file = os.path.join(target_dir, os.path.basename(template))
+        print('Generating file {}'.format(target_file))
+        shutil.copy(template, target_file)
 
 
 # load other functions from config.py
@@ -54,6 +68,7 @@ def _get_parser():
     # Worker
     worker = subparsers.add_parser('worker', parents=[parent])
     worker.set_defaults(action=_work)
+    _add_common_arguments(worker)
     worker.add_argument('--cloud-mode', action='store_true', default=False,
                         help='Whether to run this worker in cloud mode')
 
@@ -65,6 +80,10 @@ def _get_parser():
     worker.add_argument('--no-save', dest='save_files', default=True,
                         action='store_const', const=False,
                         help="don't save models and metrics at all")
+
+    # Make Config
+    make_config = subparsers.add_parser('make_config', parents=[parent])
+    make_config.set_defaults(action=_make_config)
 
     # End to end test
     end_to_end = subparsers.add_parser('end_to_end', parents=[parent])
