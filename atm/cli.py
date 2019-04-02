@@ -35,7 +35,9 @@ def _make_config(args):
     config_templates = os.path.join('config', 'templates')
     config_dir = os.path.join(os.path.dirname(__file__), config_templates)
     target_dir = os.path.join(os.getcwd(), config_templates)
-    os.makedirs(target_dir, exist_ok=True)
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir, exist_ok=True)
+
     for template in glob.glob(os.path.join(config_dir, '*.yaml')):
         target_file = os.path.join(target_dir, os.path.basename(template))
         print('Generating file {}'.format(target_file))
