@@ -13,7 +13,7 @@ From 10,000 feet, a "method" in ATM comprises the following:
 
 3. A *conditional parameter tree* that defines how hyperparameters depend on one
    another; and
-   
+
 4. A JSON file in ``atm/methods/`` that describes all of the above.
 
 1. Valid method classes
@@ -44,14 +44,14 @@ All configuration for a classification method must be described in a json file w
 
 - "name" is a short string (or "code") which ATM uses to refer to the method.
 - "class" is an import path to the class which Python can interpret.
-- "hyperparameters" is a list of hyperparameters which ATM will attempt to tune. 
-  
+- "hyperparameters" is a list of hyperparameters which ATM will attempt to tune.
+
 Defining hyperparameters
 ^^^^^^^^^^^^^^^^^^^^^^^^
-Most parameter definitions have two fields: "type" and either "range" or "values". 
+Most parameter definitions have two fields: "type" and either "range" or "values".
 The "type" is one of ["float", "float_exp", "float_cat", "int", "int_exp",
 "int_cat", "string", "bool"]. Types ending in "_cat" are categorical
-types, and those ending in "_exp" are exponential types. 
+types, and those ending in "_exp" are exponential types.
 
 - If the type is ordinal or continuous (e.g. "int" or "float"), "range"
   defines the upper and lower bound on possible values for the parameter.
@@ -131,11 +131,11 @@ If ``kernel`` is set to "matern", it means ``nu`` must also be set. If it's set 
 
 The example above defines a conditional parameter tree that looks something like
 this::
-    kernel-----------------------  
-    |        \                   \ 
+    kernel-----------------------
+    |        \                   \
     matern    rational_quadratic  exp_sine_squared
-    |         |           |       |             |    
-    nu      length_scale  alpha   length_scale  periodicity 
+    |         |           |       |             |
+    nu      length_scale  alpha   length_scale  periodicity
 
 
 3. (Optional) Adding a new method to the ATM library
@@ -156,4 +156,3 @@ Test out your method with ``python scripts/test_method.py --method
 good to go.  Commit your changes to a separate branch, then open up a pull
 request in the main repository. Explain why your method is a useful addition to
 ATM, and we'll merge it in if we agree!
-

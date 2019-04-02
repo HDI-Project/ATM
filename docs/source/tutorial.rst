@@ -29,7 +29,7 @@ Here's a handy Python script to create a CSV header line for data that doesn't h
         separator = ","
         zip([name for i in range(n_features)], range(1, n_features + 1, 1))
         header_row_string = separator.join(
-            [x + str(y) for (x, y) in 
+            [x + str(y) for (x, y) in
             ])
         return separator.join([class_label_name, header_row_string])
 
@@ -41,12 +41,13 @@ Once your data in the proper format, you can upload it to the ModelHub for proce
 
 Configuration File
 ^^^^^^^^^^^^^^^^^^
+
 To run ATM, you must create a configuration file.
+
 A configuration file template is included in ``config/atm.cnf.template`` (and shown below).
 Since the configuration file contains passwords, it's best to rename it to ``atm.cnf`` so that it will be ignored by git.
 This is especially true if you plan to make changes to ATM and upload them to the repository.
 The git repository is setup to ignore all files in the ``config`` folder except ``atm.cnf.template``.
-
 
 The name of the file must also be a environmental variable called ``ATM_CONFIG_FILE``.
 For example if the configuration file is called ``atm.cnf`` in the ``config`` directory of the root atm directory, then an environmental variable would created with the command::
@@ -61,7 +62,7 @@ A datarun consists of all the parameters for a single experiment run, including 
 The datarun ID in the database also ties together the `hyperpartitions` (frozen sets) which delineate how ATM can explore different subtypes of classifiers to maximize their performance.
 Once the configuration file is filled out, we can enter it in ModelHub with::
 
-    (atm-env) $ python enter_data.py
+    (atm-env) $ atm enter_data
 
 Workers
 -------
@@ -73,7 +74,7 @@ On a Local Machine
 
 In local mode, this is simple::
 
-    (atm-env) $ python worker.py
+    (atm-env) $ atm worker
 
 This command can b executed several times to create many workers that operate independently in parallel.
 How many to run depends of your judgment of your computer's capabilities.

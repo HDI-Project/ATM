@@ -57,29 +57,32 @@ class DataEncoder(object):
             raise KeyError('Class column "%s" not found in dataset!' %
                            self.class_column)
 
-        cat_cols = []
+        self.categorical_columns = []
         if self.feature_columns is None:
-            features = data.drop([self.class_column], axis=1)
-            self.feature_columns = features.columns
+            X = data.drop([self.class_column], axis=1)
+            self.feature_columns = X.columns
         else:
-            features = data[self.feature_columns]
+            X = data[self.feature_columns]
 
         # encode categorical columns, leave ordinal values alone
-        for column in features.columns:
-            if features[column].dtype == 'object':
+        for column in X.columns:
+            if X[column].dtype == 'object':
                 # save the indices of categorical columns for one-hot encoding
-                cat_cols.append(features.columns.get_loc(column))
+                self.categorical_columns.append(X.columns.get_loc(column))
 
                 # encode each feature as an integer in range(unique_vals)
                 le = LabelEncoder()
-                features[column] = le.fit_transform(features[column])
+                X[column] = le.fit_transform(X[column])
                 self.column_encoders[column] = le
 
         # One-hot encode the whole feature matrix.
         # Set sparse to False so that we can test for NaNs in the output
-        self.feature_encoder = OneHotEncoder(categorical_features=cat_cols,
-                                             sparse=False)
-        self.feature_encoder.fit(features)
+        if self.categorical_columns:
+            self.feature_encoder = OneHotEncoder(
+                categorical_features=self.categorical_columns,
+                sparse=False
+            )
+            self.feature_encoder.fit(X)
 
         # Train an encoder for the label as well
         labels = np.array(data[[self.class_column]])
@@ -99,14 +102,19 @@ class DataEncoder(object):
         else:
             y = None
 
-        features = data[self.feature_columns]
+        X = data[self.feature_columns]
 
-        # encode each categorical feature as an integer
-        for column, encoder in list(self.column_encoders.items()):
-            features[column] = encoder.transform(features[column])
+        # one-hot encode the categorical X
+        if self.categorical_columns:
 
-        # one-hot encode the categorical features
-        X = self.feature_encoder.transform(features)
+            # encode each categorical feature as an integer
+            for column, encoder in list(self.column_encoders.items()):
+                X[column] = encoder.transform(X[column])
+
+            X = self.feature_encoder.transform(X)
+
+        else:
+            X = X.values
 
         return X, y
 

@@ -5,13 +5,12 @@ from builtins import range
 import numpy as np
 import pandas as pd
 from past.utils import old_div
-from sklearn.metrics import (accuracy_score, average_precision_score,
-                             cohen_kappa_score, f1_score, matthews_corrcoef,
-                             precision_recall_curve, roc_auc_score, roc_curve)
+from sklearn.metrics import (
+    accuracy_score, average_precision_score, cohen_kappa_score, f1_score, matthews_corrcoef,
+    precision_recall_curve, roc_auc_score, roc_curve)
 from sklearn.model_selection import StratifiedKFold
 
-from atm.constants import (METRICS_BINARY, METRICS_MULTICLASS, N_FOLDS_DEFAULT,
-                           Metrics)
+from atm.constants import METRICS_BINARY, METRICS_MULTICLASS, N_FOLDS_DEFAULT, Metrics
 
 
 def rank_n_accuracy(y_true, y_prob_mat, n=0.33):

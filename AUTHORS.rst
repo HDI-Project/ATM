@@ -9,8 +9,9 @@ Contributors
 * Thomas Swearingen <swearin3@msu.edu>
 * Kalyan Veeramachaneni <kveerama.su@gmail.com>
 * Laura Gustafson <lgustaf@mit.edu>
-* Carles Sala <c.sala.stq@gmail.com>
+* Carles Sala <csala@csail.mit.edu>
 * Micah Smith <micahjsmith@gmail.com>
+* Plamen Valentinov <plamen@pythiac.com>
 * Kiran Karra <kiran.karra@gmail.com>
 * swearin3 <swearin3@msu.edu>
 * Max Kanter <kmax12@gmail.com>

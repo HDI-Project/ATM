@@ -5,7 +5,7 @@ This page is a quick tutorial to help you get ATM up and running for the first
 time. We'll use a featurized dataset for a binary classification problem,
 already saved in ``atm/data/test/pollution_1.csv``. This is one of the datasets
 available on `openml.org <https://openml.org>`_.  More information about the
-data can be found `here <https://www.openml.org/d/542>`_. 
+data can be found `here <https://www.openml.org/d/542>`_.
 
 Our goal is predict mortality using the metrics associated with the air
 pollution. Below we show a snapshot of the csv file. The dataset has 15
@@ -34,14 +34,14 @@ Before we can train any classifiers, we need to create a datarun. In ATM, a
 datarun is a single logical machine learning task. The ``enter_data.py`` script
 will set up everything you need.::
 
-$ python scripts/enter_data.py
+(atm-env) $ atm enter_data
 
 The first time you run it, the above command will create a ModelHub database, a
 dataset, and a datarun. If you run it without any arguments, it will load
 configuration from the default values defined in ``atm/config.py``. By default,
 it will create a new SQLite3 database at ./atm.db, create a new dataset instance
 which refers to the data at ``atm/data/test/pollution_1.csv``, and create a
-datarun instance which points to that dataset. 
+datarun instance which points to that dataset.
 
 The command should produce output that looks something like this:::
 
@@ -75,7 +75,7 @@ An ATM *worker* is a process that connects to a ModelHub, asks it what dataruns
 need to be worked on, and trains and tests classifiers until all the work is
 done. To run one, use the following command::
 
-$ python scripts/worker.py 
+(atm-env) $ atm worker.py
 
 This will start a process that builds classifiers, tests them, and saves them to
 the ./models/ directory. As it runs, it should print output indicating which
@@ -102,7 +102,7 @@ of hyperparameters to find the absolute best model for your problem. You can
 break out of the worker with Ctrl+C and restart it with the same command; it
 will pick up right where it left off. You can also run the command
 simultaneously in different terminals to parallelize the work -- all workers
-will refer to the same ModelHub database. 
+will refer to the same ModelHub database.
 
 Occassionally, a worker will encounter an error in the process of building and
 testing a classifier. Don't worry: when this happens, the worker will print
