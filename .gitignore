@@ -96,6 +96,7 @@ docs/build/
 docs/modules.rst
 docs/atm.rst
 docs/atm.*.rst
+docs/api
 
 # PyBuilder
 target/

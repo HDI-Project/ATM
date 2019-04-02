@@ -159,12 +159,24 @@ bumpversion-release: ## Merge master to stable and bumpversion release
 	bumpversion release
 	git push --tags origin stable
 
+.PHONY: test-bumpversion-release
+test-bumpversion-release: ## Merge master to stable and bumpversion release
+	git checkout stable
+	git merge --no-ff master -m"make release-tag: Merge branch 'master' into stable"
+	bumpversion release
+
 .PHONY: bumpversion-patch
 bumpversion-patch: ## Merge stable to master and bumpversion patch
 	git checkout master
 	git merge stable
 	bumpversion --no-tag patch
 	git push
+
+.PHONY: test-bumpversion-patch
+test-bumpversion-patch: ## Merge stable to master and bumpversion patch
+	git checkout master
+	git merge stable
+	bumpversion --no-tag patch
 
 .PHONY: bumpversion-minor
 bumpversion-minor: ## Bump the version the next minor skipping the release
@@ -194,3 +206,6 @@ release-minor: check-release bumpversion-minor release
 
 .PHONY: release-major
 release-major: check-release bumpversion-major release
+
+.PHONY: test-release
+test-release: check-release test-bumpversion-release test-publish test-bumpversion-patch
