@@ -36,7 +36,7 @@ def _make_config(args):
     config_dir = os.path.join(os.path.dirname(__file__), config_templates)
     target_dir = os.path.join(os.getcwd(), config_templates)
     if not os.path.exists(target_dir):
-        os.makedirs(target_dir, exist_ok=True)
+        os.makedirs(target_dir)
 
     for template in glob.glob(os.path.join(config_dir, '*.yaml')):
         target_file = os.path.join(target_dir, os.path.basename(template))
