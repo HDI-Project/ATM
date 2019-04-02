@@ -1,4 +1,4 @@
-Adding a BTB Selector or Tuner 
+Adding a BTB Selector or Tuner
 ==============================
 
 BTB is the metamodeling library and framework at the core of ATM. It defines two
@@ -24,7 +24,7 @@ create a new datarun with the 'selector' or 'tuner' set to
 
 .. Creating a hyperpartition Selector
    ----------------------------------
-   A parameter selector can be created by creating a class which inherits the ``btb.Selector`` class. The class must have a ``select`` method which returns the chose parameters. 
+   A parameter selector can be created by creating a class which inherits the ``btb.Selector`` class. The class must have a ``select`` method which returns the chose parameters.
 
 
 .. Changing the acquisition function
@@ -35,4 +35,3 @@ create a new datarun with the 'selector' or 'tuner' set to
 .. Creating a hyperparameter Tuner
    -------------------------------
    A parameter selector can be created by creating a class which inherits the ``btb.Tuner`` class. The class must have a ``select()`` method which returns the chose parameters.  An example which uses the UCB1 algorithm to choose the hyperpartition is shown below.
-

@@ -14,7 +14,7 @@ Background
 `AutoML <http://www.ml4aad.org/automl/>`_ systems attempt to automate part or all
 of the machine learning pipeline, from data cleaning to feature extraction to
 model selection and tuning. ATM focuses on the last part of the machine-learning
-pipeline: model selection and hyperparameter tuning. 
+pipeline: model selection and hyperparameter tuning.
 
 Machine learning algorithms typically have a number of parameters (called
 *hyperparameters*) that must be chosen in order to define their behavior. ATM
@@ -34,7 +34,7 @@ hyperparameters (using another HDI Project library, `BTB
 best model within a limited amount of time or by training a limited amount of
 total models.
 
-ATM can be used locally or on a cloud-computing cluster with AWS. 
+ATM can be used locally or on a cloud-computing cluster with AWS.
 Currently, ATM only works with classification problems, but the project is under
 active development. If you like the project and would like to help out, check
 out our guide to `contributing <contributing.html>`_!
