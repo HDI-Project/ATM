@@ -8,17 +8,17 @@ from datetime import datetime
 from operator import attrgetter
 
 import pandas as pd
-from sqlalchemy import (Column, DateTime, Enum, ForeignKey, Integer, MetaData,
-                        Numeric, String, Text, and_, create_engine, func,
-                        inspect)
+from sqlalchemy import (
+    Column, DateTime, Enum, ForeignKey, Integer, MetaData, Numeric, String, Text, and_,
+    create_engine, func, inspect)
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.orm.properties import ColumnProperty
 
-from atm.constants import (BUDGET_TYPES, CLASSIFIER_STATUS, DATARUN_STATUS,
-                           METRICS, PARTITION_STATUS, SCORE_TARGETS,
-                           ClassifierStatus, PartitionStatus, RunStatus)
+from atm.constants import (
+    BUDGET_TYPES, CLASSIFIER_STATUS, DATARUN_STATUS, METRICS, PARTITION_STATUS, SCORE_TARGETS,
+    ClassifierStatus, PartitionStatus, RunStatus)
 from atm.utilities import base_64_to_object, object_to_base_64
 
 # The maximum number of errors allowed in a single hyperpartition. If more than
@@ -277,8 +277,7 @@ class Database(object):
                 # judgment metric
                 if self.cv_judgment_metric is None:
                     return None
-                return (self.cv_judgment_metric - 2 *
-                        self.cv_judgment_metric_stdev)
+                return (self.cv_judgment_metric - 2 * self.cv_judgment_metric_stdev)
 
             def __repr__(self):
                 params = ', '.join(['%s: %s' % i for i in
@@ -422,11 +421,9 @@ class Database(object):
         if method is not None:
             query = query.filter(self.Hyperpartition.method == method)
         if ignore_gridding_done:
-            query = query.filter(self.Hyperpartition.status !=
-                                 PartitionStatus.GRIDDING_DONE)
+            query = query.filter(self.Hyperpartition.status != PartitionStatus.GRIDDING_DONE)
         if ignore_errored:
-            query = query.filter(self.Hyperpartition.status !=
-                                 PartitionStatus.ERRORED)
+            query = query.filter(self.Hyperpartition.status != PartitionStatus.ERRORED)
 
         return query.all()
 
@@ -449,8 +446,7 @@ class Database(object):
             query = query.join(self.Hyperpartition)\
                 .filter(self.Hyperpartition.method == method)
         if hyperpartition_id is not None:
-            query = query.filter(self.Classifier.hyperpartition_id ==
-                                 hyperpartition_id)
+            query = query.filter(self.Classifier.hyperpartition_id == hyperpartition_id)
         if status is not None:
             query = query.filter(self.Classifier.status == status)
 
@@ -614,8 +610,9 @@ class Database(object):
         classifier.error_message = error_message
         classifier.status = ClassifierStatus.ERRORED
         classifier.end_time = datetime.now()
-        if (self.get_number_of_hyperpartition_errors(classifier.hyperpartition_id) >
-                MAX_HYPERPARTITION_ERRORS):
+
+        noh_errors = self.get_number_of_hyperpartition_errors(classifier.hyperpartition_id)
+        if noh_errors > MAX_HYPERPARTITION_ERRORS:
             self.mark_hyperpartition_errored(classifier.hyperpartition_id)
 
     @try_with_session(commit=True)

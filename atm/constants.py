@@ -4,9 +4,9 @@ import logging
 import os
 from builtins import object
 
-from btb.selection import (UCB1, BestKReward, BestKVelocity,
-                           HierarchicalByAlgorithm, PureBestKVelocity,
-                           RecentKReward, RecentKVelocity)
+from btb.selection import (
+    UCB1, BestKReward, BestKVelocity, HierarchicalByAlgorithm, PureBestKVelocity, RecentKReward,
+    RecentKVelocity)
 from btb.selection import Uniform as UniformSelector
 from btb.tuning import GP, GPEi, GPEiVelocity
 from btb.tuning import Uniform as UniformTuner

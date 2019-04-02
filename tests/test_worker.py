@@ -1,7 +1,6 @@
 import datetime
 import os
 import random
-from mock import ANY, Mock, patch
 
 import numpy as np
 import pytest
@@ -9,13 +8,14 @@ from btb.selection import BestKVelocity
 from btb.selection.selector import Selector
 from btb.tuning import GP
 from btb.tuning.tuner import BaseTuner
+from mock import ANY, Mock, patch
 
 from atm import PROJECT_ROOT
+from atm.classifier import Model
 from atm.config import LogConfig, RunConfig, SQLConfig
 from atm.constants import METRICS_BINARY, TIME_FMT
 from atm.database import Database, db_session
 from atm.enter_data import enter_data
-from atm.model import Model
 from atm.utilities import download_data, load_metrics, load_model
 from atm.worker import ClassifierError, Worker
 
@@ -124,8 +124,8 @@ def test_load_selector_and_tuner(db, dataset):
 
 
 def test_load_custom_selector_and_tuner(db, dataset):
-    tuner_path = os.path.join(PROJECT_ROOT, 'tests/utilities/mytuner.py')
-    selector_path = os.path.join(PROJECT_ROOT, 'tests/utilities/myselector.py')
+    tuner_path = os.path.join(PROJECT_ROOT, '../tests/utilities/mytuner.py')
+    selector_path = os.path.join(PROJECT_ROOT, '../tests/utilities/myselector.py')
     worker = get_new_worker(selector=selector_path + ':MySelector',
                             tuner=tuner_path + ':MyTuner')
     assert isinstance(worker.selector, Selector)
@@ -165,8 +165,6 @@ def test_tune_hyperparameters(worker, hyperpartition):
             constants=hyperpartition.constants
         )
 
-    approximate_tunables = [(k, ObjWithAttrs(range=v.range))
-                            for k, v in hyperpartition.tunables]
     mock_tuner.propose.assert_called()
 
 

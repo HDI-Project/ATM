@@ -11,8 +11,8 @@ import os
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # this defines which modules will be imported by "from atm import *"
-__all__ = ['config', 'constants', 'database', 'enter_data', 'method', 'metrics',
-           'model', 'utilities', 'worker']
+__all__ = ['config', 'classifier', 'constants', 'database', 'enter_data',
+           'method', 'metrics', 'models', 'utilities', 'worker']
 
 # by default, nothing should be logged
 logger = logging.getLogger('atm')

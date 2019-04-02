@@ -5,35 +5,28 @@ import datetime
 import imp
 import logging
 import os
-import random
 import re
-import time
 import traceback
 import warnings
 from builtins import object, str
 from collections import defaultdict
-from operator import attrgetter
 
 import numpy as np
 from boto.s3.connection import Key as S3Key
 from boto.s3.connection import S3Connection
 
+from atm.classifier import Model
 from atm.config import LogConfig
 from atm.constants import CUSTOM_CLASS_REGEX, SELECTORS_MAP, TUNERS_MAP
 from atm.database import ClassifierStatus, db_session
-from atm.model import Model
-from atm.utilities import (download_data, ensure_directory, get_instance,
-                           get_public_ip, params_to_vectors, save_metrics,
-                           save_model, update_params)
+from atm.utilities import (
+    download_data, ensure_directory, get_instance, save_metrics, save_model, update_params)
 
 # shhh
 warnings.filterwarnings('ignore')
 
 # for garrays
 os.environ['GNUMPY_IMPLICIT_CONVERSION'] = 'allow'
-
-# how long to sleep between loops while waiting for new dataruns to be added
-LOOP_WAIT = 1
 
 # load the library-wide logger
 logger = logging.getLogger('atm')
@@ -234,11 +227,11 @@ class Worker(object):
                                                score_target=target)
         if old_best is not None:
             if getattr(model, target) > getattr(old_best, target):
-                logger.info('New best score! Previous best (classifier %s): %s'
-                            % (old_best.id, metric_string(old_best)))
+                logger.info('New best score! Previous best (classifier %s): %s',
+                            old_best.id, metric_string(old_best))
             else:
-                logger.info('Best so far (classifier %s): %s' % (old_best.id,
-                                                                 metric_string(old_best)))
+                logger.info('Best so far (classifier %s): %s',
+                            old_best.id, metric_string(old_best))
 
         return model, metrics
 
@@ -391,6 +384,7 @@ class Worker(object):
         param_info = 'Chose parameters for method "%s":' % hyperpartition.method
         for k in sorted(params.keys()):
             param_info += '\n\t%s = %s' % (k, params[k])
+
         logger.info(param_info)
 
         logger.debug('Creating classifier...')
@@ -411,78 +405,3 @@ class Worker(object):
             logger.error(msg)
             self.db.mark_classifier_errored(classifier.id, error_message=msg)
             raise ClassifierError()
-
-
-def work(db, datarun_ids=None, save_files=False, choose_randomly=True,
-         cloud_mode=False, aws_config=None, log_config=None, total_time=None,
-         wait=True):
-    """
-    Check the ModelHub database for unfinished dataruns, and spawn workers to
-    work on them as they are added. This process will continue to run until it
-    exceeds total_time or is broken with ctrl-C.
-
-    db: Database instance with which we can make queries to ModelHub
-    datarun_ids (optional): list of IDs of dataruns to compute on. If None,
-        this will work on all unfinished dataruns in the database.
-    choose_randomly: if True, work on all highest-priority dataruns in random
-        order. If False, work on them in sequential order (by ID)
-    cloud_mode: if True, save processed datasets to AWS. If this option is set,
-        aws_config must be supplied.
-    aws_config (optional): if cloud_mode is set, this must be an AWSConfig
-        object with connection details for an S3 bucket.
-    total_time (optional): if set to an integer, this worker will only work for
-        total_time seconds. Otherwise, it will continue working until all
-        dataruns are complete (or indefinitely).
-    wait: if True, once all dataruns in the database are complete, keep spinning
-        and wait for new runs to be added. If False, exit once all dataruns are
-        complete.
-    """
-    start_time = datetime.datetime.now()
-    public_ip = get_public_ip()
-
-    # main loop
-    while True:
-        # get all pending and running dataruns, or all pending/running dataruns
-        # from the list we were given
-        dataruns = db.get_dataruns(include_ids=datarun_ids, ignore_complete=True)
-        if not dataruns:
-            if wait:
-                logger.warning('No dataruns found. Sleeping %d seconds and trying again.'
-                               % LOOP_WAIT)
-                time.sleep(LOOP_WAIT)
-                continue
-
-            else:
-                logger.warning('No dataruns found. Exiting.')
-                break
-
-        max_priority = max([r.priority for r in dataruns])
-        priority_runs = [r for r in dataruns if r.priority == max_priority]
-
-        # either choose a run randomly, or take the run with the lowest ID
-        if choose_randomly:
-            run = random.choice(priority_runs)
-        else:
-            run = sorted(dataruns, key=attrgetter('id'))[0]
-
-        # say we've started working on this datarun, if we haven't already
-        db.mark_datarun_running(run.id)
-
-        logger.info('Computing on datarun %d' % run.id)
-        # actual work happens here
-        worker = Worker(db, run, save_files=save_files,
-                        cloud_mode=cloud_mode, aws_config=aws_config,
-                        log_config=log_config, public_ip=public_ip)
-        try:
-            worker.run_classifier()
-
-        except ClassifierError:
-            # the exception has already been handled; just wait a sec so we
-            # don't go out of control reporting errors
-            logger.warning('Something went wrong. Sleeping %d seconds.' % LOOP_WAIT)
-            time.sleep(LOOP_WAIT)
-
-        elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
-        if total_time is not None and elapsed_time >= total_time:
-            logger.warning('Total run time for worker exceeded; exiting.')
-            break

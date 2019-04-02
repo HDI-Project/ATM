@@ -16,9 +16,8 @@ import numpy as np
 import pandas as pd
 from past.utils import old_div
 from sklearn import decomposition
-from sklearn.gaussian_process.kernels import (RBF, ConstantKernel,
-                                              ExpSineSquared, Matern,
-                                              RationalQuadratic)
+from sklearn.gaussian_process.kernels import (
+    RBF, ConstantKernel, ExpSineSquared, Matern, RationalQuadratic)
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -146,8 +145,9 @@ class Model(object):
 
         self.cv_judgment_metric = np.mean(df[self.judgment_metric])
         self.cv_judgment_metric_stdev = np.std(df[self.judgment_metric])
-        self.mu_sigma_judgment_metric = (self.cv_judgment_metric
-                                         - 2 * self.cv_judgment_metric_stdev)
+        cv_stdev = (2 * self.cv_judgment_metric_stdev)
+        self.mu_sigma_judgment_metric = self.cv_judgment_metric - cv_stdev
+
         return cv_scores
 
     def test_final_model(self, X, y):
