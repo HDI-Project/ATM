@@ -1,9 +1,12 @@
+from datetime import datetime, timedelta
+
 from past.utils import old_div
 import simplejson as json
 
 from flask import Response, jsonify
 from flask_restplus import Resource
 
+from atm.models import ATM
 from atm.encoder import MetaData
 from api.encoders import encode_entity
 from api.parsers import (dataset_metaparsers, classifier_metaparsers,
@@ -31,14 +34,14 @@ class Hyperpartitions(Resource):
         args = hyperpartition_metaparsers['get'].parser.parse_args()
 
         try:
-            res = hyperpartition_metaparsers['get'].db.get_hyperpartitions_for_api(
-                **args)
+            res = hyperpartition_metaparsers['get'].db.get_hyperpartitions_for_api(**args)
 
             res_dict = {}
             for hype in res:
                 res_dict[hype.id] = json.loads(hype.to_json())
 
             return jsonify(res_dict)
+
         except Exception as e:
             return json.loads(e)
 
@@ -68,7 +71,9 @@ class Classifiers(Resource):
             # get the object and turn it into a dict
             res = classifier_metaparsers['get'].db.get_classifiers_api(**args)
             res = encode_entity(res)
+
             return json.loads(res)
+
         except Exception as e:
             return json.loads(e)
 
@@ -91,6 +96,7 @@ dataset_metaparsers['delete'].set_flaskplus_parser(api)
 class Dataset(Resource):
     # ns.doc specifies the descriiption
     # decorate the method with its parser
+
     @ns.doc('get some or all datasets')
     @api.expect(dataset_metaparsers['get'].parser)
     def get(self):
@@ -105,6 +111,7 @@ class Dataset(Resource):
             res = encode_entity(
                 dataset_metaparsers['get'].db.get_datasets(**args))
             return json.loads(res)
+
         except Exception as e:
             return json.loads(e)
 
@@ -113,14 +120,18 @@ class Dataset(Resource):
     def post(self):
         args = dataset_metaparsers['post'].parser.parse_args()
 
-        meta = MetaData(
-            args['class_column'], args['train_path'], args['test_path'])
-        args['size_kb'] = old_div(meta.size, 1000)
+        meta = MetaData(args['class_column'], args['train_path'], args['test_path'])
+        meta = meta.__dict__
+
+        args['size_kb'] = old_div(meta.pop('size'), 1000)
+        args.update(meta)
 
         try:
             dataset = dataset_metaparsers['post'].db.create_dataset(**args)
             res = encode_entity([dataset])
+
             return json.loads(res)[0]
+
         except Exception as e:
             return json.loads(e)
 
@@ -132,21 +143,28 @@ class Dataset(Resource):
         try:
             datasets = dataset_metaparsers['post'].db.update_datasets(**args)
             res = encode_entity(datasets)
+
             return json.loads(res)
+
         except Exception as e:
             res = json.loads(e)
+
             return Response(res, status=500, mimetype='application/json')
 
     @ns.doc('delete a dataset')
     @api.expect(dataset_metaparsers['delete'].parser)
     def delete(self):
         args = dataset_metaparsers['delete'].parser.parse_args()
+
         try:
             entity_id = args['entity_id']
             dataset_metaparsers['delete'].db.delete_dataset(id=entity_id)
+
             return Response('{}', status=201, mimetype='application/json')
+
         except Exception as e:
             res = json.loads(e)
+
             return Response(res, status=500, mimetype='application/json')
 
 
