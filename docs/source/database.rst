@@ -17,7 +17,7 @@ A Dataset represents a single set of data which can be used to train and test
 models by ATM. The table stores information about the location of the data as
 well as metadata to help with analysis.
 
-- ``dataset_id`` (Int): Unique identifier for the dataset. 
+- ``dataset_id`` (Int): Unique identifier for the dataset.
 - ``name`` (String): Identifier string for a classification technique.
 - ``description`` (String): Human-readable description of the dataset.
     - not described in the paper
@@ -27,12 +27,12 @@ well as metadata to help with analysis.
 
 The metadata fields below are not described in the paper.
 
-- ``n_examples`` (Int): Number of samples (rows) in the dataset. 
-- ``k_classes`` (Int): Number of classes in the dataset. 
+- ``n_examples`` (Int): Number of samples (rows) in the dataset.
+- ``k_classes`` (Int): Number of classes in the dataset.
 - ``d_features`` (Int): Number of features in the dataset.
 - ``majority`` (Number): Ratio of the number of samples in the largest class to
-  the number of samples in all other classes. 
-- ``size_kb`` (Int): Approximate size of the dataset in KB. 
+  the number of samples in all other classes.
+- ``size_kb`` (Int): Approximate size of the dataset in KB.
 
 
 Dataruns
@@ -87,7 +87,7 @@ ATM configuration:
   multiclass problems
     - not in the paper
 - ``score_target`` (Enum): One of ["cv", "test", "mu_sigma"]. Determines how the
-  final comparative metric (the *judgment metric*) is calculated. 
+  final comparative metric (the *judgment metric*) is calculated.
     - "cv" (cross-validation): the judgment metric is the average of a 5-fold
       cross-validation test.
     - "test": the judgment metric is computed on the test data.

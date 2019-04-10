@@ -1,3 +1,10 @@
+<p align="left">
+<img width=15% src="https://dai.lids.mit.edu/wp-content/uploads/2018/06/Logo_DAI_highres.png" alt=“ATM” />
+<i>An open source project from Data to AI Lab at MIT.</i>
+</p>
+
+
+
 [![CircleCI][circleci-img]][circleci-url]
 [![Coverage status][codecov-img]][codecov-url]
 [![Documentation][rtd-img]][rtd-url]
@@ -67,14 +74,8 @@ Unix-based systems.
 
 ATM is compatible with and has been tested on Python 2.7, 3.5, and 3.6.
 
-1. **Clone the project**
 
-   ```
-   git clone https://github.com/hdi-project/ATM.git /path/to/atm
-   cd /path/to/atm
-   ```
-
-2. **Install a database**
+1. **Install a database**
 
    You will need to install the libmysqlclient-dev package (for sqlalchemy)
 
@@ -96,19 +97,26 @@ ATM is compatible with and has been tested on Python 2.7, 3.5, and 3.6.
    sudo apt install mysql-server mysql-client
    ```
 
-3. **Install python dependencies**.
+2. **Install ATM**
 
-   This will also install [btb](https://github.com/hdi-project/btb), the core AutoML library in
-   development under the HDI project, as an egg which will track changes to the git repository.
+    To get started with **ATM**, we recommend using `pip`:
 
-   Here, usage of `virtualenv` is shown, but you can substitute `conda` or your preferred
-   environment manager as well.
+    ```bash
+    pip install atm
+    ```
 
-   ```
-   virtualenv venv
-   . venv/bin/activate
-   python setup.py install
-   ```
+    Alternatively, you can clone the repository and install it from source by running
+    `make install`:
+
+    ```bash
+    git clone git@github.com:HDI-Project/ATM.git
+    cd ATM
+    make install
+    ```
+
+    For development, you can use the `make install-develop` command instead in order to install all
+    the required dependencies for testing and linting.
+
 
 4. ** Testing **
 
@@ -151,12 +159,12 @@ The data has 15 features and the last column is the `class` label.
 1. **Create a datarun**
 
    ```
-   python scripts/enter_data.py
+   atm enter_data
    ```
 
    This command will create a `datarun`. In ATM, a "datarun" is a single logical machine learning
    task. If you run the above command without any arguments, it will use the default settings
-   found in `atm/config.py` to create a new SQLite3 database at `./atm.db`, create a new
+   found in the code to create a new SQLite3 database at `./atm.db`, create a new
    `dataset` instance which refers to the data above, and create a `datarun` instance which
    points to that dataset. More about what is stored in this database and what is it used for
    can be found [here](https://cyphe.rs/static/atm.pdf).
@@ -180,7 +188,7 @@ The data has 15 features and the last column is the `class` label.
 2. **Start a worker**
 
    ```
-   python scripts/worker.py
+   atm worker
    ```
 
    This will start a process that builds classifiers, tests them, and saves them to the
@@ -215,7 +223,7 @@ all workers will exit gracefully.
 
 ## Customizing ATM's configuration and using your own data
 
-ATM's default configuration is fully controlled by `atm/config.py`. Our documentation will
+ATM's default configuration is fully controlled by the intern code. Our documentation will
 cover the configuration in more detail, but this section provides a brief overview of how
 to specify the most important values.
 
@@ -229,27 +237,50 @@ to the example shown above. The format is:
  * The first row is the header row, which contains names for each column of data
  * A single column (the *target* or *label*) is named `class`
 
-Next, you'll need to use `enter_data.py` to create a `dataset` and `datarun` for your task.
+Next, you'll need to use `atm enter_data` to create a `dataset` and `datarun` for your task.
 
-The script will look for values for each configuration variable in the following places, in order:
+The command line will look for values for each configuration variable in the following places,
+in order:
 
 1. Command line arguments
 2. Configuration files
-3. Defaults specified in `atm/config.py`
+3. Defaults specified inside the code.
 
 That means there are two ways to pass configuration to the command.
 
-1. **Using YAML configuration files**
+1. **Using command line arguments**
 
-   Saving configuration as YAML files is an easy way to save complicated setups or share
-   them with team members.
+   You can specify each argument individually on the command line. The names of the
+   variables are the same as those in the YAML files. SQL configuration variables must be
+   prepended by `sql-`, and AWS config variables must be prepended by `aws-`.
 
-   You should start with the templates provided in `atm/config/templates` and modify them
-   to suit your own needs.
+   Using command line arguments is convenient for quick experiments, or for cases where you
+   need to change just a couple of values from the default configuration. For example:
 
    ```
-   mkdir config
-   cp atm/config/templates/*.yaml config/
+   atm enter_data --train-path ./data/my-custom-data.csv --selector bestkvel
+   ```
+
+   You can also use a mixture of config files and command line arguments; any command line
+   arguments you specify will override the values found in config files.
+
+2. **Using YAML configuration files**
+
+   You can also save the configuration as YAML files is an easy way to save complicated setups
+   or share them with team members.
+
+   You should start with the templates provided by the `atm make_config` command:
+
+   ```
+   atm make_config
+   ```
+
+   This will generate a folder called `config/templates` in your current working directory which
+   will contain 5 files, which you will need to copy over to the `config` folder and edit according
+   to your needs:
+
+   ```
+   cp config/templates/*.yaml config/
    vim config/*.yaml
    ```
 
@@ -274,43 +305,22 @@ That means there are two ways to pass configuration to the command.
    `aws.yaml` should contain the settings for running ATM in the cloud. This is not necessary
    for local operation.
 
-   Once your YAML files have been updated, run the datarun creation script and pass it the paths
+   Once your YAML files have been updated, run the datarun creation command and pass it the paths
    to your new config files:
 
    ```
-   python scripts/enter_data.py --sql-config config/sql.yaml \
-                                --aws-config config/aws.yaml \
-                                --run-config config/run.yaml
+   atm enter_data --sql-config config/sql.yaml \
+                  --aws-config config/aws.yaml \
+                  --run-config config/run.yaml
    ```
-
-2. **Using command line arguments**
-
-   You can also specify each argument individually on the command line. The names of the
-   variables are the same as those in the YAML files. SQL configuration variables must be
-   prepended by `sql-`, and AWS config variables must be prepended by `aws-`.
-
-   Using command line arguments is convenient for quick experiments, or for cases where you
-   need to change just a couple of values from the default configuration. For example:
-
-   ```
-   python scripts/enter_data.py --train-path ./data/my-custom-data.csv --selector bestkvel
-   ```
-
-   You can also use a mixture of config files and command line arguments; any command line
-   arguments you specify will override the values found in config files.
-
-Once you've created your custom datarun, start a worker, specifying your config files and the
-datarun(s) you'd like to compute on.
-
-```
-python scripts/worker.py --sql-config config/sql.yaml \
-                         --aws-config config/aws.yaml \
-                         --dataruns 1
-```
 
 It's important that the SQL configuration used by the worker matches the configuration you
-passed to `enter_data.py` -- otherwise, the worker will be looking in the wrong ModelHub
+passed to `enter_data` -- otherwise, the worker will be looking in the wrong ModelHub
 database for its datarun!
+   ```
+   atm worker --sql-config config/sql.yaml \
+              --aws-config config/aws.yaml \
+   ```
 
 <!--## Testing Tuners and Selectors-->
 

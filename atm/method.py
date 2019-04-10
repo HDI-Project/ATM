@@ -31,7 +31,7 @@ class Numeric(HyperParameter):
         return len(self.range) == 1
 
     def as_tunable(self):
-        return btb.HyperParameter(typ=self.type, rang=self.range)
+        return btb.HyperParameter(param_type=self.type, param_range=self.range)
 
 
 class Categorical(HyperParameter):
@@ -63,7 +63,7 @@ class Categorical(HyperParameter):
         return len(self.values) == 1
 
     def as_tunable(self):
-        return btb.HyperParameter(typ=self.type, rang=self.values)
+        return btb.HyperParameter(param_type=self.type, param_range=self.values)
 
 
 class List(HyperParameter):
@@ -92,6 +92,7 @@ class HyperPartition(object):
     """
     Class which holds the hyperparameter settings that define a hyperpartition.
     """
+
     def __init__(self, categoricals, constants, tunables):
         """
         categoricals: the values for this hyperpartition which have been fixed
@@ -137,6 +138,7 @@ class Method(object):
     hyperparameter arguments it needs to run. Its main purpose is to generate
     hyperpartitions (possible combinations of categorical hyperparameters).
     """
+
     def __init__(self, method):
         """
         method: method code or path to JSON file containing all the information
@@ -167,7 +169,7 @@ class Method(object):
         # CPT with a size hyperparameter and sets of element hyperparameters
         # conditioned on the size.
         for name, param in list(self.parameters.items()):
-            if type(param) == List:
+            if isinstance(param, List):
                 elements, conditions = param.get_elements()
                 for e in elements:
                     self.parameters[e] = param.element

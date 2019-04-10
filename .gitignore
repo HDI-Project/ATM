@@ -96,6 +96,7 @@ docs/build/
 docs/modules.rst
 docs/atm.rst
 docs/atm.*.rst
+docs/api
 
 # PyBuilder
 target/
@@ -119,6 +120,9 @@ celerybeat-schedule
 .venv
 venv/
 ENV/
+
+# vim temporary files
+*.swp
 
 # Spyder project settings
 .spyderproject

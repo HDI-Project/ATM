@@ -12,8 +12,8 @@ from builtins import str
 import numpy as np
 import requests
 from boto.s3.connection import Key, S3Connection
-from btb import ParamTypes
 
+from atm.compat import getargs
 from atm.constants import DATA_DL_PATH, HTTP_PREFIX, S3_PREFIX, FileType
 
 # global variable storing this machine's public IP address
@@ -92,17 +92,13 @@ def obj_has_method(obj, method):
 
 # Converting hyperparameters to and from BTB-compatible formats
 
-def vector_to_params(vector, tunables, categoricals, constants):
+def update_params(params, categoricals, constants):
     """
-    Converts a numpy vector to a dictionary mapping keys to named parameters.
+    Update params with categoricals and constants for the fitting proces.
 
-    vector: single example to convert
+    params: params proposed by the tuner
 
     Examples of the format for SVM sigmoid hyperpartition:
-
-    tunables = [('C', HyperParameter(type='float_exp', range=(1e-05, 1e5))),
-                ('degree', HyperParameter(type='int', range=(2, 4))),
-                ('gamma', HyperParameter(type='float_exp', range=(1e-05, 1e5)))]
 
     categoricals = (('kernel', 'poly'),
                     ('probability', True),
@@ -110,23 +106,30 @@ def vector_to_params(vector, tunables, categoricals, constants):
 
     constants = [('cache_size', 15000)]
     """
-    params = {}
-
-    # add the tunables
-    for i, elt in enumerate(vector):
-        key, struct = tunables[i]
-        if struct.type in [ParamTypes.INT, ParamTypes.INT_EXP]:
-            params[key] = int(elt)
-        elif struct.type in [ParamTypes.FLOAT, ParamTypes.FLOAT_EXP]:
-            params[key] = float(elt)
-        else:
-            raise ValueError('Unknown data type: {}'.format(struct.type))
-
-    # add the fixed categorical settings and fixed constant values
     for key, value in categoricals + constants:
         params[key] = value
 
     return params
+
+
+def get_instance(class_, **kwargs):
+    """Instantiate an instance of the given class with unused kwargs
+
+    Args:
+        class_ (type): class to instantiate
+        **kwargs: keyword arguments to specific selector class
+
+    Returns:
+        instance of specific class with the args that accepts.
+    """
+    init_args = getargs(class_.__init__)
+    relevant_kwargs = {
+        k: kwargs[k]
+        for k in kwargs
+        if k in init_args
+    }
+
+    return class_(**relevant_kwargs)
 
 
 def params_to_vectors(params, tunables):
@@ -158,22 +161,11 @@ def params_to_vectors(params, tunables):
     for i, p in enumerate(params):
         for j, k in enumerate(keys):
             vectors[i, j] = p[k]
+
     return vectors
 
 
 # Serializing and deserializing data on disk
-
-def _make_save_path_old(dir, classifier, suffix):
-    """
-    Generate the base save path for a classifier's model and metrics files,
-    based on the classifier's dataset name and hyperparameters.
-    """
-    run_hash = hash_string(classifier.datarun.dataset.name)
-    params_hash = hash_dict(classifier.hyperparameter_values)
-    filename = "%s-%s-%s.%s" % (run_hash, params_hash,
-                                classifier.datarun.description, suffix)
-    return os.path.join(dir, filename)
-
 
 def make_save_path(dir, classifier, suffix):
     """
@@ -323,14 +315,12 @@ def download_data(train_path, test_path=None, aws_config=None):
         if train_type == FileType.HTTP:
             assert (download_file_http(train_path) == local_train_path)
         elif train_type == FileType.S3:
-            assert (download_file_s3(train_path, aws_config=aws_config) ==
-                    local_train_path)
+            assert (download_file_s3(train_path, aws_config=aws_config) == local_train_path)
 
     if local_test_path and not os.path.isfile(local_test_path):
         if test_type == FileType.HTTP:
             assert (download_file_http(test_path) == local_test_path)
         elif test_type == FileType.S3:
-            assert (download_file_s3(test_path, aws_config=aws_config) ==
-                    local_test_path)
+            assert (download_file_s3(test_path, aws_config=aws_config) == local_test_path)
 
     return local_train_path, local_test_path

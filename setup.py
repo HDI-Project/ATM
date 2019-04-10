@@ -9,8 +9,8 @@ with open('README.md') as readme_file:
 with open('HISTORY.md') as history_file:
     history = history_file.read()
 
-requirements = [
-    'baytune==0.1.2',  # This one needs to be exact
+install_requires = [
+    'baytune==0.2.5',
     'boto>=2.48.0',
     'flask>=1.0.2',
     'flask-restplus>=0.12.1',
@@ -32,12 +32,40 @@ setup_requires = [
     'pytest-runner'
 ]
 
-test_requirements = [
+tests_require = [
     'mock>=2.0.0',
     'pytest-cov>=2.5.1',
     'pytest-runner>=3.0',
     'pytest-xdist>=1.20.1',
     'pytest>=3.2.3',
+]
+
+development_requires = [
+    # general
+    'bumpversion>=0.5.3',
+    'pip>=9.0.1',
+    'watchdog>=0.8.3',
+
+    # docs
+    'm2r>=0.2.0',
+    'Sphinx>=1.7.1',
+    'sphinx_rtd_theme>=0.2.4',
+
+    # style check
+    'flake8>=3.7.7',
+    'isort>=4.3.4',
+
+    # fix style issues
+    'autoflake>=1.1',
+    'autopep8>=1.4.3',
+
+    # distribute on PyPI
+    'twine>=1.10.0',
+    'wheel>=0.30.0',
+
+    # Advanced testing
+    'coverage>=4.5.1',
+    'tox>=2.9.1',
 ]
 
 setup(
@@ -56,19 +84,27 @@ setup(
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
     ],
     description="Auto Tune Models",
-    install_requires=requirements,
+    entry_points={
+        'console_scripts': [
+            'atm=atm.cli:main'
+        ]
+    },
+    extras_require={
+        'dev': development_requires + tests_require,
+        'tests': tests_require,
+    },
+    include_package_data=True,
+    install_requires=install_requires,
     license="MIT license",
     long_description=readme + '\n\n' + history,
     long_description_content_type='text/markdown',
-    include_package_data=True,
     keywords='machine learning hyperparameters tuning classification',
     name='atm',
     packages=find_packages(include=['atm', 'atm.*']),
-    python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*',
     setup_requires=setup_requires,
-    test_suite='atm/tests',
-    tests_require=test_requirements,
+    test_suite='tests',
+    tests_require=tests_require,
     url='https://github.com/HDI-project/ATM',
-    version='0.1.0',
+    version='0.1.2-dev',
     zip_safe=False,
 )
