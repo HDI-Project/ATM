@@ -7,6 +7,7 @@ from collections import defaultdict
 from multiprocessing import Process
 from sklearn.metrics import auc
 
+from atm import PROJECT_ROOT
 from atm.config import *
 from atm.worker import work
 from atm.database import db_session

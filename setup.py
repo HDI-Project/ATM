@@ -12,14 +12,18 @@ with open('HISTORY.md') as history_file:
 requirements = [
     'baytune==0.1.2',  # This one needs to be exact
     'boto>=2.48.0',
+    'flask>=1.0.2',
+    'flask-restplus>=0.12.1',
     'future>=0.16.0',
     'joblib>=0.11',
     'mysqlclient>=1.2',
     'numpy>=1.13.1',
     'pandas>=0.22.0',
     'pyyaml>=3.12',
-    'scikit-learn>=0.18.2',
+    'requests>=2.21.0',
+    'scikit-learn==0.19.1',
     'scipy>=0.19.1',
+    'simplejson>=3.16.0',
     'sklearn-pandas>=1.5.0',
     'sqlalchemy>=1.1.14',
 ]
