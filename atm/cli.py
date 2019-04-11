@@ -30,7 +30,7 @@ def _work(args):
 def _serve(args):
     atm = ATM(**vars(args))
     app = create_app(atm)
-    app.run()
+    app.run(host=args.host, port=args.port)
 
 
 def _enter_data(args):
@@ -93,6 +93,8 @@ def _get_parser():
     # Server
     server = subparsers.add_parser('server', parents=[parent])
     server.set_defaults(action=_serve)
+    server.add_argument('--host', help='IP to listen at')
+    server.add_argument('--port', help='Port to listen at', type=int)
 
     # Make Config
     make_config = subparsers.add_parser('make_config', parents=[parent])
