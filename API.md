@@ -14,13 +14,6 @@ virtualenv, and execute this command:
 atm server
 ```
 
-If you would like to start the server in another port, which by default it's 5000, you can include
-the `--port` option to run it at the port that you would like:
-
-```bash
-atm server --port 1234
-```
-
 An output similar to this one should apear in the terminal:
 
 ```bash
@@ -35,56 +28,71 @@ An output similar to this one should apear in the terminal:
  * Debugger PIN: 150-127-826
 ```
 
-If you now point your browser at http://127.0.0.1:5000/, you will see the documentation
+After this, the REST server will be listening at the port 5000 of you machine, and if you
+point your browser at http://127.0.0.1:5000/, you will see the documentation
 website that shows information about all the REST operations allowed by the API.
 
-You can press <kbd>Ctrl</kbd>+<kbd>c</kbd> at any moment to stop the process, but for now
+Optionally, the `--port <port>` can be added to modify the port which the server listents at:
+
+```bash
+atm server --port 1234
+```
+
+In order to stop the server you can press <kbd>Ctrl</kbd>+<kbd>c</kbd>, but for now
 you can keep it running and head to the next section.
 
 
-## Usage
+## Quickstart
 
-For this example we have run `atm enter_data` with the default dataset and `atm worker` in order
-to create the classifiers and to populate our database.
+In this section we will briefly show the basic usage of the REST API.
 
-By accessing the http://127.0.0.1:5000/ you will see the [Swagger](https://swagger.io/)
-documentation and be able to run examples and calls to the REST API.
+For more detailed information about all the operations supported by the API, please point your
+browser to http://127.0.0.1:5000/ and explore the examples provided by the
+[Swagger](https://swagger.io/) interface.
 
-In the following steps we will explain how to use this **API**:
+### 1. Generate some data
 
-**ATM** REST API allows you to navigate arround the database and have access the following tables:
+Before proceeding any further, please make sure the have already populated your data by triggering
+at least one model tuning process.
 
-* Dataset
-* Datarun
-* Hyperpartition
-* Classifier
+An easy way to do this is to follow the quickstart from the ATM [README.md](README.md) file,
+which means having run these two commands:
 
-### Dataset
-
-In order to retrieve the information stored for a `Dataset`, the available parameters to create
-an API call are as follow:
-
-* class_column (string, optional)
-* d_features (integer, optional)
-* dataruns (Array[Datarun], optional)
-* description (string, optional)
-* id (integer, optional)
-* k_classes (integer, optional)
-* majority (number, optional)
-* n_examples (integer, optional)
-* name (string, optional)
-* size_kb (integer, optional)
-* test_path (string, optional)
-* train_path (string, optional)
-
-If you are using `Unix` and you have [CURL](https://curl.haxx.se/) you can run this commands in
-a separate terminal, otherwise you can access and visualize the data recived from your browser.
-
-```bash
-curl -X GET --header 'Accept: application/json, application/json' 'http://127.0.0.1:5000/api/datasets'
+```
+atm enter_data
+atm worker
 ```
 
-This should print an output out of the database similar to this one:
+### 2. REST Models
+
+Once the database is populated, you can use the REST API to explore the following 4 models:
+
+* Datasets
+* Dataruns
+* Hyperpartitions
+* Classifiers
+
+And these are the operations that can be performed on them:
+
+### 3. Get all objects from a model
+
+In order to get all the objects for a single model, you need to make a `GET` request to
+`/api/<model>`.
+
+The output will be a JSON with 4 entries:
+
+* `num_results`: The number of results found
+* `objects`: A list containing a subdocument for each result
+* `page`: The current page
+* `total_pages`: The number of pages
+
+For example, you can get all the datasets using:
+
+```
+GET /api/datasets HTTP/1.1
+```
+
+And the output will be:
 
 ```
 {
@@ -100,7 +108,7 @@ This should print an output out of the database similar to this one:
           "dataset_id": 1,
           "deadline": null,
           "description": "uniform__uniform",
-          "end_time": "2019-04-11T17:26:28.781095",
+          "end_time": "2019-04-11T20:58:11.346733",
           "gridding": 0,
           "id": 1,
           "k_window": 3,
@@ -109,7 +117,7 @@ This should print an output out of the database similar to this one:
           "r_minimum": 2,
           "score_target": "cv_judgment_metric",
           "selector": "uniform",
-          "start_time": "2019-04-11T17:25:57.192200",
+          "start_time": "2019-04-11T20:58:02.514514",
           "status": "complete",
           "tuner": "uniform"
         }
@@ -122,65 +130,81 @@ This should print an output out of the database similar to this one:
       "name": "pollution_1",
       "size_kb": 8,
       "test_path": null,
-      "train_path": "/test/pollution_1.csv"
+      "train_path": "/home/xals/Projects/Pythia/MIT/ATM-csala/atm/data/test/pollution_1.csv"
     }
   ],
   "page": 1,
   "total_pages": 1
 }
-
 ```
 
-If you would like to recover a certain dataset, we can do so by `id`:
+### 4. Get a single object by id
 
-```bash
-curl -X GET "http://127.0.0.1:5000/api/datasets/10" -H "accept: application/json"
+In order to get one particular objects for a model, you need to make a `GET` request to
+`/api/<model>/<id>`.
+
+The output will be the document representing the corresponding object.
+
+For example, you can get the dataset with id 1 using:
+
+```
+GET /api/datasets/1 HTTP/1.1
 ```
 
-Where `10` is the `id` of our dataset.
-If you have the database created from our example, containing only one dataset, the output to this
-call should be empty:
+And the output will be:
 
-```bash
-{}
+```
+{
+  "class_column": "class",
+  "d_features": 16,
+  "dataruns": [
+    {
+      "budget": 100,
+      "budget_type": "classifier",
+      "dataset_id": 1,
+      "deadline": null,
+      "description": "uniform__uniform",
+      "end_time": "2019-04-11T20:58:11.346733",
+      "gridding": 0,
+      "id": 1,
+      "k_window": 3,
+      "metric": "f1",
+      "priority": 1,
+      "r_minimum": 2,
+      "score_target": "cv_judgment_metric",
+      "selector": "uniform",
+      "start_time": "2019-04-11T20:58:02.514514",
+      "status": "complete",
+      "tuner": "uniform"
+    }
+  ],
+  "description": null,
+  "id": 1,
+  "k_classes": 2,
+  "majority": 0.516666667,
+  "n_examples": 60,
+  "name": "pollution_1",
+  "size_kb": 8,
+  "test_path": null,
+  "train_path": "/home/xals/Projects/Pythia/MIT/ATM-csala/atm/data/test/pollution_1.csv"
+}
 ```
 
-If you would like to delete a dataset, you need it's `id` and run:
+### 5. Get all the children objects
 
-```bash
-curl -X DELETE --header 'Accept: application/json, application/json' 'http://127.0.0.1:5000/api/datasets/16'
+In order to get all the childre objects from one parent object, you need to make a
+`GET` request to `/api/<parent_model>/<parent_id>/<child_model>`.
+
+The output will be in the same format as if you had requested all the elements from the
+children model, but with the results filtered by the parent one.
+
+So, for example, in order to get all the dataruns that use the dataset with id 1, you can use:
+
+```
+GET /api/datasets/1/dataruns HTTP/1.1
 ```
 
-Where `16` is the `id` of the dataset.
-
-### Datarun
-
-* budget (integer, optional),
-* budget_type (string, optional),
-* classifiers (Array[Classifier], optional),
-* dataset (Dataset, optional),
-* dataset_id (integer, optional),
-* deadline (string, optional),
-* description (string, optional),
-* end_time (string, optional),
-* gridding (integer, optional),
-* hyperpartitions (Array[Hyperpartition], optional),
-* id (integer, optional),
-* k_window (integer, optional),
-* metric (string, optional),
-* priority (integer, optional),
-* r_minimum (integer, optional),
-* score_target (string, optional),
-* selector (string, optional),
-* start_time (string, optional),
-* status (string, optional),
-* tuner (string, optional)
-
-```bash
-curl -X GET --header 'Accept: application/json, application/json' 'http://127.0.0.1:5000/api/dataruns'
-```
-
-This should print an output out of the database similar to this one:
+And the output will be (note that some parts have been cut):
 
 ```
 {
@@ -191,199 +215,66 @@ This should print an output out of the database similar to this one:
       "budget_type": "classifier",
       "classifiers": [
         {
-          "cv_judgment_metric": 0.7120634921,
-          "cv_judgment_metric_stdev": 0.1153100042,
+          "cv_judgment_metric": 0.8444444444,
+          "cv_judgment_metric_stdev": 0.1507184441,
           "datarun_id": 1,
-          "end_time": "2019-04-11T17:25:57.412273",
+          "end_time": "2019-04-11T20:58:02.600185",
           "error_message": null,
           "host": "83.56.245.36",
-          "hyperparameter_values_64": "gAN9cQAoWAsAAABuX25laWdoYm9yc3EBY251bXB5LmNvcmUubXVsdGlhcnJheQpzY2FsYXIKcQJjbnVtcHkKZHR5cGUKcQNYAgAAAGk4cQRLAEsBh3EFUnEGKEsDWAEAAAA8cQdOTk5K/////0r/////SwB0cQhiQwgSAAAAAAAAAHEJhnEKUnELWAcAAAB3ZWlnaHRzcQxYCAAAAGRpc3RhbmNlcQ1YCQAAAGFsZ29yaXRobXEOWAUAAABicnV0ZXEPWAYAAABtZXRyaWNxEFgJAAAAbWFuaGF0dGFucRFYBgAAAF9zY2FsZXESiHUu",
-          "hyperpartition_id": 31,
+          "hyperparameter_values_64": "gAN9cQAoWAsAAABuX25laWdoYm9yc3EBY251bXB5LmNvcmUubXVsdGlhcnJheQpzY2FsYXIKcQJjbnVtcHkKZHR5cGUKcQNYAgAAAGk4cQRLAEsBh3EFUnEGKEsDWAEAAAA8cQdOTk5K/////0r/////SwB0cQhiQwgPAAAAAAAAAHEJhnEKUnELWAkAAABsZWFmX3NpemVxDGgCaAZDCCsAAAAAAAAAcQ2GcQ5ScQ9YBwAAAHdlaWdodHNxEFgIAAAAZGlzdGFuY2VxEVgJAAAAYWxnb3JpdGhtcRJYCQAAAGJhbGxfdHJlZXETWAYAAABtZXRyaWNxFFgJAAAAbWFuaGF0dGFucRVYBgAAAF9zY2FsZXEWiHUu",
+          "hyperpartition_id": 23,
           "id": 1,
-          "metrics_location": "metrics/pollution_1-fd916442.metric",
-          "model_location": "models/pollution_1-fd916442.model",
-          "start_time": "2019-04-11T17:25:57.273278",
+          "metrics_location": "metrics/pollution_1-4bc39b14.metric",
+          "model_location": "models/pollution_1-4bc39b14.model",
+          "start_time": "2019-04-11T20:58:02.539046",
           "status": "complete",
-          "test_judgment_metric": 0.9523809524
+          "test_judgment_metric": 0.6250000000
         },
-...
-```
-
-If you would like to recover a certain datarun, we can do so by `id`:
-
-```bash
-curl -X GET "http://127.0.0.1:5000/api/dataruns/10" -H "accept: application/json"
-```
-
-Where `10` is the `id` of our dataset.
-If you have the database created from our example, containing only one dataset, the output to this
-call should be empty:
-
-```bash
-{}
-```
-
-If you would like to delete a datarun, you need it's `id` and run:
-
-```bash
-curl -X DELETE --header 'Accept: application/json, application/json' 'http://127.0.0.1:5000/api/dataruns/16'
-```
-
-Where `16` is the `id` of the datarun.
-
-### Hyperpartition
-
-* categorical_hyperparameters_64 (string, optional),
-* classifiers (Array[Classifier], optional),
-* constant_hyperparameters_64 (string, optional),
-* datarun (Datarun, optional),
-* datarun_id (integer, optional),
-* id (integer, optional),
-* method (string, optional),
-* status (string, optional),
-* tunable_hyperparameters_64 (string, optional)
-
-```bash
-curl -X GET --header 'Accept: application/json, application/json' 'http://127.0.0.1:5000/api/hyperpartitions'
-```
-
-This should print an output out of the database similar to this one:
-
-```
-{
-  "num_results": 32,
-  "objects": [
-    {
-      "categorical_hyperparameters_64": "gANdcQAoWAcAAABwZW5hbHR5cQFYAgAAAGwxcQKGcQNYDQAAAGZpdF9pbnRlcmNlcHRxBIiGcQVlLg==",
-      "classifiers": [
-        {
-          "cv_judgment_metric": 0E-10,
-          "cv_judgment_metric_stdev": 0E-10,
-          "datarun_id": 1,
-          "end_time": "2019-04-11T17:25:58.591654",
-          "error_message": null,
-          "host": "83.56.245.36",
-          "hyperparameter_values_64": "gAN9cQAoWAEAAABDcQFjbnVtcHkuY29yZS5tdWx0aWFycmF5CnNjYWxhcgpxAmNudW1weQpkdHlwZQpxA1gCAAAAZjhxBEsASwGHcQVScQYoSwNYAQAAADxxB05OTkr/////Sv////9LAHRxCGJDCJx3VDODxC8/cQmGcQpScQtYAwAAAHRvbHEMaAJoBkMIFQYn8/JBj0BxDYZxDlJxD1gHAAAAcGVuYWx0eXEQWAIAAABsMXERWA0AAABmaXRfaW50ZXJjZXB0cRKIWAwAAABjbGFzc193ZWlnaHRxE1gIAAAAYmFsYW5jZWRxFFgGAAAAX3NjYWxlcRWIdS4=",
-          "hyperpartition_id": 1,
-          "id": 7,
-          "metrics_location": "metrics/pollution_1-b2ac0bd8.metric",
-          "model_location": "models/pollution_1-b2ac0bd8.model",
-          "start_time": "2019-04-11T17:25:58.476363",
-          "status": "complete",
-          "test_judgment_metric": 0E-10
-        },
-...
-```
-
-If you would like to recover a certain hyperpartition, we can do so by `id`:
-
-```bash
-curl -X GET "http://127.0.0.1:5000/api/hyperpartition/10" -H "accept: application/json"
-```
-
-Where `10` is the `id` of our hyperpartition.
-
-If you have the database created from our example, containing only one dataset, the output to this
-call should be empty:
-
-```bash
-{}
-```
-
-If you would like to delete a hyperpartition, you need it's `id` and run:
-
-```bash
-curl -X DELETE --header 'Accept: application/json, application/json' 'http://127.0.0.1:5000/api/hyperpartitions/16'
-```
-
-Where `16` is the `id` of the hyperpartition.
-
-### Classifier
-
-* cv_judgment_metric (number, optional),
-* cv_judgment_metric_stdev (number, optional),
-* datarun (Datarun, optional),
-* datarun_id (integer, optional),
-* end_time (string, optional),
-* error_message (string, optional),
-* host (string, optional),
-* hyperparameter_values_64 (string, optional),
-* hyperpartition (Hyperpartition, optional),
-* hyperpartition_id (integer, optional),
-* id (integer, optional),
-* metrics_location (string, optional),
-* model_location (string, optional),
-* start_time (string, optional),
-* status (string, optional),
-* test_judgment_metric (number, optional)
-
-```bash
-curl -X GET --header 'Accept: application/json, application/json' 'http://127.0.0.1:5000/api/classifiers'
-```
-
-This should print an output out of the database similar to this one:
-
-```
-{
-  "num_results": 100,
-  "objects": [
-    {
-      "cv_judgment_metric": 0.7120634921,
-      "cv_judgment_metric_stdev": 0.1153100042,
-      "datarun": {
-        "budget": 100,
-        "budget_type": "classifier",
-        "dataset_id": 1,
-        "deadline": null,
-        "description": "uniform__uniform",
-        "end_time": "2019-04-11T17:26:28.781095",
-        "gridding": 0,
+        ...
+      ],
+      "dataset": {
+        "class_column": "class",
+        "d_features": 16,
+        "description": null,
         "id": 1,
-        "k_window": 3,
-        "metric": "f1",
-        "priority": 1,
-        "r_minimum": 2,
-        "score_target": "cv_judgment_metric",
-        "selector": "uniform",
-        "start_time": "2019-04-11T17:25:57.192200",
-        "status": "complete",
-        "tuner": "uniform"
+        "k_classes": 2,
+        "majority": 0.516666667,
+        "n_examples": 60,
+        "name": "pollution_1",
+        "size_kb": 8,
+        "test_path": null,
+        "train_path": "/home/xals/Projects/Pythia/MIT/ATM-csala/atm/data/test/pollution_1.csv"
       },
-      "datarun_id": 1,
-      "end_time": "2019-04-11T17:25:57.412273",
-      "error_message": null,
-      "host": "83.56.245.36",
-      "hyperparameter_values_64": "gAN9cQAoWAsAAABuX25laWdoYm9yc3EBY251bXB5LmNvcmUubXVsdGlhcnJheQpzY2FsYXIKcQJjbnVtcHkKZHR5cGUKcQNYAgAAAGk4cQRLAEsBh3EFUnEGKEsDWAEAAAA8cQdOTk5K/////0r/////SwB0cQhiQwgSAAAAAAAAAHEJhnEKUnELWAcAAAB3ZWlnaHRzcQxYCAAAAGRpc3RhbmNlcQ1YCQAAAGFsZ29yaXRobXEOWAUAAABicnV0ZXEPWAYAAABtZXRyaWNxEFgJAAAAbWFuaGF0dGFucRFYBgAAAF9zY2FsZXESiHUu",
-      "hyperpartition": {
-        "categorical_hyperparameters_64": "gANdcQAoWAcAAAB3ZWlnaHRzcQFYCAAAAGRpc3RhbmNlcQKGcQNYCQAAAGFsZ29yaXRobXEEWAUAAABicnV0ZXEFhnEGWAYAAABtZXRyaWNxB1gJAAAAbWFuaGF0dGFucQiGcQllLg==",
-        "constant_hyperparameters_64": "gANdcQBYBgAAAF9zY2FsZXEBiIZxAmEu",
-        "datarun_id": 1,
-        "id": 31,
-        "method": "knn",
-        "status": "incomplete",
-        "tunable_hyperparameters_64": "gANdcQBYCwAAAG5fbmVpZ2hib3JzcQFjYnRiLmh5cGVyX3BhcmFtZXRlcgpJbnRIeXBlclBhcmFtZXRlcgpxAmNidGIuaHlwZXJfcGFyYW1ldGVyClBhcmFtVHlwZXMKcQNLAYVxBFJxBV1xBihLAUsUZYZxB4FxCH1xCShYDAAAAF9wYXJhbV9yYW5nZXEKaAZYBQAAAHJhbmdlcQtdcQwoSwFLFGV1YoZxDWEu"
-      },
+      "dataset_id": 1,
+      "deadline": null,
+      "description": "uniform__uniform",
+      "end_time": "2019-04-11T20:58:11.346733",
+      "gridding": 0,
+      "hyperpartitions": [
+        {
+          "categorical_hyperparameters_64": "gANdcQAoWAcAAABwZW5hbHR5cQFYAgAAAGwxcQKGcQNYDQAAAGZpdF9pbnRlcmNlcHRxBIiGcQVlLg==",
+          "constant_hyperparameters_64": "gANdcQAoWAwAAABjbGFzc193ZWlnaHRxAVgIAAAAYmFsYW5jZWRxAoZxA1gGAAAAX3NjYWxlcQSIhnEFZS4=",
+          "datarun_id": 1,
+          "id": 1,
+          "method": "logreg",
+          "status": "incomplete",
+          "tunable_hyperparameters_64": "gANdcQAoWAEAAABDcQFjYnRiLmh5cGVyX3BhcmFtZXRlcgpGbG9hdEV4cEh5cGVyUGFyYW1ldGVyCnECY2J0Yi5oeXBlcl9wYXJhbWV0ZXIKUGFyYW1UeXBlcwpxA0sFhXEEUnEFXXEGKEc+5Pi1iONo8UdA+GoAAAAAAGWGcQeBcQh9cQkoWAwAAABfcGFyYW1fcmFuZ2VxCmgGWAUAAAByYW5nZXELXXEMKEfAFAAAAAAAAEdAFAAAAAAAAGV1YoZxDVgDAAAAdG9scQ5oAmgFXXEPKEc+5Pi1iONo8UdA+GoAAAAAAGWGcRCBcRF9cRIoaApoD2gLXXETKEfAFAAAAAAAAEdAFAAAAAAAAGV1YoZxFGUu"
+        },
+        ...
+      ],
+      "id": 1,
+      "k_window": 3,
+      "metric": "f1",
+      "priority": 1,
+      "r_minimum": 2,
+      "score_target": "cv_judgment_metric",
+      "selector": "uniform",
+      "start_time": "2019-04-11T20:58:02.514514",
+      "status": "complete",
+      "tuner": "uniform"
+    }
+  ],
+  "page": 1,
+  "total_pages": 1
+}
 ```
-
-If you would like to recover a certain classifier, we can do so by `id`:
-
-```bash
-curl -X GET "http://127.0.0.1:5000/api/classifiers/10" -H "accept: application/json"
-```
-
-Where `10` is the `id` of our classifier.
-
-If you have the database created from our example, containing only one dataset, the output to this
-call should be empty:
-
-```bash
-{}
-```
-
-If you would like to delete a classifiers, you need it's `id` and run:
-
-```bash
-curl -X DELETE --header 'Accept: application/json, application/json' 'http://127.0.0.1:5000/api/classifiers/16'
-```
-
-Where `16` is the `id` of the classifiers.

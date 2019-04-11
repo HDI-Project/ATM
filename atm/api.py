@@ -29,9 +29,9 @@ def create_app(atm):
     def swagger():
         return redirect('/static/swagger/swagger-ui/index.html')
 
-    manager.create_api(atm.db.Dataset, methods=['GET', 'POST', 'DELETE'])
-    manager.create_api(atm.db.Datarun, methods=['GET', 'POST', 'DELETE'])
-    manager.create_api(atm.db.Hyperpartition, methods=['GET', 'POST', 'DELETE'])
-    manager.create_api(atm.db.Classifier, methods=['GET', 'POST', 'DELETE'])
+    manager.create_api(atm.db.Dataset, methods=['GET'])
+    manager.create_api(atm.db.Datarun, methods=['GET'])
+    manager.create_api(atm.db.Hyperpartition, methods=['GET'])
+    manager.create_api(atm.db.Classifier, methods=['GET'])
 
     return app
