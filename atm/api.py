@@ -1,7 +1,6 @@
 import os
 
-from flask import Flask
-from flask import redirect
+from flask import Flask, redirect
 from flask_restless_swagger import SwagAPIManager as APIManager
 from flask_sqlalchemy import SQLAlchemy
 
