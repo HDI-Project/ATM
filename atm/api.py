@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask
+from flask import redirect
 from flask_restless_swagger import SwagAPIManager as APIManager
 from flask_sqlalchemy import SQLAlchemy
 
@@ -23,6 +24,10 @@ def create_app(atm):
 
     # Create API endpoints, which will be available at /api/<tablename> by
     # default. Allowed HTTP methods can be specified as well.
+
+    @app.route('/')
+    def swagger():
+        return redirect('/static/swagger/swagger-ui/index.html')
 
     manager.create_api(atm.db.Dataset, methods=['GET', 'POST', 'DELETE'])
     manager.create_api(atm.db.Datarun, methods=['GET', 'POST', 'DELETE'])
