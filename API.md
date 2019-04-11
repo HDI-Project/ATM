@@ -130,7 +130,7 @@ And the output will be:
       "name": "pollution_1",
       "size_kb": 8,
       "test_path": null,
-      "train_path": "/home/xals/Projects/Pythia/MIT/ATM-csala/atm/data/test/pollution_1.csv"
+      "train_path": "/path/to/atm/data/test/pollution_1.csv"
     }
   ],
   "page": 1,
@@ -186,7 +186,7 @@ And the output will be:
   "name": "pollution_1",
   "size_kb": 8,
   "test_path": null,
-  "train_path": "/home/xals/Projects/Pythia/MIT/ATM-csala/atm/data/test/pollution_1.csv"
+  "train_path": "/path/to/atm/data/test/pollution_1.csv"
 }
 ```
 
@@ -243,7 +243,7 @@ And the output will be (note that some parts have been cut):
         "name": "pollution_1",
         "size_kb": 8,
         "test_path": null,
-        "train_path": "/home/xals/Projects/Pythia/MIT/ATM-csala/atm/data/test/pollution_1.csv"
+        "train_path": "/path/to/atm/data/test/pollution_1.csv"
       },
       "dataset_id": 1,
       "deadline": null,
