@@ -311,6 +311,15 @@ database for its datarun!
               --aws-config config/aws.yaml \
    ```
 
+
+## REST API Server
+
+**ATM** comes with the possibility to start a server process that enables interacting with
+the ModelHub Database via a REST API server that runs over [flask](http://flask.pocoo.org/).
+
+For more details about how to start and use this REST API please check the [API.md](API.md) document.
+
+
 <!--## Testing Tuners and Selectors-->
 
 <!--The script `test_btb.py`, in the main directory, allows you to test different-->
