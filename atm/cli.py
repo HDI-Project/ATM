@@ -5,6 +5,7 @@ import glob
 import os
 import shutil
 
+from atm.api import create_app
 from atm.config import (
     add_arguments_aws_s3, add_arguments_datarun, add_arguments_logging, add_arguments_sql)
 from atm.models import ATM
@@ -24,6 +25,12 @@ def _work(args):
         total_time=args.time,
         wait=False
     )
+
+
+def _serve(args):
+    atm = ATM(**vars(args))
+    app = create_app(atm)
+    app.run()
 
 
 def _enter_data(args):
@@ -82,6 +89,10 @@ def _get_parser():
     worker.add_argument('--no-save', dest='save_files', default=True,
                         action='store_const', const=False,
                         help="don't save models and metrics at all")
+
+    # Server
+    server = subparsers.add_parser('server', parents=[parent])
+    server.set_defaults(action=_serve)
 
     # Make Config
     make_config = subparsers.add_parser('make_config', parents=[parent])

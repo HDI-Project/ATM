@@ -25,6 +25,14 @@ install_requires = [
     'sqlalchemy>=1.1.14',
 ]
 
+api_requires = [
+    'flask>=1.0.2',
+    'flask-restless>=0.17.0',
+    'flask-sqlalchemy>=2.3.2',
+    'flask-restless-swagger-2>=0.0.3',
+    'simplejson>=3.16.0',
+]
+
 setup_requires = [
     'pytest-runner'
 ]
@@ -87,7 +95,8 @@ setup(
         ]
     },
     extras_require={
-        'dev': development_requires + tests_require,
+        'api': api_requires,
+        'dev': api_requires + development_requires + tests_require,
         'tests': tests_require,
     },
     include_package_data=True,
