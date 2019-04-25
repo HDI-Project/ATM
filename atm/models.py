@@ -10,16 +10,13 @@ from operator import attrgetter
 
 from past.utils import old_div
 
-from atm.config import initialize_logging, load_config
-from atm.constants import PROJECT_ROOT, TIME_FMT, PartitionStatus
-from atm.database import Database
+from atm.constants import TIME_FMT, PartitionStatus
 from atm.encoder import MetaData
 from atm.method import Method
 from atm.utilities import download_data, get_public_ip
 from atm.worker import ClassifierError, Worker
 
-# load the library-wide logger
-logger = logging.getLogger('atm')
+LOGGER = logging.getLogger(__name__)
 
 
 class ATM(object):
@@ -29,17 +26,11 @@ class ATM(object):
 
     LOOP_WAIT = 1
 
-    def __init__(self, **kwargs):
-
-        if kwargs.get('log_config') is None:
-            kwargs['log_config'] = os.path.join(PROJECT_ROOT,
-                                                'config/templates/log-script.yaml')
-
-        self.sql_conf, self.run_conf, self.aws_conf, self.log_conf = load_config(**kwargs)
-
-        self.db = Database(**vars(self.sql_conf))
-
-        initialize_logging(self.log_conf)
+    def __init__(self, db, run_conf, aws_conf, log_conf):
+        self.db = db
+        self.run_conf = run_conf
+        self.aws_conf = aws_conf
+        self.log_conf = log_conf
 
     def work(self, datarun_ids=None, save_files=False, choose_randomly=True,
              cloud_mode=False, total_time=None, wait=True):
@@ -71,13 +62,13 @@ class ATM(object):
             dataruns = self.db.get_dataruns(include_ids=datarun_ids, ignore_complete=True)
             if not dataruns:
                 if wait:
-                    logger.warning('No dataruns found. Sleeping %d seconds and trying again.',
+                    LOGGER.warning('No dataruns found. Sleeping %d seconds and trying again.',
                                    ATM.LOOP_WAIT)
                     time.sleep(ATM.LOOP_WAIT)
                     continue
 
                 else:
-                    logger.warning('No dataruns found. Exiting.')
+                    LOGGER.warning('No dataruns found. Exiting.')
                     break
 
             max_priority = max([datarun.priority for datarun in dataruns])
@@ -92,7 +83,7 @@ class ATM(object):
             # say we've started working on this datarun, if we haven't already
             self.db.mark_datarun_running(run.id)
 
-            logger.info('Computing on datarun %d' % run.id)
+            LOGGER.info('Computing on datarun %d' % run.id)
             # actual work happens here
             worker = Worker(self.db, run, save_files=save_files,
                             cloud_mode=cloud_mode, aws_config=self.aws_conf,
@@ -103,12 +94,12 @@ class ATM(object):
             except ClassifierError:
                 # the exception has already been handled; just wait a sec so we
                 # don't go out of control reporting errors
-                logger.warning('Something went wrong. Sleeping %d seconds.', ATM.LOOP_WAIT)
+                LOGGER.warning('Something went wrong. Sleeping %d seconds.', ATM.LOOP_WAIT)
                 time.sleep(ATM.LOOP_WAIT)
 
             elapsed_time = (datetime.now() - start_time).total_seconds()
             if total_time is not None and elapsed_time >= total_time:
-                logger.warning('Total run time for worker exceeded; exiting.')
+                LOGGER.warning('Total run time for worker exceeded; exiting.')
                 break
 
     def create_dataset(self):
@@ -197,16 +188,16 @@ class ATM(object):
             # enumerate all combinations of categorical variables for this method
             method = Method(m)
             method_parts[m] = method.get_hyperpartitions()
-            logger.info('method %s has %d hyperpartitions' %
+            LOGGER.info('method %s has %d hyperpartitions' %
                         (m, len(method_parts[m])))
 
         # create hyperpartitions and datarun(s)
         run_ids = []
         if not run_per_partition:
-            logger.debug('saving datarun...')
+            LOGGER.debug('saving datarun...')
             datarun = self.create_datarun(dataset)
 
-        logger.debug('saving hyperpartions...')
+        LOGGER.debug('saving hyperpartions...')
         for method, parts in list(method_parts.items()):
             for part in parts:
                 # if necessary, create a new datarun for each hyperpartition.
@@ -223,19 +214,19 @@ class ATM(object):
                                               categoricals=part.categoricals,
                                               status=PartitionStatus.INCOMPLETE)
 
-        logger.info('Data entry complete. Summary:')
-        logger.info('\tDataset ID: %d', dataset.id)
-        logger.info('\tTraining data: %s', dataset.train_path)
-        logger.info('\tTest data: %s', (dataset.test_path or 'None'))
+        LOGGER.info('Data entry complete. Summary:')
+        LOGGER.info('\tDataset ID: %d', dataset.id)
+        LOGGER.info('\tTraining data: %s', dataset.train_path)
+        LOGGER.info('\tTest data: %s', (dataset.test_path or 'None'))
 
         if run_per_partition:
-            logger.info('\tDatarun IDs: %s', ', '.join(map(str, run_ids)))
+            LOGGER.info('\tDatarun IDs: %s', ', '.join(map(str, run_ids)))
 
         else:
-            logger.info('\tDatarun ID: %d', datarun.id)
+            LOGGER.info('\tDatarun ID: %d', datarun.id)
 
-        logger.info('\tHyperpartition selection strategy: %s', datarun.selector)
-        logger.info('\tParameter tuning strategy: %s', datarun.tuner)
-        logger.info('\tBudget: %d (%s)', datarun.budget, datarun.budget_type)
+        LOGGER.info('\tHyperpartition selection strategy: %s', datarun.selector)
+        LOGGER.info('\tParameter tuning strategy: %s', datarun.tuner)
+        LOGGER.info('\tBudget: %d (%s)', datarun.budget, datarun.budget_type)
 
         return run_ids or datarun.id

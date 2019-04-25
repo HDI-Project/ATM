@@ -319,9 +319,9 @@ def add_arguments_sql(parser):
 
     # All of these arguments must start with --sql-, and must correspond to
     # keys present in the SQL config example file.
-    parser.add_argument('--sql-dialect', choices=SQL_DIALECTS,
+    parser.add_argument('--sql-dialect', choices=SQL_DIALECTS, default='sqlite',
                         help='Dialect of SQL to use')
-    parser.add_argument('--sql-database',
+    parser.add_argument('--sql-database', default='atm.db',
                         help='Name of, or path to, SQL database')
     parser.add_argument('--sql-username', help='Username for SQL database')
     parser.add_argument('--sql-password', help='Password for SQL database')
@@ -494,23 +494,18 @@ def add_arguments_datarun(parser):
     return parser
 
 
-def load_config(sql_path=None, run_path=None, aws_path=None, log_path=None, **kwargs):
+def load_config(**kwargs):
     """
     Load config objects from yaml files and command line arguments. Command line
     args override yaml files where applicable.
 
     Args:
-        sql_path: path to .yaml file with SQL configuration
-        run_path: path to .yaml file with Dataset and Datarun configuration
-        aws_path: path to .yaml file with AWS configuration
-        log_path: path to .yaml file with logging configuration
         **kwargs: miscellaneous arguments specifying individual configuration
             parameters. Any kwargs beginning with sql_ are SQL config
             arguments, any beginning with aws_ are AWS config.
 
-    Returns: sql_conf, run_conf, aws_conf, log_conf
+    Returns: run_conf, aws_conf, log_conf
     """
-    sql_args = {}
     run_args = {}
     aws_args = {}
     log_args = {}
@@ -521,15 +516,11 @@ def load_config(sql_path=None, run_path=None, aws_path=None, log_path=None, **kw
     kwargs = {k: v for k, v in list(kwargs.items()) if v is not None}
 
     # check the keyword args for config paths
-    sql_path = sql_path or kwargs.get('sql_config')
-    run_path = run_path or kwargs.get('run_config')
-    aws_path = aws_path or kwargs.get('aws_config')
-    log_path = log_path or kwargs.get('log_config')
+    run_path = kwargs.get('run_config')
+    aws_path = kwargs.get('aws_config')
+    log_path = kwargs.get('log_config')
 
     # load any yaml config files for which paths were provided
-    if sql_path:
-        with open(sql_path) as f:
-            sql_args = yaml.load(f)
 
     if run_path:
         with open(run_path) as f:
@@ -544,8 +535,6 @@ def load_config(sql_path=None, run_path=None, aws_path=None, log_path=None, **kw
             log_args = yaml.load(f)
 
     # Use keyword args to override yaml config values
-    sql_args.update({k.replace('sql_', ''): v for k, v in list(kwargs.items())
-                     if 'sql_' in k})
     aws_args.update({k.replace('aws_', ''): v for k, v in list(kwargs.items())
                      if 'aws_' in k})
     run_args.update({k: v for k, v in list(kwargs.items()) if k in
@@ -556,9 +545,8 @@ def load_config(sql_path=None, run_path=None, aws_path=None, log_path=None, **kw
     # It's ok if there are some extra arguments that get passed in here; only
     # kwargs that correspond to real config values will be stored on the config
     # objects.
-    sql_conf = SQLConfig(**sql_args)
     aws_conf = AWSConfig(**aws_args)
     run_conf = RunConfig(**run_args)
     log_conf = LogConfig(**log_args)
 
-    return sql_conf, run_conf, aws_conf, log_conf
+    return run_conf, aws_conf, log_conf
