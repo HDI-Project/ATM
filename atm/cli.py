@@ -9,6 +9,10 @@ import socket
 import time
 from multiprocessing import Pool, Process, Queue
 
+import daemon
+import psutil
+from daemon.pidfile import PIDLockFile
+
 from atm.api import create_app
 from atm.config import (
     add_arguments_aws_s3, add_arguments_datarun, add_arguments_logging, add_arguments_sql,
@@ -29,10 +33,25 @@ def _get_db(args):
     return Database(**db_args)
 
 
+def _work(args):
+    db = _get_db(args)
+    run_conf, aws_conf, log_conf = load_config(**vars(args))
+
+    atm = ATM(db, run_conf, aws_conf, log_conf)
+
+    atm.work(
+        datarun_ids=args.dataruns,
+        choose_randomly=False,
+        save_files=args.save_files,
+        cloud_mode=args.cloud_mode,
+        total_time=args.time,
+        wait=False
+    )
+
 
 def _serve(args):
     db = _get_db(args)
-    app = create_app(db)
+    app = create_app(db, False)
     app.run(host=args.host, port=args.port)
 
 
@@ -88,14 +107,49 @@ def _worker_loop(args):
             queue.put(datarun.id)
 
 
-def _start(args):
+def _stop(args):
+    """Stop the current running process of ATM."""
+    pid_path = args.pid
+    if not os.path.isabs(pid_path):
+        pid_path = os.path.join(os.getcwd(), args.pid)
+
+    try:
+        with open(pid_path, 'r') as f:
+            pid = int(f.read())
+
+        process = psutil.Process(pid)
+        command = process.as_dict().get('cmdline')
+        if 'atm' in command and 'start' in command:
+            process.kill()
+
+        print('ATM stopped successfully')
+
+    except (FileNotFoundError, psutil.NoSuchProcess) as e:
+        print('ATM process not found, try different pid file?')
+
+
+def _start_background(args):
     if args.server:
         LOGGER.info('Starting the REST API server')
+
         process = Process(target=_serve, args=(args, ))
         process.daemon = True
+
         process.start()
 
     _worker_loop(args)
+
+
+def _start(args):
+
+    pid_path = args.pid
+    if not os.path.isabs(pid_path):
+        pid_path = os.path.join(os.getcwd(), args.pid)
+
+    pid_file = PIDLockFile(pid_path)
+
+    with daemon.DaemonContext(pidfile=pid_file, working_directory=os.getcwd()):
+        _start_background(args)
 
 
 def _enter_data(args):
@@ -144,6 +198,27 @@ def _get_parser():
     enter_data.add_argument('--run-per-partition', default=False, action='store_true',
                             help='if set, generate a new datarun for each hyperpartition')
 
+    # Worker
+    worker = subparsers.add_parser('worker', parents=[parent])
+    worker.set_defaults(action=_work)
+    _add_common_arguments(worker)
+    worker.add_argument('--cloud-mode', action='store_true', default=False,
+                        help='Whether to run this worker in cloud mode')
+
+    worker.add_argument('--dataruns', help='Only train on dataruns with these ids', nargs='+')
+    worker.add_argument('--time', help='Number of seconds to run worker', type=int)
+
+    worker.add_argument('--no-save', dest='save_files', action='store_false',
+                        help="don't save models and metrics at all")
+
+    # Server
+    server = subparsers.add_parser('server', parents=[parent])
+    server.set_defaults(action=_serve)
+    _add_common_arguments(server)
+    server.add_argument('--host', help='IP to listen at')
+    server.add_argument('--port', help='Port to listen at', type=int)
+    server.add_argument('--debug', action='store_true', help='Start the server in debug mode.')
+
     # Start
     start = subparsers.add_parser('start', parents=[parent])
     start.set_defaults(action=_start)
@@ -155,10 +230,15 @@ def _get_parser():
                        help="don't save models and metrics at all")
     start.add_argument('-w', '--workers', default=1, type=int, help='Number of workers')
 
-    start.add_argument('--server', action='store_true',
-                       help='Also start the REST server')
+    start.add_argument('--server', action='store_true', help='Also start the REST server')
     start.add_argument('--host', help='IP to listen at')
     start.add_argument('--port', help='Port to listen at', type=int)
+    start.add_argument('--pid', help='PID file to use.', default='atm.pid')
+
+    # Stop
+    stop = subparsers.add_parser('stop', parents=[parent])
+    stop.set_defaults(action=_stop)
+    stop.add_argument('--pid', help='PID file to use.', default='atm.pid')
 
     # Make Config
     make_config = subparsers.add_parser('make_config', parents=[parent])

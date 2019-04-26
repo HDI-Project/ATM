@@ -12,9 +12,9 @@ def make_absolute(url):
     return url
 
 
-def create_app(db):
+def create_app(db, debug=False):
     app = Flask(__name__)
-    app.config['DEBUG'] = True
+    app.config['DEBUG'] = debug
     app.config['SQLALCHEMY_DATABASE_URI'] = make_absolute(db.engine.url)
 
     # Create the Flask-Restless API manager.
