@@ -43,6 +43,7 @@ tests_require = [
     'pytest-runner>=3.0',
     'pytest-xdist>=1.20.1',
     'pytest>=3.2.3',
+    'google-compute-engine==2.8.12',    # required by travis
 ]
 
 development_requires = [

@@ -7,7 +7,7 @@ python:
 
 # Command to install dependencies
 install:
-  - pip install -U tox-travis codecov google-compute-engine
+  - pip install -U tox-travis codecov
 
 # Command to run tests
 script: tox
