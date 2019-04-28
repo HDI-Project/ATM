@@ -1,0 +1,32 @@
+# Config file for automatic testing at travis-ci.org
+language: python
+dist: xenial
+python:
+  - 2.7
+  - 3.5
+  - 3.6
+
+# Fix travis failure when using boto3 on travis
+# see https://github.com/travis-ci/travis-ci/issues/7940
+before_install:
+  - sudo rm -f /etc/boto.cfg
+
+# Command to install dependencies
+install: pip install -U tox-travis codecov
+
+# Command to run tests
+script: tox
+
+after_success: codecov
+
+deploy:
+
+  - provider: pages
+    skip-cleanup: true
+    github-token: "$GITHUB_TOKEN"
+    keep-history: true
+    local-dir: docs/_build/html
+    target-branch: gh-pages
+    on:
+      branch: master
+      python: 3.6

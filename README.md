@@ -6,6 +6,7 @@
 
 
 [![CircleCI][circleci-img]][circleci-url]
+[![Travis](https://travis-ci.org/HDI-Project/ATM.svg?branch=master)](https://travis-ci.org/HDI-Project/ATM)
 [![Coverage status][codecov-img]][codecov-url]
 [![Documentation][rtd-img]][rtd-url]
 
