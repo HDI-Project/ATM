@@ -1,0 +1,7 @@
+atm.api module
+==============
+
+.. automodule:: atm.api
+    :members:
+    :undoc-members:
+    :show-inheritance:

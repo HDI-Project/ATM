@@ -1,0 +1,299 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>atm.metrics module &mdash; ATM 0.1.2-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ATM
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">ATM: Scalable model selection and tuning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#requirements">0. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#install-atm">1. Install ATM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../setup.html#install-using-pip">Install using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../setup.html#install-from-source">Install from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#start-using-atm">3. Start using ATM!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#create-a-datarun">Create a datarun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#execute-the-datarun">Execute the datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../database.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../database.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../database.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../database.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../database.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to ATM and BTB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#style">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#docs">Docs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../add_method.html">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../add_method.html#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../add_method.html#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../add_method.html#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../add_method.html#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>atm.metrics module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/HDI-project/ATM/blob/master/docs/api/atm.metrics.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-atm.metrics">
+<span id="atm-metrics-module"></span><h1>atm.metrics module<a class="headerlink" href="#module-atm.metrics" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="atm.metrics.cross_validate_pipeline">
+<code class="descclassname">atm.metrics.</code><code class="descname">cross_validate_pipeline</code><span class="sig-paren">(</span><em>pipeline</em>, <em>X</em>, <em>y</em>, <em>binary=True</em>, <em>n_folds=10</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#cross_validate_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.cross_validate_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute metrics for each of <cite>n_folds</cite> folds of the training data in (X, y).</p>
+<p>pipeline: the sklearn Pipeline to train and test
+X: feature matrix
+y: series of labels corresponding to rows in X
+binary: whether the label is binary or multi-ary
+n_folds: number of non-overlapping “folds” of the data to make for</p>
+<blockquote>
+<div><p>cross-validation</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.metrics.get_metrics_binary">
+<code class="descclassname">atm.metrics.</code><code class="descname">get_metrics_binary</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em>, <em>y_pred_probs</em>, <em>include_curves=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#get_metrics_binary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.get_metrics_binary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="atm.metrics.get_metrics_multiclass">
+<code class="descclassname">atm.metrics.</code><code class="descname">get_metrics_multiclass</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em>, <em>y_pred_probs</em>, <em>include_per_class=False</em>, <em>include_curves=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#get_metrics_multiclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.get_metrics_multiclass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="atm.metrics.get_per_class_matrix">
+<code class="descclassname">atm.metrics.</code><code class="descname">get_per_class_matrix</code><span class="sig-paren">(</span><em>y</em>, <em>classes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#get_per_class_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.get_per_class_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a (num_classes x num_examples) binary matrix representation of the
+true and predicted y values.
+If classes is None, class values will be extracted from y. Values that are
+not present at all will not receive a column – this is to allow computation
+of per-class roc_auc scores without error.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.metrics.get_pr_roc_curves">
+<code class="descclassname">atm.metrics.</code><code class="descname">get_pr_roc_curves</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred_probs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#get_pr_roc_curves"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.get_pr_roc_curves" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute precision/recall and receiver operating characteristic metrics for a
+binary class label.</p>
+<p>y_true: series of true class labels (only 1 or 0)
+y_pred_probs: series of probabilities generated by the model for the label</p>
+<blockquote>
+<div><p>class 1</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.metrics.rank_n_accuracy">
+<code class="descclassname">atm.metrics.</code><code class="descname">rank_n_accuracy</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_prob_mat</em>, <em>n=0.33</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#rank_n_accuracy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.rank_n_accuracy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute how often the true label is one of the top n predicted classes
+for each training example.
+If n is an integer, consider the top n predictions for each example.
+If n is a float, it represents a proportion of the top predictions.
+This metric is only really useful when the total number of classes is large.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.metrics.test_pipeline">
+<code class="descclassname">atm.metrics.</code><code class="descname">test_pipeline</code><span class="sig-paren">(</span><em>pipeline</em>, <em>X</em>, <em>y</em>, <em>binary</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#test_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.test_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

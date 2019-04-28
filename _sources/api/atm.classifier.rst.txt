@@ -1,0 +1,7 @@
+atm.classifier module
+=====================
+
+.. automodule:: atm.classifier
+    :members:
+    :undoc-members:
+    :show-inheritance:

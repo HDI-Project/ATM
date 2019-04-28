@@ -1,0 +1,639 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>atm.worker &mdash; ATM 0.1.2-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> ATM
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">ATM: Scalable model selection and tuning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#requirements">0. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-atm">1. Install ATM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-using-pip">Install using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-from-source">Install from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#start-using-atm">3. Start using ATM!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#create-a-datarun">Create a datarun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#execute-the-datarun">Execute the datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../database.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to ATM and BTB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#style">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#docs">Docs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../add_method.html">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../add_method.html#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../add_method.html#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>atm.worker</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for atm.worker</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python2.7</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">imp</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">str</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">boto.s3.connection</span> <span class="k">import</span> <span class="n">Key</span> <span class="k">as</span> <span class="n">S3Key</span>
+<span class="kn">from</span> <span class="nn">boto.s3.connection</span> <span class="k">import</span> <span class="n">S3Connection</span>
+
+<span class="kn">from</span> <span class="nn">atm.classifier</span> <span class="k">import</span> <span class="n">Model</span>
+<span class="kn">from</span> <span class="nn">atm.config</span> <span class="k">import</span> <span class="n">LogConfig</span>
+<span class="kn">from</span> <span class="nn">atm.constants</span> <span class="k">import</span> <span class="n">CUSTOM_CLASS_REGEX</span><span class="p">,</span> <span class="n">SELECTORS_MAP</span><span class="p">,</span> <span class="n">TUNERS_MAP</span>
+<span class="kn">from</span> <span class="nn">atm.database</span> <span class="k">import</span> <span class="n">ClassifierStatus</span><span class="p">,</span> <span class="n">db_session</span>
+<span class="kn">from</span> <span class="nn">atm.utilities</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">download_data</span><span class="p">,</span> <span class="n">ensure_directory</span><span class="p">,</span> <span class="n">get_instance</span><span class="p">,</span> <span class="n">save_metrics</span><span class="p">,</span> <span class="n">save_model</span><span class="p">,</span> <span class="n">update_params</span><span class="p">)</span>
+
+<span class="c1"># shhh</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+<span class="c1"># for garrays</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GNUMPY_IMPLICIT_CONVERSION&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;allow&#39;</span>
+
+<span class="c1"># load the library-wide logger</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;atm&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># Exception thrown when something goes wrong for the worker, but the worker</span>
+<span class="c1"># handles the error.</span>
+<div class="viewcode-block" id="ClassifierError"><a class="viewcode-back" href="../../api/atm.worker.html#atm.worker.ClassifierError">[docs]</a><span class="k">class</span> <span class="nc">ClassifierError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Worker"><a class="viewcode-back" href="../../api/atm.worker.html#atm.worker.Worker">[docs]</a><span class="k">class</span> <span class="nc">Worker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">datarun</span><span class="p">,</span> <span class="n">save_files</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cloud_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">aws_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">public_ip</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        database: Database object with connection information</span>
+<span class="sd">        datarun: Datarun ORM object to work on.</span>
+<span class="sd">        save_files: if True, save model and metrics files to disk or cloud.</span>
+<span class="sd">        cloud_mode: if True, save classifiers to the cloud</span>
+<span class="sd">        aws_config: S3Config object with amazon s3 connection info</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">database</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span> <span class="o">=</span> <span class="n">datarun</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_files</span> <span class="o">=</span> <span class="n">save_files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cloud_mode</span> <span class="o">=</span> <span class="n">cloud_mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span> <span class="o">=</span> <span class="n">aws_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">public_ip</span> <span class="o">=</span> <span class="n">public_ip</span>
+
+        <span class="n">log_config</span> <span class="o">=</span> <span class="n">log_config</span> <span class="ow">or</span> <span class="n">LogConfig</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span> <span class="o">=</span> <span class="n">log_config</span><span class="o">.</span><span class="n">model_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metric_dir</span> <span class="o">=</span> <span class="n">log_config</span><span class="o">.</span><span class="n">metric_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose_metrics</span> <span class="o">=</span> <span class="n">log_config</span><span class="o">.</span><span class="n">verbose_metrics</span>
+        <span class="n">ensure_directory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">)</span>
+        <span class="n">ensure_directory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metric_dir</span><span class="p">)</span>
+
+        <span class="c1"># load the Dataset from the database</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">)</span>
+
+        <span class="c1"># load the Selector and Tuner classes specified by our datarun</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_selector</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_tuner</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Worker.load_selector"><a class="viewcode-back" href="../../api/atm.worker.html#atm.worker.Worker.load_selector">[docs]</a>    <span class="k">def</span> <span class="nf">load_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load and initialize the BTB class which will be responsible for</span>
+<span class="sd">        selecting hyperpartitions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># selector will either be a key into SELECTORS_MAP or a path to</span>
+        <span class="c1"># a file that defines a class called CustomSelector.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">selector</span> <span class="ow">in</span> <span class="n">SELECTORS_MAP</span><span class="p">:</span>
+            <span class="n">Selector</span> <span class="o">=</span> <span class="n">SELECTORS_MAP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">selector</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">path</span><span class="p">,</span> <span class="n">classname</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">CUSTOM_CLASS_REGEX</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">selector</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">load_source</span><span class="p">(</span><span class="s1">&#39;btb.selection.custom&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="n">Selector</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">classname</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Selector: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">Selector</span><span class="p">)</span>
+
+        <span class="c1"># generate the arguments we need to initialize the selector</span>
+        <span class="n">hyperpartitions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_hyperpartitions</span><span class="p">(</span><span class="n">datarun_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">hp_by_method</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">hp</span> <span class="ow">in</span> <span class="n">hyperpartitions</span><span class="p">:</span>
+            <span class="n">hp_by_method</span><span class="p">[</span><span class="n">hp</span><span class="o">.</span><span class="n">method</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hp</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="n">hyperpartition_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">hp</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">hp</span> <span class="ow">in</span> <span class="n">hyperpartitions</span><span class="p">]</span>
+
+        <span class="c1"># Selector classes support passing in redundant arguments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selector</span> <span class="o">=</span> <span class="n">get_instance</span><span class="p">(</span><span class="n">Selector</span><span class="p">,</span>
+                                     <span class="n">choices</span><span class="o">=</span><span class="n">hyperpartition_ids</span><span class="p">,</span>
+                                     <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">k_window</span><span class="p">,</span>
+                                     <span class="n">by_algorithm</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">hp_by_method</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Worker.load_tuner"><a class="viewcode-back" href="../../api/atm.worker.html#atm.worker.Worker.load_tuner">[docs]</a>    <span class="k">def</span> <span class="nf">load_tuner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load, but don&#39;t initialize, the BTB class which will be responsible for</span>
+<span class="sd">        choosing non-hyperpartition hyperparameter values (a subclass of Tuner). The</span>
+<span class="sd">        tuner must be initialized with information about the hyperpartition, so it</span>
+<span class="sd">        cannot be created until later.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># tuner will either be a key into TUNERS_MAP or a path to</span>
+        <span class="c1"># a file that defines a class called CustomTuner.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">tuner</span> <span class="ow">in</span> <span class="n">TUNERS_MAP</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Tuner</span> <span class="o">=</span> <span class="n">TUNERS_MAP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">tuner</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">path</span><span class="p">,</span> <span class="n">classname</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">CUSTOM_CLASS_REGEX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">tuner</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">load_source</span><span class="p">(</span><span class="s1">&#39;btb.tuning.custom&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Tuner</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">classname</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Tuner: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">Tuner</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Worker.select_hyperpartition"><a class="viewcode-back" href="../../api/atm.worker.html#atm.worker.Worker.select_hyperpartition">[docs]</a>    <span class="k">def</span> <span class="nf">select_hyperpartition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Use the hyperpartition selection method specified by our datarun to choose a</span>
+<span class="sd">        hyperpartition of hyperparameters from the ModelHub. Only consider</span>
+<span class="sd">        partitions for which gridding is not complete.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">hyperpartitions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_hyperpartitions</span><span class="p">(</span><span class="n">datarun_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="c1"># load classifiers and build scores lists</span>
+        <span class="c1"># make sure all hyperpartitions are present in the dict, even ones that</span>
+        <span class="c1"># don&#39;t have any classifiers. That way the selector can choose hyperpartitions</span>
+        <span class="c1"># that haven&#39;t been scored yet.</span>
+        <span class="n">hyperpartition_scores</span> <span class="o">=</span> <span class="p">{</span><span class="n">fs</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">fs</span> <span class="ow">in</span> <span class="n">hyperpartitions</span><span class="p">}</span>
+        <span class="n">classifiers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_classifiers</span><span class="p">(</span><span class="n">datarun_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">classifiers</span><span class="p">:</span>
+            <span class="c1"># ignore hyperpartitions for which gridding is done</span>
+            <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">hyperpartition_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hyperpartition_scores</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># the cast to float is necessary because the score is a Decimal;</span>
+            <span class="c1"># doing Decimal-float arithmetic throws errors later on.</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">score_target</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">hyperpartition_scores</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">hyperpartition_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+
+        <span class="n">hyperpartition_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selector</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">hyperpartition_scores</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_hyperpartition</span><span class="p">(</span><span class="n">hyperpartition_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Worker.tune_hyperparameters"><a class="viewcode-back" href="../../api/atm.worker.html#atm.worker.Worker.tune_hyperparameters">[docs]</a>    <span class="k">def</span> <span class="nf">tune_hyperparameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperpartition</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Use the hyperparameter tuning method specified by our datarun to choose</span>
+<span class="sd">        a set of hyperparameters from the potential space.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get parameter metadata for this hyperpartition</span>
+        <span class="n">tunables</span> <span class="o">=</span> <span class="n">hyperpartition</span><span class="o">.</span><span class="n">tunables</span>
+
+        <span class="c1"># If there aren&#39;t any tunable parameters, we&#39;re done. Return the vector</span>
+        <span class="c1"># of values in the hyperpartition and mark the set as finished.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">tunables</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No tunables for hyperpartition </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">hyperpartition</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">mark_hyperpartition_gridding_done</span><span class="p">(</span><span class="n">hyperpartition</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">update_params</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="p">[],</span>
+                                 <span class="n">tunables</span><span class="o">=</span><span class="n">tunables</span><span class="p">,</span>
+                                 <span class="n">categoricals</span><span class="o">=</span><span class="n">hyperpartition</span><span class="o">.</span><span class="n">categoricals</span><span class="p">,</span>
+                                 <span class="n">constants</span><span class="o">=</span><span class="n">hyperpartition</span><span class="o">.</span><span class="n">constants</span><span class="p">)</span>
+
+        <span class="c1"># Get previously-used parameters: every classifier should either be</span>
+        <span class="c1"># completed or have thrown an error</span>
+        <span class="n">all_clfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_classifiers</span><span class="p">(</span><span class="n">hyperpartition_id</span><span class="o">=</span><span class="n">hyperpartition</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">classifiers</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">all_clfs</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">ClassifierStatus</span><span class="o">.</span><span class="n">COMPLETE</span><span class="p">]</span>
+
+        <span class="n">X</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">hyperparameter_values</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">classifiers</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">score_target</span><span class="p">))</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">classifiers</span><span class="p">])</span>
+
+        <span class="c1"># Initialize the tuner and propose a new set of parameters</span>
+        <span class="c1"># this has to be initialized with information from the hyperpartition, so we</span>
+        <span class="c1"># need to do it fresh for each classifier (not in load_tuner)</span>
+        <span class="n">tuner</span> <span class="o">=</span> <span class="n">get_instance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tuner</span><span class="p">,</span>
+                             <span class="n">tunables</span><span class="o">=</span><span class="n">tunables</span><span class="p">,</span>
+                             <span class="n">gridding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">gridding</span><span class="p">,</span>
+                             <span class="n">r_minimum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">r_minimum</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">tuner</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="n">tuner</span><span class="o">.</span><span class="n">propose</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">gridding</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Gridding done for hyperpartition </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">hyperpartition</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">mark_hyperpartition_gridding_done</span><span class="p">(</span><span class="n">hyperpartition</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Append categorical and constants to the params.</span>
+        <span class="k">return</span> <span class="n">update_params</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+                             <span class="n">categoricals</span><span class="o">=</span><span class="n">hyperpartition</span><span class="o">.</span><span class="n">categoricals</span><span class="p">,</span>
+                             <span class="n">constants</span><span class="o">=</span><span class="n">hyperpartition</span><span class="o">.</span><span class="n">constants</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Worker.test_classifier"><a class="viewcode-back" href="../../api/atm.worker.html#atm.worker.Worker.test_classifier">[docs]</a>    <span class="k">def</span> <span class="nf">test_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a set of fully-qualified hyperparameters, create and test a</span>
+<span class="sd">        classifier model.</span>
+<span class="sd">        Returns: Model object and metrics dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+                      <span class="n">judgment_metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span>
+                      <span class="n">class_column</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">class_column</span><span class="p">,</span>
+                      <span class="n">verbose_metrics</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose_metrics</span><span class="p">)</span>
+
+        <span class="n">train_path</span><span class="p">,</span> <span class="n">test_path</span> <span class="o">=</span> <span class="n">download_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">train_path</span><span class="p">,</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">test_path</span><span class="p">,</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="p">)</span>
+
+        <span class="n">metrics</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_test</span><span class="p">(</span><span class="n">train_path</span><span class="o">=</span><span class="n">train_path</span><span class="p">,</span> <span class="n">test_path</span><span class="o">=</span><span class="n">test_path</span><span class="p">)</span>
+
+        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">score_target</span>
+
+        <span class="k">def</span> <span class="nf">metric_string</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s1">&#39;cv&#39;</span> <span class="ow">in</span> <span class="n">target</span> <span class="ow">or</span> <span class="s1">&#39;mu_sigma&#39;</span> <span class="ow">in</span> <span class="n">target</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%.3f</span><span class="s1"> +- </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">cv_judgment_metric</span><span class="p">,</span>
+                                         <span class="mi">2</span> <span class="o">*</span> <span class="n">model</span><span class="o">.</span><span class="n">cv_judgment_metric_stdev</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">model</span><span class="o">.</span><span class="n">test_judgment_metric</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Judgment metric (</span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">): </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span>
+                                                      <span class="n">target</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;_judgment_metric&#39;</span><span class="p">)],</span>
+                                                      <span class="n">metric_string</span><span class="p">(</span><span class="n">model</span><span class="p">)))</span>
+
+        <span class="n">old_best</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_best_classifier</span><span class="p">(</span><span class="n">datarun_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                               <span class="n">score_target</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">old_best</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">old_best</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;New best score! Previous best (classifier </span><span class="si">%s</span><span class="s1">): </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                            <span class="n">old_best</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">metric_string</span><span class="p">(</span><span class="n">old_best</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Best so far (classifier </span><span class="si">%s</span><span class="s1">): </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                            <span class="n">old_best</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">metric_string</span><span class="p">(</span><span class="n">old_best</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">metrics</span></div>
+
+<div class="viewcode-block" id="Worker.save_classifier"><a class="viewcode-back" href="../../api/atm.worker.html#atm.worker.Worker.save_classifier">[docs]</a>    <span class="k">def</span> <span class="nf">save_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">classifier_id</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">metrics</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update a classifier with metrics and model information and mark it as</span>
+<span class="sd">        &quot;complete&quot;</span>
+
+<span class="sd">        classifier_id: ID of the classifier to save</span>
+<span class="sd">        model: Model object containing a serializable representation of the</span>
+<span class="sd">            final model generated by this classifier.</span>
+<span class="sd">        metrics: Dictionary containing cross-validation and test metrics data</span>
+<span class="sd">            for the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># whether to save model and metrics data to the filesystem</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_files</span><span class="p">:</span>
+            <span class="c1"># keep a database session open so that the utility functions can</span>
+            <span class="c1"># access the linked hyperpartitions and dataruns</span>
+            <span class="k">with</span> <span class="n">db_session</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">):</span>
+                <span class="n">classifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_classifier</span><span class="p">(</span><span class="n">classifier_id</span><span class="p">)</span>
+                <span class="n">model_path</span> <span class="o">=</span> <span class="n">save_model</span><span class="p">(</span><span class="n">classifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+                <span class="n">metric_path</span> <span class="o">=</span> <span class="n">save_metrics</span><span class="p">(</span><span class="n">classifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metric_dir</span><span class="p">,</span> <span class="n">metrics</span><span class="p">)</span>
+
+            <span class="c1"># if necessary, save model and metrics to Amazon S3 bucket</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cloud_mode</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">save_classifier_cloud</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">metric_path</span><span class="p">)</span>
+
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Error in save_classifier_cloud()&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">mark_classifier_errored</span><span class="p">(</span><span class="n">classifier_id</span><span class="p">,</span> <span class="n">error_message</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">model_path</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">metric_path</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># update the classifier in the database</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">complete_classifier</span><span class="p">(</span><span class="n">classifier_id</span><span class="o">=</span><span class="n">classifier_id</span><span class="p">,</span>
+                                    <span class="n">model_location</span><span class="o">=</span><span class="n">model_path</span><span class="p">,</span>
+                                    <span class="n">metrics_location</span><span class="o">=</span><span class="n">metric_path</span><span class="p">,</span>
+                                    <span class="n">cv_score</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">cv_judgment_metric</span><span class="p">,</span>
+                                    <span class="n">cv_stdev</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">cv_judgment_metric_stdev</span><span class="p">,</span>
+                                    <span class="n">test_score</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">test_judgment_metric</span><span class="p">)</span>
+
+        <span class="c1"># update this session&#39;s hyperpartition entry</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Saved classifier </span><span class="si">%d</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="n">classifier_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Worker.save_classifier_cloud"><a class="viewcode-back" href="../../api/atm.worker.html#atm.worker.Worker.save_classifier_cloud">[docs]</a>    <span class="k">def</span> <span class="nf">save_classifier_cloud</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_model_path</span><span class="p">,</span> <span class="n">local_metric_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save a classifier to the S3 bucket supplied by aws_config. Saves a</span>
+<span class="sd">        serialized representaion of the model as well as a detailed set</span>
+<span class="sd">        of metrics.</span>
+
+<span class="sd">        local_model_path: path to serialized model in the local file system</span>
+<span class="sd">        local_metric_path: path to serialized metrics in the local file system</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: This does not work</span>
+        <span class="n">conn</span> <span class="o">=</span> <span class="n">S3Connection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">access_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">secret_key</span><span class="p">)</span>
+        <span class="n">bucket</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">get_bucket</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">s3_bucket</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">aws_folder</span><span class="p">:</span>
+            <span class="n">aws_model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">aws_folder</span><span class="p">,</span> <span class="n">local_model_path</span><span class="p">)</span>
+            <span class="n">aws_metric_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">aws_folder</span><span class="p">,</span> <span class="n">local_metric_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">aws_model_path</span> <span class="o">=</span> <span class="n">local_model_path</span>
+            <span class="n">aws_metric_path</span> <span class="o">=</span> <span class="n">local_metric_path</span>
+
+        <span class="n">kmodel</span> <span class="o">=</span> <span class="n">S3Key</span><span class="p">(</span><span class="n">bucket</span><span class="p">)</span>
+        <span class="n">kmodel</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">aws_model_path</span>
+        <span class="n">kmodel</span><span class="o">.</span><span class="n">set_contents_from_filename</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Uploading model at </span><span class="si">%s</span><span class="s1"> to S3 bucket </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">s3_bucket</span><span class="p">,</span> <span class="n">local_model_path</span><span class="p">)</span>
+
+        <span class="n">kmodel</span> <span class="o">=</span> <span class="n">S3Key</span><span class="p">(</span><span class="n">bucket</span><span class="p">)</span>
+        <span class="n">kmodel</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">aws_metric_path</span>
+        <span class="n">kmodel</span><span class="o">.</span><span class="n">set_contents_from_filename</span><span class="p">(</span><span class="n">local_metric_path</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Uploading metrics at </span><span class="si">%s</span><span class="s1"> to S3 bucket </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">s3_bucket</span><span class="p">,</span> <span class="n">local_metric_path</span><span class="p">)</span>
+
+        <span class="c1"># delete the local copy of the model &amp; metrics so that they don&#39;t fill</span>
+        <span class="c1"># up the worker instance&#39;s hard drive</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Deleting local copies of </span><span class="si">%s</span><span class="s1"> and </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="n">local_model_path</span><span class="p">,</span> <span class="n">local_metric_path</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">local_metric_path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Worker.is_datarun_finished"><a class="viewcode-back" href="../../api/atm.worker.html#atm.worker.Worker.is_datarun_finished">[docs]</a>    <span class="k">def</span> <span class="nf">is_datarun_finished</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check to see whether the datarun is finished. This could be due to the</span>
+<span class="sd">        budget being exhausted or due to hyperparameter gridding being done.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">hyperpartitions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_hyperpartitions</span><span class="p">(</span><span class="n">datarun_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">hyperpartitions</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No incomplete hyperpartitions for datarun </span><span class="si">%d</span><span class="s1"> present in database.&#39;</span>
+                           <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">budget_type</span> <span class="o">==</span> <span class="s1">&#39;classifier&#39;</span><span class="p">:</span>
+            <span class="c1"># hyperpartition classifier counts are updated whenever a classifier</span>
+            <span class="c1"># is created, so this will count running, errored, and complete.</span>
+            <span class="n">n_completed</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_classifiers</span><span class="p">(</span><span class="n">datarun_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">n_completed</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">budget</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Classifier budget has run out!&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">budget_type</span> <span class="o">==</span> <span class="s1">&#39;walltime&#39;</span><span class="p">:</span>
+            <span class="n">deadline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">deadline</span>
+            <span class="k">if</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">deadline</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Walltime budget has run out!&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Worker.run_classifier"><a class="viewcode-back" href="../../api/atm.worker.html#atm.worker.Worker.run_classifier">[docs]</a>    <span class="k">def</span> <span class="nf">run_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperpartition_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Choose hyperparameters, then use them to test and save a Classifier.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check to see if our work is done</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_datarun_finished</span><span class="p">():</span>
+            <span class="c1"># marked the run as done successfully</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">mark_datarun_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Datarun </span><span class="si">%d</span><span class="s1"> has ended.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Choosing hyperparameters...&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hyperpartition_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">hyperpartition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_hyperpartition</span><span class="p">(</span><span class="n">hyperpartition_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">hyperpartition</span><span class="o">.</span><span class="n">datarun_id</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Hyperpartition </span><span class="si">%d</span><span class="s1"> is not a part of datarun </span><span class="si">%d</span><span class="s1">&#39;</span>
+                                 <span class="o">%</span> <span class="p">(</span><span class="n">hyperpartition_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+                    <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># use the multi-arm bandit to choose which hyperpartition to use next</span>
+                <span class="n">hyperpartition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_hyperpartition</span><span class="p">()</span>
+
+            <span class="c1"># use tuner to choose a set of parameters for the hyperpartition</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tune_hyperparameters</span><span class="p">(</span><span class="n">hyperpartition</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Error choosing hyperparameters: datarun=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="k">raise</span> <span class="n">ClassifierError</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No parameters chosen: hyperpartition </span><span class="si">%d</span><span class="s1"> is finished.&#39;</span>
+                           <span class="o">%</span> <span class="n">hyperpartition</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">param_info</span> <span class="o">=</span> <span class="s1">&#39;Chose parameters for method &quot;</span><span class="si">%s</span><span class="s1">&quot;:&#39;</span> <span class="o">%</span> <span class="n">hyperpartition</span><span class="o">.</span><span class="n">method</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">param_info</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">param_info</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating classifier...&#39;</span><span class="p">)</span>
+        <span class="n">classifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">start_classifier</span><span class="p">(</span><span class="n">hyperpartition_id</span><span class="o">=</span><span class="n">hyperpartition</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                              <span class="n">datarun_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                              <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_ip</span><span class="p">,</span>
+                                              <span class="n">hyperparameter_values</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Testing classifier...&#39;</span><span class="p">)</span>
+            <span class="n">model</span><span class="p">,</span> <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_classifier</span><span class="p">(</span><span class="n">hyperpartition</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Saving classifier...&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save_classifier</span><span class="p">(</span><span class="n">classifier</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">metrics</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Error testing classifier: datarun=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">mark_classifier_errored</span><span class="p">(</span><span class="n">classifier</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">error_message</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ClassifierError</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

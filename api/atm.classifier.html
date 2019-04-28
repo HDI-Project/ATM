@@ -1,0 +1,327 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>atm.classifier module &mdash; ATM 0.1.2-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ATM
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">ATM: Scalable model selection and tuning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#requirements">0. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#install-atm">1. Install ATM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../setup.html#install-using-pip">Install using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../setup.html#install-from-source">Install from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#start-using-atm">3. Start using ATM!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#create-a-datarun">Create a datarun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#execute-the-datarun">Execute the datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../database.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../database.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../database.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../database.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../database.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to ATM and BTB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#style">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#docs">Docs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../add_method.html">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../add_method.html#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../add_method.html#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../add_method.html#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../add_method.html#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>atm.classifier module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/HDI-project/ATM/blob/master/docs/api/atm.classifier.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-atm.classifier">
+<span id="atm-classifier-module"></span><h1>atm.classifier module<a class="headerlink" href="#module-atm.classifier" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-wrapper"></span><dl class="class">
+<dt id="atm.classifier.Model">
+<em class="property">class </em><code class="descclassname">atm.classifier.</code><code class="descname">Model</code><span class="sig-paren">(</span><em>method</em>, <em>params</em>, <em>judgment_metric</em>, <em>class_column</em>, <em>testing_ratio=0.3</em>, <em>verbose_metrics=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.classifier.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class contains everything needed to run an end-to-end ATM classifier
+pipeline. It is initialized with a set of parameters and trained like a
+normal sklearn model. This class can be pickled and saved to disk, then
+unpickled outside of ATM and used to classify new datasets.</p>
+<dl class="attribute">
+<dt id="atm.classifier.Model.ATM_KEYS">
+<code class="descname">ATM_KEYS</code><em class="property"> = ['_scale', '_whiten', '_scale_minmax', '_pca', '_pca_dimensions']</em><a class="headerlink" href="#atm.classifier.Model.ATM_KEYS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.classifier.Model.MINMAX">
+<code class="descname">MINMAX</code><em class="property"> = '_scale_minmax'</em><a class="headerlink" href="#atm.classifier.Model.MINMAX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.classifier.Model.N_FOLDS">
+<code class="descname">N_FOLDS</code><em class="property"> = 5</em><a class="headerlink" href="#atm.classifier.Model.N_FOLDS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.classifier.Model.PCA">
+<code class="descname">PCA</code><em class="property"> = '_pca'</em><a class="headerlink" href="#atm.classifier.Model.PCA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.classifier.Model.PCA_DIMS">
+<code class="descname">PCA_DIMS</code><em class="property"> = '_pca_dimensions'</em><a class="headerlink" href="#atm.classifier.Model.PCA_DIMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.classifier.Model.SCALE">
+<code class="descname">SCALE</code><em class="property"> = '_scale'</em><a class="headerlink" href="#atm.classifier.Model.SCALE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.classifier.Model.WHITEN">
+<code class="descname">WHITEN</code><em class="property"> = '_whiten'</em><a class="headerlink" href="#atm.classifier.Model.WHITEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="atm.classifier.Model.cross_validate">
+<code class="descname">cross_validate</code><span class="sig-paren">(</span><em>X</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.cross_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.classifier.Model.cross_validate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="atm.classifier.Model.load_data">
+<code class="descname">load_data</code><span class="sig-paren">(</span><em>path</em>, <em>dropvals=None</em>, <em>sep='</em>, <em>'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.load_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.classifier.Model.load_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="atm.classifier.Model.make_pipeline">
+<code class="descname">make_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.make_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.classifier.Model.make_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes the classifier as well as scaling or dimension reduction steps.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="atm.classifier.Model.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.classifier.Model.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the trained encoder and pipeline to transform training data into
+predicted labels</p>
+<p>data: pd.DataFrame of data for which to predict classes</p>
+<p>returns: pd.Series populated with predictions, with index matching data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="atm.classifier.Model.special_conversions">
+<code class="descname">special_conversions</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.special_conversions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.classifier.Model.special_conversions" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO: replace this logic with something better</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="atm.classifier.Model.test_final_model">
+<code class="descname">test_final_model</code><span class="sig-paren">(</span><em>X</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.test_final_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.classifier.Model.test_final_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test the (already trained) model pipeline on the provided test data
+(X and y). Store the test judgment metric and return the rest of the
+metrics as a hierarchical dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="atm.classifier.Model.train_test">
+<code class="descname">train_test</code><span class="sig-paren">(</span><em>train_path</em>, <em>test_path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.train_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.classifier.Model.train_test" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,329 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tutorial &mdash; ATM 0.1.2-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ATM
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">ATM: Scalable model selection and tuning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#requirements">0. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#install-atm">1. Install ATM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="setup.html#install-using-pip">Install using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="setup.html#install-from-source">Install from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#start-using-atm">3. Start using ATM!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#create-a-datarun">Create a datarun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#execute-the-datarun">Execute the datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="database.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to ATM and BTB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#style">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#docs">Docs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="add_method.html">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="add_method.html#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="add_method.html#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="add_method.html#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="add_method.html#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Tutorial</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/HDI-project/ATM/blob/master/docs/tutorial.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="creating-a-dataset">
+<h2>Creating a Dataset<a class="headerlink" href="#creating-a-dataset" title="Permalink to this headline">¶</a></h2>
+<p>A Dataset in ATM is defined by the following fields:</p>
+<div class="section" id="data-format">
+<h3>Data format<a class="headerlink" href="#data-format" title="Permalink to this headline">¶</a></h3>
+<p>ATM works with data in CSV format. For ATM to interpret it, each CSV file needs
+the following</p>
+<ul class="simple">
+<li><p>Have the first line of the file be headers with strings as the feature names, and the class column named “class” (or configured otherwise in run_config.yaml). If the features aren’t named (ie, image or SVD or PCA data), then anything will do (but see below for a small script to generate nice feature names).</p></li>
+<li><p>Should have N + 1 rows (1 header + N examples)</p></li>
+<li><p>Should have D + 1 features (1 class label + D features per example)</p></li>
+</ul>
+<p>Here’s a handy Python script to create a CSV header line for data that doesn’t have feature names:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">create_csv_header</span><span class="p">(</span><span class="n">n_features</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">class_label_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a CSV header like:</span>
+<span class="sd">            &quot;&lt;class_label_name&gt;, &lt;name&gt;1, &lt;name&gt;2, ..., &lt;name&gt;&lt;n_features&gt;&quot;</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            print CreateCSVHeader(64, &quot;pixel&quot;, &quot;class&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">separator</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span>
+    <span class="nb">zip</span><span class="p">([</span><span class="n">name</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_features</span><span class="p">)],</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_features</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">header_row_string</span> <span class="o">=</span> <span class="n">separator</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span>
+        <span class="p">])</span>
+    <span class="k">return</span> <span class="n">separator</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">class_label_name</span><span class="p">,</span> <span class="n">header_row_string</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="creating-a-datarun-in-the-modelhub">
+<h2>Creating a Datarun in the ModelHub<a class="headerlink" href="#creating-a-datarun-in-the-modelhub" title="Permalink to this headline">¶</a></h2>
+<p>Once your data in the proper format, you can upload it to the ModelHub for processing.</p>
+<div class="section" id="configuration-file">
+<h3>Configuration File<a class="headerlink" href="#configuration-file" title="Permalink to this headline">¶</a></h3>
+<p>To run ATM, you must create a configuration file.</p>
+<p>A configuration file template is included in <code class="docutils literal notranslate"><span class="pre">config/atm.cnf.template</span></code> (and shown below).
+Since the configuration file contains passwords, it’s best to rename it to <code class="docutils literal notranslate"><span class="pre">atm.cnf</span></code> so that it will be ignored by git.
+This is especially true if you plan to make changes to ATM and upload them to the repository.
+The git repository is setup to ignore all files in the <code class="docutils literal notranslate"><span class="pre">config</span></code> folder except <code class="docutils literal notranslate"><span class="pre">atm.cnf.template</span></code>.</p>
+<p>The name of the file must also be a environmental variable called <code class="docutils literal notranslate"><span class="pre">ATM_CONFIG_FILE</span></code>.
+For example if the configuration file is called <code class="docutils literal notranslate"><span class="pre">atm.cnf</span></code> in the <code class="docutils literal notranslate"><span class="pre">config</span></code> directory of the root atm directory, then an environmental variable would created with the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(atm-env) $ export ATM_CONFIG_FILE=/path_to_atm_root/config/atm.cnf
+</pre></div>
+</div>
+</div>
+<div class="section" id="datarun-creation">
+<h3>Datarun Creation<a class="headerlink" href="#datarun-creation" title="Permalink to this headline">¶</a></h3>
+<p>Now we need to add the <cite>datarun</cite> to the ModelHub (database).
+A datarun consists of all the parameters for a single experiment run, including where the find the data, what the budget is for number of learners to train, the majoirty class benchmark, and other things.
+The datarun ID in the database also ties together the <cite>hyperpartitions</cite> (frozen sets) which delineate how ATM can explore different subtypes of classifiers to maximize their performance.
+Once the configuration file is filled out, we can enter it in ModelHub with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(atm-env) $ atm enter_data
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="workers">
+<h2>Workers<a class="headerlink" href="#workers" title="Permalink to this headline">¶</a></h2>
+<p>Once at least one datarun is in the ModelHub, workers can be started to run classification routines.</p>
+<div class="section" id="on-a-local-machine">
+<h3>On a Local Machine<a class="headerlink" href="#on-a-local-machine" title="Permalink to this headline">¶</a></h3>
+<p>In local mode, this is simple:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(atm-env) $ atm worker
+</pre></div>
+</div>
+<p>This command can b executed several times to create many workers that operate independently in parallel.
+How many to run depends of your judgment of your computer’s capabilities.</p>
+</div>
+<div class="section" id="on-amazon-web-services">
+<h3>On Amazon Web Services<a class="headerlink" href="#on-amazon-web-services" title="Permalink to this headline">¶</a></h3>
+<p>In cloud mode, the <a class="reference external" href="https://www.fabfile.org">fabric</a> package is used to deploy workers on AWS.
+First, you must create instance(s) by executing the following command on your local machine:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(atm-env) $ fab create_instances
+</pre></div>
+</div>
+<p>The number of instances will be the number specified in the <em>aws</em> section of the configuration file.
+Second, you must start ATM worker processes on the instance(s) by executing the following command on your local machine:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(atm-env) $ fab deploy
+</pre></div>
+</div>
+<p>The number of worker processes on each EC2 instance is specified in the configuration file.
+Once the workers are done, the worker processes can be killed by executing the following command on your local machine:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(atm-env) $ fab killworkers
+</pre></div>
+</div>
+<p><strong>This does NOT terminate the instances</strong>.
+Currently, the instances have to be terminated from the AWS Management Console.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

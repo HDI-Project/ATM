@@ -1,0 +1,411 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>atm.utilities module &mdash; ATM 0.1.2-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ATM
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">ATM: Scalable model selection and tuning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#requirements">0. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#install-atm">1. Install ATM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../setup.html#install-using-pip">Install using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../setup.html#install-from-source">Install from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#start-using-atm">3. Start using ATM!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#create-a-datarun">Create a datarun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#execute-the-datarun">Execute the datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../database.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../database.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../database.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../database.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../database.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to ATM and BTB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#style">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#docs">Docs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../add_method.html">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../add_method.html#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../add_method.html#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../add_method.html#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../add_method.html#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>atm.utilities module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/HDI-project/ATM/blob/master/docs/api/atm.utilities.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-atm.utilities">
+<span id="atm-utilities-module"></span><h1>atm.utilities module<a class="headerlink" href="#module-atm.utilities" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="atm.utilities.base_64_to_object">
+<code class="descclassname">atm.utilities.</code><code class="descname">base_64_to_object</code><span class="sig-paren">(</span><em>b64str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#base_64_to_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.base_64_to_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverse of object_to_base_64.
+Decode base64-encoded string and then unpickle it.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.download_data">
+<code class="descclassname">atm.utilities.</code><code class="descname">download_data</code><span class="sig-paren">(</span><em>train_path</em>, <em>test_path=None</em>, <em>aws_config=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#download_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.download_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a set of train/test data from AWS (if necessary) and return the
+path to the local data.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.download_file_http">
+<code class="descclassname">atm.utilities.</code><code class="descname">download_file_http</code><span class="sig-paren">(</span><em>url</em>, <em>local_folder='/home/travis/build/HDI-Project/ATM/atm/data/downloads'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#download_file_http"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.download_file_http" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a file from a public URL and save it locally.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.download_file_s3">
+<code class="descclassname">atm.utilities.</code><code class="descname">download_file_s3</code><span class="sig-paren">(</span><em>aws_path</em>, <em>aws_config</em>, <em>local_folder='/home/travis/build/HDI-Project/ATM/atm/data/downloads'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#download_file_s3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.download_file_s3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a file from an S3 bucket and save it in the local folder.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.ensure_directory">
+<code class="descclassname">atm.utilities.</code><code class="descname">ensure_directory</code><span class="sig-paren">(</span><em>directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#ensure_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.ensure_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create directory if it doesn’t exist.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.get_instance">
+<code class="descclassname">atm.utilities.</code><code class="descname">get_instance</code><span class="sig-paren">(</span><em>class_</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#get_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.get_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate an instance of the given class with unused kwargs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>class</strong> (<em>type</em>) – class to instantiate</p></li>
+<li><p><strong>**kwargs</strong> – keyword arguments to specific selector class</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>instance of specific class with the args that accepts.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.get_local_data_path">
+<code class="descclassname">atm.utilities.</code><code class="descname">get_local_data_path</code><span class="sig-paren">(</span><em>data_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#get_local_data_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.get_local_data_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>given a data path of the form “s3://…” or “http://…”, return the local
+path where the file should be stored once it’s downloaded.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.get_public_ip">
+<code class="descclassname">atm.utilities.</code><code class="descname">get_public_ip</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#get_public_ip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.get_public_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the public IP address of this machine. If the request times out,
+return “localhost”.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.hash_dict">
+<code class="descclassname">atm.utilities.</code><code class="descname">hash_dict</code><span class="sig-paren">(</span><em>dictionary</em>, <em>ignored_keys=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#hash_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.hash_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hash a python dictionary to a hexadecimal string.
+<a class="reference external" href="http://stackoverflow.com/questions/5884066/hashing-a-python-dictionary">http://stackoverflow.com/questions/5884066/hashing-a-python-dictionary</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.hash_nested_tuple">
+<code class="descclassname">atm.utilities.</code><code class="descname">hash_nested_tuple</code><span class="sig-paren">(</span><em>tup</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#hash_nested_tuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.hash_nested_tuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hash a nested tuple to hexadecimal</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.hash_string">
+<code class="descclassname">atm.utilities.</code><code class="descname">hash_string</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#hash_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.hash_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hash a string to hexadecimal</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.load_metrics">
+<code class="descclassname">atm.utilities.</code><code class="descname">load_metrics</code><span class="sig-paren">(</span><em>classifier</em>, <em>metric_dir</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#load_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.load_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the performance metrics for a particular classifier</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.load_model">
+<code class="descclassname">atm.utilities.</code><code class="descname">load_model</code><span class="sig-paren">(</span><em>classifier</em>, <em>model_dir</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#load_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.load_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the Model object for a particular classifier</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.make_save_path">
+<code class="descclassname">atm.utilities.</code><code class="descname">make_save_path</code><span class="sig-paren">(</span><em>dir</em>, <em>classifier</em>, <em>suffix</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#make_save_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.make_save_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the base save path for a classifier’s model and metrics files,
+based on the classifier’s dataset name and hyperparameters.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.obj_has_method">
+<code class="descclassname">atm.utilities.</code><code class="descname">obj_has_method</code><span class="sig-paren">(</span><em>obj</em>, <em>method</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#obj_has_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.obj_has_method" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://stackoverflow.com/questions/34439/finding-what-methods-an-object-has">http://stackoverflow.com/questions/34439/finding-what-methods-an-object-has</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.object_to_base_64">
+<code class="descclassname">atm.utilities.</code><code class="descname">object_to_base_64</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#object_to_base_64"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.object_to_base_64" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pickle and base64-encode an object.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.params_to_vectors">
+<code class="descclassname">atm.utilities.</code><code class="descname">params_to_vectors</code><span class="sig-paren">(</span><em>params</em>, <em>tunables</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#params_to_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.params_to_vectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a list of parameter vectors (with metadata) into a numpy array
+ready for BTB tuning.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> – list of hyperparameter vectors. Each vector is a dict mapping
+the names of parameters to those parameters’ values.</p></li>
+<li><p><strong>tunables</strong> – list of HyperParameter metadata structures describing all
+the optimizable hyperparameters that should be in each vector. e.g.</p></li>
+<li><p><strong>=</strong><strong> [</strong> (<em>tunables</em>) – (‘degree’,  HyperParameter(‘int’, (2, 4))),
+(‘gamma’,  HyperParameter(‘float_exp’, (1e-05, 1e5)))]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>np.array of parameter vectors ready to be optimized by a</dt><dd><p>Gaussian Process (or what have you).
+vectors.shape = (len(params), len(tunables))</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>vectors</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.save_metrics">
+<code class="descclassname">atm.utilities.</code><code class="descname">save_metrics</code><span class="sig-paren">(</span><em>classifier</em>, <em>metric_dir</em>, <em>metrics</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#save_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.save_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a JSON-serialized version of a set of performance metrics for a
+particular classifier. The metrics will be stored at a path generated from
+the classifier’s attributes.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.save_model">
+<code class="descclassname">atm.utilities.</code><code class="descname">save_model</code><span class="sig-paren">(</span><em>classifier</em>, <em>model_dir</em>, <em>model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#save_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.save_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a serialized version of a Model object for a particular classifier.
+The object will be stored at a path generated from the classifier’s
+attributes.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="atm.utilities.update_params">
+<code class="descclassname">atm.utilities.</code><code class="descname">update_params</code><span class="sig-paren">(</span><em>params</em>, <em>categoricals</em>, <em>constants</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#update_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.update_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update params with categoricals and constants for the fitting proces.</p>
+<p>params: params proposed by the tuner</p>
+<p>Examples of the format for SVM sigmoid hyperpartition:</p>
+<dl class="simple">
+<dt>categoricals = ((‘kernel’, ‘poly’),</dt><dd><p>(‘probability’, True),
+(‘_scale’, True))</p>
+</dd>
+</dl>
+<p>constants = [(‘cache_size’, 15000)]</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

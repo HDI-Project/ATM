@@ -1,0 +1,7 @@
+atm.cli module
+==============
+
+.. automodule:: atm.cli
+    :members:
+    :undoc-members:
+    :show-inheritance:

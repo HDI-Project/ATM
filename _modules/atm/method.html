@@ -1,0 +1,511 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>atm.method &mdash; ATM 0.1.2-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> ATM
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">ATM: Scalable model selection and tuning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#requirements">0. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-atm">1. Install ATM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-using-pip">Install using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-from-source">Install from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#start-using-atm">3. Start using ATM!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#create-a-datarun">Create a datarun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#execute-the-datarun">Execute the datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../database.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to ATM and BTB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#style">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#docs">Docs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../add_method.html">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../add_method.html#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../add_method.html#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>atm.method</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for atm.method</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">str</span> <span class="k">as</span> <span class="n">newstr</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span>
+
+<span class="kn">import</span> <span class="nn">btb</span>
+
+<span class="kn">from</span> <span class="nn">atm.constants</span> <span class="k">import</span> <span class="n">METHOD_PATH</span><span class="p">,</span> <span class="n">METHODS_MAP</span>
+
+
+<div class="viewcode-block" id="HyperParameter"><a class="viewcode-back" href="../../api/atm.method.html#atm.method.HyperParameter">[docs]</a><span class="k">class</span> <span class="nc">HyperParameter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_categorical</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Numeric"><a class="viewcode-back" href="../../api/atm.method.html#atm.method.Numeric">[docs]</a><span class="k">class</span> <span class="nc">Numeric</span><span class="p">(</span><span class="n">HyperParameter</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="nb">range</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">range</span> <span class="o">=</span> <span class="nb">range</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">range</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="Numeric.as_tunable"><a class="viewcode-back" href="../../api/atm.method.html#atm.method.Numeric.as_tunable">[docs]</a>    <span class="k">def</span> <span class="nf">as_tunable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">btb</span><span class="o">.</span><span class="n">HyperParameter</span><span class="p">(</span><span class="n">param_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">param_range</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">range</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Categorical"><a class="viewcode-back" href="../../api/atm.method.html#atm.method.Categorical">[docs]</a><span class="k">class</span> <span class="nc">Categorical</span><span class="p">(</span><span class="n">HyperParameter</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># the value None is allowed for every parameter type</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;int_cat&#39;</span><span class="p">:</span>
+                <span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;float_cat&#39;</span><span class="p">:</span>
+                <span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;string&#39;</span><span class="p">:</span>
+                <span class="c1"># this is necessary to avoid a bug in sklearn, which won&#39;t be</span>
+                <span class="c1"># fixed until 0.20</span>
+                <span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">newstr</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;bool&#39;</span><span class="p">:</span>
+                <span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">values</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_categorical</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="Categorical.as_tunable"><a class="viewcode-back" href="../../api/atm.method.html#atm.method.Categorical.as_tunable">[docs]</a>    <span class="k">def</span> <span class="nf">as_tunable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">btb</span><span class="o">.</span><span class="n">HyperParameter</span><span class="p">(</span><span class="n">param_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">param_range</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="List"><a class="viewcode-back" href="../../api/atm.method.html#atm.method.List">[docs]</a><span class="k">class</span> <span class="nc">List</span><span class="p">(</span><span class="n">HyperParameter</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">list_length</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">Categorical</span><span class="p">(</span><span class="s1">&#39;len(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;int_cat&#39;</span><span class="p">,</span> <span class="n">list_length</span><span class="p">)</span>
+        <span class="n">element_type</span> <span class="o">=</span> <span class="n">HYPERPARAMETER_TYPES</span><span class="p">[</span><span class="n">element</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="n">element_type</span><span class="p">(</span><span class="s1">&#39;element&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">element</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_categorical</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="List.get_elements"><a class="viewcode-back" href="../../api/atm.method.html#atm.method.List.get_elements">[docs]</a>    <span class="k">def</span> <span class="nf">get_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">elements</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="o">.</span><span class="n">values</span><span class="p">)):</span>
+            <span class="c1"># generate names for the pseudo-hyperparameters in the list</span>
+            <span class="n">elt_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">[</span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">elt_name</span><span class="p">)</span>
+
+        <span class="n">conditions</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">):</span> <span class="n">elements</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="o">.</span><span class="n">values</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">elements</span><span class="p">,</span> <span class="n">conditions</span></div></div>
+
+
+<div class="viewcode-block" id="HyperPartition"><a class="viewcode-back" href="../../api/atm.method.html#atm.method.HyperPartition">[docs]</a><span class="k">class</span> <span class="nc">HyperPartition</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class which holds the hyperparameter settings that define a hyperpartition.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">categoricals</span><span class="p">,</span> <span class="n">constants</span><span class="p">,</span> <span class="n">tunables</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        categoricals: the values for this hyperpartition which have been fixed</span>
+<span class="sd">            and define the hyperpartition. List of tuples of the form (&#39;param&#39;, val).</span>
+<span class="sd">        constants: the values for this hyperpartition for which there was no</span>
+<span class="sd">            choice. List of tuples of the form (&#39;param&#39;, val).</span>
+<span class="sd">        tunables: the free variables which must be tuned. List of tuples of the</span>
+<span class="sd">            form (&#39;param&#39;, HyperParameter).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">categoricals</span> <span class="o">=</span> <span class="n">categoricals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constants</span> <span class="o">=</span> <span class="n">constants</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tunables</span> <span class="o">=</span> <span class="n">tunables</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cats</span><span class="p">,</span> <span class="n">cons</span><span class="p">,</span> <span class="n">tuns</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">categoricals</span><span class="p">:</span>
+            <span class="n">cats</span> <span class="o">=</span> <span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categoricals</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">constants</span><span class="p">:</span>
+            <span class="n">cons</span> <span class="o">=</span> <span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">constants</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tunables</span><span class="p">:</span>
+            <span class="n">tuns</span> <span class="o">=</span> <span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tunables</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;&lt;HyperPartition: categoricals: </span><span class="si">%s</span><span class="s1">; constants: </span><span class="si">%s</span><span class="s1">; tunables: </span><span class="si">%s</span><span class="s1">&gt;&#39;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">cats</span><span class="p">,</span> <span class="n">cons</span><span class="p">,</span> <span class="n">tuns</span><span class="p">))</span></div>
+
+
+<span class="n">HYPERPARAMETER_TYPES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;int&#39;</span><span class="p">:</span> <span class="n">Numeric</span><span class="p">,</span>
+    <span class="s1">&#39;int_exp&#39;</span><span class="p">:</span> <span class="n">Numeric</span><span class="p">,</span>
+    <span class="s1">&#39;float&#39;</span><span class="p">:</span> <span class="n">Numeric</span><span class="p">,</span>
+    <span class="s1">&#39;float_exp&#39;</span><span class="p">:</span> <span class="n">Numeric</span><span class="p">,</span>
+    <span class="s1">&#39;int_cat&#39;</span><span class="p">:</span> <span class="n">Categorical</span><span class="p">,</span>
+    <span class="s1">&#39;float_cat&#39;</span><span class="p">:</span> <span class="n">Categorical</span><span class="p">,</span>
+    <span class="s1">&#39;string&#39;</span><span class="p">:</span> <span class="n">Categorical</span><span class="p">,</span>
+    <span class="s1">&#39;bool&#39;</span><span class="p">:</span> <span class="n">Categorical</span><span class="p">,</span>
+    <span class="s1">&#39;list&#39;</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="Method"><a class="viewcode-back" href="../../api/atm.method.html#atm.method.Method">[docs]</a><span class="k">class</span> <span class="nc">Method</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is initialized with the name of a json configuration file.</span>
+<span class="sd">    The config contains information about a classification method and the</span>
+<span class="sd">    hyperparameter arguments it needs to run. Its main purpose is to generate</span>
+<span class="sd">    hyperpartitions (possible combinations of categorical hyperparameters).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        method: method code or path to JSON file containing all the information</span>
+<span class="sd">            needed to specify this enumerator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">METHODS_MAP</span><span class="p">:</span>
+            <span class="c1"># if the configured method is a code, look up the path to its json</span>
+            <span class="n">config_path</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">METHOD_PATH</span><span class="p">,</span> <span class="n">METHODS_MAP</span><span class="p">[</span><span class="n">method</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># otherwise, it must be a path to a file</span>
+            <span class="n">config_path</span> <span class="o">=</span> <span class="n">method</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root_params</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;root_hyperparameters&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;conditional_hyperparameters&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">class_path</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span>
+
+        <span class="c1"># create hyperparameters from the parameter config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;hyperparameters&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">param_type</span> <span class="o">=</span> <span class="n">HYPERPARAMETER_TYPES</span><span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_type</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="o">**</span><span class="n">v</span><span class="p">)</span>
+
+        <span class="c1"># List hyperparameters are special. These are replaced in the</span>
+        <span class="c1"># CPT with a size hyperparameter and sets of element hyperparameters</span>
+        <span class="c1"># conditioned on the size.</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">List</span><span class="p">):</span>
+                <span class="n">elements</span><span class="p">,</span> <span class="n">conditions</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">get_elements</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">element</span>
+
+                <span class="c1"># add the size parameter, remove the list parameter</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">param</span><span class="o">.</span><span class="n">length</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">length</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+
+                <span class="c1"># if this is a root param, replace its name with the new size</span>
+                <span class="c1"># name in the root params list</span>
+                <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_params</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">root_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">length</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">root_params</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+                <span class="c1"># if this is a conditional param, replace it there instead</span>
+                <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">cond</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conditions</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                    <span class="k">for</span> <span class="n">val</span><span class="p">,</span> <span class="n">deps</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">cond</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                        <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">deps</span><span class="p">:</span>
+                            <span class="n">deps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">length</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                            <span class="n">deps</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="n">val</span><span class="p">]</span> <span class="o">=</span> <span class="n">deps</span>
+
+                <span class="c1"># finally, add all the potential sets of list elements as</span>
+                <span class="c1"># conditions of the list&#39;s size</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span><span class="p">[</span><span class="n">param</span><span class="o">.</span><span class="n">length</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">conditions</span>
+
+    <span class="k">def</span> <span class="nf">_sort_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sort a list of HyperParameter objects into lists of constants,</span>
+<span class="sd">        categoricals, and tunables.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">constants</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">categoricals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tunables</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">is_constant</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">is_categorical</span><span class="p">:</span>
+                    <span class="n">constants</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">p</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">constants</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">p</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">range</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">elif</span> <span class="n">param</span><span class="o">.</span><span class="n">is_categorical</span><span class="p">:</span>
+                <span class="n">categoricals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tunables</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">p</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">as_tunable</span><span class="p">()))</span>
+
+        <span class="k">return</span> <span class="n">constants</span><span class="p">,</span> <span class="n">categoricals</span><span class="p">,</span> <span class="n">tunables</span>
+
+    <span class="k">def</span> <span class="nf">_enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fixed_cats</span><span class="p">,</span> <span class="n">constants</span><span class="p">,</span> <span class="n">free_cats</span><span class="p">,</span> <span class="n">tunables</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Some things are fixed. Make a choice from the things that aren&#39;t fixed</span>
+<span class="sd">        and see where that leaves us. Recurse.</span>
+
+<span class="sd">        fixed_cats: a list of (name, value) tuples of qualified categorical</span>
+<span class="sd">            variables</span>
+<span class="sd">        constants: a list of (name, value) tuples of fixed constants</span>
+<span class="sd">        free_cats: a list of names of free categorical variables</span>
+<span class="sd">        tunables: a list of names of free tunable parameters</span>
+
+<span class="sd">        Returns: a list of HyperPartition objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if there are no more free variables, we have a new HyperPartition. We&#39;ve</span>
+        <span class="c1"># reached the bottom of the recursion, so return.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">free_cats</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">HyperPartition</span><span class="p">(</span><span class="n">fixed_cats</span><span class="p">,</span> <span class="n">constants</span><span class="p">,</span> <span class="n">tunables</span><span class="p">)]</span>
+
+        <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># fix a single categorical parameter, removing it from the list of free</span>
+        <span class="c1"># variables, and see where that takes us</span>
+        <span class="n">cat</span> <span class="o">=</span> <span class="n">free_cats</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+            <span class="c1"># add this value to the list of qualified categoricals</span>
+            <span class="n">new_fixed_cats</span> <span class="o">=</span> <span class="n">fixed_cats</span> <span class="o">+</span> <span class="p">[(</span><span class="n">cat</span><span class="p">,</span> <span class="n">val</span><span class="p">)]</span>
+
+            <span class="c1"># these lists are copied for now</span>
+            <span class="n">new_constants</span> <span class="o">=</span> <span class="n">constants</span><span class="p">[:]</span>
+            <span class="n">new_free_cats</span> <span class="o">=</span> <span class="n">free_cats</span><span class="p">[:]</span>
+            <span class="n">new_tunables</span> <span class="o">=</span> <span class="n">tunables</span><span class="p">[:]</span>
+
+            <span class="c1"># check if choosing this value opens up new parts of the conditional</span>
+            <span class="c1"># parameter tree.</span>
+            <span class="c1"># we need to check conditions for str(val) because all keys in json</span>
+            <span class="c1"># must be strings.</span>
+            <span class="k">if</span> <span class="n">cat</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span> <span class="ow">and</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span><span class="p">[</span><span class="n">cat</span><span class="p">]:</span>
+                <span class="c1"># categorize the conditional variables which are now in play</span>
+                <span class="n">new_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span><span class="p">[</span><span class="n">cat</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)]</span>
+                <span class="n">cons</span><span class="p">,</span> <span class="n">cats</span><span class="p">,</span> <span class="n">tuns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sort_parameters</span><span class="p">(</span><span class="n">new_params</span><span class="p">)</span>
+                <span class="n">new_constants</span> <span class="o">=</span> <span class="n">constants</span> <span class="o">+</span> <span class="n">cons</span>
+                <span class="n">new_free_cats</span> <span class="o">=</span> <span class="n">free_cats</span> <span class="o">+</span> <span class="n">cats</span>
+                <span class="n">new_tunables</span> <span class="o">=</span> <span class="n">tunables</span> <span class="o">+</span> <span class="n">tuns</span>
+
+            <span class="c1"># recurse with the newly qualified categorical as a constant</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_enumerate</span><span class="p">(</span><span class="n">fixed_cats</span><span class="o">=</span><span class="n">new_fixed_cats</span><span class="p">,</span>
+                                         <span class="n">constants</span><span class="o">=</span><span class="n">new_constants</span><span class="p">,</span>
+                                         <span class="n">free_cats</span><span class="o">=</span><span class="n">new_free_cats</span><span class="p">,</span>
+                                         <span class="n">tunables</span><span class="o">=</span><span class="n">new_tunables</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">parts</span>
+
+<div class="viewcode-block" id="Method.get_hyperpartitions"><a class="viewcode-back" href="../../api/atm.method.html#atm.method.Method.get_hyperpartitions">[docs]</a>    <span class="k">def</span> <span class="nf">get_hyperpartitions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Traverse the CPT and enumerate all possible hyperpartitions of</span>
+<span class="sd">        categorical parameters for this method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_enumerate</span><span class="p">([],</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_sort_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_params</span><span class="p">))</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

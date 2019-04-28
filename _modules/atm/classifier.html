@@ -1,0 +1,524 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>atm.classifier &mdash; ATM 0.1.2-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> ATM
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">ATM: Scalable model selection and tuning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#requirements">0. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-atm">1. Install ATM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-using-pip">Install using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-from-source">Install from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#start-using-atm">3. Start using ATM!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#create-a-datarun">Create a datarun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#execute-the-datarun">Execute the datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../database.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to ATM and BTB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#style">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#docs">Docs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../add_method.html">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../add_method.html#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../add_method.html#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>atm.classifier</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for atm.classifier</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: wrapper</span>
+<span class="sd">   :synopsis: Model around classification method.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">object</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="k">import</span> <span class="n">import_module</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">past.utils</span> <span class="k">import</span> <span class="n">old_div</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="k">import</span> <span class="n">decomposition</span>
+<span class="kn">from</span> <span class="nn">sklearn.gaussian_process.kernels</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">RBF</span><span class="p">,</span> <span class="n">ConstantKernel</span><span class="p">,</span> <span class="n">ExpSineSquared</span><span class="p">,</span> <span class="n">Matern</span><span class="p">,</span> <span class="n">RationalQuadratic</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="k">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">MinMaxScaler</span><span class="p">,</span> <span class="n">StandardScaler</span>
+
+<span class="kn">from</span> <span class="nn">atm.constants</span> <span class="k">import</span> <span class="n">Metrics</span>
+<span class="kn">from</span> <span class="nn">atm.encoder</span> <span class="k">import</span> <span class="n">DataEncoder</span><span class="p">,</span> <span class="n">MetaData</span>
+<span class="kn">from</span> <span class="nn">atm.method</span> <span class="k">import</span> <span class="n">Method</span>
+<span class="kn">from</span> <span class="nn">atm.metrics</span> <span class="k">import</span> <span class="n">cross_validate_pipeline</span><span class="p">,</span> <span class="n">test_pipeline</span>
+
+<span class="c1"># load the library-wide logger</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;atm&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.classifier.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class contains everything needed to run an end-to-end ATM classifier</span>
+<span class="sd">    pipeline. It is initialized with a set of parameters and trained like a</span>
+<span class="sd">    normal sklearn model. This class can be pickled and saved to disk, then</span>
+<span class="sd">    unpickled outside of ATM and used to classify new datasets.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># these are special keys that are used for general purpose</span>
+    <span class="c1"># things like scaling, normalization, PCA, etc</span>
+    <span class="n">SCALE</span> <span class="o">=</span> <span class="s2">&quot;_scale&quot;</span>
+    <span class="n">WHITEN</span> <span class="o">=</span> <span class="s2">&quot;_whiten&quot;</span>
+    <span class="n">MINMAX</span> <span class="o">=</span> <span class="s2">&quot;_scale_minmax&quot;</span>
+    <span class="n">PCA</span> <span class="o">=</span> <span class="s2">&quot;_pca&quot;</span>
+    <span class="n">PCA_DIMS</span> <span class="o">=</span> <span class="s2">&quot;_pca_dimensions&quot;</span>
+
+    <span class="c1"># list of all such keys</span>
+    <span class="n">ATM_KEYS</span> <span class="o">=</span> <span class="p">[</span><span class="n">SCALE</span><span class="p">,</span> <span class="n">WHITEN</span><span class="p">,</span> <span class="n">MINMAX</span><span class="p">,</span> <span class="n">PCA</span><span class="p">,</span> <span class="n">PCA_DIMS</span><span class="p">]</span>
+
+    <span class="c1"># number of folds for cross-validation (arbitrary, for speed)</span>
+    <span class="n">N_FOLDS</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">judgment_metric</span><span class="p">,</span> <span class="n">class_column</span><span class="p">,</span>
+                 <span class="n">testing_ratio</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">verbose_metrics</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters:</span>
+<span class="sd">            method: the short method code (as defined in constants.py) or path</span>
+<span class="sd">                to method json</span>
+<span class="sd">            judgment_metric: string that indicates which metric should be</span>
+<span class="sd">                optimized for.</span>
+<span class="sd">            params: parameters passed to the sklearn classifier constructor</span>
+<span class="sd">            class_: sklearn classifier class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># configuration &amp; database</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">judgment_metric</span> <span class="o">=</span> <span class="n">judgment_metric</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">class_column</span> <span class="o">=</span> <span class="n">class_column</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">testing_ratio</span> <span class="o">=</span> <span class="n">testing_ratio</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose_metrics</span> <span class="o">=</span> <span class="n">verbose_metrics</span>
+
+        <span class="c1"># load the classifier method&#39;s class</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">Method</span><span class="p">(</span><span class="n">method</span><span class="p">)</span><span class="o">.</span><span class="n">class_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="n">mod_str</span><span class="p">,</span> <span class="n">cls_str</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">mod_str</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">class_</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">cls_str</span><span class="p">)</span>
+
+        <span class="c1"># pipelining</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># persistent random state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mf">1e7</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Model.load_data"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.classifier.Model.load_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">dropvals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">):</span>
+        <span class="c1"># load data as a Pandas dataframe</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">skipinitialspace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                           <span class="n">na_values</span><span class="o">=</span><span class="n">dropvals</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">)</span>
+
+        <span class="c1"># drop rows with any NA values</span>
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.make_pipeline"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.classifier.Model.make_pipeline">[docs]</a>    <span class="k">def</span> <span class="nf">make_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Makes the classifier as well as scaling or dimension reduction steps.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># create a list of steps, starting with the data encoder</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># create a classifier with specified parameters</span>
+        <span class="n">hyperparameters</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+                           <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Model</span><span class="o">.</span><span class="n">ATM_KEYS</span><span class="p">}</span>
+        <span class="n">atm_params</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+                      <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">Model</span><span class="o">.</span><span class="n">ATM_KEYS</span><span class="p">}</span>
+
+        <span class="c1"># do special conversions</span>
+        <span class="n">hyperparameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">special_conversions</span><span class="p">(</span><span class="n">hyperparameters</span><span class="p">)</span>
+        <span class="n">classifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_</span><span class="p">(</span><span class="o">**</span><span class="n">hyperparameters</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">Model</span><span class="o">.</span><span class="n">PCA</span> <span class="ow">in</span> <span class="n">atm_params</span> <span class="ow">and</span> <span class="n">atm_params</span><span class="p">[</span><span class="n">Model</span><span class="o">.</span><span class="n">PCA</span><span class="p">]:</span>
+            <span class="n">whiten</span> <span class="o">=</span> <span class="p">(</span><span class="n">Model</span><span class="o">.</span><span class="n">WHITEN</span> <span class="ow">in</span> <span class="n">atm_params</span> <span class="ow">and</span> <span class="n">atm_params</span><span class="p">[</span><span class="n">Model</span><span class="o">.</span><span class="n">WHITEN</span><span class="p">])</span>
+            <span class="n">pca_dims</span> <span class="o">=</span> <span class="n">atm_params</span><span class="p">[</span><span class="n">Model</span><span class="o">.</span><span class="n">PCA_DIMS</span><span class="p">]</span>
+            <span class="c1"># PCA dimension in atm_params is a float reprsenting percentages of</span>
+            <span class="c1"># features to use</span>
+            <span class="k">if</span> <span class="n">pca_dims</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">dimensions</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pca_dims</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_features</span><span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using PCA to reduce </span><span class="si">%d</span><span class="s2"> features to </span><span class="si">%d</span><span class="s2"> dimensions&quot;</span>
+                            <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_features</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">))</span>
+                <span class="n">pca</span> <span class="o">=</span> <span class="n">decomposition</span><span class="o">.</span><span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">whiten</span><span class="o">=</span><span class="n">whiten</span><span class="p">)</span>
+                <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;pca&#39;</span><span class="p">,</span> <span class="n">pca</span><span class="p">))</span>
+
+        <span class="c1"># should we scale the data?</span>
+        <span class="k">if</span> <span class="n">atm_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Model</span><span class="o">.</span><span class="n">SCALE</span><span class="p">):</span>
+            <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;standard_scale&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Model</span><span class="o">.</span><span class="n">MINMAX</span><span class="p">):</span>
+            <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;minmax_scale&#39;</span><span class="p">,</span> <span class="n">MinMaxScaler</span><span class="p">()))</span>
+
+        <span class="c1"># add the classifier as the final step in the pipeline</span>
+        <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">classifier</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.cross_validate"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.classifier.Model.cross_validate">[docs]</a>    <span class="k">def</span> <span class="nf">cross_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="c1"># TODO: this is hacky. See https://github.com/HDI-Project/ATM/issues/48</span>
+        <span class="n">binary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose_metrics</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;include_curves&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">binary</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;include_per_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">df</span><span class="p">,</span> <span class="n">cv_scores</span> <span class="o">=</span> <span class="n">cross_validate_pipeline</span><span class="p">(</span><span class="n">pipeline</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span>
+                                                <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="n">binary</span><span class="p">,</span>
+                                                <span class="n">n_folds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">N_FOLDS</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cv_judgment_metric</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">judgment_metric</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cv_judgment_metric_stdev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">judgment_metric</span><span class="p">])</span>
+        <span class="n">cv_stdev</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_judgment_metric_stdev</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mu_sigma_judgment_metric</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_judgment_metric</span> <span class="o">-</span> <span class="n">cv_stdev</span>
+
+        <span class="k">return</span> <span class="n">cv_scores</span></div>
+
+<div class="viewcode-block" id="Model.test_final_model"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.classifier.Model.test_final_model">[docs]</a>    <span class="k">def</span> <span class="nf">test_final_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test the (already trained) model pipeline on the provided test data</span>
+<span class="sd">        (X and y). Store the test judgment metric and return the rest of the</span>
+<span class="sd">        metrics as a hierarchical dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># time the prediction</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">avg_predict_time</span> <span class="o">=</span> <span class="n">old_div</span><span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)))</span>
+
+        <span class="c1"># TODO: this is hacky. See https://github.com/HDI-Project/ATM/issues/48</span>
+        <span class="n">binary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose_metrics</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;include_curves&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">binary</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;include_per_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># compute the actual test scores!</span>
+        <span class="n">test_scores</span> <span class="o">=</span> <span class="n">test_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">binary</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># save meta-metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_judgment_metric</span> <span class="o">=</span> <span class="n">test_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">judgment_metric</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">test_scores</span></div>
+
+<div class="viewcode-block" id="Model.train_test"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.classifier.Model.train_test">[docs]</a>    <span class="k">def</span> <span class="nf">train_test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_path</span><span class="p">,</span> <span class="n">test_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># load train and (maybe) test data</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">(</span><span class="n">class_column</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">class_column</span><span class="p">,</span>
+                            <span class="n">train_path</span><span class="o">=</span><span class="n">train_path</span><span class="p">,</span>
+                            <span class="n">test_path</span><span class="o">=</span><span class="n">test_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">k_classes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_features</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">d_features</span>
+
+        <span class="c1"># if necessary, cast judgment metric into its binary/multiary equivalent</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">judgment_metric</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Metrics</span><span class="o">.</span><span class="n">F1_MICRO</span><span class="p">,</span> <span class="n">Metrics</span><span class="o">.</span><span class="n">F1_MACRO</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">judgment_metric</span> <span class="o">=</span> <span class="n">Metrics</span><span class="o">.</span><span class="n">F1</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">judgment_metric</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Metrics</span><span class="o">.</span><span class="n">ROC_AUC_MICRO</span><span class="p">,</span>
+                                          <span class="n">Metrics</span><span class="o">.</span><span class="n">ROC_AUC_MACRO</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">judgment_metric</span> <span class="o">=</span> <span class="n">Metrics</span><span class="o">.</span><span class="n">ROC_AUC</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">judgment_metric</span> <span class="o">==</span> <span class="n">Metrics</span><span class="o">.</span><span class="n">F1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">judgment_metric</span> <span class="o">=</span> <span class="n">Metrics</span><span class="o">.</span><span class="n">F1_MACRO</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">judgment_metric</span> <span class="o">==</span> <span class="n">Metrics</span><span class="o">.</span><span class="n">ROC_AUC</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">judgment_metric</span> <span class="o">=</span> <span class="n">Metrics</span><span class="o">.</span><span class="n">ROC_AUC_MACRO</span>
+
+        <span class="c1"># load training data</span>
+        <span class="n">train_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="n">train_path</span><span class="p">)</span>
+
+        <span class="c1"># if necessary, generate permanent train/test split</span>
+        <span class="k">if</span> <span class="n">test_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">test_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="n">test_path</span><span class="p">)</span>
+            <span class="n">all_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">all_data</span> <span class="o">=</span> <span class="n">train_data</span>
+            <span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span>
+                                                     <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">testing_ratio</span><span class="p">,</span>
+                                                     <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+
+        <span class="c1"># extract feature matrix and labels from raw data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">DataEncoder</span><span class="p">(</span><span class="n">class_column</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">class_column</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">all_data</span><span class="p">)</span>
+        <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span>
+        <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
+
+        <span class="c1"># create and cross-validate pipeline</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_pipeline</span><span class="p">()</span>
+        <span class="n">cv_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cross_validate</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+        <span class="c1"># train and test the final model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+        <span class="n">test_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_final_model</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;cv&#39;</span><span class="p">:</span> <span class="n">cv_scores</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="n">test_scores</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="Model.predict"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.classifier.Model.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Use the trained encoder and pipeline to transform training data into</span>
+<span class="sd">        predicted labels</span>
+
+<span class="sd">        data: pd.DataFrame of data for which to predict classes</span>
+
+<span class="sd">        returns: pd.Series populated with predictions, with index matching data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">label_encoder</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">labels</span></div>
+
+<div class="viewcode-block" id="Model.special_conversions"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.classifier.Model.special_conversions">[docs]</a>    <span class="k">def</span> <span class="nf">special_conversions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        TODO: replace this logic with something better</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># create list parameters</span>
+        <span class="n">lists</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="n">element_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(.*)\[(\d)\]&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="c1"># look for variables of the form &quot;param_name[1]&quot;</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">element_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="c1"># name of the list parameter</span>
+                <span class="n">lname</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="c1"># index of the list item</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">lists</span><span class="p">[</span><span class="n">lname</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">index</span><span class="p">,</span> <span class="n">param</span><span class="p">))</span>
+
+                <span class="c1"># drop the element parameter from our list</span>
+                <span class="k">del</span> <span class="n">params</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">lname</span><span class="p">,</span> <span class="n">items</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">lists</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="c1"># drop the list size parameter</span>
+            <span class="k">del</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;len(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">lname</span><span class="p">]</span>
+
+            <span class="c1"># sort the list by index</span>
+            <span class="n">params</span><span class="p">[</span><span class="n">lname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">items</span><span class="p">)]</span>
+
+        <span class="c1"># Gaussian process classifier</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;gp&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;constant&quot;</span><span class="p">:</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ConstantKernel</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;rbf&quot;</span><span class="p">:</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">RBF</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;matern&quot;</span><span class="p">:</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Matern</span><span class="p">(</span><span class="n">nu</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;nu&quot;</span><span class="p">])</span>
+                <span class="k">del</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;nu&quot;</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;rational_quadratic&quot;</span><span class="p">:</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">RationalQuadratic</span><span class="p">(</span><span class="n">length_scale</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;length_scale&quot;</span><span class="p">],</span>
+                                                     <span class="n">alpha</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">])</span>
+                <span class="k">del</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;length_scale&quot;</span><span class="p">]</span>
+                <span class="k">del</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;exp_sine_squared&quot;</span><span class="p">:</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ExpSineSquared</span><span class="p">(</span><span class="n">length_scale</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;length_scale&quot;</span><span class="p">],</span>
+                                                  <span class="n">periodicity</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;periodicity&quot;</span><span class="p">])</span>
+                <span class="k">del</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;length_scale&quot;</span><span class="p">]</span>
+                <span class="k">del</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;periodicity&quot;</span><span class="p">]</span>
+
+        <span class="c1"># return the updated parameter vector</span>
+        <span class="k">return</span> <span class="n">params</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

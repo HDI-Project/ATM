@@ -1,0 +1,7 @@
+atm.compat module
+=================
+
+.. automodule:: atm.compat
+    :members:
+    :undoc-members:
+    :show-inheritance:

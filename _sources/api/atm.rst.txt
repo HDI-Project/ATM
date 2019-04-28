@@ -1,0 +1,28 @@
+atm package
+===========
+
+.. automodule:: atm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+
+   atm.api
+   atm.classifier
+   atm.cli
+   atm.compat
+   atm.config
+   atm.constants
+   atm.database
+   atm.encoder
+   atm.enter_data
+   atm.method
+   atm.metrics
+   atm.models
+   atm.utilities
+   atm.worker
+

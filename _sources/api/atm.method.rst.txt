@@ -1,0 +1,7 @@
+atm.method module
+=================
+
+.. automodule:: atm.method
+    :members:
+    :undoc-members:
+    :show-inheritance:

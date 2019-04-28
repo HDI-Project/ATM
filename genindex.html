@@ -1,0 +1,809 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Index &mdash; ATM 0.1.2-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ATM
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">ATM: Scalable model selection and tuning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#requirements">0. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#install-atm">1. Install ATM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="setup.html#install-using-pip">Install using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="setup.html#install-from-source">Install from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#start-using-atm">3. Start using ATM!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#create-a-datarun">Create a datarun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#execute-the-datarun">Execute the datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="database.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to ATM and BTB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#style">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#docs">Docs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="add_method.html">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="add_method.html#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="add_method.html#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="add_method.html#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="add_method.html#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Index</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/HDI-project/ATM/blob/master/docs/genindex" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ 
+</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.constants.html#atm.constants.Metrics.ACCURACY">ACCURACY (atm.constants.Metrics attribute)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.add_arguments_aws_ec2">add_arguments_aws_ec2() (in module atm.config)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.add_arguments_aws_s3">add_arguments_aws_s3() (in module atm.config)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.add_arguments_datarun">add_arguments_datarun() (in module atm.config)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.add_arguments_logging">add_arguments_logging() (in module atm.config)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.add_arguments_sql">add_arguments_sql() (in module atm.config)</a>
+</li>
+      <li><a href="api/atm.constants.html#atm.constants.Metrics.AP">AP (atm.constants.Metrics attribute)</a>
+</li>
+      <li><a href="api/atm.method.html#atm.method.Categorical.as_tunable">as_tunable() (atm.method.Categorical method)</a>
+
+      <ul>
+        <li><a href="api/atm.method.html#atm.method.Numeric.as_tunable">(atm.method.Numeric method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/atm.models.html#atm.models.ATM">ATM (class in atm.models)</a>
+</li>
+      <li><a href="api/atm.html#module-atm">atm (module)</a>
+</li>
+      <li><a href="api/atm.api.html#module-atm.api">atm.api (module)</a>
+</li>
+      <li><a href="api/atm.classifier.html#module-atm.classifier">atm.classifier (module)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.cli.html#module-atm.cli">atm.cli (module)</a>
+</li>
+      <li><a href="api/atm.compat.html#module-atm.compat">atm.compat (module)</a>
+</li>
+      <li><a href="api/atm.config.html#module-atm.config">atm.config (module)</a>
+</li>
+      <li><a href="api/atm.constants.html#module-atm.constants">atm.constants (module)</a>
+</li>
+      <li><a href="api/atm.database.html#module-atm.database">atm.database (module)</a>
+</li>
+      <li><a href="api/atm.encoder.html#module-atm.encoder">atm.encoder (module)</a>
+</li>
+      <li><a href="api/atm.enter_data.html#module-atm.enter_data">atm.enter_data (module)</a>
+</li>
+      <li><a href="api/atm.method.html#module-atm.method">atm.method (module)</a>
+</li>
+      <li><a href="api/atm.metrics.html#module-atm.metrics">atm.metrics (module)</a>
+</li>
+      <li><a href="api/atm.models.html#module-atm.models">atm.models (module)</a>
+</li>
+      <li><a href="api/atm.utilities.html#module-atm.utilities">atm.utilities (module)</a>
+</li>
+      <li><a href="api/atm.worker.html#module-atm.worker">atm.worker (module)</a>
+</li>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model.ATM_KEYS">ATM_KEYS (atm.classifier.Model attribute)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.AWSConfig">AWSConfig (class in atm.config)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.utilities.html#atm.utilities.base_64_to_object">base_64_to_object() (in module atm.utilities)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.method.html#atm.method.Categorical">Categorical (class in atm.method)</a>
+</li>
+      <li><a href="api/atm.worker.html#atm.worker.ClassifierError">ClassifierError</a>
+</li>
+      <li><a href="api/atm.constants.html#atm.constants.ClassifierStatus">ClassifierStatus (class in atm.constants)</a>
+</li>
+      <li><a href="api/atm.constants.html#atm.constants.Metrics.COHEN_KAPPA">COHEN_KAPPA (atm.constants.Metrics attribute)</a>
+</li>
+      <li><a href="api/atm.constants.html#atm.constants.ClassifierStatus.COMPLETE">COMPLETE (atm.constants.ClassifierStatus attribute)</a>
+
+      <ul>
+        <li><a href="api/atm.constants.html#atm.constants.RunStatus.COMPLETE">(atm.constants.RunStatus attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/atm.database.html#atm.database.Database.complete_classifier">complete_classifier() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.Config">Config (class in atm.config)</a>
+</li>
+      <li><a href="api/atm.api.html#atm.api.create_app">create_app() (in module atm.api)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.database.html#atm.database.Database.create_classifier">create_classifier() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.create_datarun">create_datarun() (atm.database.Database method)</a>
+
+      <ul>
+        <li><a href="api/atm.models.html#atm.models.ATM.create_datarun">(atm.models.ATM method)</a>
+</li>
+        <li><a href="api/atm.enter_data.html#atm.enter_data.create_datarun">(in module atm.enter_data)</a>
+</li>
+      </ul></li>
+      <li><a href="api/atm.database.html#atm.database.Database.create_dataset">create_dataset() (atm.database.Database method)</a>
+
+      <ul>
+        <li><a href="api/atm.models.html#atm.models.ATM.create_dataset">(atm.models.ATM method)</a>
+</li>
+        <li><a href="api/atm.enter_data.html#atm.enter_data.create_dataset">(in module atm.enter_data)</a>
+</li>
+      </ul></li>
+      <li><a href="api/atm.database.html#atm.database.Database.create_hyperpartition">create_hyperpartition() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model.cross_validate">cross_validate() (atm.classifier.Model method)</a>
+</li>
+      <li><a href="api/atm.metrics.html#atm.metrics.cross_validate_pipeline">cross_validate_pipeline() (in module atm.metrics)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.database.html#atm.database.Database">Database (class in atm.database)</a>
+</li>
+      <li><a href="api/atm.encoder.html#atm.encoder.DataEncoder">DataEncoder (class in atm.encoder)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.db_session">db_session (class in atm.database)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.AWSConfig.DEFAULTS">DEFAULTS (atm.config.AWSConfig attribute)</a>
+
+      <ul>
+        <li><a href="api/atm.config.html#atm.config.Config.DEFAULTS">(atm.config.Config attribute)</a>
+</li>
+        <li><a href="api/atm.config.html#atm.config.LogConfig.DEFAULTS">(atm.config.LogConfig attribute)</a>
+</li>
+        <li><a href="api/atm.config.html#atm.config.RunConfig.DEFAULTS">(atm.config.RunConfig attribute)</a>
+</li>
+        <li><a href="api/atm.config.html#atm.config.SQLConfig.DEFAULTS">(atm.config.SQLConfig attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.utilities.html#atm.utilities.download_data">download_data() (in module atm.utilities)</a>
+</li>
+      <li><a href="api/atm.utilities.html#atm.utilities.download_file_http">download_file_http() (in module atm.utilities)</a>
+</li>
+      <li><a href="api/atm.utilities.html#atm.utilities.download_file_s3">download_file_s3() (in module atm.utilities)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.utilities.html#atm.utilities.ensure_directory">ensure_directory() (in module atm.utilities)</a>
+</li>
+      <li><a href="api/atm.models.html#atm.models.ATM.enter_data">enter_data() (atm.models.ATM method)</a>
+
+      <ul>
+        <li><a href="api/atm.enter_data.html#atm.enter_data.enter_data">(in module atm.enter_data)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.constants.html#atm.constants.ClassifierStatus.ERRORED">ERRORED (atm.constants.ClassifierStatus attribute)</a>
+
+      <ul>
+        <li><a href="api/atm.constants.html#atm.constants.PartitionStatus.ERRORED">(atm.constants.PartitionStatus attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.constants.html#atm.constants.Metrics.F1">F1 (atm.constants.Metrics attribute)</a>
+</li>
+      <li><a href="api/atm.constants.html#atm.constants.Metrics.F1_MACRO">F1_MACRO (atm.constants.Metrics attribute)</a>
+</li>
+      <li><a href="api/atm.constants.html#atm.constants.Metrics.F1_MICRO">F1_MICRO (atm.constants.Metrics attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.constants.html#atm.constants.FileType">FileType (class in atm.constants)</a>
+</li>
+      <li><a href="api/atm.encoder.html#atm.encoder.DataEncoder.fit">fit() (atm.encoder.DataEncoder method)</a>
+</li>
+      <li><a href="api/atm.encoder.html#atm.encoder.DataEncoder.fit_transform">fit_transform() (atm.encoder.DataEncoder method)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.from_csv">from_csv() (atm.database.Database method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.database.html#atm.database.Database.get_best_classifier">get_best_classifier() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.get_classifier">get_classifier() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.get_classifiers">get_classifiers() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.get_datarun">get_datarun() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.get_dataruns">get_dataruns() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.get_dataset">get_dataset() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.method.html#atm.method.List.get_elements">get_elements() (atm.method.List method)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.get_hyperpartition">get_hyperpartition() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.get_hyperpartitions">get_hyperpartitions() (atm.database.Database method)</a>
+
+      <ul>
+        <li><a href="api/atm.method.html#atm.method.Method.get_hyperpartitions">(atm.method.Method method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/atm.utilities.html#atm.utilities.get_instance">get_instance() (in module atm.utilities)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.utilities.html#atm.utilities.get_local_data_path">get_local_data_path() (in module atm.utilities)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.get_maximum_y">get_maximum_y() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.get_methods">get_methods() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.metrics.html#atm.metrics.get_metrics_binary">get_metrics_binary() (in module atm.metrics)</a>
+</li>
+      <li><a href="api/atm.metrics.html#atm.metrics.get_metrics_multiclass">get_metrics_multiclass() (in module atm.metrics)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.get_number_of_hyperpartition_errors">get_number_of_hyperpartition_errors() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.metrics.html#atm.metrics.get_per_class_matrix">get_per_class_matrix() (in module atm.metrics)</a>
+</li>
+      <li><a href="api/atm.metrics.html#atm.metrics.get_pr_roc_curves">get_pr_roc_curves() (in module atm.metrics)</a>
+</li>
+      <li><a href="api/atm.utilities.html#atm.utilities.get_public_ip">get_public_ip() (in module atm.utilities)</a>
+</li>
+      <li><a href="api/atm.compat.html#atm.compat.getargs">getargs() (in module atm.compat)</a>
+</li>
+      <li><a href="api/atm.constants.html#atm.constants.PartitionStatus.GRIDDING_DONE">GRIDDING_DONE (atm.constants.PartitionStatus attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.utilities.html#atm.utilities.hash_dict">hash_dict() (in module atm.utilities)</a>
+</li>
+      <li><a href="api/atm.utilities.html#atm.utilities.hash_nested_tuple">hash_nested_tuple() (in module atm.utilities)</a>
+</li>
+      <li><a href="api/atm.utilities.html#atm.utilities.hash_string">hash_string() (in module atm.utilities)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.constants.html#atm.constants.FileType.HTTP">HTTP (atm.constants.FileType attribute)</a>
+</li>
+      <li><a href="api/atm.method.html#atm.method.HyperParameter">HyperParameter (class in atm.method)</a>
+</li>
+      <li><a href="api/atm.method.html#atm.method.HyperPartition">HyperPartition (class in atm.method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.constants.html#atm.constants.PartitionStatus.INCOMPLETE">INCOMPLETE (atm.constants.PartitionStatus attribute)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.initialize_logging">initialize_logging() (in module atm.config)</a>
+</li>
+      <li><a href="api/atm.method.html#atm.method.Categorical.is_categorical">is_categorical (atm.method.Categorical attribute)</a>
+
+      <ul>
+        <li><a href="api/atm.method.html#atm.method.HyperParameter.is_categorical">(atm.method.HyperParameter attribute)</a>
+</li>
+        <li><a href="api/atm.method.html#atm.method.List.is_categorical">(atm.method.List attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.method.html#atm.method.Categorical.is_constant">is_constant (atm.method.Categorical attribute)</a>
+
+      <ul>
+        <li><a href="api/atm.method.html#atm.method.HyperParameter.is_constant">(atm.method.HyperParameter attribute)</a>
+</li>
+        <li><a href="api/atm.method.html#atm.method.Numeric.is_constant">(atm.method.Numeric attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/atm.worker.html#atm.worker.Worker.is_datarun_finished">is_datarun_finished() (atm.worker.Worker method)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.is_datatun_gridding_done">is_datatun_gridding_done() (atm.database.Database method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.method.html#atm.method.List">List (class in atm.method)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.load_config">load_config() (in module atm.config)</a>
+</li>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model.load_data">load_data() (atm.classifier.Model method)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.load_metrics">load_metrics() (atm.database.Database method)</a>
+
+      <ul>
+        <li><a href="api/atm.utilities.html#atm.utilities.load_metrics">(in module atm.utilities)</a>
+</li>
+      </ul></li>
+      <li><a href="api/atm.database.html#atm.database.Database.load_model">load_model() (atm.database.Database method)</a>
+
+      <ul>
+        <li><a href="api/atm.utilities.html#atm.utilities.load_model">(in module atm.utilities)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.worker.html#atm.worker.Worker.load_selector">load_selector() (atm.worker.Worker method)</a>
+</li>
+      <li><a href="api/atm.worker.html#atm.worker.Worker.load_tuner">load_tuner() (atm.worker.Worker method)</a>
+</li>
+      <li><a href="api/atm.constants.html#atm.constants.FileType.LOCAL">LOCAL (atm.constants.FileType attribute)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.LogConfig">LogConfig (class in atm.config)</a>
+</li>
+      <li><a href="api/atm.models.html#atm.models.ATM.LOOP_WAIT">LOOP_WAIT (atm.models.ATM attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.cli.html#atm.cli.main">main() (in module atm.cli)</a>
+</li>
+      <li><a href="api/atm.api.html#atm.api.make_absolute">make_absolute() (in module atm.api)</a>
+</li>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model.make_pipeline">make_pipeline() (atm.classifier.Model method)</a>
+</li>
+      <li><a href="api/atm.utilities.html#atm.utilities.make_save_path">make_save_path() (in module atm.utilities)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.mark_classifier_errored">mark_classifier_errored() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.mark_datarun_complete">mark_datarun_complete() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.mark_datarun_running">mark_datarun_running() (atm.database.Database method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.database.html#atm.database.Database.mark_hyperpartition_errored">mark_hyperpartition_errored() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.mark_hyperpartition_gridding_done">mark_hyperpartition_gridding_done() (atm.database.Database method)</a>
+</li>
+      <li><a href="api/atm.constants.html#atm.constants.Metrics.MCC">MCC (atm.constants.Metrics attribute)</a>
+</li>
+      <li><a href="api/atm.encoder.html#atm.encoder.MetaData">MetaData (class in atm.encoder)</a>
+</li>
+      <li><a href="api/atm.method.html#atm.method.Method">Method (class in atm.method)</a>
+</li>
+      <li><a href="api/atm.constants.html#atm.constants.Metrics">Metrics (class in atm.constants)</a>
+</li>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model.MINMAX">MINMAX (atm.classifier.Model attribute)</a>
+</li>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model">Model (class in atm.classifier)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model.N_FOLDS">N_FOLDS (atm.classifier.Model attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.method.html#atm.method.Numeric">Numeric (class in atm.method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.utilities.html#atm.utilities.obj_has_method">obj_has_method() (in module atm.utilities)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.utilities.html#atm.utilities.object_to_base_64">object_to_base_64() (in module atm.utilities)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.option_or_path">option_or_path() (in module atm.config)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.config.html#atm.config.AWSConfig.PARAMETERS">PARAMETERS (atm.config.AWSConfig attribute)</a>
+
+      <ul>
+        <li><a href="api/atm.config.html#atm.config.Config.PARAMETERS">(atm.config.Config attribute)</a>
+</li>
+        <li><a href="api/atm.config.html#atm.config.LogConfig.PARAMETERS">(atm.config.LogConfig attribute)</a>
+</li>
+        <li><a href="api/atm.config.html#atm.config.RunConfig.PARAMETERS">(atm.config.RunConfig attribute)</a>
+</li>
+        <li><a href="api/atm.config.html#atm.config.SQLConfig.PARAMETERS">(atm.config.SQLConfig attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/atm.utilities.html#atm.utilities.params_to_vectors">params_to_vectors() (in module atm.utilities)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.constants.html#atm.constants.PartitionStatus">PartitionStatus (class in atm.constants)</a>
+</li>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model.PCA">PCA (atm.classifier.Model attribute)</a>
+</li>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model.PCA_DIMS">PCA_DIMS (atm.classifier.Model attribute)</a>
+</li>
+      <li><a href="api/atm.constants.html#atm.constants.RunStatus.PENDING">PENDING (atm.constants.RunStatus attribute)</a>
+</li>
+      <li><a href="api/atm.constants.html#atm.constants.Metrics.PR_CURVE">PR_CURVE (atm.constants.Metrics attribute)</a>
+</li>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model.predict">predict() (atm.classifier.Model method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.constants.html#atm.constants.Metrics.RANK_ACCURACY">RANK_ACCURACY (atm.constants.Metrics attribute)</a>
+</li>
+      <li><a href="api/atm.metrics.html#atm.metrics.rank_n_accuracy">rank_n_accuracy() (in module atm.metrics)</a>
+</li>
+      <li><a href="api/atm.constants.html#atm.constants.Metrics.ROC_AUC">ROC_AUC (atm.constants.Metrics attribute)</a>
+</li>
+      <li><a href="api/atm.constants.html#atm.constants.Metrics.ROC_AUC_MACRO">ROC_AUC_MACRO (atm.constants.Metrics attribute)</a>
+</li>
+      <li><a href="api/atm.constants.html#atm.constants.Metrics.ROC_AUC_MICRO">ROC_AUC_MICRO (atm.constants.Metrics attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.constants.html#atm.constants.Metrics.ROC_CURVE">ROC_CURVE (atm.constants.Metrics attribute)</a>
+</li>
+      <li><a href="api/atm.worker.html#atm.worker.Worker.run_classifier">run_classifier() (atm.worker.Worker method)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.RunConfig">RunConfig (class in atm.config)</a>
+</li>
+      <li><a href="api/atm.constants.html#atm.constants.ClassifierStatus.RUNNING">RUNNING (atm.constants.ClassifierStatus attribute)</a>
+
+      <ul>
+        <li><a href="api/atm.constants.html#atm.constants.RunStatus.RUNNING">(atm.constants.RunStatus attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/atm.constants.html#atm.constants.RunStatus">RunStatus (class in atm.constants)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.constants.html#atm.constants.FileType.S3">S3 (atm.constants.FileType attribute)</a>
+</li>
+      <li><a href="api/atm.worker.html#atm.worker.Worker.save_classifier">save_classifier() (atm.worker.Worker method)</a>
+</li>
+      <li><a href="api/atm.worker.html#atm.worker.Worker.save_classifier_cloud">save_classifier_cloud() (atm.worker.Worker method)</a>
+</li>
+      <li><a href="api/atm.utilities.html#atm.utilities.save_metrics">save_metrics() (in module atm.utilities)</a>
+</li>
+      <li><a href="api/atm.utilities.html#atm.utilities.save_model">save_model() (in module atm.utilities)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model.SCALE">SCALE (atm.classifier.Model attribute)</a>
+</li>
+      <li><a href="api/atm.worker.html#atm.worker.Worker.select_hyperpartition">select_hyperpartition() (atm.worker.Worker method)</a>
+</li>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model.special_conversions">special_conversions() (atm.classifier.Model method)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.SQLConfig">SQLConfig (class in atm.config)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.start_classifier">start_classifier() (atm.database.Database method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.worker.html#atm.worker.Worker.test_classifier">test_classifier() (atm.worker.Worker method)</a>
+</li>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model.test_final_model">test_final_model() (atm.classifier.Model method)</a>
+</li>
+      <li><a href="api/atm.metrics.html#atm.metrics.test_pipeline">test_pipeline() (in module atm.metrics)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.Database.to_csv">to_csv() (atm.database.Database method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model.train_test">train_test() (atm.classifier.Model method)</a>
+</li>
+      <li><a href="api/atm.encoder.html#atm.encoder.DataEncoder.transform">transform() (atm.encoder.DataEncoder method)</a>
+</li>
+      <li><a href="api/atm.database.html#atm.database.try_with_session">try_with_session() (in module atm.database)</a>
+</li>
+      <li><a href="api/atm.worker.html#atm.worker.Worker.tune_hyperparameters">tune_hyperparameters() (atm.worker.Worker method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.utilities.html#atm.utilities.update_params">update_params() (in module atm.utilities)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model.WHITEN">WHITEN (atm.classifier.Model attribute)</a>
+</li>
+      <li><a href="api/atm.models.html#atm.models.ATM.work">work() (atm.models.ATM method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.worker.html#atm.worker.Worker">Worker (class in atm.worker)</a>
+</li>
+      <li><a href="api/atm.classifier.html#module-wrapper">wrapper (module)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

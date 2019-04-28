@@ -1,0 +1,7 @@
+atm.encoder module
+==================
+
+.. automodule:: atm.encoder
+    :members:
+    :undoc-members:
+    :show-inheritance:

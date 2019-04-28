@@ -1,0 +1,887 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>atm.database &mdash; ATM 0.1.2-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> ATM
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">ATM: Scalable model selection and tuning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#requirements">0. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-atm">1. Install ATM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-using-pip">Install using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-from-source">Install from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#start-using-atm">3. Start using ATM!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#create-a-datarun">Create a datarun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#execute-the-datarun">Execute the datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../database.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to ATM and BTB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#style">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#docs">Docs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../add_method.html">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../add_method.html#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../add_method.html#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>atm.database</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for atm.database</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">object</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="k">import</span> <span class="n">attrgetter</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">Column</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">MetaData</span><span class="p">,</span> <span class="n">Numeric</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="n">and_</span><span class="p">,</span>
+    <span class="n">create_engine</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">inspect</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.engine.url</span> <span class="k">import</span> <span class="n">URL</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">relationship</span><span class="p">,</span> <span class="n">sessionmaker</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm.properties</span> <span class="k">import</span> <span class="n">ColumnProperty</span>
+
+<span class="kn">from</span> <span class="nn">atm.constants</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">BUDGET_TYPES</span><span class="p">,</span> <span class="n">CLASSIFIER_STATUS</span><span class="p">,</span> <span class="n">DATARUN_STATUS</span><span class="p">,</span> <span class="n">METRICS</span><span class="p">,</span> <span class="n">PARTITION_STATUS</span><span class="p">,</span> <span class="n">SCORE_TARGETS</span><span class="p">,</span>
+    <span class="n">ClassifierStatus</span><span class="p">,</span> <span class="n">PartitionStatus</span><span class="p">,</span> <span class="n">RunStatus</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">atm.utilities</span> <span class="k">import</span> <span class="n">base_64_to_object</span><span class="p">,</span> <span class="n">object_to_base_64</span>
+
+<span class="c1"># The maximum number of errors allowed in a single hyperpartition. If more than</span>
+<span class="c1"># this many classifiers using a hyperpartition error, the hyperpartition will be</span>
+<span class="c1"># considered broken and ignored for the rest of the datarun.</span>
+<span class="n">MAX_HYPERPARTITION_ERRORS</span> <span class="o">=</span> <span class="mi">3</span>
+
+
+<div class="viewcode-block" id="try_with_session"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.try_with_session">[docs]</a><span class="k">def</span> <span class="nf">try_with_session</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator for instance methods on Database that need a sqlalchemy session.</span>
+
+<span class="sd">    This wrapping function checks if the Database has an active session yet. If</span>
+<span class="sd">    not, it wraps the function call in a `with db_session():` block.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="c1"># if the Database has an active session, don&#39;t create a new one</span>
+            <span class="k">if</span> <span class="n">db</span><span class="o">.</span><span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">commit</span><span class="p">:</span>
+                    <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># otherwise, use the session generator</span>
+                <span class="k">with</span> <span class="n">db_session</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">commit</span><span class="o">=</span><span class="n">commit</span><span class="p">):</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">call</span>
+    <span class="k">return</span> <span class="n">wrap</span></div>
+
+
+<div class="viewcode-block" id="db_session"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.db_session">[docs]</a><span class="k">class</span> <span class="nc">db_session</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">commit</span> <span class="o">=</span> <span class="n">commit</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_session</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">commit</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Database"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database">[docs]</a><span class="k">class</span> <span class="nc">Database</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialect</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accepts configuration for a database connection, and defines SQLAlchemy</span>
+<span class="sd">        ORM objects for all the tables in the database.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">db_url</span> <span class="o">=</span> <span class="n">URL</span><span class="p">(</span><span class="n">drivername</span><span class="o">=</span><span class="n">dialect</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="n">database</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span>
+                     <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">db_url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">,</span>
+                                        <span class="n">expire_on_commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># create ORM objects for the tables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_define_tables</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_define_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define the SQLAlchemy ORM class for each table in the ModelHub database.</span>
+
+<span class="sd">        These must be defined after the Database class is initialized so that</span>
+<span class="sd">        the database metadata is available (at runtime).</span>
+<span class="sd">        If the database does not already exist, it will be created. If it does</span>
+<span class="sd">        exist, it will not be updated with new schema -- after schema changes,</span>
+<span class="sd">        the database must be destroyed and reinialized.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+        <span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+
+        <span class="k">class</span> <span class="nc">Dataset</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;datasets&#39;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="c1"># columns necessary for loading/processing data</span>
+            <span class="n">class_column</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">train_path</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">test_path</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">200</span><span class="p">))</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">1000</span><span class="p">))</span>
+
+            <span class="c1"># metadata columns, for convenience</span>
+            <span class="n">n_examples</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">k_classes</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">d_features</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">majority</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Numeric</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">9</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">size_kb</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">base</span> <span class="o">=</span> <span class="s2">&quot;&lt;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">, </span><span class="si">%d</span><span class="s2"> classes, </span><span class="si">%d</span><span class="s2"> features, </span><span class="si">%d</span><span class="s2"> rows&gt;&quot;</span>
+                <span class="k">return</span> <span class="n">base</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_classes</span><span class="p">,</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">d_features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_examples</span><span class="p">)</span>
+
+        <span class="k">class</span> <span class="nc">Datarun</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;dataruns&#39;</span>
+
+            <span class="c1"># relational columns</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">dataset_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;datasets.id&#39;</span><span class="p">))</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s1">&#39;Dataset&#39;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s1">&#39;dataruns&#39;</span><span class="p">)</span>
+
+            <span class="n">description</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">priority</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+
+            <span class="c1"># hyperparameter selection and tuning settings</span>
+            <span class="n">selector</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">k_window</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+            <span class="n">tuner</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">gridding</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">r_minimum</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+
+            <span class="c1"># budget settings</span>
+            <span class="n">budget_type</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Enum</span><span class="p">(</span><span class="o">*</span><span class="n">BUDGET_TYPES</span><span class="p">))</span>
+            <span class="n">budget</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+            <span class="n">deadline</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">)</span>
+
+            <span class="c1"># which metric to use for judgment, and how to compute it</span>
+            <span class="n">metric</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Enum</span><span class="p">(</span><span class="o">*</span><span class="n">METRICS</span><span class="p">))</span>
+            <span class="n">score_target</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Enum</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">s</span> <span class="o">+</span> <span class="s1">&#39;_judgment_metric&#39;</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span>
+                                         <span class="n">SCORE_TARGETS</span><span class="p">]))</span>
+
+            <span class="c1"># variables that store the status of the datarun</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">)</span>
+            <span class="n">end_time</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">)</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Enum</span><span class="p">(</span><span class="o">*</span><span class="n">DATARUN_STATUS</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="n">RunStatus</span><span class="o">.</span><span class="n">PENDING</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">base</span> <span class="o">=</span> <span class="s2">&quot;&lt;ID = </span><span class="si">%d</span><span class="s2">, dataset ID = </span><span class="si">%s</span><span class="s2">, strategy = </span><span class="si">%s</span><span class="s2">, budget = </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">), status: </span><span class="si">%s</span><span class="s2">&gt;&quot;</span>
+                <span class="k">return</span> <span class="n">base</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">budget_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">budget</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
+
+        <span class="n">Dataset</span><span class="o">.</span><span class="n">dataruns</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s1">&#39;Datarun&#39;</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="s1">&#39;Datarun.id&#39;</span><span class="p">,</span>
+                                        <span class="n">back_populates</span><span class="o">=</span><span class="s1">&#39;dataset&#39;</span><span class="p">)</span>
+
+        <span class="k">class</span> <span class="nc">Hyperpartition</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;hyperpartitions&#39;</span>
+
+            <span class="c1"># relational columns</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">datarun_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;dataruns.id&#39;</span><span class="p">))</span>
+            <span class="n">datarun</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s1">&#39;Datarun&#39;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s1">&#39;hyperpartitions&#39;</span><span class="p">)</span>
+
+            <span class="c1"># name of or path to a configured classification method</span>
+            <span class="n">method</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">255</span><span class="p">))</span>
+
+            <span class="c1"># list of categorical parameters whose values are fixed to define</span>
+            <span class="c1"># this hyperpartition</span>
+            <span class="n">categorical_hyperparameters_64</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+
+            <span class="c1"># list of continuous parameters which are not fixed; their values</span>
+            <span class="c1"># must be selected by a Tuner</span>
+            <span class="n">tunable_hyperparameters_64</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+
+            <span class="c1"># list of categorical or continuous parameters whose values are</span>
+            <span class="c1"># always fixed. These do not define the hyperpartition, but their</span>
+            <span class="c1"># values must be passed on to the method. Here for convenience.</span>
+            <span class="n">constant_hyperparameters_64</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+
+            <span class="c1"># has the partition had too many errors, or is gridding done?</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Enum</span><span class="p">(</span><span class="o">*</span><span class="n">PARTITION_STATUS</span><span class="p">),</span>
+                            <span class="n">default</span><span class="o">=</span><span class="n">PartitionStatus</span><span class="o">.</span><span class="n">INCOMPLETE</span><span class="p">)</span>
+
+            <span class="nd">@property</span>
+            <span class="k">def</span> <span class="nf">categoricals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                A list of categorical variables along with the fixed values</span>
+<span class="sd">                which define this hyperpartition.</span>
+<span class="sd">                Each element is a (&#39;name&#39;, HyperParameter) tuple.</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="k">return</span> <span class="n">base_64_to_object</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_hyperparameters_64</span><span class="p">)</span>
+
+            <span class="nd">@categoricals</span><span class="o">.</span><span class="n">setter</span>
+            <span class="k">def</span> <span class="nf">categoricals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">categorical_hyperparameters_64</span> <span class="o">=</span> <span class="n">object_to_base_64</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+            <span class="nd">@property</span>
+            <span class="k">def</span> <span class="nf">tunables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                A list of parameters which are unspecified and must be selected</span>
+<span class="sd">                with a Tuner. Each element is a (&#39;name&#39;, HyperParameter) tuple.</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="k">return</span> <span class="n">base_64_to_object</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tunable_hyperparameters_64</span><span class="p">)</span>
+
+            <span class="nd">@tunables</span><span class="o">.</span><span class="n">setter</span>
+            <span class="k">def</span> <span class="nf">tunables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tunable_hyperparameters_64</span> <span class="o">=</span> <span class="n">object_to_base_64</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+            <span class="nd">@property</span>
+            <span class="k">def</span> <span class="nf">constants</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">base_64_to_object</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_hyperparameters_64</span><span class="p">)</span>
+
+            <span class="nd">@constants</span><span class="o">.</span><span class="n">setter</span>
+            <span class="k">def</span> <span class="nf">constants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">constant_hyperparameters_64</span> <span class="o">=</span> <span class="n">object_to_base_64</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">categoricals</span><span class="p">)</span>
+
+        <span class="n">Datarun</span><span class="o">.</span><span class="n">hyperpartitions</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s1">&#39;Hyperpartition&#39;</span><span class="p">,</span>
+                                               <span class="n">order_by</span><span class="o">=</span><span class="s1">&#39;Hyperpartition.id&#39;</span><span class="p">,</span>
+                                               <span class="n">back_populates</span><span class="o">=</span><span class="s1">&#39;datarun&#39;</span><span class="p">)</span>
+
+        <span class="k">class</span> <span class="nc">Classifier</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;classifiers&#39;</span>
+
+            <span class="c1"># relational columns</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">datarun_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;dataruns.id&#39;</span><span class="p">))</span>
+            <span class="n">datarun</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s1">&#39;Datarun&#39;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s1">&#39;classifiers&#39;</span><span class="p">)</span>
+            <span class="n">hyperpartition_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;hyperpartitions.id&#39;</span><span class="p">))</span>
+            <span class="n">hyperpartition</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s1">&#39;Hyperpartition&#39;</span><span class="p">,</span>
+                                          <span class="n">back_populates</span><span class="o">=</span><span class="s1">&#39;classifiers&#39;</span><span class="p">)</span>
+
+            <span class="c1"># name of the host where the model was trained</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+            <span class="c1"># these columns point to where the output is stored</span>
+            <span class="n">model_location</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">300</span><span class="p">))</span>
+            <span class="n">metrics_location</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">300</span><span class="p">))</span>
+
+            <span class="c1"># base 64 encoding of the hyperparameter names and values</span>
+            <span class="n">hyperparameter_values_64</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="c1"># performance metrics</span>
+            <span class="n">cv_judgment_metric</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Numeric</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+            <span class="n">cv_judgment_metric_stdev</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Numeric</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+            <span class="n">test_judgment_metric</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Numeric</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">)</span>
+            <span class="n">end_time</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">)</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Enum</span><span class="p">(</span><span class="o">*</span><span class="n">CLASSIFIER_STATUS</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+
+            <span class="nd">@property</span>
+            <span class="k">def</span> <span class="nf">hyperparameter_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">base_64_to_object</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hyperparameter_values_64</span><span class="p">)</span>
+
+            <span class="nd">@hyperparameter_values</span><span class="o">.</span><span class="n">setter</span>
+            <span class="k">def</span> <span class="nf">hyperparameter_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hyperparameter_values_64</span> <span class="o">=</span> <span class="n">object_to_base_64</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+            <span class="nd">@property</span>
+            <span class="k">def</span> <span class="nf">mu_sigma_judgment_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="c1"># compute the lower confidence bound on the cross-validated</span>
+                <span class="c1"># judgment metric</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_judgment_metric</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">None</span>
+                <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cv_judgment_metric</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_judgment_metric_stdev</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">params</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
+                                    <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hyperparameter_values</span><span class="o">.</span><span class="n">items</span><span class="p">())])</span>
+                <span class="k">return</span> <span class="s2">&quot;&lt;id=</span><span class="si">%d</span><span class="s2">, params=(</span><span class="si">%s</span><span class="s2">)&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+
+        <span class="n">Datarun</span><span class="o">.</span><span class="n">classifiers</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s1">&#39;Classifier&#39;</span><span class="p">,</span>
+                                           <span class="n">order_by</span><span class="o">=</span><span class="s1">&#39;Classifier.id&#39;</span><span class="p">,</span>
+                                           <span class="n">back_populates</span><span class="o">=</span><span class="s1">&#39;datarun&#39;</span><span class="p">)</span>
+        <span class="n">Hyperpartition</span><span class="o">.</span><span class="n">classifiers</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s1">&#39;Classifier&#39;</span><span class="p">,</span>
+                                                  <span class="n">order_by</span><span class="o">=</span><span class="s1">&#39;Classifier.id&#39;</span><span class="p">,</span>
+                                                  <span class="n">back_populates</span><span class="o">=</span><span class="s1">&#39;hyperpartition&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">Dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Datarun</span> <span class="o">=</span> <span class="n">Datarun</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hyperpartition</span> <span class="o">=</span> <span class="n">Hyperpartition</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Classifier</span> <span class="o">=</span> <span class="n">Classifier</span>
+
+        <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+
+    <span class="c1"># ##########################################################################</span>
+    <span class="c1"># #  Save/load the database  ###############################################</span>
+    <span class="c1"># ##########################################################################</span>
+
+<div class="viewcode-block" id="Database.to_csv"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.to_csv">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save the entire ModelHub database as a set of CSVs in the given</span>
+<span class="sd">        directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;datasets&#39;</span><span class="p">,</span> <span class="s1">&#39;dataruns&#39;</span><span class="p">,</span> <span class="s1">&#39;hyperpartitions&#39;</span><span class="p">,</span> <span class="s1">&#39;classifiers&#39;</span><span class="p">]:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="s1">&#39;SELECT * FROM </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">table</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">bind</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.csv&#39;</span> <span class="o">%</span> <span class="n">table</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Database.from_csv"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.from_csv">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">from_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load a snapshot of the ModelHub database from a set of CSVs in the given</span>
+<span class="sd">        directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">table</span> <span class="ow">in</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="s1">&#39;dataset&#39;</span><span class="p">),</span>
+                             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Datarun</span><span class="p">,</span> <span class="s1">&#39;datarun&#39;</span><span class="p">),</span>
+                             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Hyperpartition</span><span class="p">,</span> <span class="s1">&#39;hyperpartition&#39;</span><span class="p">),</span>
+                             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Classifier</span><span class="p">,</span> <span class="s1">&#39;classifier&#39;</span><span class="p">)]:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">s.csv&#39;</span> <span class="o">%</span> <span class="n">table</span><span class="p">))</span>
+
+            <span class="c1"># parse datetime columns. This is necessary because SQLAlchemy can&#39;t</span>
+            <span class="c1"># interpret strings as datetimes on its own.</span>
+            <span class="c1"># yes, this is the easiest way to do it</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">inspect</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">ColumnProperty</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">col</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">):</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">key</span><span class="p">],</span>
+                                               <span class="n">infer_datetime_format</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="c1"># replace NaN and NaT with None</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()):</span>
+                    <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                        <span class="n">r</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+                <span class="c1"># insert the row into the database</span>
+                <span class="n">create_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;create_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">table</span><span class="p">)</span>
+                <span class="n">create_func</span><span class="p">(</span><span class="o">**</span><span class="n">r</span><span class="p">)</span></div>
+
+    <span class="c1"># ##########################################################################</span>
+    <span class="c1"># #  Standard query methods  ###############################################</span>
+    <span class="c1"># ##########################################################################</span>
+
+<div class="viewcode-block" id="Database.get_dataset"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.get_dataset">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a specific dataset. &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Database.get_datarun"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.get_datarun">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_datarun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datarun_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a specific datarun. &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Datarun</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">datarun_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Database.get_dataruns"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.get_dataruns">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_dataruns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ignore_pending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ignore_running</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">ignore_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">max_priority</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a list of all dataruns matching the chosen filters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ignore_pending: if True, ignore dataruns that have not been started</span>
+<span class="sd">            ignore_running: if True, ignore dataruns that are already running</span>
+<span class="sd">            ignore_complete: if True, ignore completed dataruns</span>
+<span class="sd">            include_ids: only include ids from this list</span>
+<span class="sd">            exclude_ids: don&#39;t return any ids from this list</span>
+<span class="sd">            max_priority: only return dataruns which have the highest priority</span>
+<span class="sd">                of any in the filtered set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Datarun</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ignore_pending</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Datarun</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="n">RunStatus</span><span class="o">.</span><span class="n">PENDING</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ignore_running</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Datarun</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="n">RunStatus</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ignore_complete</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Datarun</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="n">RunStatus</span><span class="o">.</span><span class="n">COMPLETE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">include_ids</span><span class="p">:</span>
+            <span class="n">exclude_ids</span> <span class="o">=</span> <span class="n">exclude_ids</span> <span class="ow">or</span> <span class="p">[]</span>
+            <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">include_ids</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude_ids</span><span class="p">]</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Datarun</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">exclude_ids</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Datarun</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">notin_</span><span class="p">(</span><span class="n">exclude_ids</span><span class="p">))</span>
+
+        <span class="n">dataruns</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataruns</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">max_priority</span><span class="p">:</span>
+            <span class="n">mp</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dataruns</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">attrgetter</span><span class="p">(</span><span class="s1">&#39;priority&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">priority</span>
+            <span class="n">dataruns</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dataruns</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">priority</span> <span class="o">==</span> <span class="n">mp</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">dataruns</span></div>
+
+<div class="viewcode-block" id="Database.get_hyperpartition"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.get_hyperpartition">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_hyperpartition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperpartition_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a specific classifier.  &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Hyperpartition</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">hyperpartition_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Database.get_hyperpartitions"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.get_hyperpartitions">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_hyperpartitions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">datarun_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                            <span class="n">ignore_gridding_done</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ignore_errored</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return all the hyperpartitions in a given datarun by id.</span>
+<span class="sd">        By default, only returns incomplete hyperpartitions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Hyperpartition</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dataset_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Datarun</span><span class="p">)</span>\
+                <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Datarun</span><span class="o">.</span><span class="n">dataset_id</span> <span class="o">==</span> <span class="n">dataset_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">datarun_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Hyperpartition</span><span class="o">.</span><span class="n">datarun_id</span> <span class="o">==</span> <span class="n">datarun_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Hyperpartition</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="n">method</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ignore_gridding_done</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Hyperpartition</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="n">PartitionStatus</span><span class="o">.</span><span class="n">GRIDDING_DONE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ignore_errored</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Hyperpartition</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="n">PartitionStatus</span><span class="o">.</span><span class="n">ERRORED</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Database.get_classifier"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.get_classifier">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">classifier_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a specific classifier. &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Classifier</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">classifier_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Database.get_classifiers"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.get_classifiers">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_classifiers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">datarun_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">hyperpartition_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a set of classifiers, filtered by the passed-in arguments. &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Classifier</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dataset_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Datarun</span><span class="p">)</span>\
+                <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Datarun</span><span class="o">.</span><span class="n">dataset_id</span> <span class="o">==</span> <span class="n">dataset_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">datarun_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Classifier</span><span class="o">.</span><span class="n">datarun_id</span> <span class="o">==</span> <span class="n">datarun_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Hyperpartition</span><span class="p">)</span>\
+                <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Hyperpartition</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="n">method</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hyperpartition_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Classifier</span><span class="o">.</span><span class="n">hyperpartition_id</span> <span class="o">==</span> <span class="n">hyperpartition_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Classifier</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">status</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></div>
+
+    <span class="c1"># ##########################################################################</span>
+    <span class="c1"># #  Special-purpose queries  ##############################################</span>
+    <span class="c1"># ##########################################################################</span>
+
+<div class="viewcode-block" id="Database.is_datatun_gridding_done"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.is_datatun_gridding_done">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">is_datatun_gridding_done</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datarun_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check whether gridding is done for the entire datarun.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">datarun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_datarun</span><span class="p">(</span><span class="n">datarun_id</span><span class="p">)</span>
+        <span class="n">is_done</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">hyperpartition</span> <span class="ow">in</span> <span class="n">datarun</span><span class="o">.</span><span class="n">hyperpartitions</span><span class="p">:</span>
+            <span class="c1"># If any hyperpartiton has not finished gridding or errored out,</span>
+            <span class="c1"># gridding is not done for the datarun.</span>
+            <span class="k">if</span> <span class="n">hyperpartition</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">PartitionStatus</span><span class="o">.</span><span class="n">INCOMPLETE</span><span class="p">:</span>
+                <span class="n">is_done</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="n">is_done</span></div>
+
+<div class="viewcode-block" id="Database.get_number_of_hyperpartition_errors"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.get_number_of_hyperpartition_errors">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_number_of_hyperpartition_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperpartition_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the number of classifiers that have errored using a specified</span>
+<span class="sd">        hyperpartition.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">classifiers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Classifier</span><span class="p">)</span>\
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">and_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Classifier</span><span class="o">.</span><span class="n">hyperpartition_id</span> <span class="o">==</span> <span class="n">hyperpartition_id</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">Classifier</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">ClassifierStatus</span><span class="o">.</span><span class="n">ERRORED</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">classifiers</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Database.get_methods"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.get_methods">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">datarun_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">ignore_errored</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ignore_gridding_done</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get all methods used in a particular datarun. &quot;&quot;&quot;</span>
+        <span class="n">hyperpartitions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hyperpartitions</span><span class="p">(</span><span class="n">dataset_id</span><span class="o">=</span><span class="n">dataset_id</span><span class="p">,</span>
+                                                   <span class="n">datarun_id</span><span class="o">=</span><span class="n">datarun_id</span><span class="p">,</span>
+                                                   <span class="n">ignore_gridding_done</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                   <span class="n">ignore_errored</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">methods</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">method</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">hyperpartitions</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">methods</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Database.get_maximum_y"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.get_maximum_y">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_maximum_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datarun_id</span><span class="p">,</span> <span class="n">score_target</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the maximum value of a numeric column by name, or None. &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Classifier</span><span class="p">,</span>
+                                                    <span class="n">score_target</span><span class="p">)))</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Classifier</span><span class="o">.</span><span class="n">datarun_id</span> <span class="o">==</span> <span class="n">datarun_id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Database.get_best_classifier"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.get_best_classifier">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_best_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">score_target</span><span class="p">,</span> <span class="n">dataset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                            <span class="n">datarun_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                            <span class="n">hyperpartition_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the classifier with the best judgment metric, as indicated by</span>
+<span class="sd">        score_target.</span>
+
+<span class="sd">        score_target: indicates the metric by which to judge the best classifier.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">classifiers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_classifiers</span><span class="p">(</span><span class="n">dataset_id</span><span class="o">=</span><span class="n">dataset_id</span><span class="p">,</span>
+                                           <span class="n">datarun_id</span><span class="o">=</span><span class="n">datarun_id</span><span class="p">,</span>
+                                           <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
+                                           <span class="n">hyperpartition_id</span><span class="o">=</span><span class="n">hyperpartition_id</span><span class="p">,</span>
+                                           <span class="n">status</span><span class="o">=</span><span class="n">ClassifierStatus</span><span class="o">.</span><span class="n">COMPLETE</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;_judgment_metric&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">score_target</span><span class="p">:</span>
+            <span class="n">score_target</span> <span class="o">+=</span> <span class="s1">&#39;_judgment_metric&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">classifiers</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">classifiers</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">attrgetter</span><span class="p">(</span><span class="n">score_target</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Database.load_model"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.load_model">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">classifier_id</span><span class="p">):</span>
+        <span class="n">clf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_classifier</span><span class="p">(</span><span class="n">classifier_id</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">model_location</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Database.load_metrics"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.load_metrics">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">load_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">classifier_id</span><span class="p">):</span>
+        <span class="n">clf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_classifier</span><span class="p">(</span><span class="n">classifier_id</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">metrics_location</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div>
+
+    <span class="c1"># ##########################################################################</span>
+    <span class="c1"># #  Methods to update the database  #######################################</span>
+    <span class="c1"># ##########################################################################</span>
+
+<div class="viewcode-block" id="Database.create_dataset"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.create_dataset">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">create_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dataset</span></div>
+
+<div class="viewcode-block" id="Database.create_datarun"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.create_datarun">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">create_datarun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">datarun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datarun</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">datarun</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">datarun</span></div>
+
+<div class="viewcode-block" id="Database.create_hyperpartition"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.create_hyperpartition">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">create_hyperpartition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">partition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Hyperpartition</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">partition</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">partition</span></div>
+
+<div class="viewcode-block" id="Database.create_classifier"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.create_classifier">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">create_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">classifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Classifier</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">classifier</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">classifier</span></div>
+
+<div class="viewcode-block" id="Database.start_classifier"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.start_classifier">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">start_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperpartition_id</span><span class="p">,</span> <span class="n">datarun_id</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span>
+                         <span class="n">hyperparameter_values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save a new, fully qualified classifier object to the database.</span>
+<span class="sd">        Returns: the ID of the newly-created classifier</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">classifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Classifier</span><span class="p">(</span><span class="n">hyperpartition_id</span><span class="o">=</span><span class="n">hyperpartition_id</span><span class="p">,</span>
+                                     <span class="n">datarun_id</span><span class="o">=</span><span class="n">datarun_id</span><span class="p">,</span>
+                                     <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span>
+                                     <span class="n">hyperparameter_values</span><span class="o">=</span><span class="n">hyperparameter_values</span><span class="p">,</span>
+                                     <span class="n">start_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+                                     <span class="n">status</span><span class="o">=</span><span class="n">ClassifierStatus</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">classifier</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">classifier</span></div>
+
+<div class="viewcode-block" id="Database.complete_classifier"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.complete_classifier">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">complete_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">classifier_id</span><span class="p">,</span> <span class="n">model_location</span><span class="p">,</span>
+                            <span class="n">metrics_location</span><span class="p">,</span> <span class="n">cv_score</span><span class="p">,</span> <span class="n">cv_stdev</span><span class="p">,</span> <span class="n">test_score</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set all the parameters on a classifier that haven&#39;t yet been set, and mark</span>
+<span class="sd">        it as complete.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">classifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Classifier</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">classifier_id</span><span class="p">)</span>
+
+        <span class="n">classifier</span><span class="o">.</span><span class="n">model_location</span> <span class="o">=</span> <span class="n">model_location</span>
+        <span class="n">classifier</span><span class="o">.</span><span class="n">metrics_location</span> <span class="o">=</span> <span class="n">metrics_location</span>
+        <span class="n">classifier</span><span class="o">.</span><span class="n">cv_judgment_metric</span> <span class="o">=</span> <span class="n">cv_score</span>
+        <span class="n">classifier</span><span class="o">.</span><span class="n">cv_judgment_metric_stdev</span> <span class="o">=</span> <span class="n">cv_stdev</span>
+        <span class="n">classifier</span><span class="o">.</span><span class="n">test_judgment_metric</span> <span class="o">=</span> <span class="n">test_score</span>
+        <span class="n">classifier</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">classifier</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">ClassifierStatus</span><span class="o">.</span><span class="n">COMPLETE</span></div>
+
+<div class="viewcode-block" id="Database.mark_classifier_errored"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.mark_classifier_errored">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">mark_classifier_errored</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">classifier_id</span><span class="p">,</span> <span class="n">error_message</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mark an existing classifier as having errored and set the error message. If</span>
+<span class="sd">        the classifier&#39;s hyperpartiton has produced too many erring classifiers, mark it</span>
+<span class="sd">        as errored as well.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">classifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Classifier</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">classifier_id</span><span class="p">)</span>
+        <span class="n">classifier</span><span class="o">.</span><span class="n">error_message</span> <span class="o">=</span> <span class="n">error_message</span>
+        <span class="n">classifier</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">ClassifierStatus</span><span class="o">.</span><span class="n">ERRORED</span>
+        <span class="n">classifier</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="n">noh_errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_number_of_hyperpartition_errors</span><span class="p">(</span><span class="n">classifier</span><span class="o">.</span><span class="n">hyperpartition_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">noh_errors</span> <span class="o">&gt;</span> <span class="n">MAX_HYPERPARTITION_ERRORS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mark_hyperpartition_errored</span><span class="p">(</span><span class="n">classifier</span><span class="o">.</span><span class="n">hyperpartition_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Database.mark_hyperpartition_gridding_done"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.mark_hyperpartition_gridding_done">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">mark_hyperpartition_gridding_done</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperpartition_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mark a hyperpartiton as having all of its possible grid points explored.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">hyperpartition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hyperpartition</span><span class="p">(</span><span class="n">hyperpartition_id</span><span class="p">)</span>
+        <span class="n">hyperpartition</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">PartitionStatus</span><span class="o">.</span><span class="n">GRIDDING_DONE</span></div>
+
+<div class="viewcode-block" id="Database.mark_hyperpartition_errored"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.mark_hyperpartition_errored">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">mark_hyperpartition_errored</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperpartition_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mark a hyperpartiton as having had too many classifier errors. This will</span>
+<span class="sd">        prevent more classifiers from being trained on this hyperpartiton in the</span>
+<span class="sd">        future.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">hyperpartition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hyperpartition</span><span class="p">(</span><span class="n">hyperpartition_id</span><span class="p">)</span>
+        <span class="n">hyperpartition</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">PartitionStatus</span><span class="o">.</span><span class="n">ERRORED</span></div>
+
+<div class="viewcode-block" id="Database.mark_datarun_running"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.mark_datarun_running">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">mark_datarun_running</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datarun_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the status of the Datarun to RUNNING and set the &#39;start_time&#39; field</span>
+<span class="sd">        to the current datetime.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">datarun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_datarun</span><span class="p">(</span><span class="n">datarun_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">datarun</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">RunStatus</span><span class="o">.</span><span class="n">PENDING</span><span class="p">:</span>
+            <span class="n">datarun</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">RunStatus</span><span class="o">.</span><span class="n">RUNNING</span>
+            <span class="n">datarun</span><span class="o">.</span><span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Database.mark_datarun_complete"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database.mark_datarun_complete">[docs]</a>    <span class="nd">@try_with_session</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">mark_datarun_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datarun_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the status of the Datarun to COMPLETE and set the &#39;end_time&#39; field</span>
+<span class="sd">        to the current datetime.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">datarun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_datarun</span><span class="p">(</span><span class="n">datarun_id</span><span class="p">)</span>
+        <span class="n">datarun</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">RunStatus</span><span class="o">.</span><span class="n">COMPLETE</span>
+        <span class="n">datarun</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

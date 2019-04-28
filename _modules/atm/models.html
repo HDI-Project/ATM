@@ -1,0 +1,473 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>atm.models &mdash; ATM 0.1.2-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> ATM
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">ATM: Scalable model selection and tuning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#requirements">0. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-atm">1. Install ATM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-using-pip">Install using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-from-source">Install from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#start-using-atm">3. Start using ATM!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#create-a-datarun">Create a datarun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#execute-the-datarun">Execute the datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../database.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to ATM and BTB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#style">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#docs">Docs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../add_method.html">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../add_method.html#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../add_method.html#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>atm.models</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for atm.models</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">map</span><span class="p">,</span> <span class="nb">object</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="k">import</span> <span class="n">attrgetter</span>
+
+<span class="kn">from</span> <span class="nn">past.utils</span> <span class="k">import</span> <span class="n">old_div</span>
+
+<span class="kn">from</span> <span class="nn">atm.config</span> <span class="k">import</span> <span class="n">initialize_logging</span><span class="p">,</span> <span class="n">load_config</span>
+<span class="kn">from</span> <span class="nn">atm.constants</span> <span class="k">import</span> <span class="n">PROJECT_ROOT</span><span class="p">,</span> <span class="n">TIME_FMT</span><span class="p">,</span> <span class="n">PartitionStatus</span>
+<span class="kn">from</span> <span class="nn">atm.database</span> <span class="k">import</span> <span class="n">Database</span>
+<span class="kn">from</span> <span class="nn">atm.encoder</span> <span class="k">import</span> <span class="n">MetaData</span>
+<span class="kn">from</span> <span class="nn">atm.method</span> <span class="k">import</span> <span class="n">Method</span>
+<span class="kn">from</span> <span class="nn">atm.utilities</span> <span class="k">import</span> <span class="n">download_data</span><span class="p">,</span> <span class="n">get_public_ip</span>
+<span class="kn">from</span> <span class="nn">atm.worker</span> <span class="k">import</span> <span class="n">ClassifierError</span><span class="p">,</span> <span class="n">Worker</span>
+
+<span class="c1"># load the library-wide logger</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;atm&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ATM"><a class="viewcode-back" href="../../api/atm.models.html#atm.models.ATM">[docs]</a><span class="k">class</span> <span class="nc">ATM</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Thiss class is code API instance that allows you to use ATM in your python code.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">LOOP_WAIT</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;log_config&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;log_config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">,</span>
+                                                <span class="s1">&#39;config/templates/log-script.yaml&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql_conf</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_conf</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_conf</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">Database</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sql_conf</span><span class="p">))</span>
+
+        <span class="n">initialize_logging</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_conf</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ATM.work"><a class="viewcode-back" href="../../api/atm.models.html#atm.models.ATM.work">[docs]</a>    <span class="k">def</span> <span class="nf">work</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datarun_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_files</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choose_randomly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+             <span class="n">cloud_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">total_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check the ModelHub database for unfinished dataruns, and spawn workers to</span>
+<span class="sd">        work on them as they are added. This process will continue to run until it</span>
+<span class="sd">        exceeds total_time or is broken with ctrl-C.</span>
+
+<span class="sd">        datarun_ids (optional): list of IDs of dataruns to compute on. If None,</span>
+<span class="sd">            this will work on all unfinished dataruns in the database.</span>
+<span class="sd">        choose_randomly: if True, work on all highest-priority dataruns in random</span>
+<span class="sd">            order. If False, work on them in sequential order (by ID)</span>
+<span class="sd">        cloud_mode: if True, save processed datasets to AWS. If this option is set,</span>
+<span class="sd">            aws_config must be supplied.</span>
+<span class="sd">        total_time (optional): if set to an integer, this worker will only work for</span>
+<span class="sd">            total_time seconds. Otherwise, it will continue working until all</span>
+<span class="sd">            dataruns are complete (or indefinitely).</span>
+<span class="sd">        wait: if True, once all dataruns in the database are complete, keep spinning</span>
+<span class="sd">            and wait for new runs to be added. If False, exit once all dataruns are</span>
+<span class="sd">            complete.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">public_ip</span> <span class="o">=</span> <span class="n">get_public_ip</span><span class="p">()</span>
+
+        <span class="c1"># main loop</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="c1"># get all pending and running dataruns, or all pending/running dataruns</span>
+            <span class="c1"># from the list we were given</span>
+            <span class="n">dataruns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_dataruns</span><span class="p">(</span><span class="n">include_ids</span><span class="o">=</span><span class="n">datarun_ids</span><span class="p">,</span> <span class="n">ignore_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">dataruns</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">wait</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No dataruns found. Sleeping </span><span class="si">%d</span><span class="s1"> seconds and trying again.&#39;</span><span class="p">,</span>
+                                   <span class="n">ATM</span><span class="o">.</span><span class="n">LOOP_WAIT</span><span class="p">)</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">ATM</span><span class="o">.</span><span class="n">LOOP_WAIT</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No dataruns found. Exiting.&#39;</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+            <span class="n">max_priority</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">datarun</span><span class="o">.</span><span class="n">priority</span> <span class="k">for</span> <span class="n">datarun</span> <span class="ow">in</span> <span class="n">dataruns</span><span class="p">])</span>
+            <span class="n">priority_runs</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">dataruns</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">priority</span> <span class="o">==</span> <span class="n">max_priority</span><span class="p">]</span>
+
+            <span class="c1"># either choose a run randomly, or take the run with the lowest ID</span>
+            <span class="k">if</span> <span class="n">choose_randomly</span><span class="p">:</span>
+                <span class="n">run</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">priority_runs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">run</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">dataruns</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">attrgetter</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># say we&#39;ve started working on this datarun, if we haven&#39;t already</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">mark_datarun_running</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Computing on datarun </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">run</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="c1"># actual work happens here</span>
+            <span class="n">worker</span> <span class="o">=</span> <span class="n">Worker</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">,</span> <span class="n">run</span><span class="p">,</span> <span class="n">save_files</span><span class="o">=</span><span class="n">save_files</span><span class="p">,</span>
+                            <span class="n">cloud_mode</span><span class="o">=</span><span class="n">cloud_mode</span><span class="p">,</span> <span class="n">aws_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aws_conf</span><span class="p">,</span>
+                            <span class="n">log_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_conf</span><span class="p">,</span> <span class="n">public_ip</span><span class="o">=</span><span class="n">public_ip</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">worker</span><span class="o">.</span><span class="n">run_classifier</span><span class="p">()</span>
+
+            <span class="k">except</span> <span class="n">ClassifierError</span><span class="p">:</span>
+                <span class="c1"># the exception has already been handled; just wait a sec so we</span>
+                <span class="c1"># don&#39;t go out of control reporting errors</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Something went wrong. Sleeping </span><span class="si">%d</span><span class="s1"> seconds.&#39;</span><span class="p">,</span> <span class="n">ATM</span><span class="o">.</span><span class="n">LOOP_WAIT</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">ATM</span><span class="o">.</span><span class="n">LOOP_WAIT</span><span class="p">)</span>
+
+            <span class="n">elapsed_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">total_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">elapsed_time</span> <span class="o">&gt;=</span> <span class="n">total_time</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Total run time for worker exceeded; exiting.&#39;</span><span class="p">)</span>
+                <span class="k">break</span></div>
+
+<div class="viewcode-block" id="ATM.create_dataset"><a class="viewcode-back" href="../../api/atm.models.html#atm.models.ATM.create_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">create_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a dataset and add it to the ModelHub database.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># download data to the local filesystem to extract metadata</span>
+        <span class="n">train_local</span><span class="p">,</span> <span class="n">test_local</span> <span class="o">=</span> <span class="n">download_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">train_path</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">test_path</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">aws_conf</span><span class="p">)</span>
+
+        <span class="c1"># create the name of the dataset from the path to the data</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">train_local</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_train.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># process the data into the form ATM needs and save it to disk</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">class_column</span><span class="p">,</span> <span class="n">train_local</span><span class="p">,</span> <span class="n">test_local</span><span class="p">)</span>
+
+        <span class="c1"># enter dataset into database</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                                         <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">data_description</span><span class="p">,</span>
+                                         <span class="n">train_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">train_path</span><span class="p">,</span>
+                                         <span class="n">test_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">test_path</span><span class="p">,</span>
+                                         <span class="n">class_column</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">class_column</span><span class="p">,</span>
+                                         <span class="n">n_examples</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">n_examples</span><span class="p">,</span>
+                                         <span class="n">k_classes</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">k_classes</span><span class="p">,</span>
+                                         <span class="n">d_features</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">d_features</span><span class="p">,</span>
+                                         <span class="n">majority</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">majority</span><span class="p">,</span>
+                                         <span class="n">size_kb</span><span class="o">=</span><span class="n">old_div</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">dataset</span></div>
+
+<div class="viewcode-block" id="ATM.create_datarun"><a class="viewcode-back" href="../../api/atm.models.html#atm.models.ATM.create_datarun">[docs]</a>    <span class="k">def</span> <span class="nf">create_datarun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a config, creates a set of dataruns for the config and enters them into</span>
+<span class="sd">        the database. Returns the ID of the created datarun.</span>
+
+<span class="sd">        dataset: Dataset SQLAlchemy ORM object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># describe the datarun by its tuner and selector</span>
+        <span class="n">run_description</span> <span class="o">=</span> <span class="s1">&#39;__&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">tuner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">selector</span><span class="p">])</span>
+
+        <span class="c1"># set the deadline, if applicable</span>
+        <span class="n">deadline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">deadline</span>
+        <span class="k">if</span> <span class="n">deadline</span><span class="p">:</span>
+            <span class="n">deadline</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">deadline</span><span class="p">,</span> <span class="n">TIME_FMT</span><span class="p">)</span>
+            <span class="c1"># this overrides the otherwise configured budget_type</span>
+            <span class="c1"># TODO: why not walltime and classifiers budget simultaneously?</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">budget_type</span> <span class="o">=</span> <span class="s1">&#39;walltime&#39;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">budget_type</span> <span class="o">==</span> <span class="s1">&#39;walltime&#39;</span><span class="p">:</span>
+            <span class="n">deadline</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">budget</span><span class="p">)</span>
+
+        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">score_target</span> <span class="o">+</span> <span class="s1">&#39;_judgment_metric&#39;</span>
+        <span class="n">datarun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">create_datarun</span><span class="p">(</span><span class="n">dataset_id</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                         <span class="n">description</span><span class="o">=</span><span class="n">run_description</span><span class="p">,</span>
+                                         <span class="n">tuner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">tuner</span><span class="p">,</span>
+                                         <span class="n">selector</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">selector</span><span class="p">,</span>
+                                         <span class="n">gridding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">gridding</span><span class="p">,</span>
+                                         <span class="n">priority</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">priority</span><span class="p">,</span>
+                                         <span class="n">budget_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">budget_type</span><span class="p">,</span>
+                                         <span class="n">budget</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">budget</span><span class="p">,</span>
+                                         <span class="n">deadline</span><span class="o">=</span><span class="n">deadline</span><span class="p">,</span>
+                                         <span class="n">metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span>
+                                         <span class="n">score_target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>
+                                         <span class="n">k_window</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">k_window</span><span class="p">,</span>
+                                         <span class="n">r_minimum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">r_minimum</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">datarun</span></div>
+
+<div class="viewcode-block" id="ATM.enter_data"><a class="viewcode-back" href="../../api/atm.models.html#atm.models.ATM.enter_data">[docs]</a>    <span class="k">def</span> <span class="nf">enter_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_per_partition</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a datarun, including a dataset if necessary.</span>
+
+<span class="sd">        Returns: ID of the generated datarun</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># connect to the database</span>
+
+        <span class="c1"># if the user has provided a dataset id, use that. Otherwise, create a new</span>
+        <span class="c1"># dataset based on the arguments we were passed.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">dataset_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">dataset_id</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">)</span>
+
+        <span class="n">method_parts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_conf</span><span class="o">.</span><span class="n">methods</span><span class="p">:</span>
+            <span class="c1"># enumerate all combinations of categorical variables for this method</span>
+            <span class="n">method</span> <span class="o">=</span> <span class="n">Method</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+            <span class="n">method_parts</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">get_hyperpartitions</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;method </span><span class="si">%s</span><span class="s1"> has </span><span class="si">%d</span><span class="s1"> hyperpartitions&#39;</span> <span class="o">%</span>
+                        <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">method_parts</span><span class="p">[</span><span class="n">m</span><span class="p">])))</span>
+
+        <span class="c1"># create hyperpartitions and datarun(s)</span>
+        <span class="n">run_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">run_per_partition</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;saving datarun...&#39;</span><span class="p">)</span>
+            <span class="n">datarun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_datarun</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;saving hyperpartions...&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">method</span><span class="p">,</span> <span class="n">parts</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">method_parts</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">:</span>
+                <span class="c1"># if necessary, create a new datarun for each hyperpartition.</span>
+                <span class="c1"># This setting is useful for debugging.</span>
+                <span class="k">if</span> <span class="n">run_per_partition</span><span class="p">:</span>
+                    <span class="n">datarun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_datarun</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+                    <span class="n">run_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+                <span class="c1"># create a new hyperpartition in the database</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">create_hyperpartition</span><span class="p">(</span><span class="n">datarun_id</span><span class="o">=</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                              <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
+                                              <span class="n">tunables</span><span class="o">=</span><span class="n">part</span><span class="o">.</span><span class="n">tunables</span><span class="p">,</span>
+                                              <span class="n">constants</span><span class="o">=</span><span class="n">part</span><span class="o">.</span><span class="n">constants</span><span class="p">,</span>
+                                              <span class="n">categoricals</span><span class="o">=</span><span class="n">part</span><span class="o">.</span><span class="n">categoricals</span><span class="p">,</span>
+                                              <span class="n">status</span><span class="o">=</span><span class="n">PartitionStatus</span><span class="o">.</span><span class="n">INCOMPLETE</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Data entry complete. Summary:&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Dataset ID: </span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Training data: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">train_path</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Test data: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">test_path</span> <span class="ow">or</span> <span class="s1">&#39;None&#39;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">run_per_partition</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Datarun IDs: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">run_ids</span><span class="p">)))</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Datarun ID: </span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Hyperpartition selection strategy: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">datarun</span><span class="o">.</span><span class="n">selector</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Parameter tuning strategy: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">datarun</span><span class="o">.</span><span class="n">tuner</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Budget: </span><span class="si">%d</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="n">datarun</span><span class="o">.</span><span class="n">budget</span><span class="p">,</span> <span class="n">datarun</span><span class="o">.</span><span class="n">budget_type</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">run_ids</span> <span class="ow">or</span> <span class="n">datarun</span><span class="o">.</span><span class="n">id</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

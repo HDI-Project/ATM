@@ -1,0 +1,494 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Guide to the ModelHub database &mdash; ATM 0.1.2-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contributing to ATM and BTB" href="contributing.html" />
+    <link rel="prev" title="Quick-start guide" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ATM
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">ATM: Scalable model selection and tuning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#requirements">0. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#install-atm">1. Install ATM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="setup.html#install-using-pip">Install using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="setup.html#install-from-source">Install from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#start-using-atm">3. Start using ATM!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#create-a-datarun">Create a datarun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#execute-the-datarun">Execute the datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to ATM and BTB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#style">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#docs">Docs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="add_method.html">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="add_method.html#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="add_method.html#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="add_method.html#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="add_method.html#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Guide to the ModelHub database</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/HDI-project/ATM/blob/master/docs/database.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="guide-to-the-modelhub-database">
+<h1>Guide to the ModelHub database<a class="headerlink" href="#guide-to-the-modelhub-database" title="Permalink to this headline">¶</a></h1>
+<p>The ModelHub database is what ATM uses to save state about ongoing jobs,
+datasets, and previously-generated models. It allows multiple workers on
+multiple machines to collaborate on a single task, regardless of failures or
+interruptions. The ideas behind ModelHub are described in the corresponding
+<a class="reference external" href="https://cyphe.rs/static/atm.pdf">paper</a>, although the structure described
+there does not match up one-to-one with the ModelHub implemented in
+<code class="docutils literal notranslate"><span class="pre">atm/database.py</span></code>. This page gives a brief overview of the structure of the
+ModelHub database as implemented and how it compares to the version in the
+paper.</p>
+<div class="section" id="datasets">
+<h2>Datasets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
+<p>A Dataset represents a single set of data which can be used to train and test
+models by ATM. The table stores information about the location of the data as
+well as metadata to help with analysis.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> (Int): Unique identifier for the dataset.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code> (String): Identifier string for a classification technique.</p></li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">description</span></code> (String): Human-readable description of the dataset.</dt><dd><ul>
+<li><p>not described in the paper</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">train_path</span></code> (String): Location of the dataset train file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test_path</span></code> (String): Location of the dataset test file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">class_column</span></code> (String): Name of the class label column.</p></li>
+</ul>
+<p>The metadata fields below are not described in the paper.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">n_examples</span></code> (Int): Number of samples (rows) in the dataset.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">k_classes</span></code> (Int): Number of classes in the dataset.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">d_features</span></code> (Int): Number of features in the dataset.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">majority</span></code> (Number): Ratio of the number of samples in the largest class to
+the number of samples in all other classes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">size_kb</span></code> (Int): Approximate size of the dataset in KB.</p></li>
+</ul>
+</div>
+<div class="section" id="dataruns">
+<h2>Dataruns<a class="headerlink" href="#dataruns" title="Permalink to this headline">¶</a></h2>
+<p>A Datarun is a single logical job for ATM to complete. The Dataruns table
+contains a reference to a dataset, configuration for ATM and BTB, and
+state information.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">datarun_id</span></code> (Int): Unique identifier for the datarun.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> (Int): ID of the dataset associated with this datarun.</p></li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">description</span></code> (String): Human-readable description of the datarun.</dt><dd><ul>
+<li><p>not in the paper</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>BTB configuration:</p>
+<ul>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">selector</span></code> (String): Selection technique for hyperpartitions.</dt><dd><ul class="simple">
+<li><p>called “hyperpartition_selection_scheme” in the paper</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">k_window</span></code> (Int): The number of previous classifiers the selector will
+consider, for selection techniques that set a limit of the number of
+historical runs to use.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>called “t<sub>s</sub>” in the paper</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tuner</span></code> (String): The technique that BTB will use to choose new continuous
+hyperparameters.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>called “hyperparameters_tuning_scheme” in the paper</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r_minimum</span></code> (Int): The number of random runs that must be performed in each
+hyperpartition before allowing Bayesian optimization to select parameters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gridding</span></code> (Int): If this value is set to a positive integer, each
+numeric hyperparameter will be chosen from a set of <code class="docutils literal notranslate"><span class="pre">gridding</span></code> discrete,
+evenly-spaced values. If set to 0 or NULL, values will be chosen from the
+full, continuous space of possibilities.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>not in the paper</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>ATM configuration:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">priority</span></code> (Int): Run priority for the datarun. If multiple unfinished
+dataruns are in the ModelHub at once, workers will process higher-priority
+runs first.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">budget_type</span></code> (Enum): One of [“learner”, “walltime”]. If this is “learner”,
+only <code class="docutils literal notranslate"><span class="pre">budget</span></code> classifiers will be trained; if “walltime”, classifiers will
+only be trained for <code class="docutils literal notranslate"><span class="pre">budget</span></code> minutes total.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">budget</span></code> (Int): The maximum number of classifiers to build, or the maximum
+amount of time to train classifiers (in minutes).</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>called “budget_amount” in the paper</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">deadline</span></code> (DateTime): If provided, and if <code class="docutils literal notranslate"><span class="pre">budget_type</span></code> is set to
+“walltime”, the datarun will run until this absolute time. This overrides the
+<code class="docutils literal notranslate"><span class="pre">budget</span></code> column.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>not in the paper</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metric</span></code> (String): The metric by which to score each classifier for
+comparison purposes. Can be one of [“accuracy”, “cohen_kappa”, “f1”,
+“roc_auc”, “ap”, “mcc”] for binary problems, or [“accuracy”, “rank_accuracy”,
+“cohen_kappa”, “f1_micro”, “f1_macro”, “roc_auc_micro”, “roc_auc_macro”] for
+multiclass problems</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>not in the paper</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">score_target</span></code> (Enum): One of [“cv”, “test”, “mu_sigma”]. Determines how the
+final comparative metric (the <em>judgment metric</em>) is calculated.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>“cv” (cross-validation): the judgment metric is the average of a 5-fold
+cross-validation test.</p></li>
+<li><p>“test”: the judgment metric is computed on the test data.</p></li>
+<li><p>“mu_sigma”: the judgment metric is the lower error bound on the mean CV
+score.</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p>not in the paper</p></li>
+</ul>
+</li>
+</ul>
+<p>State information:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">start_time</span></code> (DateTime): Time the DataRun began.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">end_time</span></code> (DateTime): Time the DataRun was completed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">status</span></code> (Enum): Indicates whether the run is pending, in progress, or has
+been finished. One of [“pending”, “running”, “complete”].</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>not in the paper</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="hyperpartitions">
+<h2>Hyperpartitions<a class="headerlink" href="#hyperpartitions" title="Permalink to this headline">¶</a></h2>
+<p>A Hyperpartition is a fixed set of categorical hyperparameters which defines a
+space of numeric hyperparameters that can be explored by a tuner. ATM uses BTB
+selectors to choose among hyperpartitions during a run. Each hyperpartition
+instance must be associated with a single datarun; the performance of a
+hyperpartition in a previous datarun is assumed to have no bearing on its
+performance in the future.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">hyperparition_id</span></code> (Int): Unique identifier for the hyperparition.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">datarun_id</span></code> (Int): ID of the datarun associated with this hyperpartition.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">method</span></code> (String): Code for, or path to a JSON file describing, this
+hyperpartition’s classification method (e.g. “svm”, “knn”).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">categoricals</span></code> (Base64-encoded object): List of categorical hyperparameters
+whose values are fixed to define this hyperpartition.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>called “partition_hyperparameter_values” in the paper</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tunables</span></code> (Base64-encoded object): List of continuous hyperparameters which
+are free; their values must be selected by a Tuner.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>called “conditional_hyperparameters” in the paper</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">constants</span></code> (Base64-encoded object): List of categorical or continuous
+parameters whose values are always fixed. These do not define the
+hyperpartition, but their values must be passed to the classification method
+to fully parameterize it.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>not in the paper</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">status</span></code> (Enum): Indicates whether the hyperpartition has caused too many
+classifiers to error, or whether the grid for this partition has been fully
+explored. One of [“incomplete”, “gridding_done”, “errored”].</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>not in the paper</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="classifiers">
+<h2>Classifiers<a class="headerlink" href="#classifiers" title="Permalink to this headline">¶</a></h2>
+<p>A Classifier represents a single train/test run using a method and a set of hyperparameters with a particular dataset.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">classifier_id</span></code> (Int): Unique identifier for the classifier.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">datarun_id</span></code> (Int): ID of the datarun associated with this classifier.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hyperpartition_id</span></code> (Int): ID of the hyperpartition associated with this
+classifier.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">host</span></code> (String): IP address or name of the host machine where the classifier
+was tested.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>not in the paper</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model_location</span></code> (String): Path to the serialized model object for this
+classifier.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metrics_location</span></code> (String): Path to the full set of metrics computed during
+testing.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cv_judgment_metric</span></code> (Number): Mean of the judgement metrics from the
+cross-validated training data.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cv_judgment_metric_stdev</span></code> (Number): Standard deviation of the
+cross-validation test.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test_judgment_metric</span></code> (Number): Judgment metric computed on the test data.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hyperparameters_values</span></code> (Base64-encoded object): The full set of
+hyperparameter values used to create this classifier.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">start_time</span></code> (DateTime): Time that a worker started working on the
+classifier.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">end_time</span></code> (DateTime): Time that a worker finished working on the
+classifier.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">status</span></code> (Enum): One of [“running”, “errored”, “complete”].</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">error_message</span></code> (String): If this classifier encountered an error, this is
+the Python stack trace from the caught exception.</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing to ATM and BTB" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="quickstart.html" class="btn btn-neutral float-left" title="Quick-start guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

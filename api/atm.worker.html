@@ -1,0 +1,328 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>atm.worker module &mdash; ATM 0.1.2-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ATM
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">ATM: Scalable model selection and tuning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#requirements">0. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#install-atm">1. Install ATM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../setup.html#install-using-pip">Install using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../setup.html#install-from-source">Install from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#start-using-atm">3. Start using ATM!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#create-a-datarun">Create a datarun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#execute-the-datarun">Execute the datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../database.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../database.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../database.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../database.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../database.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to ATM and BTB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#style">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#docs">Docs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../add_method.html">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../add_method.html#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../add_method.html#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../add_method.html#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../add_method.html#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>atm.worker module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/HDI-project/ATM/blob/master/docs/api/atm.worker.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-atm.worker">
+<span id="atm-worker-module"></span><h1>atm.worker module<a class="headerlink" href="#module-atm.worker" title="Permalink to this headline">¶</a></h1>
+<dl class="exception">
+<dt id="atm.worker.ClassifierError">
+<em class="property">exception </em><code class="descclassname">atm.worker.</code><code class="descname">ClassifierError</code><a class="reference internal" href="../_modules/atm/worker.html#ClassifierError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.ClassifierError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="atm.worker.Worker">
+<em class="property">class </em><code class="descclassname">atm.worker.</code><code class="descname">Worker</code><span class="sig-paren">(</span><em>database</em>, <em>datarun</em>, <em>save_files=True</em>, <em>cloud_mode=False</em>, <em>aws_config=None</em>, <em>log_config=None</em>, <em>public_ip='localhost'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="atm.worker.Worker.is_datarun_finished">
+<code class="descname">is_datarun_finished</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.is_datarun_finished"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.is_datarun_finished" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check to see whether the datarun is finished. This could be due to the
+budget being exhausted or due to hyperparameter gridding being done.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="atm.worker.Worker.load_selector">
+<code class="descname">load_selector</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.load_selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.load_selector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load and initialize the BTB class which will be responsible for
+selecting hyperpartitions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="atm.worker.Worker.load_tuner">
+<code class="descname">load_tuner</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.load_tuner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.load_tuner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load, but don’t initialize, the BTB class which will be responsible for
+choosing non-hyperpartition hyperparameter values (a subclass of Tuner). The
+tuner must be initialized with information about the hyperpartition, so it
+cannot be created until later.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="atm.worker.Worker.run_classifier">
+<code class="descname">run_classifier</code><span class="sig-paren">(</span><em>hyperpartition_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.run_classifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.run_classifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Choose hyperparameters, then use them to test and save a Classifier.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="atm.worker.Worker.save_classifier">
+<code class="descname">save_classifier</code><span class="sig-paren">(</span><em>classifier_id</em>, <em>model</em>, <em>metrics</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.save_classifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.save_classifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update a classifier with metrics and model information and mark it as
+“complete”</p>
+<p>classifier_id: ID of the classifier to save
+model: Model object containing a serializable representation of the</p>
+<blockquote>
+<div><p>final model generated by this classifier.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>metrics: Dictionary containing cross-validation and test metrics data</dt><dd><p>for the model.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="atm.worker.Worker.save_classifier_cloud">
+<code class="descname">save_classifier_cloud</code><span class="sig-paren">(</span><em>local_model_path</em>, <em>local_metric_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.save_classifier_cloud"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.save_classifier_cloud" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a classifier to the S3 bucket supplied by aws_config. Saves a
+serialized representaion of the model as well as a detailed set
+of metrics.</p>
+<p>local_model_path: path to serialized model in the local file system
+local_metric_path: path to serialized metrics in the local file system</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="atm.worker.Worker.select_hyperpartition">
+<code class="descname">select_hyperpartition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.select_hyperpartition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.select_hyperpartition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the hyperpartition selection method specified by our datarun to choose a
+hyperpartition of hyperparameters from the ModelHub. Only consider
+partitions for which gridding is not complete.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="atm.worker.Worker.test_classifier">
+<code class="descname">test_classifier</code><span class="sig-paren">(</span><em>method</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.test_classifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.test_classifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a set of fully-qualified hyperparameters, create and test a
+classifier model.
+Returns: Model object and metrics dictionary</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="atm.worker.Worker.tune_hyperparameters">
+<code class="descname">tune_hyperparameters</code><span class="sig-paren">(</span><em>hyperpartition</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.tune_hyperparameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.tune_hyperparameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the hyperparameter tuning method specified by our datarun to choose
+a set of hyperparameters from the potential space.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+atm.worker module
+=================
+
+.. automodule:: atm.worker
+    :members:
+    :undoc-members:
+    :show-inheritance:

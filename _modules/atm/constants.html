@@ -1,0 +1,380 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>atm.constants &mdash; ATM 0.1.2-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> ATM
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">ATM: Scalable model selection and tuning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#requirements">0. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-atm">1. Install ATM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-using-pip">Install using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-from-source">Install from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#start-using-atm">3. Start using ATM!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#create-a-datarun">Create a datarun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#execute-the-datarun">Execute the datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../database.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to ATM and BTB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#style">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#docs">Docs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../add_method.html">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../add_method.html#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../add_method.html#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>atm.constants</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for atm.constants</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">object</span>
+
+<span class="kn">from</span> <span class="nn">btb.selection</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">UCB1</span><span class="p">,</span> <span class="n">BestKReward</span><span class="p">,</span> <span class="n">BestKVelocity</span><span class="p">,</span> <span class="n">HierarchicalByAlgorithm</span><span class="p">,</span> <span class="n">PureBestKVelocity</span><span class="p">,</span> <span class="n">RecentKReward</span><span class="p">,</span>
+    <span class="n">RecentKVelocity</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">btb.selection</span> <span class="k">import</span> <span class="n">Uniform</span> <span class="k">as</span> <span class="n">UniformSelector</span>
+<span class="kn">from</span> <span class="nn">btb.tuning</span> <span class="k">import</span> <span class="n">GP</span><span class="p">,</span> <span class="n">GPEi</span><span class="p">,</span> <span class="n">GPEiVelocity</span>
+<span class="kn">from</span> <span class="nn">btb.tuning</span> <span class="k">import</span> <span class="n">Uniform</span> <span class="k">as</span> <span class="n">UniformTuner</span>
+
+<span class="kn">from</span> <span class="nn">atm</span> <span class="k">import</span> <span class="n">PROJECT_ROOT</span>
+
+<span class="c1"># A bunch of constants which are used throughout the project, mostly for config.</span>
+<span class="c1"># TODO: convert these lists and classes to something more elegant, like enums</span>
+<span class="n">SQL_DIALECTS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sqlite&#39;</span><span class="p">,</span> <span class="s1">&#39;mysql&#39;</span><span class="p">]</span>
+<span class="n">SCORE_TARGETS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cv&#39;</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="s1">&#39;mu_sigma&#39;</span><span class="p">]</span>
+<span class="n">BUDGET_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="s1">&#39;classifier&#39;</span><span class="p">,</span> <span class="s1">&#39;walltime&#39;</span><span class="p">]</span>
+<span class="n">METHODS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;logreg&#39;</span><span class="p">,</span> <span class="s1">&#39;svm&#39;</span><span class="p">,</span> <span class="s1">&#39;sgd&#39;</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">,</span> <span class="s1">&#39;et&#39;</span><span class="p">,</span> <span class="s1">&#39;rf&#39;</span><span class="p">,</span> <span class="s1">&#39;gnb&#39;</span><span class="p">,</span> <span class="s1">&#39;mnb&#39;</span><span class="p">,</span> <span class="s1">&#39;bnb&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;gp&#39;</span><span class="p">,</span> <span class="s1">&#39;pa&#39;</span><span class="p">,</span> <span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="s1">&#39;mlp&#39;</span><span class="p">,</span> <span class="s1">&#39;ada&#39;</span><span class="p">]</span>
+<span class="n">TUNERS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="s1">&#39;gp&#39;</span><span class="p">,</span> <span class="s1">&#39;gp_ei&#39;</span><span class="p">,</span> <span class="s1">&#39;gp_eivel&#39;</span><span class="p">]</span>
+<span class="n">SELECTORS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="s1">&#39;ucb1&#39;</span><span class="p">,</span> <span class="s1">&#39;bestk&#39;</span><span class="p">,</span> <span class="s1">&#39;bestkvel&#39;</span><span class="p">,</span> <span class="s1">&#39;purebestkvel&#39;</span><span class="p">,</span> <span class="s1">&#39;recentk&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;recentkvel&#39;</span><span class="p">,</span> <span class="s1">&#39;hieralg&#39;</span><span class="p">]</span>
+<span class="n">DATARUN_STATUS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;pending&#39;</span><span class="p">,</span> <span class="s1">&#39;running&#39;</span><span class="p">,</span> <span class="s1">&#39;complete&#39;</span><span class="p">]</span>
+<span class="n">CLASSIFIER_STATUS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;running&#39;</span><span class="p">,</span> <span class="s1">&#39;errored&#39;</span><span class="p">,</span> <span class="s1">&#39;complete&#39;</span><span class="p">]</span>
+<span class="n">PARTITION_STATUS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;incomplete&#39;</span><span class="p">,</span> <span class="s1">&#39;errored&#39;</span><span class="p">,</span> <span class="s1">&#39;gridding_done&#39;</span><span class="p">]</span>
+
+<span class="n">S3_PREFIX</span> <span class="o">=</span> <span class="s1">&#39;^s3://&#39;</span>
+<span class="n">HTTP_PREFIX</span> <span class="o">=</span> <span class="s1">&#39;^https?://&#39;</span>
+
+<span class="n">TIME_FMT</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M&#39;</span>
+<span class="n">DATA_TEST_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">,</span> <span class="s1">&#39;data/test&#39;</span><span class="p">)</span>
+<span class="n">DATA_DL_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">,</span> <span class="s1">&#39;data/downloads&#39;</span><span class="p">)</span>
+<span class="n">METHOD_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">,</span> <span class="s1">&#39;methods&#39;</span><span class="p">)</span>
+
+<span class="n">CUSTOM_CLASS_REGEX</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(.*\.py):(\w+)$&#39;</span>
+<span class="n">JSON_REGEX</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(.*\.json)$&#39;</span>
+
+<span class="n">N_FOLDS_DEFAULT</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="n">LOG_LEVELS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;CRITICAL&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">,</span>
+    <span class="s1">&#39;ERROR&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+    <span class="s1">&#39;WARNING&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
+    <span class="s1">&#39;INFO&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+    <span class="s1">&#39;DEBUG&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+    <span class="s1">&#39;NONE&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span>
+<span class="p">}</span>
+
+<span class="n">TUNERS_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;uniform&#39;</span><span class="p">:</span> <span class="n">UniformTuner</span><span class="p">,</span>
+    <span class="s1">&#39;gp&#39;</span><span class="p">:</span> <span class="n">GP</span><span class="p">,</span>
+    <span class="s1">&#39;gp_ei&#39;</span><span class="p">:</span> <span class="n">GPEi</span><span class="p">,</span>
+    <span class="s1">&#39;gp_eivel&#39;</span><span class="p">:</span> <span class="n">GPEiVelocity</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">SELECTORS_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;uniform&#39;</span><span class="p">:</span> <span class="n">UniformSelector</span><span class="p">,</span>
+    <span class="s1">&#39;ucb1&#39;</span><span class="p">:</span> <span class="n">UCB1</span><span class="p">,</span>
+    <span class="s1">&#39;bestk&#39;</span><span class="p">:</span> <span class="n">BestKReward</span><span class="p">,</span>
+    <span class="s1">&#39;bestkvel&#39;</span><span class="p">:</span> <span class="n">BestKVelocity</span><span class="p">,</span>
+    <span class="s1">&#39;purebestkvel&#39;</span><span class="p">:</span> <span class="n">PureBestKVelocity</span><span class="p">,</span>
+    <span class="s1">&#39;recentk&#39;</span><span class="p">:</span> <span class="n">RecentKReward</span><span class="p">,</span>
+    <span class="s1">&#39;recentkvel&#39;</span><span class="p">:</span> <span class="n">RecentKVelocity</span><span class="p">,</span>
+    <span class="s1">&#39;hieralg&#39;</span><span class="p">:</span> <span class="n">HierarchicalByAlgorithm</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">METHODS_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;logreg&#39;</span><span class="p">:</span> <span class="s1">&#39;logistic_regression.json&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;svm&#39;</span><span class="p">:</span> <span class="s1">&#39;support_vector_machine.json&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sgd&#39;</span><span class="p">:</span> <span class="s1">&#39;stochastic_gradient_descent.json&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dt&#39;</span><span class="p">:</span> <span class="s1">&#39;decision_tree.json&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;et&#39;</span><span class="p">:</span> <span class="s1">&#39;extra_trees.json&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;rf&#39;</span><span class="p">:</span> <span class="s1">&#39;random_forest.json&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;gnb&#39;</span><span class="p">:</span> <span class="s1">&#39;gaussian_naive_bayes.json&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;mnb&#39;</span><span class="p">:</span> <span class="s1">&#39;multinomial_naive_bayes.json&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;bnb&#39;</span><span class="p">:</span> <span class="s1">&#39;bernoulli_naive_bayes.json&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;gp&#39;</span><span class="p">:</span> <span class="s1">&#39;gaussian_process.json&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;pa&#39;</span><span class="p">:</span> <span class="s1">&#39;passive_aggressive.json&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;knn&#39;</span><span class="p">:</span> <span class="s1">&#39;k_nearest_neighbors.json&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;mlp&#39;</span><span class="p">:</span> <span class="s1">&#39;multi_layer_perceptron.json&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ada&#39;</span><span class="p">:</span> <span class="s1">&#39;adaboost.json&#39;</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="ClassifierStatus"><a class="viewcode-back" href="../../api/atm.constants.html#atm.constants.ClassifierStatus">[docs]</a><span class="k">class</span> <span class="nc">ClassifierStatus</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">RUNNING</span> <span class="o">=</span> <span class="s1">&#39;running&#39;</span>
+    <span class="n">ERRORED</span> <span class="o">=</span> <span class="s1">&#39;errored&#39;</span>
+    <span class="n">COMPLETE</span> <span class="o">=</span> <span class="s1">&#39;complete&#39;</span></div>
+
+
+<div class="viewcode-block" id="RunStatus"><a class="viewcode-back" href="../../api/atm.constants.html#atm.constants.RunStatus">[docs]</a><span class="k">class</span> <span class="nc">RunStatus</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">PENDING</span> <span class="o">=</span> <span class="s1">&#39;pending&#39;</span>
+    <span class="n">RUNNING</span> <span class="o">=</span> <span class="s1">&#39;running&#39;</span>
+    <span class="n">COMPLETE</span> <span class="o">=</span> <span class="s1">&#39;complete&#39;</span></div>
+
+
+<div class="viewcode-block" id="PartitionStatus"><a class="viewcode-back" href="../../api/atm.constants.html#atm.constants.PartitionStatus">[docs]</a><span class="k">class</span> <span class="nc">PartitionStatus</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">INCOMPLETE</span> <span class="o">=</span> <span class="s1">&#39;incomplete&#39;</span>
+    <span class="n">GRIDDING_DONE</span> <span class="o">=</span> <span class="s1">&#39;gridding_done&#39;</span>
+    <span class="n">ERRORED</span> <span class="o">=</span> <span class="s1">&#39;errored&#39;</span></div>
+
+
+<div class="viewcode-block" id="FileType"><a class="viewcode-back" href="../../api/atm.constants.html#atm.constants.FileType">[docs]</a><span class="k">class</span> <span class="nc">FileType</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">LOCAL</span> <span class="o">=</span> <span class="s1">&#39;local&#39;</span>
+    <span class="n">S3</span> <span class="o">=</span> <span class="s1">&#39;s3&#39;</span>
+    <span class="n">HTTP</span> <span class="o">=</span> <span class="s1">&#39;http&#39;</span></div>
+
+
+<span class="c1"># these are the strings that are used to index into results dictionaries</span>
+<div class="viewcode-block" id="Metrics"><a class="viewcode-back" href="../../api/atm.constants.html#atm.constants.Metrics">[docs]</a><span class="k">class</span> <span class="nc">Metrics</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">ACCURACY</span> <span class="o">=</span> <span class="s1">&#39;accuracy&#39;</span>
+    <span class="n">RANK_ACCURACY</span> <span class="o">=</span> <span class="s1">&#39;rank_accuracy&#39;</span>
+    <span class="n">COHEN_KAPPA</span> <span class="o">=</span> <span class="s1">&#39;cohen_kappa&#39;</span>
+    <span class="n">F1</span> <span class="o">=</span> <span class="s1">&#39;f1&#39;</span>
+    <span class="n">F1_MICRO</span> <span class="o">=</span> <span class="s1">&#39;f1_micro&#39;</span>
+    <span class="n">F1_MACRO</span> <span class="o">=</span> <span class="s1">&#39;f1_macro&#39;</span>
+    <span class="n">ROC_AUC</span> <span class="o">=</span> <span class="s1">&#39;roc_auc&#39;</span>     <span class="c1"># receiver operating characteristic</span>
+    <span class="n">ROC_AUC_MICRO</span> <span class="o">=</span> <span class="s1">&#39;roc_auc_micro&#39;</span>
+    <span class="n">ROC_AUC_MACRO</span> <span class="o">=</span> <span class="s1">&#39;roc_auc_macro&#39;</span>
+    <span class="n">AP</span> <span class="o">=</span> <span class="s1">&#39;ap&#39;</span>               <span class="c1"># average precision</span>
+    <span class="n">MCC</span> <span class="o">=</span> <span class="s1">&#39;mcc&#39;</span>             <span class="c1"># matthews correlation coefficient</span>
+    <span class="n">PR_CURVE</span> <span class="o">=</span> <span class="s1">&#39;pr_curve&#39;</span>
+    <span class="n">ROC_CURVE</span> <span class="o">=</span> <span class="s1">&#39;roc_curve&#39;</span></div>
+
+
+<span class="n">METRICS_BINARY</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Metrics</span><span class="o">.</span><span class="n">ACCURACY</span><span class="p">,</span>
+    <span class="n">Metrics</span><span class="o">.</span><span class="n">COHEN_KAPPA</span><span class="p">,</span>
+    <span class="n">Metrics</span><span class="o">.</span><span class="n">F1</span><span class="p">,</span>
+    <span class="n">Metrics</span><span class="o">.</span><span class="n">ROC_AUC</span><span class="p">,</span>
+    <span class="n">Metrics</span><span class="o">.</span><span class="n">AP</span><span class="p">,</span>
+    <span class="n">Metrics</span><span class="o">.</span><span class="n">MCC</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">METRICS_MULTICLASS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Metrics</span><span class="o">.</span><span class="n">ACCURACY</span><span class="p">,</span>
+    <span class="n">Metrics</span><span class="o">.</span><span class="n">RANK_ACCURACY</span><span class="p">,</span>
+    <span class="n">Metrics</span><span class="o">.</span><span class="n">COHEN_KAPPA</span><span class="p">,</span>
+    <span class="n">Metrics</span><span class="o">.</span><span class="n">F1_MICRO</span><span class="p">,</span>
+    <span class="n">Metrics</span><span class="o">.</span><span class="n">F1_MACRO</span><span class="p">,</span>
+    <span class="n">Metrics</span><span class="o">.</span><span class="n">ROC_AUC_MICRO</span><span class="p">,</span>
+    <span class="n">Metrics</span><span class="o">.</span><span class="n">ROC_AUC_MACRO</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">METRICS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">METRICS_BINARY</span> <span class="o">+</span> <span class="n">METRICS_MULTICLASS</span><span class="p">))</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

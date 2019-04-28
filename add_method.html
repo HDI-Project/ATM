@@ -1,0 +1,387 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Adding a classification method &mdash; ATM 0.1.2-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Adding a BTB Selector or Tuner" href="add_to_btb.html" />
+    <link rel="prev" title="Contributing to ATM and BTB" href="contributing.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ATM
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">ATM: Scalable model selection and tuning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#requirements">0. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#install-atm">1. Install ATM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="setup.html#install-using-pip">Install using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="setup.html#install-from-source">Install from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#start-using-atm">3. Start using ATM!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#create-a-datarun">Create a datarun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#execute-the-datarun">Execute the datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="database.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to ATM and BTB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#style">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#docs">Docs</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Adding a classification method</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/HDI-project/ATM/blob/master/docs/add_method.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="adding-a-classification-method">
+<h1>Adding a classification method<a class="headerlink" href="#adding-a-classification-method" title="Permalink to this headline">¶</a></h1>
+<p>ATM includes several classification methods out of the box, but it’s possible to
+add custom ones too.</p>
+<p>From 10,000 feet, a “method” in ATM comprises the following:</p>
+<ol class="arabic simple">
+<li><p>A Python class which defines a fit-predict interface;</p></li>
+<li><p>A set of <em>hyperparameters</em> that are (or may be) passed to the class’s
+constructor, and the range of values that each hyperparameter may take;</p></li>
+<li><p>A <em>conditional parameter tree</em> that defines how hyperparameters depend on one
+another; and</p></li>
+<li><p>A JSON file in <code class="docutils literal notranslate"><span class="pre">atm/methods/</span></code> that describes all of the above.</p></li>
+</ol>
+<div class="section" id="valid-method-classes">
+<h2>1. Valid method classes<a class="headerlink" href="#valid-method-classes" title="Permalink to this headline">¶</a></h2>
+<p>Every method must be implemented by a python class that has the following
+instance methods:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">fit</span></code>: accepts training data and labels (X and y) and trains a predictive model.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predict</span></code>: accepts a matrix of unlabeled feature vectors (X) and returns predictions for the corresponding labels (y).</p></li>
+</ol>
+<p>This follows the convention used by <a class="reference external" href="http://scikit-learn.org/stable/">scikit-learn</a>, and most of the classifier methods already included with ATM are <code class="docutils literal notranslate"><span class="pre">sklearn</span></code> classes. However, any custom python class that implements the fit/predict interface can be used with ATM.</p>
+<p>Once you have a class, you need to configure the relevant hyperparameters and tell ATM about your class.</p>
+</div>
+<div class="section" id="creating-the-json-file">
+<h2>2. Creating the JSON file<a class="headerlink" href="#creating-the-json-file" title="Permalink to this headline">¶</a></h2>
+<p>All configuration for a classification method must be described in a json file with the following format:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;bnb&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;class&quot;</span><span class="o">:</span> <span class="s2">&quot;sklearn.naive_bayes.BernoulliNB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hyperparameters&quot;</span><span class="o">:</span> <span class="p">{...},</span>
+    <span class="s2">&quot;root_hyperparameters&quot;</span><span class="o">:</span> <span class="p">[...],</span>
+    <span class="s2">&quot;conditions&quot;</span><span class="o">:</span> <span class="p">{...}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>“name” is a short string (or “code”) which ATM uses to refer to the method.</p></li>
+<li><p>“class” is an import path to the class which Python can interpret.</p></li>
+<li><p>“hyperparameters” is a list of hyperparameters which ATM will attempt to tune.</p></li>
+</ul>
+<div class="section" id="defining-hyperparameters">
+<h3>Defining hyperparameters<a class="headerlink" href="#defining-hyperparameters" title="Permalink to this headline">¶</a></h3>
+<p>Most parameter definitions have two fields: “type” and either “range” or “values”.
+The “type” is one of [“float”, “float_exp”, “float_cat”, “int”, “int_exp”,
+“int_cat”, “string”, “bool”]. Types ending in “_cat” are categorical
+types, and those ending in “_exp” are exponential types.</p>
+<ul class="simple">
+<li><p>If the type is ordinal or continuous (e.g. “int” or “float”), “range”
+defines the upper and lower bound on possible values for the parameter.
+Ranges are inclusive: [0.0, 1.0] includes both 0.0 and 1.0.</p></li>
+<li><p>If the type is categorical (e.g. “string” or “float_cat”), “values”
+defines the list of all possible values for the parameter.</p></li>
+</ul>
+<p>Example categorical types:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;nu&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="s2">&quot;float_cat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;values&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">]</span>  <span class="c1">// will select one of the listed values</span>
+<span class="p">}</span>
+
+<span class="s2">&quot;kernel&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;values&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="s2">&quot;rbf&quot;</span><span class="p">,</span> <span class="s2">&quot;matern&quot;</span><span class="p">]</span>  <span class="c1">// will select one of the listed strings</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Example (uniform) numeric type:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;max_depth&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;range&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>   <span class="c1">// will select integer values uniformly at random between 2 and 10, inclusive</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Example exponential numeric type:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;length_scale&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="s2">&quot;float_exp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;range&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="nx">e</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="nx">e5</span><span class="p">]</span>  <span class="c1">// will select floating-point values from an exponential distribution between 10^-5 and 10^5, inclusive</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="defining-the-conditional-parameter-tree">
+<h3>Defining the Conditional Parameter Tree<a class="headerlink" href="#defining-the-conditional-parameter-tree" title="Permalink to this headline">¶</a></h3>
+<p>There are two kinds of hyperparameters: <em>root hyperparameters</em> (also referred to
+as “method hyperparameters” in the paper) and <em>conditional parameters</em>. Root parameters
+must be passed to the method class’s constructor no matter what, and conditional
+parameters are only passed if specific values for other parameters are set.  For
+example, the GaussianProcessClassifier configuration has a single root
+parameter: <code class="docutils literal notranslate"><span class="pre">kernel</span></code>. This must be set no matter what. Depending on how it’s
+set, other parameters might need to be set as well. The format for conditions is
+as follows:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;root_parameter_name&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;value1&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;conditional_parameter_name&quot;</span><span class="p">,</span> <span class="p">...],</span>
+        <span class="s2">&quot;value2&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;other_conditional_parameter_name&quot;</span><span class="p">,</span> <span class="p">...]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In <code class="docutils literal notranslate"><span class="pre">gaussian_process.json</span></code>, there are three sets of parameters which are conditioned on the value of the root parameter <code class="docutils literal notranslate"><span class="pre">kernel</span></code>:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;root_parameters&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">],</span>
+
+<span class="s2">&quot;conditions&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;kernel&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;matern&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;nu&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;rational_quadratic&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;length_scale&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;exp_sine_squared&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;length_scale&quot;</span><span class="p">,</span> <span class="s2">&quot;periodicity&quot;</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">kernel</span></code> is set to “matern”, it means <code class="docutils literal notranslate"><span class="pre">nu</span></code> must also be set. If it’s set to “rational_quadratic” instead, <code class="docutils literal notranslate"><span class="pre">length_scale</span></code> and <code class="docutils literal notranslate"><span class="pre">alpha</span></code> must be set instead. Conditions can overlap – for instance, <code class="docutils literal notranslate"><span class="pre">length_scale</span></code> must be set if kernel is either “rational_quadratic” or “exp_sine_squared”, so it’s included in both conditional lists. The only constraint is that any parameter which is set as a result of a condition (i.e. a conditional parameter) must not be listed in “root_parameters”.</p>
+<p>The example above defines a conditional parameter tree that looks something like
+this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">kernel</span><span class="o">-----------------------</span>
+<span class="o">|</span>        \                   \
+<span class="n">matern</span>    <span class="n">rational_quadratic</span>  <span class="n">exp_sine_squared</span>
+<span class="o">|</span>         <span class="o">|</span>           <span class="o">|</span>       <span class="o">|</span>             <span class="o">|</span>
+<span class="n">nu</span>      <span class="n">length_scale</span>  <span class="n">alpha</span>   <span class="n">length_scale</span>  <span class="n">periodicity</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="optional-adding-a-new-method-to-the-atm-library">
+<h2>3. (Optional) Adding a new method to the ATM library<a class="headerlink" href="#optional-adding-a-new-method-to-the-atm-library" title="Permalink to this headline">¶</a></h2>
+<p>We are always looking for new methods to add to ATM’s core! If your method is
+implemented as part of a publicly-available Python library which is compatible
+with ATM’s other dependencies, you can submit it for permanent inclusion in the
+library.</p>
+<p>Save a copy of your configuration json in the <code class="docutils literal notranslate"><span class="pre">atm/methods/</span></code> directory. Then, in
+in the <code class="docutils literal notranslate"><span class="pre">METHODS_MAP</span></code> dictionary in <code class="docutils literal notranslate"><span class="pre">atm/constants.py</span></code>, enter a mapping from
+a short string representing your method’s name to the name of its json file. For
+example, <code class="docutils literal notranslate"><span class="pre">'dt':</span> <span class="pre">'decision_tree.json'</span></code>. If necessary, add the library where
+your method lives to <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code>.</p>
+<p>Test out your method with <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">scripts/test_method.py</span> <span class="pre">--method</span>
+<span class="pre">&lt;your_method_code&gt;</span></code>.  If all hyperpartitions run error-free, you’re probably
+good to go.  Commit your changes to a separate branch, then open up a pull
+request in the main repository. Explain why your method is a useful addition to
+ATM, and we’ll merge it in if we agree!</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="add_to_btb.html" class="btn btn-neutral float-right" title="Adding a BTB Selector or Tuner" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="contributing.html" class="btn btn-neutral float-left" title="Contributing to ATM and BTB" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
