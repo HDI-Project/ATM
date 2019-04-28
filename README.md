@@ -6,9 +6,8 @@
 
 
 [![CircleCI][circleci-img]][circleci-url]
-[![Travis](https://travis-ci.org/HDI-Project/ATM.svg?branch=master)](https://travis-ci.org/HDI-Project/ATM)
+[![Travis][travis-img]][travis-url]
 [![Coverage status][codecov-img]][codecov-url]
-[![Documentation][rtd-img]][rtd-url]
 
 [circleci-img]: https://circleci.com/gh/HDI-Project/ATM.svg?style=shield
 [circleci-url]: https://circleci.com/gh/HDI-Project/ATM
@@ -18,14 +17,12 @@
 [pypi-url]: https://pypi.python.org/pypi/atm
 [codecov-img]: https://codecov.io/gh/HDI-project/ATM/branch/master/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/HDI-project/ATM
-[rtd-img]: https://readthedocs.org/projects/atm/badge/?version=latest
-[rtd-url]: http://atm.readthedocs.io/en/latest/
 
 
 # ATM - Auto Tune Models
 
 - Free software: MIT license
-- Documentation: http://atm.readthedocs.io/en/latest/
+- Documentation: https://hdi-project.github.io/ATM/
 
 
 ATM is an open source software library under the
