@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import errno
 import glob
 import logging
+import multiprocessing
 import os
 import shutil
+import signal
 import socket
 import time
-from multiprocessing import Pool, Process, Queue
 
-import daemon
 import psutil
-from daemon.pidfile import PIDLockFile
+from daemon import DaemonContext
+from lockfile.pidlockfile import PIDLockFile
 
 from atm.api import create_app
 from atm.config import (
@@ -91,9 +93,9 @@ def _process_datarun(args, queue):
 def _worker_loop(args):
     db = _get_db(args)
 
-    queue = Queue(1)
+    queue = multiprocessing.Queue(1)
     LOGGER.info('Starting %s worker processes', args.workers)
-    with Pool(args.workers, _process_datarun, (args, queue, )):
+    with multiprocessing.Pool(args.workers, _process_datarun, (args, queue, )):
         while True:
             datarun = _get_next_datarun(db)
 
@@ -107,32 +109,98 @@ def _worker_loop(args):
             queue.put(datarun.id)
 
 
+def _get_pid_path(pid):
+    """Returns abspath of the pid file which is stored on the cwd."""
+    pid_path = pid
+
+    if not os.path.isabs(pid_path):
+        pid_path = os.path.join(os.getcwd(), pid_path)
+
+    return pid_path
+
+
+def _get_next(cmd_line, _position):
+    next_position = _position + 1
+
+    if len(cmd_line) >= next_position:
+        return cmd_line[next_position]
+
+
+def _status_check(args, return_process=False):
+    """Check the status if there is an ATM server running."""
+    pid_path = _get_pid_path(args.pid)
+
+    pid_file = PIDLockFile(pid_path)
+
+    if pid_file.is_locked():
+        try:
+            pid = pid_file.read_pid()
+            process = psutil.Process(pid)
+            cmd_line = process.cmdline()
+
+            if return_process:
+                return process
+
+            workers = 1  # Default
+            server = False
+            host = '127.0.0.0'
+            port = '8000'
+
+            for _position in range(len(cmd_line)):
+                if cmd_line[_position] == '-w' or cmd_line[_position] == ['--workers']:
+                    workers = _get_next(cmd_line, _position) or 1
+
+                if cmd_line[_position] == '--server':
+                    server = True
+
+                if server:
+                    if cmd_line[_position] == '--host':
+                        host = _get_next(cmd_line, _position)
+
+                    if cmd_line[_position] == '--port':
+                        port = _get_next(cmd_line, _position)
+
+            if workers != 1:
+                print('ATM is currently runing with {} workers.'.format(workers))
+
+            else:
+                print('ATM is currently runing with 1 worker.')
+
+            if server:
+                print('ATM Server is running at http://{}:{}'.format(host, port))
+
+            return True
+
+        except psutil.NoSuchProcess:
+            print('ATM process not running for the indicated PID file.')
+            return False
+
+
+def _status(args):
+    """Check if the current ATM process is runing."""
+    if not _status_check(args):
+        print('ATM is not runing at the moment.')
+
+
 def _stop(args):
     """Stop the current running process of ATM."""
-    pid_path = args.pid
-    if not os.path.isabs(pid_path):
-        pid_path = os.path.join(os.getcwd(), args.pid)
+    process = _status_check(args, return_process=True)
 
-    try:
-        with open(pid_path, 'r') as f:
-            pid = int(f.read())
+    if process:
+        try:
+            process.terminate()
+            print('ATM process stopped correctly.')
 
-        process = psutil.Process(pid)
-        command = process.as_dict().get('cmdline')
-        if 'atm' in command and 'start' in command:
+        except psutil.:
+            time.sleep(3)
             process.kill()
-
-        print('ATM stopped successfully')
-
-    except (FileNotFoundError, psutil.NoSuchProcess) as e:
-        print('ATM process not found, try different pid file?')
 
 
 def _start_background(args):
     if args.server:
         LOGGER.info('Starting the REST API server')
 
-        process = Process(target=_serve, args=(args, ))
+        process = multiprocessing.Process(target=_serve, args=(args, ))
         process.daemon = True
 
         process.start()
@@ -141,15 +209,16 @@ def _start_background(args):
 
 
 def _start(args):
+    if not _status_check(args):
+        pid_path = _get_pid_path(args.pid)
+        pid_file = PIDLockFile(pid_path)
 
-    pid_path = args.pid
-    if not os.path.isabs(pid_path):
-        pid_path = os.path.join(os.getcwd(), args.pid)
+        context = DaemonContext()
+        context.pidfile = pid_file
+        context.working_directory = os.getcwd()
 
-    pid_file = PIDLockFile(pid_path)
-
-    with daemon.DaemonContext(pidfile=pid_file, working_directory=os.getcwd()):
-        _start_background(args)
+        with context:
+            _start_background(args)
 
 
 def _enter_data(args):
@@ -234,6 +303,11 @@ def _get_parser():
     start.add_argument('--host', help='IP to listen at')
     start.add_argument('--port', help='Port to listen at', type=int)
     start.add_argument('--pid', help='PID file to use.', default='atm.pid')
+
+    # Status
+    status = subparsers.add_parser('status', parents=[parent])
+    status.set_defaults(action=_status)
+    status.add_argument('--pid', help='PID file to use.', default='atm.pid')
 
     # Stop
     stop = subparsers.add_parser('stop', parents=[parent])
