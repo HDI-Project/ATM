@@ -119,81 +119,49 @@ def _get_pid_path(pid):
     return pid_path
 
 
-def _get_next(cmd_line, _position):
-    next_position = _position + 1
-
-    if len(cmd_line) >= next_position:
-        return cmd_line[next_position]
-
-
-def _status_check(args, return_process=False):
-    """Check the status if there is an ATM server running."""
-    pid_path = _get_pid_path(args.pid)
-
+def _get_atm_process(pid_path):
     pid_file = PIDLockFile(pid_path)
 
     if pid_file.is_locked():
+        pid = pid_file.read_pid()
+
         try:
-            pid = pid_file.read_pid()
             process = psutil.Process(pid)
-            cmd_line = process.cmdline()
-
-            if return_process:
+            if process.name() == 'atm':
                 return process
-
-            workers = 1  # Default
-            server = False
-            host = '127.0.0.0'
-            port = '8000'
-
-            for _position in range(len(cmd_line)):
-                if cmd_line[_position] == '-w' or cmd_line[_position] == ['--workers']:
-                    workers = _get_next(cmd_line, _position) or 1
-
-                if cmd_line[_position] == '--server':
-                    server = True
-
-                if server:
-                    if cmd_line[_position] == '--host':
-                        host = _get_next(cmd_line, _position)
-
-                    if cmd_line[_position] == '--port':
-                        port = _get_next(cmd_line, _position)
-
-            if workers != 1:
-                print('ATM is currently runing with {} workers.'.format(workers))
-
             else:
-                print('ATM is currently runing with 1 worker.')
-
-            if server:
-                print('ATM Server is running at http://{}:{}'.format(host, port))
-
-            return True
+                pid_file.break_lock()
 
         except psutil.NoSuchProcess:
-            print('ATM process not running for the indicated PID file.')
-            return False
+            pid_file.break_lock()
 
 
 def _status(args):
     """Check if the current ATM process is runing."""
-    if not _status_check(args):
-        print('ATM is not runing at the moment.')
 
-
-def _stop(args):
-    """Stop the current running process of ATM."""
-    process = _status_check(args, return_process=True)
+    pid_path = _get_pid_path(args.pid)
+    process = _get_atm_process(pid_path)
 
     if process:
-        try:
-            process.terminate()
-            print('ATM process stopped correctly.')
+        workers = 0
+        addr = None
+        for child in process.children():
+            connections = child.connections()
+            if connections:
+                connection = connections[0]
+                addr = connection.laddr
 
-        except psutil.:
-            time.sleep(3)
-            process.kill()
+            else:
+                workers += 1
+
+        s = 's' if workers > 1 else ''
+        print('ATM is running with {} worker{}'.format(workers, s))
+
+        if addr:
+            print('ATM REST server is listening on http://{}:{}'.format(addr.ip, addr.port))
+
+    else:
+        print('ATM is not runing.')
 
 
 def _start_background(args):
@@ -205,12 +173,18 @@ def _start_background(args):
 
         process.start()
 
-    _worker_loop(args)
+    if args.workers:
+        _worker_loop(args)
 
 
 def _start(args):
-    if not _status_check(args):
-        pid_path = _get_pid_path(args.pid)
+    pid_path = _get_pid_path(args.pid)
+    process = _get_atm_process(pid_path)
+
+    if process:
+        print('ATM is already running!')
+
+    else:
         pid_file = PIDLockFile(pid_path)
 
         context = DaemonContext()
@@ -218,7 +192,42 @@ def _start(args):
         context.working_directory = os.getcwd()
 
         with context:
+            # Set up default logs
+            if not args.logfile:
+                _logging_setup(args.verbose, 'atm.log')
+
+            print('Starting ATM')
             _start_background(args)
+
+
+def _stop(args):
+    """Stop the current running process of ATM."""
+    pid_path = _get_pid_path(args.pid)
+    process = _get_atm_process(pid_path)
+
+    if process:
+        process.terminate()
+
+        for _ in range(args.timeout):
+            if process.is_running():
+                time.sleep(1)
+            else:
+                break
+
+        if process.is_running():
+            print('ATM was not able to stop after {} seconds.'.format(args.timeout))
+            if args.force:
+                print('Killing it.')
+                process.kill()
+            else:
+                print('Use --force to kill it.')
+
+        else:
+            print('ATM stopped correctly.')
+
+    else:
+        print('ATM is not running.')
+
 
 
 def _enter_data(args):
@@ -313,6 +322,10 @@ def _get_parser():
     stop = subparsers.add_parser('stop', parents=[parent])
     stop.set_defaults(action=_stop)
     stop.add_argument('--pid', help='PID file to use.', default='atm.pid')
+    stop.add_argument('-t', '--timeout', default=5, type=int,
+                      help='Seconds to wait before killing the process.')
+    stop.add_argument('-f', '--force', action='store_true',
+                      help='Kill the process if it does not terminate gracefully.')
 
     # Make Config
     make_config = subparsers.add_parser('make_config', parents=[parent])
@@ -323,7 +336,7 @@ def _get_parser():
 
 def _logging_setup(verbosity=1, logfile=None):
     logger = logging.getLogger()
-    log_level = (3 - verbosity) * 10
+    log_level = (2 - verbosity) * 10
     fmt = '%(asctime)s - %(process)d - %(levelname)s - %(module)s - %(message)s'
     formatter = logging.Formatter(fmt)
     logger.setLevel(log_level)
