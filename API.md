@@ -278,3 +278,182 @@ And the output will be (note that some parts have been cut):
   "total_pages": 1
 }
 ```
+
+
+## Starting the REST API Server and Workers in daemon
+
+**ATM** comes with the possibility to start a daemon process (in background) with the workers
+and the REST API server. This will allow you to update dynamicly the database while new dataruns
+are created for the workers.
+
+### 1. Start the ATM process
+
+By default **ATM** launches one worker in background if we just run the following command:
+
+```bash
+atm start
+```
+
+After starting this process, we can type:
+
+```bash
+atm status
+```
+
+And an output like this will be displayed in our console:
+
+```
+ATM is running with 1 worker
+```
+
+In order to stop this process just run:
+
+```bash
+atm stop
+```
+
+An output like this should be printed in the console:
+
+```
+ATM stopped correctly.
+```
+
+### 2. Start the ATM process with more than one worker
+
+If we would like to launch more than one worker, we can use the argument `--workers WORKERS` or
+`-w WORKERS`.
+
+```bash
+atm start -w 4
+```
+
+**Bear in mind**, if the `atm` process is allready running, a message indicating so will be
+displayed when trying to start a new process.
+
+Then if you check the `status` of `atm`:
+
+```bash
+atm status
+```
+
+The expected output is:
+
+```
+ATM is running with 4 workers
+```
+
+
+### 3. Start the ATM process with the REST API server
+
+The `atm start` command accepts as an argument `--server` which will launch alongside the workers
+the same REST API server as described before.
+
+```bash
+atm start --server
+```
+
+If you run `atm status` to check it's status the expected output should be as follows:
+
+```
+ATM is running with 1 worker
+ATM REST server is listening on http://127.0.0.1:5000
+```
+
+### 4. Additional arguments for ATM Start
+
+* `--sql-config SQL_CONFIG` Path to yaml SQL config file.
+* `--sql-dialect {sqlite,mysql}` Dialect of SQL to use.
+* `--sql-database SQL_DATABASE` Name of, or path to, SQL database.
+* `--sql-username SQL_USERNAME` Username for SQL database.
+* `--sql-password SQL_PASSWORD` Password for SQL database.
+
+* `--sql-host SQL_HOST` Hostname for database machine.
+* `--sql-port SQL_PORT` Port used to connect to database.
+
+* `--sql-query SQL_QUERY` Specify extra login details.
+* `--aws-config AWS_CONFIG` path to yaml AWS config file.
+* `--aws-access-key AWS_ACCESS_KEY` AWS access key.
+* `--aws-secret-key AWS_SECRET_KEY` AWS secret key.
+* `--aws-s3-bucket AWS_S3_BUCKET` AWS S3 bucket to store data.
+* `--aws-s3-folder AWS_S3_FOLDER` Folder in AWS S3 bucket in which to store data.
+
+* `--log-config LOG_CONFIG` path to yaml logging config file.
+* `--model-dir MODEL_DIR` Directory where computed models will be saved.
+* `--metric-dir METRIC_DIR` Directory where model metrics will be saved.
+* `--log-dir LOG_DIR`     Directory where logs will be saved.
+
+* `--verbose-metrics` If set, compute full ROC and PR curves and per-label
+metrics for each classifier.
+
+* `--log-level-file` {critical,error,warning,info,debug,none} minimum log level to write to the
+log file.
+
+* `--log-level-stdout` {critical,error,warning,info,debug,none}
+minimum log level to write to stdout.
+
+* `--cloud-mode` Wheter to run this worker/s in cloud mode.
+* `--no-save` Do not save models and metrics at all.
+* `-w WORKERS` `--workers WORKERS` Number of workers.
+* `--server` Also start the REST server.
+* `--host HOST` IP to listen at.
+* `--port PORT` Port to listen at.
+* `--pid PID` PID file to use (we can use a different one in order to launch more than one process.
+
+
+### 4. Stop the ATM process
+
+As we saw before, by runing the command `atm stop` we will `terminate` the ATM process. However
+this command accepts a few arguments in order to control this behaviour:
+
+* `-t TIMEOUT`, `--timeout TIMEOUT`, time to wait in order to check if the process has been
+terminated.
+
+* `-f`, `--force`, Kill the process if it does not terminate gracefully.
+
+### 5. Starting multiple ATM processes
+
+**ATM** also has the posibility to launch more than one process. In order to do so, we use a `pid`
+file.
+
+By default, the `pid` file used by **ATM** is called `atm.pid`, however, you can change this name
+by adding the argument `--pid` when starting **ATM**.
+
+For example, we will start our ATM with the default values (1 worker and `atm.pid`):
+
+```bash
+atm start
+```
+
+If we run the status, this will display the following information:
+
+```
+ATM is running with 1 worker
+```
+
+Now if we would like to wake more workers we can run:
+
+```bash
+atm start --workers 4 --pid additional_workers.pid
+```
+
+In order to run the `atm status` for this `pid` add it as argument to it:
+
+```bash
+atm status --pid additional_workers.pid
+```
+
+The output of this command will be:
+
+```
+ATM is running with 4 workers
+```
+
+As you can see you will have now 5 workers running as the `SQL` configuration is the same and this
+will be pointing to that database.
+
+In order to stop the `additional_workers` process, we run `atm stop` with the `pid` file as
+argument:
+
+```bash
+atm stop --pid additional_workers.pid
+```

@@ -25,6 +25,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def _get_db(args):
+    """Returns an instance of Database with the given args."""
     db_args = {
         k[4:]: v
         for k, v in vars(args).items()
@@ -34,6 +35,7 @@ def _get_db(args):
 
 
 def _work(args):
+    """Creates a single worker on the current terminal / window."""
     db = _get_db(args)
     run_conf, aws_conf, log_conf = load_config(**vars(args))
 
@@ -50,12 +52,14 @@ def _work(args):
 
 
 def _serve(args):
+    """Launch the ATM API with the given host / port."""
     db = _get_db(args)
     app = create_app(db, False)
     app.run(host=args.host, port=args.port)
 
 
 def _get_next_datarun(db):
+    """Get the following datarun with the max priority."""
     dataruns = db.get_dataruns(ignore_complete=True)
     if dataruns:
         max_priority = max([datarun.priority for datarun in dataruns])
@@ -64,6 +68,7 @@ def _get_next_datarun(db):
 
 
 def _process_datarun(args, queue):
+    """Process the datarun with the worker."""
     run_conf, aws_conf, log_conf = load_config(**vars(args))
     db = _get_db(args)
 
@@ -89,6 +94,9 @@ def _process_datarun(args, queue):
 
 
 def _worker_loop(args):
+    """We create a multiprocessing Queue and then a pool with the number of workers specified
+    by the args which stay on a loop listening for new entries inside the database.
+    """
     db = _get_db(args)
 
     queue = multiprocessing.Queue(1)
@@ -118,6 +126,7 @@ def _get_pid_path(pid):
 
 
 def _get_atm_process(pid_path):
+    """Return `psutil.Process` of the `pid` file. If the pidfile is stale it will release it."""
     pid_file = PIDLockFile(pid_path)
 
     if pid_file.is_locked():
@@ -163,6 +172,7 @@ def _status(args):
 
 
 def _start_background(args):
+    """Launches the server/worker in daemon process."""
     if args.server:
         LOGGER.info('Starting the REST API server')
 
@@ -176,6 +186,7 @@ def _start_background(args):
 
 
 def _start(args):
+    """Create a new process of ATM pointing the process to a certain `pid` file."""
     pid_path = _get_pid_path(args.pid)
     process = _get_atm_process(pid_path)
 
@@ -333,7 +344,7 @@ def _get_parser():
 
 def _logging_setup(verbosity=1, logfile=None):
     logger = logging.getLogger()
-    log_level = (2 - verbosity) * 10
+    log_level = (3 - verbosity) * 10
     fmt = '%(asctime)s - %(process)d - %(levelname)s - %(module)s - %(message)s'
     formatter = logging.Formatter(fmt)
     logger.setLevel(log_level)
