@@ -341,10 +341,10 @@ def _get_parser():
     restart.set_defaults(action=_restart)
     _add_common_arguments(restart)
     restart.add_argument('--cloud-mode', action='store_true', default=False,
-                       help='Whether to run this worker in cloud mode')
+                         help='Whether to run this worker in cloud mode')
     restart.add_argument('--no-save', dest='save_files', default=True,
-                       action='store_const', const=False,
-                       help="don't save models and metrics at all")
+                         action='store_const', const=False,
+                         help="don't save models and metrics at all")
     restart.add_argument('-w', '--workers', default=1, type=int, help='Number of workers')
     restart.add_argument('--no-server', action='store_true', help='Do not start the REST server')
     restart.add_argument('--host', help='IP to listen at')
