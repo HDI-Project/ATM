@@ -54,7 +54,7 @@ def _work(args):
 def _serve(args):
     """Launch the ATM API with the given host / port."""
     db = _get_db(args)
-    app = create_app(db, False)
+    app = create_app(db, args.debug)
     app.run(host=args.host, port=args.port)
 
 
@@ -173,7 +173,7 @@ def _status(args):
 
 def _start_background(args):
     """Launches the server/worker in daemon process."""
-    if args.server:
+    if not args.no_server:
         LOGGER.info('Starting the REST API server')
 
         process = multiprocessing.Process(target=_serve, args=(args, ))
@@ -316,10 +316,11 @@ def _get_parser():
                        help="don't save models and metrics at all")
     start.add_argument('-w', '--workers', default=1, type=int, help='Number of workers')
 
-    start.add_argument('--server', action='store_true', help='Also start the REST server')
+    start.add_argument('--no-server', action='store_true', help='Do not start the REST server')
     start.add_argument('--host', help='IP to listen at')
     start.add_argument('--port', help='Port to listen at', type=int)
     start.add_argument('--pid', help='PID file to use.', default='atm.pid')
+    start.add_argument('--debug', action='store_true', help='Start the server in debug mode.')
 
     # Status
     status = subparsers.add_parser('status', parents=[parent])

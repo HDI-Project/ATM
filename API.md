@@ -11,36 +11,48 @@ In order to start a REST API server, after installing ATM open a terminal, activ
 virtualenv, and execute this command:
 
 ```bash
-atm server
+atm start
 ```
 
-An output similar to this one should apear in the terminal:
 
-```bash
- * Serving Flask app "api.setup" (lazy loading)
- * Environment: production
-   WARNING: Do not use the development server in a production environment.
-   Use a production WSGI server instead.
- * Debug mode: on
- * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 150-127-826
-```
-
-After this, the REST server will be listening at the port 5000 of you machine, and if you
-point your browser at http://127.0.0.1:5000/, you will see the documentation
-website that shows information about all the REST operations allowed by the API.
+This will start **ATM** server as a background service. The REST server will be listening at the
+port 5000 of your machine, and if you point your browser at http://127.0.0.1:5000/, you will see
+the documentation website that shows information about all the REST operations allowed by the API.
 
 Optionally, the `--port <port>` can be added to modify the port which the server listents at:
 
 ```bash
-atm server --port 1234
+atm start --port 1234
 ```
 
-In order to stop the server you can press <kbd>Ctrl</kbd>+<kbd>c</kbd>, but for now
-you can keep it running and head to the next section.
+If you would like to see the status of the server process you can run:
 
+```bash
+atm status
+```
+
+An output similar to this one will appear:
+
+```bash
+ATM is running with 1 worker
+ATM REST server is listening on http://127.0.0.1:5000
+```
+
+In order to stop the server you can run the following command:
+
+```bash
+atm stop
+```
+
+Notice that `atm start` will start one worker by default. If you would like to launch more than one,
+you can do so by adding the argument `--workers <number_of_workers` or `-w <number_of_workers>`.
+
+```bash
+atm start --workers 4
+```
+
+For more detailed options you can run `atm start --help` to obtain a list with the arguments
+that are being accepted.
 
 ## Quickstart
 
@@ -56,12 +68,14 @@ Before proceeding any further, please make sure the have already populated your 
 at least one model tuning process.
 
 An easy way to do this is to follow the quickstart from the ATM [README.md](README.md) file,
-which means having run these two commands:
+which means having run these command:
 
 ```
 atm enter_data
-atm worker
 ```
+
+The workers that you started before will proceed the data that has been inserted and will populate
+the database.
 
 ### 2. REST Models
 
@@ -280,180 +294,66 @@ And the output will be (note that some parts have been cut):
 ```
 
 
-## Starting the REST API Server and Workers in daemon
+## Additional information
 
-**ATM** comes with the possibility to start a daemon process (in background) with the workers
-and the REST API server. This will allow you to update dynamicly the database while new dataruns
-are created for the workers.
+### Start additional process with different pid file
 
-### 1. Start the ATM process
+If you would like to run more workers or you would like to launch a second **ATM** process, you can
+do so by specifying a different `PID` file.
 
-By default **ATM** launches one worker in background if we just run the following command:
-
-```bash
-atm start
-```
-
-After starting this process, we can type:
+For example:
 
 ```bash
-atm status
+atm start --no-server -w 4  --pid additional_workers.pid
 ```
 
-And an output like this will be displayed in our console:
-
-```
-ATM is running with 1 worker
-```
-
-In order to stop this process just run:
+To check the status of this process we have to run:
 
 ```bash
-atm stop
+atm status --pid additional_workers.pid
 ```
 
-An output like this should be printed in the console:
-
-```
-ATM stopped correctly.
-```
-
-### 2. Start the ATM process with more than one worker
-
-If we would like to launch more than one worker, we can use the argument `--workers WORKERS` or
-`-w WORKERS`.
+This will print an output like this:
 
 ```bash
-atm start -w 4
-```
-
-**Bear in mind**, if the `atm` process is allready running, a message indicating so will be
-displayed when trying to start a new process.
-
-Then if you check the `status` of `atm`:
-
-```bash
-atm status
-```
-
-The expected output is:
-
-```
 ATM is running with 4 workers
 ```
 
+### Stop the ATM process
 
-### 3. Start the ATM process with the REST API server
-
-The `atm start` command accepts as an argument `--server` which will launch alongside the workers
-the same REST API server as described before.
-
-```bash
-atm start --server
-```
-
-If you run `atm status` to check it's status the expected output should be as follows:
-
-```
-ATM is running with 1 worker
-ATM REST server is listening on http://127.0.0.1:5000
-```
-
-### 4. Additional arguments for ATM Start
-
-* `--sql-config SQL_CONFIG` Path to yaml SQL config file.
-* `--sql-dialect {sqlite,mysql}` Dialect of SQL to use.
-* `--sql-database SQL_DATABASE` Name of, or path to, SQL database.
-* `--sql-username SQL_USERNAME` Username for SQL database.
-* `--sql-password SQL_PASSWORD` Password for SQL database.
-
-* `--sql-host SQL_HOST` Hostname for database machine.
-* `--sql-port SQL_PORT` Port used to connect to database.
-
-* `--sql-query SQL_QUERY` Specify extra login details.
-* `--aws-config AWS_CONFIG` path to yaml AWS config file.
-* `--aws-access-key AWS_ACCESS_KEY` AWS access key.
-* `--aws-secret-key AWS_SECRET_KEY` AWS secret key.
-* `--aws-s3-bucket AWS_S3_BUCKET` AWS S3 bucket to store data.
-* `--aws-s3-folder AWS_S3_FOLDER` Folder in AWS S3 bucket in which to store data.
-
-* `--log-config LOG_CONFIG` path to yaml logging config file.
-* `--model-dir MODEL_DIR` Directory where computed models will be saved.
-* `--metric-dir METRIC_DIR` Directory where model metrics will be saved.
-* `--log-dir LOG_DIR`     Directory where logs will be saved.
-
-* `--verbose-metrics` If set, compute full ROC and PR curves and per-label
-metrics for each classifier.
-
-* `--log-level-file` {critical,error,warning,info,debug,none} minimum log level to write to the
-log file.
-
-* `--log-level-stdout` {critical,error,warning,info,debug,none}
-minimum log level to write to stdout.
-
-* `--cloud-mode` Wheter to run this worker/s in cloud mode.
-* `--no-save` Do not save models and metrics at all.
-* `-w WORKERS` `--workers WORKERS` Number of workers.
-* `--server` Also start the REST server.
-* `--host HOST` IP to listen at.
-* `--port PORT` Port to listen at.
-* `--pid PID` PID file to use (we can use a different one in order to launch more than one process.
-
-
-### 4. Stop the ATM process
-
-As we saw before, by runing the command `atm stop` we will `terminate` the ATM process. However
+As we saw before, by runing the command `atm stop` you will `terminate` the ATM process. However
 this command accepts a few arguments in order to control this behaviour:
 
 * `-t TIMEOUT`, `--timeout TIMEOUT`, time to wait in order to check if the process has been
 terminated.
 
 * `-f`, `--force`, Kill the process if it does not terminate gracefully.
+* `--pid PIDFILE`, PID file to use
 
-### 5. Starting multiple ATM processes
+### Start the ATM REST API server in foreground
 
-**ATM** also has the posibility to launch more than one process. In order to do so, we use a `pid`
-file.
-
-By default, the `pid` file used by **ATM** is called `atm.pid`, however, you can change this name
-by adding the argument `--pid` when starting **ATM**.
-
-For example, we will start our ATM with the default values (1 worker and `atm.pid`):
+If you would like to monitorize the server for debugging process, you can do so by runing the
+with the following command:
 
 ```bash
-atm start
+atm server
 ```
 
-If we run the status, this will display the following information:
-
-```
-ATM is running with 1 worker
-```
-
-Now if we would like to wake more workers we can run:
+An output similar to this one should apear in the terminal:
 
 ```bash
-atm start --workers 4 --pid additional_workers.pid
+ * Serving Flask app "api.setup" (lazy loading)
+ * Environment: production
+   WARNING: Do not use the development server in a production environment.
+   Use a production WSGI server instead.
+ * Debug mode: on
+ * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 150-127-826
 ```
 
-In order to run the `atm status` for this `pid` add it as argument to it:
+For additional arguments run `atm server --help`
 
-```bash
-atm status --pid additional_workers.pid
-```
-
-The output of this command will be:
-
-```
-ATM is running with 4 workers
-```
-
-As you can see you will have now 5 workers running as the `SQL` configuration is the same and this
-will be pointing to that database.
-
-In order to stop the `additional_workers` process, we run `atm stop` with the `pid` file as
-argument:
-
-```bash
-atm stop --pid additional_workers.pid
-```
+**Note** that this command will not launch any `workers` process. In order to launch a foreground
+worker you have to do so by runing `atm worker`.
