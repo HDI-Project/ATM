@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import errno
 import glob
 import logging
 import multiprocessing
 import os
 import shutil
-import signal
 import socket
 import time
 
@@ -227,7 +225,6 @@ def _stop(args):
 
     else:
         print('ATM is not running.')
-
 
 
 def _enter_data(args):
