@@ -319,6 +319,22 @@ This will print an output like this:
 ATM is running with 4 workers
 ```
 
+### Restart the ATM process
+
+If you have an **ATM** process running and you would like to restart it and add more workers to it
+or maybe change the port on which is running, you can achieve so with the `atm restart`:
+
+```bash
+atm restart
+```
+
+This command will restart the server with the default values, so if you would like to use other
+options you can run `--help` to see the accepted arguments:
+
+```bash
+atm restart --help
+```
+
 ### Stop the ATM process
 
 As we saw before, by runing the command `atm stop` you will `terminate` the ATM process. However

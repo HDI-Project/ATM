@@ -209,6 +209,12 @@ def _start(args):
             _start_background(args)
 
 
+def _restart(args):
+    if _stop(args):
+        time.sleep(1)
+        _start(args)
+
+
 def _stop(args):
     """Stop the current running process of ATM."""
     pid_path = _get_pid_path(args.pid)
@@ -228,11 +234,14 @@ def _stop(args):
             if args.force:
                 print('Killing it.')
                 process.kill()
+                return True
+
             else:
                 print('Use --force to kill it.')
 
         else:
             print('ATM stopped correctly.')
+            return True
 
     else:
         print('ATM is not running.')
@@ -326,6 +335,26 @@ def _get_parser():
     status = subparsers.add_parser('status', parents=[parent])
     status.set_defaults(action=_status)
     status.add_argument('--pid', help='PID file to use.', default='atm.pid')
+
+    # restart
+    restart = subparsers.add_parser('restart', parents=[parent])
+    restart.set_defaults(action=_restart)
+    _add_common_arguments(restart)
+    restart.add_argument('--cloud-mode', action='store_true', default=False,
+                       help='Whether to run this worker in cloud mode')
+    restart.add_argument('--no-save', dest='save_files', default=True,
+                       action='store_const', const=False,
+                       help="don't save models and metrics at all")
+    restart.add_argument('-w', '--workers', default=1, type=int, help='Number of workers')
+    restart.add_argument('--no-server', action='store_true', help='Do not start the REST server')
+    restart.add_argument('--host', help='IP to listen at')
+    restart.add_argument('--port', help='Port to listen at', type=int)
+    restart.add_argument('--pid', help='PID file to use.', default='atm.pid')
+    restart.add_argument('--debug', action='store_true', help='restart the server in debug mode.')
+    restart.add_argument('-t', '--timeout', default=5, type=int,
+                         help='Seconds to wait before killing the process.')
+    restart.add_argument('-f', '--force', action='store_true',
+                         help='Kill the process if it does not terminate gracefully.')
 
     # Stop
     stop = subparsers.add_parser('stop', parents=[parent])
