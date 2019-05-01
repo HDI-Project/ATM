@@ -5,7 +5,7 @@ import pytest
 from atm import PROJECT_ROOT
 from atm.config import RunConfig, SQLConfig
 from atm.database import Database, db_session
-from atm.enter_data import create_dataset, enter_data
+from atm.models import ATM
 from atm.utilities import get_local_data_path
 
 DB_PATH = '/tmp/atm.db'
@@ -64,7 +64,10 @@ def test_create_dataset(db):
                          test_path=test_url,
                          data_description='test',
                          class_column='class')
-    dataset = create_dataset(db, run_conf)
+
+    atm = ATM(db, run_conf, None, None)
+
+    dataset = atm.create_dataset()
     dataset = db.get_dataset(dataset.id)
 
     assert os.path.exists(train_path_local)
@@ -85,9 +88,11 @@ def test_enter_data_by_methods(dataset):
     db = Database(**vars(sql_conf))
     run_conf = RunConfig(dataset_id=dataset.id)
 
+    atm = ATM(db, run_conf, None, None)
+
     for method, n_parts in METHOD_HYPERPARTS.items():
         run_conf.methods = [method]
-        run_id = enter_data(sql_conf, run_conf)
+        run_id = atm.enter_data()
 
         assert db.get_datarun(run_id)
         with db_session(db):
@@ -102,7 +107,9 @@ def test_enter_data_all(dataset):
     run_conf = RunConfig(dataset_id=dataset.id,
                          methods=METHOD_HYPERPARTS.keys())
 
-    run_id = enter_data(sql_conf, run_conf)
+    atm = ATM(db, run_conf, None, None)
+
+    run_id = atm.enter_data()
 
     with db_session(db):
         run = db.get_datarun(run_id)
@@ -113,9 +120,12 @@ def test_enter_data_all(dataset):
 def test_run_per_partition(dataset):
     sql_conf = SQLConfig(database=DB_PATH)
     db = Database(**vars(sql_conf))
+
     run_conf = RunConfig(dataset_id=dataset.id, methods=['logreg'])
 
-    run_ids = enter_data(sql_conf, run_conf, run_per_partition=True)
+    atm = ATM(db, run_conf, None, None)
+
+    run_ids = atm.enter_data(run_per_partition=True)
 
     with db_session(db):
         runs = []

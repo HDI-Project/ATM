@@ -48,9 +48,9 @@ clean-pyc: ## remove Python file artifacts
 
 .PHONY: clean-docs
 clean-docs: ## remove previously built docs
-	rm -rf docs/build
-	rm -f docs/atm.rst
-	rm -f docs/atm.*.rst
+	rm -rf docs/_build
+	rm -f docs/api/atm.rst
+	rm -f docs/api/atm.*.rst
 	rm -f docs/modules.rst
 	$(MAKE) -C docs clean
 

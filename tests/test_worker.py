@@ -15,7 +15,7 @@ from atm.classifier import Model
 from atm.config import LogConfig, RunConfig, SQLConfig
 from atm.constants import METRICS_BINARY, TIME_FMT
 from atm.database import Database, db_session
-from atm.enter_data import enter_data
+from atm.models import ATM
 from atm.utilities import download_data, load_metrics, load_model
 from atm.worker import ClassifierError, Worker
 
@@ -109,8 +109,9 @@ def get_new_worker(**kwargs):
     kwargs['methods'] = kwargs.get('methods', ['logreg', 'dt'])
     sql_conf = SQLConfig(database=DB_PATH)
     run_conf = RunConfig(**kwargs)
-    run_id = enter_data(sql_conf, run_conf)
     db = Database(**vars(sql_conf))
+    atm = ATM(db, run_conf, None, None)
+    run_id = atm.enter_data()
     datarun = db.get_datarun(run_id)
     return Worker(db, datarun)
 
