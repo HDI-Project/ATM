@@ -136,3 +136,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# pid
+*.pid

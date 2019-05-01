@@ -12,14 +12,13 @@ def make_absolute(url):
     return url
 
 
-def create_app(atm):
+def create_app(db, debug=False):
     app = Flask(__name__)
-    app.config['DEBUG'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = make_absolute(atm.db.engine.url)
-    db = SQLAlchemy(app)
+    app.config['DEBUG'] = debug
+    app.config['SQLALCHEMY_DATABASE_URI'] = make_absolute(db.engine.url)
 
     # Create the Flask-Restless API manager.
-    manager = APIManager(app, flask_sqlalchemy_db=db)
+    manager = APIManager(app, flask_sqlalchemy_db=SQLAlchemy(app))
 
     # Create API endpoints, which will be available at /api/<tablename> by
     # default. Allowed HTTP methods can be specified as well.
@@ -28,9 +27,9 @@ def create_app(atm):
     def swagger():
         return redirect('/static/swagger/swagger-ui/index.html')
 
-    manager.create_api(atm.db.Dataset, methods=['GET'])
-    manager.create_api(atm.db.Datarun, methods=['GET'])
-    manager.create_api(atm.db.Hyperpartition, methods=['GET'])
-    manager.create_api(atm.db.Classifier, methods=['GET'])
+    manager.create_api(db.Dataset, methods=['GET'])
+    manager.create_api(db.Datarun, methods=['GET'])
+    manager.create_api(db.Hyperpartition, methods=['GET'])
+    manager.create_api(db.Classifier, methods=['GET'])
 
     return app

@@ -15,6 +15,7 @@ Contents:
    setup
    quickstart
    database
+   api
    contributing
    add_method
    add_to_btb
