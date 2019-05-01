@@ -106,6 +106,25 @@
 <li class="toctree-l2"><a class="reference internal" href="../../database.html#classifiers">Classifiers</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">REST API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#starting-the-rest-api-server">Starting the REST API Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#generate-some-data">1. Generate some data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#rest-models">2. REST Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-all-objects-from-a-model">3. Get all objects from a model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-a-single-object-by-id">4. Get a single object by id</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-all-the-children-objects">5. Get all the children objects</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#additional-information">Additional information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#restart-the-atm-process">Restart the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#stop-the-atm-process">Stop the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to ATM and BTB</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../contributing.html#ways-to-contribute">Ways to contribute</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../contributing.html#requirements">Requirements</a></li>
@@ -192,24 +211,48 @@
 
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">psutil</span>
+<span class="kn">from</span> <span class="nn">daemon</span> <span class="k">import</span> <span class="n">DaemonContext</span>
+<span class="kn">from</span> <span class="nn">lockfile.pidlockfile</span> <span class="k">import</span> <span class="n">PIDLockFile</span>
 
 <span class="kn">from</span> <span class="nn">atm.api</span> <span class="k">import</span> <span class="n">create_app</span>
 <span class="kn">from</span> <span class="nn">atm.config</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">add_arguments_aws_s3</span><span class="p">,</span> <span class="n">add_arguments_datarun</span><span class="p">,</span> <span class="n">add_arguments_logging</span><span class="p">,</span> <span class="n">add_arguments_sql</span><span class="p">)</span>
+    <span class="n">add_arguments_aws_s3</span><span class="p">,</span> <span class="n">add_arguments_datarun</span><span class="p">,</span> <span class="n">add_arguments_logging</span><span class="p">,</span> <span class="n">add_arguments_sql</span><span class="p">,</span>
+    <span class="n">load_config</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">atm.database</span> <span class="k">import</span> <span class="n">Database</span>
 <span class="kn">from</span> <span class="nn">atm.models</span> <span class="k">import</span> <span class="n">ATM</span>
+<span class="kn">from</span> <span class="nn">atm.worker</span> <span class="k">import</span> <span class="n">ClassifierError</span><span class="p">,</span> <span class="n">Worker</span>
+
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_end_to_end_test</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;End to end test&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_get_db</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns an instance of Database with the given args.&quot;&quot;&quot;</span>
+    <span class="n">db_args</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">k</span><span class="p">[</span><span class="mi">4</span><span class="p">:]:</span> <span class="n">v</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;sql_&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">Database</span><span class="p">(</span><span class="o">**</span><span class="n">db_args</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_work</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
-    <span class="n">atm</span> <span class="o">=</span> <span class="n">ATM</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+    <span class="sd">&quot;&quot;&quot;Creates a single worker on the current terminal / window.&quot;&quot;&quot;</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">_get_db</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">run_conf</span><span class="p">,</span> <span class="n">aws_conf</span><span class="p">,</span> <span class="n">log_conf</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+
+    <span class="n">atm</span> <span class="o">=</span> <span class="n">ATM</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">run_conf</span><span class="p">,</span> <span class="n">aws_conf</span><span class="p">,</span> <span class="n">log_conf</span><span class="p">)</span>
+
     <span class="n">atm</span><span class="o">.</span><span class="n">work</span><span class="p">(</span>
         <span class="n">datarun_ids</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">dataruns</span><span class="p">,</span>
-        <span class="n">choose_randomly</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">choose_randomly</span><span class="p">,</span>
+        <span class="n">choose_randomly</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">save_files</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">save_files</span><span class="p">,</span>
         <span class="n">cloud_mode</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">cloud_mode</span><span class="p">,</span>
         <span class="n">total_time</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
@@ -218,13 +261,206 @@
 
 
 <span class="k">def</span> <span class="nf">_serve</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
-    <span class="n">atm</span> <span class="o">=</span> <span class="n">ATM</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
-    <span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">(</span><span class="n">atm</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;Launch the ATM API with the given host / port.&quot;&quot;&quot;</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">_get_db</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
     <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_get_next_datarun</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the following datarun with the max priority.&quot;&quot;&quot;</span>
+    <span class="n">dataruns</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_dataruns</span><span class="p">(</span><span class="n">ignore_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dataruns</span><span class="p">:</span>
+        <span class="n">max_priority</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">datarun</span><span class="o">.</span><span class="n">priority</span> <span class="k">for</span> <span class="n">datarun</span> <span class="ow">in</span> <span class="n">dataruns</span><span class="p">])</span>
+        <span class="n">priority_runs</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">dataruns</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">priority</span> <span class="o">==</span> <span class="n">max_priority</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">priority_runs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_process_datarun</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">queue</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Process the datarun with the worker.&quot;&quot;&quot;</span>
+    <span class="n">run_conf</span><span class="p">,</span> <span class="n">aws_conf</span><span class="p">,</span> <span class="n">log_conf</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">_get_db</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">datarun_id</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">dataruns</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_dataruns</span><span class="p">(</span><span class="n">include_ids</span><span class="o">=</span><span class="p">[</span><span class="n">datarun_id</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">dataruns</span><span class="p">:</span>
+            <span class="n">datarun</span> <span class="o">=</span> <span class="n">dataruns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">worker</span> <span class="o">=</span> <span class="n">Worker</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">datarun</span><span class="p">,</span> <span class="n">save_files</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">save_files</span><span class="p">,</span>
+                            <span class="n">cloud_mode</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">cloud_mode</span><span class="p">,</span> <span class="n">aws_config</span><span class="o">=</span><span class="n">aws_conf</span><span class="p">,</span>
+                            <span class="n">log_config</span><span class="o">=</span><span class="n">log_conf</span><span class="p">,</span> <span class="n">public_ip</span><span class="o">=</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">())</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">worker</span><span class="o">.</span><span class="n">run_classifier</span><span class="p">()</span>
+
+            <span class="k">except</span> <span class="n">ClassifierError</span><span class="p">:</span>
+                <span class="c1"># the exception has already been handled; just wait a sec so we</span>
+                <span class="c1"># don&#39;t go out of control reporting errors</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Something went wrong. Sleeping </span><span class="si">%d</span><span class="s1"> seconds.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_worker_loop</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;We create a multiprocessing Queue and then a pool with the number of workers specified</span>
+<span class="sd">    by the args which stay on a loop listening for new entries inside the database.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">_get_db</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="n">queue</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Queue</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Starting </span><span class="si">%s</span><span class="s1"> worker processes&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">workers</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">workers</span><span class="p">,</span> <span class="n">_process_datarun</span><span class="p">,</span> <span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">queue</span><span class="p">,</span> <span class="p">)):</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">datarun</span> <span class="o">=</span> <span class="n">_get_next_datarun</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">datarun</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Processing datarun </span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">mark_datarun_running</span><span class="p">(</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+            <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_pid_path</span><span class="p">(</span><span class="n">pid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns abspath of the pid file which is stored on the cwd.&quot;&quot;&quot;</span>
+    <span class="n">pid_path</span> <span class="o">=</span> <span class="n">pid</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">pid_path</span><span class="p">):</span>
+        <span class="n">pid_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">pid_path</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pid_path</span>
+
+
+<span class="k">def</span> <span class="nf">_get_atm_process</span><span class="p">(</span><span class="n">pid_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return `psutil.Process` of the `pid` file. If the pidfile is stale it will release it.&quot;&quot;&quot;</span>
+    <span class="n">pid_file</span> <span class="o">=</span> <span class="n">PIDLockFile</span><span class="p">(</span><span class="n">pid_path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">pid_file</span><span class="o">.</span><span class="n">is_locked</span><span class="p">():</span>
+        <span class="n">pid</span> <span class="o">=</span> <span class="n">pid_file</span><span class="o">.</span><span class="n">read_pid</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">process</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;atm&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">process</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pid_file</span><span class="o">.</span><span class="n">break_lock</span><span class="p">()</span>
+
+        <span class="k">except</span> <span class="n">psutil</span><span class="o">.</span><span class="n">NoSuchProcess</span><span class="p">:</span>
+            <span class="n">pid_file</span><span class="o">.</span><span class="n">break_lock</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_status</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check if the current ATM process is runing.&quot;&quot;&quot;</span>
+
+    <span class="n">pid_path</span> <span class="o">=</span> <span class="n">_get_pid_path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="n">_get_atm_process</span><span class="p">(</span><span class="n">pid_path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">process</span><span class="p">:</span>
+        <span class="n">workers</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">addr</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">process</span><span class="o">.</span><span class="n">children</span><span class="p">():</span>
+            <span class="n">connections</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">connections</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">connections</span><span class="p">:</span>
+                <span class="n">connection</span> <span class="o">=</span> <span class="n">connections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">addr</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">laddr</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">workers</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span> <span class="k">if</span> <span class="n">workers</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ATM is running with </span><span class="si">{}</span><span class="s1"> worker</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">workers</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">addr</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ATM REST server is listening on http://</span><span class="si">{}</span><span class="s1">:</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">ip</span><span class="p">,</span> <span class="n">addr</span><span class="o">.</span><span class="n">port</span><span class="p">))</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ATM is not runing.&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_start_background</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Launches the server/worker in daemon process.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">no_server</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Starting the REST API server&#39;</span><span class="p">)</span>
+
+        <span class="n">process</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_serve</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="p">))</span>
+        <span class="n">process</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">process</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">workers</span><span class="p">:</span>
+        <span class="n">_worker_loop</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_start</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a new process of ATM pointing the process to a certain `pid` file.&quot;&quot;&quot;</span>
+    <span class="n">pid_path</span> <span class="o">=</span> <span class="n">_get_pid_path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="n">_get_atm_process</span><span class="p">(</span><span class="n">pid_path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">process</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ATM is already running!&#39;</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pid_file</span> <span class="o">=</span> <span class="n">PIDLockFile</span><span class="p">(</span><span class="n">pid_path</span><span class="p">)</span>
+
+        <span class="n">context</span> <span class="o">=</span> <span class="n">DaemonContext</span><span class="p">()</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">pidfile</span> <span class="o">=</span> <span class="n">pid_file</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">working_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">context</span><span class="p">:</span>
+            <span class="c1"># Set up default logs</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">logfile</span><span class="p">:</span>
+                <span class="n">_logging_setup</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="s1">&#39;atm.log&#39;</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Starting ATM&#39;</span><span class="p">)</span>
+            <span class="n">_start_background</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_restart</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">_stop</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">_start</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_stop</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Stop the current running process of ATM.&quot;&quot;&quot;</span>
+    <span class="n">pid_path</span> <span class="o">=</span> <span class="n">_get_pid_path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="n">_get_atm_process</span><span class="p">(</span><span class="n">pid_path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">process</span><span class="p">:</span>
+        <span class="n">process</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">timeout</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ATM was not able to stop after </span><span class="si">{}</span><span class="s1"> seconds.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">timeout</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">force</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Killing it.&#39;</span><span class="p">)</span>
+                <span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Use --force to kill it.&#39;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ATM stopped correctly.&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ATM is not running.&#39;</span><span class="p">)</span>
+
+
 <span class="k">def</span> <span class="nf">_enter_data</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
-    <span class="n">atm</span> <span class="o">=</span> <span class="n">ATM</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">_get_db</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">run_conf</span><span class="p">,</span> <span class="n">aws_conf</span><span class="p">,</span> <span class="n">log_conf</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+    <span class="n">atm</span> <span class="o">=</span> <span class="n">ATM</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">run_conf</span><span class="p">,</span> <span class="n">aws_conf</span><span class="p">,</span> <span class="n">log_conf</span><span class="p">)</span>
+
     <span class="n">atm</span><span class="o">.</span><span class="n">enter_data</span><span class="p">()</span>
 
 
@@ -250,6 +486,8 @@
 
 <span class="k">def</span> <span class="nf">_get_parser</span><span class="p">():</span>
     <span class="n">parent</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">add_help</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">parent</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;--verbose&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">parent</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-l&#39;</span><span class="p">,</span> <span class="s1">&#39;--logfile&#39;</span><span class="p">)</span>
 
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;ATM Command Line Interface&#39;</span><span class="p">)</span>
 
@@ -273,38 +511,102 @@
 
     <span class="n">worker</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--dataruns&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Only train on dataruns with these ids&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">)</span>
     <span class="n">worker</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--time&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Number of seconds to run worker&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-    <span class="n">worker</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--choose-randomly&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Choose dataruns to work on randomly (default = sequential order)&#39;</span><span class="p">)</span>
 
-    <span class="n">worker</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--no-save&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;save_files&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_const&#39;</span><span class="p">,</span> <span class="n">const</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">worker</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--no-save&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;save_files&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_false&#39;</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;don&#39;t save models and metrics at all&quot;</span><span class="p">)</span>
 
     <span class="c1"># Server</span>
     <span class="n">server</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="n">parent</span><span class="p">])</span>
     <span class="n">server</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">_serve</span><span class="p">)</span>
+    <span class="n">_add_common_arguments</span><span class="p">(</span><span class="n">server</span><span class="p">)</span>
     <span class="n">server</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--host&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;IP to listen at&#39;</span><span class="p">)</span>
     <span class="n">server</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--port&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Port to listen at&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--debug&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Start the server in debug mode.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Start</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="n">parent</span><span class="p">])</span>
+    <span class="n">start</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">_start</span><span class="p">)</span>
+    <span class="n">_add_common_arguments</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+    <span class="n">start</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--cloud-mode&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                       <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Whether to run this worker in cloud mode&#39;</span><span class="p">)</span>
+    <span class="n">start</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--no-save&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;save_files&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_const&#39;</span><span class="p">,</span> <span class="n">const</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                       <span class="n">help</span><span class="o">=</span><span class="s2">&quot;don&#39;t save models and metrics at all&quot;</span><span class="p">)</span>
+    <span class="n">start</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-w&#39;</span><span class="p">,</span> <span class="s1">&#39;--workers&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Number of workers&#39;</span><span class="p">)</span>
+
+    <span class="n">start</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--no-server&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Do not start the REST server&#39;</span><span class="p">)</span>
+    <span class="n">start</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--host&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;IP to listen at&#39;</span><span class="p">)</span>
+    <span class="n">start</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--port&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Port to listen at&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">start</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--pid&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;PID file to use.&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;atm.pid&#39;</span><span class="p">)</span>
+    <span class="n">start</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--debug&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Start the server in debug mode.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Status</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="n">parent</span><span class="p">])</span>
+    <span class="n">status</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">_status</span><span class="p">)</span>
+    <span class="n">status</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--pid&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;PID file to use.&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;atm.pid&#39;</span><span class="p">)</span>
+
+    <span class="c1"># restart</span>
+    <span class="n">restart</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;restart&#39;</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="n">parent</span><span class="p">])</span>
+    <span class="n">restart</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">_restart</span><span class="p">)</span>
+    <span class="n">_add_common_arguments</span><span class="p">(</span><span class="n">restart</span><span class="p">)</span>
+    <span class="n">restart</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--cloud-mode&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Whether to run this worker in cloud mode&#39;</span><span class="p">)</span>
+    <span class="n">restart</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--no-save&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;save_files&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                         <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_const&#39;</span><span class="p">,</span> <span class="n">const</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;don&#39;t save models and metrics at all&quot;</span><span class="p">)</span>
+    <span class="n">restart</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-w&#39;</span><span class="p">,</span> <span class="s1">&#39;--workers&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Number of workers&#39;</span><span class="p">)</span>
+    <span class="n">restart</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--no-server&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Do not start the REST server&#39;</span><span class="p">)</span>
+    <span class="n">restart</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--host&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;IP to listen at&#39;</span><span class="p">)</span>
+    <span class="n">restart</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--port&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Port to listen at&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">restart</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--pid&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;PID file to use.&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;atm.pid&#39;</span><span class="p">)</span>
+    <span class="n">restart</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--debug&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;restart the server in debug mode.&#39;</span><span class="p">)</span>
+    <span class="n">restart</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-t&#39;</span><span class="p">,</span> <span class="s1">&#39;--timeout&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Seconds to wait before killing the process.&#39;</span><span class="p">)</span>
+    <span class="n">restart</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--force&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Kill the process if it does not terminate gracefully.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Stop</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;stop&#39;</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="n">parent</span><span class="p">])</span>
+    <span class="n">stop</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">_stop</span><span class="p">)</span>
+    <span class="n">stop</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--pid&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;PID file to use.&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;atm.pid&#39;</span><span class="p">)</span>
+    <span class="n">stop</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-t&#39;</span><span class="p">,</span> <span class="s1">&#39;--timeout&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Seconds to wait before killing the process.&#39;</span><span class="p">)</span>
+    <span class="n">stop</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--force&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Kill the process if it does not terminate gracefully.&#39;</span><span class="p">)</span>
 
     <span class="c1"># Make Config</span>
     <span class="n">make_config</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;make_config&#39;</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="n">parent</span><span class="p">])</span>
     <span class="n">make_config</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">_make_config</span><span class="p">)</span>
 
-    <span class="c1"># End to end test</span>
-    <span class="n">end_to_end</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;end_to_end&#39;</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="n">parent</span><span class="p">])</span>
-    <span class="n">end_to_end</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">_end_to_end_test</span><span class="p">)</span>
-    <span class="n">end_to_end</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--processes&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;number of processes to run concurrently&#39;</span><span class="p">,</span>
-                            <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-
-    <span class="n">end_to_end</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--total-time&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Total time for each worker to work in seconds.&#39;</span><span class="p">,</span>
-                            <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-
     <span class="k">return</span> <span class="n">parser</span>
+
+
+<span class="k">def</span> <span class="nf">_logging_setup</span><span class="p">(</span><span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">logfile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+    <span class="n">log_level</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span> <span class="o">-</span> <span class="n">verbosity</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span>
+    <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(process)d</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(module)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span>
+    <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="n">logfile</span><span class="p">:</span>
+        <span class="n">file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">logfile</span><span class="p">)</span>
+        <span class="n">file_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+        <span class="n">file_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">file_handler</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">console_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+        <span class="n">console_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
+        <span class="n">console_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">console_handler</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../api/atm.cli.html#atm.cli.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">_get_parser</span><span class="p">()</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">_logging_setup</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">logfile</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span><span class="p">:</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">print_help</span><span class="p">()</span>

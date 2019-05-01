@@ -1,7 +1,0 @@
-atm.enter\_data module
-======================
-
-.. automodule:: atm.enter_data
-    :members:
-    :undoc-members:
-    :show-inheritance:

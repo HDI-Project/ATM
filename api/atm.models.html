@@ -106,6 +106,25 @@
 <li class="toctree-l2"><a class="reference internal" href="../database.html#classifiers">Classifiers</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">REST API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#starting-the-rest-api-server">Starting the REST API Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#generate-some-data">1. Generate some data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#rest-models">2. REST Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#get-all-objects-from-a-model">3. Get all objects from a model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#get-a-single-object-by-id">4. Get a single object by id</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#get-all-the-children-objects">5. Get all the children objects</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#additional-information">Additional information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#restart-the-atm-process">Restart the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#stop-the-atm-process">Stop the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to ATM and BTB</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../contributing.html#ways-to-contribute">Ways to contribute</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../contributing.html#requirements">Requirements</a></li>
@@ -195,7 +214,7 @@
 <span id="atm-models-module"></span><h1>atm.models module<a class="headerlink" href="#module-atm.models" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="atm.models.ATM">
-<em class="property">class </em><code class="descclassname">atm.models.</code><code class="descname">ATM</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/models.html#ATM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.models.ATM" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">atm.models.</code><code class="descname">ATM</code><span class="sig-paren">(</span><em>db</em>, <em>run_conf</em>, <em>aws_conf</em>, <em>log_conf</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/models.html#ATM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.models.ATM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Thiss class is code API instance that allows you to use ATM in your python code.</p>
 <dl class="attribute">

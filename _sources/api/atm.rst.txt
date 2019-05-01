@@ -19,7 +19,6 @@ Submodules
    atm.constants
    atm.database
    atm.encoder
-   atm.enter_data
    atm.method
    atm.metrics
    atm.models

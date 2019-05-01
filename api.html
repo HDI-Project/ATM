@@ -1,0 +1,594 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>REST API &mdash; ATM 0.1.2-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contributing to ATM and BTB" href="contributing.html" />
+    <link rel="prev" title="Guide to the ModelHub database" href="database.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ATM
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">ATM: Scalable model selection and tuning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#requirements">0. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#install-atm">1. Install ATM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="setup.html#install-using-pip">Install using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="setup.html#install-from-source">Install from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#start-using-atm">3. Start using ATM!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#create-a-datarun">Create a datarun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#execute-the-datarun">Execute the datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="database.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">REST API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#starting-the-rest-api-server">Starting the REST API Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#generate-some-data">1. Generate some data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rest-models">2. REST Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#get-all-objects-from-a-model">3. Get all objects from a model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#get-a-single-object-by-id">4. Get a single object by id</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#get-all-the-children-objects">5. Get all the children objects</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-information">Additional information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#restart-the-atm-process">Restart the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stop-the-atm-process">Stop the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to ATM and BTB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#style">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#docs">Docs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="add_method.html">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="add_method.html#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="add_method.html#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="add_method.html#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="add_method.html#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>REST API</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/HDI-project/ATM/blob/master/docs/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="rest-api">
+<h1>REST API<a class="headerlink" href="#rest-api" title="Permalink to this headline">¶</a></h1>
+<p><strong>ATM</strong> comes with the possibility to start a server process that enables interacting with
+it via a REST API server that runs over <a class="reference external" href="http://flask.pocoo.org/">flask</a>.</p>
+<p>In this document you will find a briefly explanation how to start it and use it.</p>
+<div class="section" id="starting-the-rest-api-server">
+<h2>Starting the REST API Server<a class="headerlink" href="#starting-the-rest-api-server" title="Permalink to this headline">¶</a></h2>
+<p>In order to start a REST API server, after installing ATM open a terminal, activate its
+virtualenv, and execute this command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm start
+</pre></div>
+</div>
+<p>This will start <strong>ATM</strong> server as a background service. The REST server will be listening at the
+port 5000 of your machine, and if you point your browser at <a class="reference external" href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a>, you will see
+the documentation website that shows information about all the REST operations allowed by the API.</p>
+<p>Optionally, the <code class="docutils literal notranslate"><span class="pre">--port</span> <span class="pre">&lt;port&gt;</span></code> can be added to modify the port which the server listents at:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm start --port <span class="m">1234</span>
+</pre></div>
+</div>
+<p>If you would like to see the status of the server process you can run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm status
+</pre></div>
+</div>
+<p>An output similar to this one will appear:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ATM is running with <span class="m">1</span> worker
+ATM REST server is listening on http://127.0.0.1:5000
+</pre></div>
+</div>
+<p>In order to stop the server you can run the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm stop
+</pre></div>
+</div>
+<p>Notice that <code class="docutils literal notranslate"><span class="pre">atm</span> <span class="pre">start</span></code> will start one worker by default. If you would like to launch more than one,
+you can do so by adding the argument <code class="docutils literal notranslate"><span class="pre">--workers</span> <span class="pre">&lt;number_of_workers</span></code> or <code class="docutils literal notranslate"><span class="pre">-w</span> <span class="pre">&lt;number_of_workers&gt;</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm start --workers <span class="m">4</span>
+</pre></div>
+</div>
+<p>For more detailed options you can run <code class="docutils literal notranslate"><span class="pre">atm</span> <span class="pre">start</span> <span class="pre">--help</span></code> to obtain a list with the arguments
+that are being accepted.</p>
+</div>
+<div class="section" id="quickstart">
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h2>
+<p>In this section we will briefly show the basic usage of the REST API.</p>
+<p>For more detailed information about all the operations supported by the API, please point your
+browser to <a class="reference external" href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a> and explore the examples provided by the
+<a class="reference external" href="https://swagger.io/">Swagger</a> interface.</p>
+<div class="section" id="generate-some-data">
+<h3>1. Generate some data<a class="headerlink" href="#generate-some-data" title="Permalink to this headline">¶</a></h3>
+<p>Before proceeding any further, please make sure the have already populated your data by triggering
+at least one model tuning process.</p>
+<p>An easy way to do this is to follow the quickstart from the ATM <a class="reference external" href="README.md">README.md</a> file,
+which means having run these command:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>atm enter_data
+</pre></div>
+</div>
+<p>The workers that you started before will proceed the data that has been inserted and will populate
+the database.</p>
+</div>
+<div class="section" id="rest-models">
+<h3>2. REST Models<a class="headerlink" href="#rest-models" title="Permalink to this headline">¶</a></h3>
+<p>Once the database is populated, you can use the REST API to explore the following 4 models:</p>
+<ul class="simple">
+<li><p>Datasets</p></li>
+<li><p>Dataruns</p></li>
+<li><p>Hyperpartitions</p></li>
+<li><p>Classifiers</p></li>
+</ul>
+<p>And these are the operations that can be performed on them:</p>
+</div>
+<div class="section" id="get-all-objects-from-a-model">
+<h3>3. Get all objects from a model<a class="headerlink" href="#get-all-objects-from-a-model" title="Permalink to this headline">¶</a></h3>
+<p>In order to get all the objects for a single model, you need to make a <code class="docutils literal notranslate"><span class="pre">GET</span></code> request to
+<code class="docutils literal notranslate"><span class="pre">/api/&lt;model&gt;</span></code>.</p>
+<p>The output will be a JSON with 4 entries:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">num_results</span></code>: The number of results found</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">objects</span></code>: A list containing a subdocument for each result</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">page</span></code>: The current page</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">total_pages</span></code>: The number of pages</p></li>
+</ul>
+<p>For example, you can get all the datasets using:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="nf">GET</span> <span class="nn">/api/datasets</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+</pre></div>
+</div>
+<p>And the output will be:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>{
+  &quot;num_results&quot;: 1,
+  &quot;objects&quot;: [
+    {
+      &quot;class_column&quot;: &quot;class&quot;,
+      &quot;d_features&quot;: 16,
+      &quot;dataruns&quot;: [
+        {
+          &quot;budget&quot;: 100,
+          &quot;budget_type&quot;: &quot;classifier&quot;,
+          &quot;dataset_id&quot;: 1,
+          &quot;deadline&quot;: null,
+          &quot;description&quot;: &quot;uniform__uniform&quot;,
+          &quot;end_time&quot;: &quot;2019-04-11T20:58:11.346733&quot;,
+          &quot;gridding&quot;: 0,
+          &quot;id&quot;: 1,
+          &quot;k_window&quot;: 3,
+          &quot;metric&quot;: &quot;f1&quot;,
+          &quot;priority&quot;: 1,
+          &quot;r_minimum&quot;: 2,
+          &quot;score_target&quot;: &quot;cv_judgment_metric&quot;,
+          &quot;selector&quot;: &quot;uniform&quot;,
+          &quot;start_time&quot;: &quot;2019-04-11T20:58:02.514514&quot;,
+          &quot;status&quot;: &quot;complete&quot;,
+          &quot;tuner&quot;: &quot;uniform&quot;
+        }
+      ],
+      &quot;description&quot;: null,
+      &quot;id&quot;: 1,
+      &quot;k_classes&quot;: 2,
+      &quot;majority&quot;: 0.516666667,
+      &quot;n_examples&quot;: 60,
+      &quot;name&quot;: &quot;pollution_1&quot;,
+      &quot;size_kb&quot;: 8,
+      &quot;test_path&quot;: null,
+      &quot;train_path&quot;: &quot;/path/to/atm/data/test/pollution_1.csv&quot;
+    }
+  ],
+  &quot;page&quot;: 1,
+  &quot;total_pages&quot;: 1
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="get-a-single-object-by-id">
+<h3>4. Get a single object by id<a class="headerlink" href="#get-a-single-object-by-id" title="Permalink to this headline">¶</a></h3>
+<p>In order to get one particular objects for a model, you need to make a <code class="docutils literal notranslate"><span class="pre">GET</span></code> request to
+<code class="docutils literal notranslate"><span class="pre">/api/&lt;model&gt;/&lt;id&gt;</span></code>.</p>
+<p>The output will be the document representing the corresponding object.</p>
+<p>For example, you can get the dataset with id 1 using:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="nf">GET</span> <span class="nn">/api/datasets/1</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+</pre></div>
+</div>
+<p>And the output will be:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>{
+  &quot;class_column&quot;: &quot;class&quot;,
+  &quot;d_features&quot;: 16,
+  &quot;dataruns&quot;: [
+    {
+      &quot;budget&quot;: 100,
+      &quot;budget_type&quot;: &quot;classifier&quot;,
+      &quot;dataset_id&quot;: 1,
+      &quot;deadline&quot;: null,
+      &quot;description&quot;: &quot;uniform__uniform&quot;,
+      &quot;end_time&quot;: &quot;2019-04-11T20:58:11.346733&quot;,
+      &quot;gridding&quot;: 0,
+      &quot;id&quot;: 1,
+      &quot;k_window&quot;: 3,
+      &quot;metric&quot;: &quot;f1&quot;,
+      &quot;priority&quot;: 1,
+      &quot;r_minimum&quot;: 2,
+      &quot;score_target&quot;: &quot;cv_judgment_metric&quot;,
+      &quot;selector&quot;: &quot;uniform&quot;,
+      &quot;start_time&quot;: &quot;2019-04-11T20:58:02.514514&quot;,
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;tuner&quot;: &quot;uniform&quot;
+    }
+  ],
+  &quot;description&quot;: null,
+  &quot;id&quot;: 1,
+  &quot;k_classes&quot;: 2,
+  &quot;majority&quot;: 0.516666667,
+  &quot;n_examples&quot;: 60,
+  &quot;name&quot;: &quot;pollution_1&quot;,
+  &quot;size_kb&quot;: 8,
+  &quot;test_path&quot;: null,
+  &quot;train_path&quot;: &quot;/path/to/atm/data/test/pollution_1.csv&quot;
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="get-all-the-children-objects">
+<h3>5. Get all the children objects<a class="headerlink" href="#get-all-the-children-objects" title="Permalink to this headline">¶</a></h3>
+<p>In order to get all the childre objects from one parent object, you need to make a
+<code class="docutils literal notranslate"><span class="pre">GET</span></code> request to <code class="docutils literal notranslate"><span class="pre">/api/&lt;parent_model&gt;/&lt;parent_id&gt;/&lt;child_model&gt;</span></code>.</p>
+<p>The output will be in the same format as if you had requested all the elements from the
+children model, but with the results filtered by the parent one.</p>
+<p>So, for example, in order to get all the dataruns that use the dataset with id 1, you can use:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="nf">GET</span> <span class="nn">/api/datasets/1/dataruns</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+</pre></div>
+</div>
+<p>And the output will be (note that some parts have been cut):</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>{
+  &quot;num_results&quot;: 1,
+  &quot;objects&quot;: [
+    {
+      &quot;budget&quot;: 100,
+      &quot;budget_type&quot;: &quot;classifier&quot;,
+      &quot;classifiers&quot;: [
+        {
+          &quot;cv_judgment_metric&quot;: 0.8444444444,
+          &quot;cv_judgment_metric_stdev&quot;: 0.1507184441,
+          &quot;datarun_id&quot;: 1,
+          &quot;end_time&quot;: &quot;2019-04-11T20:58:02.600185&quot;,
+          &quot;error_message&quot;: null,
+          &quot;host&quot;: &quot;83.56.245.36&quot;,
+          &quot;hyperparameter_values_64&quot;: &quot;gAN9cQAoWAsAAABuX25laWdoYm9yc3EBY251bXB5LmNvcmUubXVsdGlhcnJheQpzY2FsYXIKcQJjbnVtcHkKZHR5cGUKcQNYAgAAAGk4cQRLAEsBh3EFUnEGKEsDWAEAAAA8cQdOTk5K/////0r/////SwB0cQhiQwgPAAAAAAAAAHEJhnEKUnELWAkAAABsZWFmX3NpemVxDGgCaAZDCCsAAAAAAAAAcQ2GcQ5ScQ9YBwAAAHdlaWdodHNxEFgIAAAAZGlzdGFuY2VxEVgJAAAAYWxnb3JpdGhtcRJYCQAAAGJhbGxfdHJlZXETWAYAAABtZXRyaWNxFFgJAAAAbWFuaGF0dGFucRVYBgAAAF9zY2FsZXEWiHUu&quot;,
+          &quot;hyperpartition_id&quot;: 23,
+          &quot;id&quot;: 1,
+          &quot;metrics_location&quot;: &quot;metrics/pollution_1-4bc39b14.metric&quot;,
+          &quot;model_location&quot;: &quot;models/pollution_1-4bc39b14.model&quot;,
+          &quot;start_time&quot;: &quot;2019-04-11T20:58:02.539046&quot;,
+          &quot;status&quot;: &quot;complete&quot;,
+          &quot;test_judgment_metric&quot;: 0.6250000000
+        },
+        ...
+      ],
+      &quot;dataset&quot;: {
+        &quot;class_column&quot;: &quot;class&quot;,
+        &quot;d_features&quot;: 16,
+        &quot;description&quot;: null,
+        &quot;id&quot;: 1,
+        &quot;k_classes&quot;: 2,
+        &quot;majority&quot;: 0.516666667,
+        &quot;n_examples&quot;: 60,
+        &quot;name&quot;: &quot;pollution_1&quot;,
+        &quot;size_kb&quot;: 8,
+        &quot;test_path&quot;: null,
+        &quot;train_path&quot;: &quot;/path/to/atm/data/test/pollution_1.csv&quot;
+      },
+      &quot;dataset_id&quot;: 1,
+      &quot;deadline&quot;: null,
+      &quot;description&quot;: &quot;uniform__uniform&quot;,
+      &quot;end_time&quot;: &quot;2019-04-11T20:58:11.346733&quot;,
+      &quot;gridding&quot;: 0,
+      &quot;hyperpartitions&quot;: [
+        {
+          &quot;categorical_hyperparameters_64&quot;: &quot;gANdcQAoWAcAAABwZW5hbHR5cQFYAgAAAGwxcQKGcQNYDQAAAGZpdF9pbnRlcmNlcHRxBIiGcQVlLg==&quot;,
+          &quot;constant_hyperparameters_64&quot;: &quot;gANdcQAoWAwAAABjbGFzc193ZWlnaHRxAVgIAAAAYmFsYW5jZWRxAoZxA1gGAAAAX3NjYWxlcQSIhnEFZS4=&quot;,
+          &quot;datarun_id&quot;: 1,
+          &quot;id&quot;: 1,
+          &quot;method&quot;: &quot;logreg&quot;,
+          &quot;status&quot;: &quot;incomplete&quot;,
+          &quot;tunable_hyperparameters_64&quot;: &quot;gANdcQAoWAEAAABDcQFjYnRiLmh5cGVyX3BhcmFtZXRlcgpGbG9hdEV4cEh5cGVyUGFyYW1ldGVyCnECY2J0Yi5oeXBlcl9wYXJhbWV0ZXIKUGFyYW1UeXBlcwpxA0sFhXEEUnEFXXEGKEc+5Pi1iONo8UdA+GoAAAAAAGWGcQeBcQh9cQkoWAwAAABfcGFyYW1fcmFuZ2VxCmgGWAUAAAByYW5nZXELXXEMKEfAFAAAAAAAAEdAFAAAAAAAAGV1YoZxDVgDAAAAdG9scQ5oAmgFXXEPKEc+5Pi1iONo8UdA+GoAAAAAAGWGcRCBcRF9cRIoaApoD2gLXXETKEfAFAAAAAAAAEdAFAAAAAAAAGV1YoZxFGUu&quot;
+        },
+        ...
+      ],
+      &quot;id&quot;: 1,
+      &quot;k_window&quot;: 3,
+      &quot;metric&quot;: &quot;f1&quot;,
+      &quot;priority&quot;: 1,
+      &quot;r_minimum&quot;: 2,
+      &quot;score_target&quot;: &quot;cv_judgment_metric&quot;,
+      &quot;selector&quot;: &quot;uniform&quot;,
+      &quot;start_time&quot;: &quot;2019-04-11T20:58:02.514514&quot;,
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;tuner&quot;: &quot;uniform&quot;
+    }
+  ],
+  &quot;page&quot;: 1,
+  &quot;total_pages&quot;: 1
+}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="additional-information">
+<h2>Additional information<a class="headerlink" href="#additional-information" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="start-additional-process-with-different-pid-file">
+<h3>Start additional process with different pid file<a class="headerlink" href="#start-additional-process-with-different-pid-file" title="Permalink to this headline">¶</a></h3>
+<p>If you would like to run more workers or you would like to launch a second <strong>ATM</strong> process, you can
+do so by specifying a different <code class="docutils literal notranslate"><span class="pre">PID</span></code> file.</p>
+<p>For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm start --no-server -w <span class="m">4</span>  --pid additional_workers.pid
+</pre></div>
+</div>
+<p>To check the status of this process we have to run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm status --pid additional_workers.pid
+</pre></div>
+</div>
+<p>This will print an output like this:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ATM is running with <span class="m">4</span> workers
+</pre></div>
+</div>
+</div>
+<div class="section" id="restart-the-atm-process">
+<h3>Restart the ATM process<a class="headerlink" href="#restart-the-atm-process" title="Permalink to this headline">¶</a></h3>
+<p>If you have an <strong>ATM</strong> process running and you would like to restart it and add more workers to it
+or maybe change the port on which is running, you can achieve so with the <code class="docutils literal notranslate"><span class="pre">atm</span> <span class="pre">restart</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm restart
+</pre></div>
+</div>
+<p>This command will restart the server with the default values, so if you would like to use other
+options you can run <code class="docutils literal notranslate"><span class="pre">--help</span></code> to see the accepted arguments:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm restart --help
+</pre></div>
+</div>
+</div>
+<div class="section" id="stop-the-atm-process">
+<h3>Stop the ATM process<a class="headerlink" href="#stop-the-atm-process" title="Permalink to this headline">¶</a></h3>
+<p>As we saw before, by runing the command <code class="docutils literal notranslate"><span class="pre">atm</span> <span class="pre">stop</span></code> you will <code class="docutils literal notranslate"><span class="pre">terminate</span></code> the ATM process. However
+this command accepts a few arguments in order to control this behaviour:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">-t</span> <span class="pre">TIMEOUT</span></code>, <code class="docutils literal notranslate"><span class="pre">--timeout</span> <span class="pre">TIMEOUT</span></code>, time to wait in order to check if the process has been
+terminated.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-f</span></code>, <code class="docutils literal notranslate"><span class="pre">--force</span></code>, Kill the process if it does not terminate gracefully.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--pid</span> <span class="pre">PIDFILE</span></code>, PID file to use</p></li>
+</ul>
+</div>
+<div class="section" id="start-the-atm-rest-api-server-in-foreground">
+<h3>Start the ATM REST API server in foreground<a class="headerlink" href="#start-the-atm-rest-api-server-in-foreground" title="Permalink to this headline">¶</a></h3>
+<p>If you would like to monitorize the server for debugging process, you can do so by runing the
+with the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm server
+</pre></div>
+</div>
+<p>An output similar to this one should apear in the terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>* Serving Flask app <span class="s2">&quot;api.setup&quot;</span> <span class="o">(</span>lazy loading<span class="o">)</span>
+* Environment: production
+  WARNING: Do not use the development server in a production environment.
+  Use a production WSGI server instead.
+* Debug mode: on
+* Running on http://127.0.0.1:5000/ <span class="o">(</span>Press CTRL+C to quit<span class="o">)</span>
+* Restarting with stat
+* Debugger is active!
+* Debugger PIN: <span class="m">150</span>-127-826
+</pre></div>
+</div>
+<p>For additional arguments run <code class="docutils literal notranslate"><span class="pre">atm</span> <span class="pre">server</span> <span class="pre">--help</span></code></p>
+<p><strong>Note</strong> that this command will not launch any <code class="docutils literal notranslate"><span class="pre">workers</span></code> process. In order to launch a foreground
+worker you have to do so by runing <code class="docutils literal notranslate"><span class="pre">atm</span> <span class="pre">worker</span></code>.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing to ATM and BTB" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="database.html" class="btn btn-neutral float-left" title="Guide to the ModelHub database" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -107,6 +107,25 @@
 <li class="toctree-l2"><a class="reference internal" href="database.html#classifiers">Classifiers</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">REST API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#starting-the-rest-api-server">Starting the REST API Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#generate-some-data">1. Generate some data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#rest-models">2. REST Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#get-all-objects-from-a-model">3. Get all objects from a model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#get-a-single-object-by-id">4. Get a single object by id</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#get-all-the-children-objects">5. Get all the children objects</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#additional-information">Additional information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#restart-the-atm-process">Restart the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#stop-the-atm-process">Stop the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to ATM and BTB</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="contributing.html#ways-to-contribute">Ways to contribute</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contributing.html#requirements">Requirements</a></li>
@@ -262,8 +281,6 @@
 </li>
       <li><a href="api/atm.encoder.html#module-atm.encoder">atm.encoder (module)</a>
 </li>
-      <li><a href="api/atm.enter_data.html#module-atm.enter_data">atm.enter_data (module)</a>
-</li>
       <li><a href="api/atm.method.html#module-atm.method">atm.method (module)</a>
 </li>
       <li><a href="api/atm.metrics.html#module-atm.metrics">atm.metrics (module)</a>
@@ -310,10 +327,10 @@
 </li>
       <li><a href="api/atm.config.html#atm.config.Config">Config (class in atm.config)</a>
 </li>
-      <li><a href="api/atm.api.html#atm.api.create_app">create_app() (in module atm.api)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.api.html#atm.api.create_app">create_app() (in module atm.api)</a>
+</li>
       <li><a href="api/atm.database.html#atm.database.Database.create_classifier">create_classifier() (atm.database.Database method)</a>
 </li>
       <li><a href="api/atm.database.html#atm.database.Database.create_datarun">create_datarun() (atm.database.Database method)</a>
@@ -321,15 +338,11 @@
       <ul>
         <li><a href="api/atm.models.html#atm.models.ATM.create_datarun">(atm.models.ATM method)</a>
 </li>
-        <li><a href="api/atm.enter_data.html#atm.enter_data.create_datarun">(in module atm.enter_data)</a>
-</li>
       </ul></li>
       <li><a href="api/atm.database.html#atm.database.Database.create_dataset">create_dataset() (atm.database.Database method)</a>
 
       <ul>
         <li><a href="api/atm.models.html#atm.models.ATM.create_dataset">(atm.models.ATM method)</a>
-</li>
-        <li><a href="api/atm.enter_data.html#atm.enter_data.create_dataset">(in module atm.enter_data)</a>
 </li>
       </ul></li>
       <li><a href="api/atm.database.html#atm.database.Database.create_hyperpartition">create_hyperpartition() (atm.database.Database method)</a>
@@ -379,11 +392,7 @@
       <li><a href="api/atm.utilities.html#atm.utilities.ensure_directory">ensure_directory() (in module atm.utilities)</a>
 </li>
       <li><a href="api/atm.models.html#atm.models.ATM.enter_data">enter_data() (atm.models.ATM method)</a>
-
-      <ul>
-        <li><a href="api/atm.enter_data.html#atm.enter_data.enter_data">(in module atm.enter_data)</a>
 </li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.constants.html#atm.constants.ClassifierStatus.ERRORED">ERRORED (atm.constants.ClassifierStatus attribute)</a>

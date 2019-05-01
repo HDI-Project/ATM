@@ -106,6 +106,25 @@
 <li class="toctree-l2"><a class="reference internal" href="../../database.html#classifiers">Classifiers</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">REST API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#starting-the-rest-api-server">Starting the REST API Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#generate-some-data">1. Generate some data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#rest-models">2. REST Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-all-objects-from-a-model">3. Get all objects from a model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-a-single-object-by-id">4. Get a single object by id</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-all-the-children-objects">5. Get all the children objects</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#additional-information">Additional information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#restart-the-atm-process">Restart the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#stop-the-atm-process">Stop the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to ATM and BTB</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../contributing.html#ways-to-contribute">Ways to contribute</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../contributing.html#requirements">Requirements</a></li>
@@ -509,9 +528,9 @@
 
     <span class="c1"># All of these arguments must start with --sql-, and must correspond to</span>
     <span class="c1"># keys present in the SQL config example file.</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--sql-dialect&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">SQL_DIALECTS</span><span class="p">,</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--sql-dialect&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">SQL_DIALECTS</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;sqlite&#39;</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Dialect of SQL to use&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--sql-database&#39;</span><span class="p">,</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--sql-database&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;atm.db&#39;</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Name of, or path to, SQL database&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--sql-username&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Username for SQL database&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--sql-password&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Password for SQL database&#39;</span><span class="p">)</span>
@@ -684,23 +703,18 @@
     <span class="k">return</span> <span class="n">parser</span></div>
 
 
-<div class="viewcode-block" id="load_config"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.load_config">[docs]</a><span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">sql_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">run_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aws_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="load_config"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.load_config">[docs]</a><span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load config objects from yaml files and command line arguments. Command line</span>
 <span class="sd">    args override yaml files where applicable.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        sql_path: path to .yaml file with SQL configuration</span>
-<span class="sd">        run_path: path to .yaml file with Dataset and Datarun configuration</span>
-<span class="sd">        aws_path: path to .yaml file with AWS configuration</span>
-<span class="sd">        log_path: path to .yaml file with logging configuration</span>
 <span class="sd">        **kwargs: miscellaneous arguments specifying individual configuration</span>
 <span class="sd">            parameters. Any kwargs beginning with sql_ are SQL config</span>
 <span class="sd">            arguments, any beginning with aws_ are AWS config.</span>
 
-<span class="sd">    Returns: sql_conf, run_conf, aws_conf, log_conf</span>
+<span class="sd">    Returns: run_conf, aws_conf, log_conf</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">sql_args</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">run_args</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">aws_args</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">log_args</span> <span class="o">=</span> <span class="p">{}</span>
@@ -711,15 +725,11 @@
     <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
 
     <span class="c1"># check the keyword args for config paths</span>
-    <span class="n">sql_path</span> <span class="o">=</span> <span class="n">sql_path</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sql_config&#39;</span><span class="p">)</span>
-    <span class="n">run_path</span> <span class="o">=</span> <span class="n">run_path</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;run_config&#39;</span><span class="p">)</span>
-    <span class="n">aws_path</span> <span class="o">=</span> <span class="n">aws_path</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;aws_config&#39;</span><span class="p">)</span>
-    <span class="n">log_path</span> <span class="o">=</span> <span class="n">log_path</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;log_config&#39;</span><span class="p">)</span>
+    <span class="n">run_path</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;run_config&#39;</span><span class="p">)</span>
+    <span class="n">aws_path</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;aws_config&#39;</span><span class="p">)</span>
+    <span class="n">log_path</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;log_config&#39;</span><span class="p">)</span>
 
     <span class="c1"># load any yaml config files for which paths were provided</span>
-    <span class="k">if</span> <span class="n">sql_path</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">sql_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">sql_args</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">run_path</span><span class="p">:</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">run_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -734,8 +744,6 @@
             <span class="n">log_args</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
     <span class="c1"># Use keyword args to override yaml config values</span>
-    <span class="n">sql_args</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;sql_&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
-                     <span class="k">if</span> <span class="s1">&#39;sql_&#39;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">})</span>
     <span class="n">aws_args</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;aws_&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
                      <span class="k">if</span> <span class="s1">&#39;aws_&#39;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">})</span>
     <span class="n">run_args</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span>
@@ -746,12 +754,11 @@
     <span class="c1"># It&#39;s ok if there are some extra arguments that get passed in here; only</span>
     <span class="c1"># kwargs that correspond to real config values will be stored on the config</span>
     <span class="c1"># objects.</span>
-    <span class="n">sql_conf</span> <span class="o">=</span> <span class="n">SQLConfig</span><span class="p">(</span><span class="o">**</span><span class="n">sql_args</span><span class="p">)</span>
     <span class="n">aws_conf</span> <span class="o">=</span> <span class="n">AWSConfig</span><span class="p">(</span><span class="o">**</span><span class="n">aws_args</span><span class="p">)</span>
     <span class="n">run_conf</span> <span class="o">=</span> <span class="n">RunConfig</span><span class="p">(</span><span class="o">**</span><span class="n">run_args</span><span class="p">)</span>
     <span class="n">log_conf</span> <span class="o">=</span> <span class="n">LogConfig</span><span class="p">(</span><span class="o">**</span><span class="n">log_args</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">sql_conf</span><span class="p">,</span> <span class="n">run_conf</span><span class="p">,</span> <span class="n">aws_conf</span><span class="p">,</span> <span class="n">log_conf</span></div>
+    <span class="k">return</span> <span class="n">run_conf</span><span class="p">,</span> <span class="n">aws_conf</span><span class="p">,</span> <span class="n">log_conf</span></div>
 </pre></div>
 
            </div>
