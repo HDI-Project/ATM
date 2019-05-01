@@ -288,6 +288,7 @@ class Worker(object):
         local_model_path: path to serialized model in the local file system
         local_metric_path: path to serialized metrics in the local file system
         """
+
         # TODO: This does not work
         conn = S3Connection(self.aws_config.access_key, self.aws_config.secret_key)
         bucket = conn.get_bucket(self.aws_config.s3_bucket)

@@ -14,7 +14,6 @@ from importlib import import_module
 
 import numpy as np
 import pandas as pd
-from past.utils import old_div
 from sklearn import decomposition
 from sklearn.gaussian_process.kernels import (
     RBF, ConstantKernel, ExpSineSquared, Matern, RationalQuadratic)
@@ -159,7 +158,7 @@ class Model(object):
         # time the prediction
         start_time = time.time()
         total = time.time() - start_time
-        self.avg_predict_time = old_div(total, float(len(y)))
+        self.avg_predict_time = total / float(len(y))
 
         # TODO: this is hacky. See https://github.com/HDI-Project/ATM/issues/48
         binary = self.num_classes == 2
