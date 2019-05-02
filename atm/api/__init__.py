@@ -1,11 +1,9 @@
-import os
-
-from flask import Flask, abort, jsonify, redirect, request
+from flask import Flask, jsonify, redirect, request
 from flask_restless_swagger import SwagAPIManager as APIManager
 from flask_sqlalchemy import SQLAlchemy
 
 from atm.api.preprocessors import DATASET_PREPROCESSORS
-from atm.api.utils import make_absolute
+from atm.api.utils import auto_abort, make_absolute
 from atm.config import RunConfig
 
 
@@ -19,17 +17,15 @@ def create_app(atm, debug=False):
     manager = APIManager(app, flask_sqlalchemy_db=SQLAlchemy(app))
 
     @app.route('/api/run', methods=['POST'])
+    @auto_abort((KeyError, ValueError))
     def atm_run():
-        if not request.json:
-            abort(400)
-
         data = request.json
         run_conf = RunConfig(data)
 
         dataruns = atm.create_dataruns(run_conf)
 
         response = {
-            'status': 'OK',
+            'status': 200,
             'datarun_ids': [datarun.id for datarun in dataruns]
         }
 
