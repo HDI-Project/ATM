@@ -229,7 +229,8 @@ def _get_parser():
     logging_args.add_argument('-v', '--verbose', action='count', default=0)
     logging_args.add_argument('-l', '--logfile')
 
-    parser = argparse.ArgumentParser(description='ATM Command Line Interface')
+    parser = argparse.ArgumentParser(description='ATM Command Line Interface',
+                                     parents=[logging_args])
 
     subparsers = parser.add_subparsers(title='action', help='Action to perform')
     parser.set_defaults(action=None)
@@ -250,7 +251,8 @@ def _get_parser():
         log_args,
         run_args
     ]
-    enter_data = subparsers.add_parser('enter_data', parents=enter_data_parents)
+    enter_data = subparsers.add_parser('enter_data', parents=enter_data_parents,
+                                       help='Add a Dataset and trigger a Datarun on it.')
     enter_data.set_defaults(action=_enter_data)
 
     # Wroker Args
@@ -268,7 +270,8 @@ def _get_parser():
         aws_args,
         log_args
     ]
-    worker = subparsers.add_parser('worker', parents=worker_parents)
+    worker = subparsers.add_parser('worker', parents=worker_parents,
+                                   help='Start a single worker in foreground.')
     worker.set_defaults(action=_work)
     worker.add_argument('--dataruns', help='Only train on dataruns with these ids', nargs='+')
     worker.add_argument('--total-time', help='Number of seconds to run worker', type=int)
@@ -279,7 +282,8 @@ def _get_parser():
     server_args.add_argument('--port', help='Port to listen at', type=int)
 
     # Server
-    server = subparsers.add_parser('server', parents=[logging_args, server_args, sql_args])
+    server = subparsers.add_parser('server', parents=[logging_args, server_args, sql_args],
+                                   help='Start the REST API Server in foreground.')
     server.set_defaults(action=_serve)
     server.add_argument('--debug', help='Start in debug mode', action='store_true')
     # add_arguments_sql(server)
@@ -306,7 +310,8 @@ def _get_parser():
         aws_args,
         log_args
     ]
-    start = subparsers.add_parser('start', parents=start_parents)
+    start = subparsers.add_parser('start', parents=start_parents,
+                                  help='Start an ATM Local Cluster.')
     start.set_defaults(action=_start)
 
     # Status
@@ -321,19 +326,23 @@ def _get_parser():
                            help='Kill the process if it does not terminate gracefully.')
 
     # Stop
-    stop = subparsers.add_parser('stop', parents=[logging_args, stop_args, background_args])
+    stop = subparsers.add_parser('stop', parents=[logging_args, stop_args, background_args],
+                                 help='Stop an ATM Local Cluster.')
     stop.set_defaults(action=_stop)
 
     # restart
-    restart = subparsers.add_parser('restart', parents=start_parents + [stop_args])
+    restart = subparsers.add_parser('restart', parents=start_parents + [stop_args],
+                                    help='Restart an ATM Local Cluster.')
     restart.set_defaults(action=_restart)
 
     # Make Config
-    make_config = subparsers.add_parser('make_config', parents=[logging_args])
+    make_config = subparsers.add_parser('make_config', parents=[logging_args],
+                                        help='Generate a config templates folder in the cwd.')
     make_config.set_defaults(action=_make_config)
 
     # Get Demos
-    get_demos = subparsers.add_parser('get_demos', parents=[logging_args])
+    get_demos = subparsers.add_parser('get_demos', parents=[logging_args],
+                                      help='Generate a demos folder with demo CSVs in the cwd.')
     get_demos.set_defaults(action=_get_demos)
 
     return parser
