@@ -55,7 +55,7 @@ class Worker(object):
         self.aws_config = aws_config
         self.public_ip = public_ip
 
-        log_config = log_config or LogConfig()
+        log_config = log_config or LogConfig({})
         self.model_dir = log_config.model_dir
         self.metric_dir = log_config.metric_dir
         self.verbose_metrics = log_config.verbose_metrics

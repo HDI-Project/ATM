@@ -8,20 +8,24 @@ DATASET_KEYS = ['name', 'description', 'train_path', 'class_column']
 def dataset_post(data):
     """Preprocess the Dataset POST data."""
     if all(key in data for key in DATASET_KEYS):
-        meta = MetaData(
-            data['class_column'],
-            data['train_path'],
-            data.get('test_path')
-        )
+        try:
+            meta = MetaData(
+                data['class_column'],
+                data['train_path'],
+                data.get('test_path')
+            )
 
-        data['n_examples'] = meta.n_examples
-        data['k_classes'] = meta.k_classes
-        data['d_features'] = meta.d_features
-        data['majority'] = meta.majority
-        data['size_kb'] = meta.size
+            data['n_examples'] = meta.n_examples
+            data['k_classes'] = meta.k_classes
+            data['d_features'] = meta.d_features
+            data['majority'] = meta.majority
+            data['size_kb'] = meta.size
+
+        except FileNotFoundError:
+            abort(400, 'The train_path does not exists in the server.')
 
     else:
-        abort(400)
+        abort(400, 'There is a missing field from the requiered ones')
 
 
 DATASET_PREPROCESSORS = {

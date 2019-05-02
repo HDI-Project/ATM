@@ -240,4 +240,5 @@ class ATM(object):
             dataset = self.create_dataset(dataset_conf)
             run_conf.dataset_id = dataset.id
 
-        self.create_dataruns(run_conf)
+        dataruns = self.create_dataruns(run_conf)
+        return dataruns[0] if not run_conf.run_per_partition else dataruns
