@@ -177,6 +177,8 @@ class ATM(object):
         Returns: ID of the generated datarun
         """
         dataset = self.db.get_dataset(run_conf.dataset_id)
+        if not dataset:
+            raise ValueError('Invalid Dataset ID: {}'.format(run_conf.dataset_id))
 
         method_parts = {}
         for m in run_conf.methods:
