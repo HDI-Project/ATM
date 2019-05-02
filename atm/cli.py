@@ -197,17 +197,31 @@ def _enter_data(args):
     atm.enter_data(dataset_conf, run_conf)
 
 
-def _make_config(args):
-    config_templates = os.path.join('config', 'templates')
-    config_dir = os.path.join(os.path.dirname(__file__), config_templates)
-    target_dir = os.path.join(os.getcwd(), config_templates)
+def _copy_files(pattern, source, target=None):
+    if isinstance(source, (list, tuple)):
+        source = os.path.join(*source)
+
+    if target is None:
+        target = source
+
+    source_dir = os.path.join(os.path.dirname(__file__), source)
+    target_dir = os.path.join(os.getcwd(), target)
+
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
 
-    for template in glob.glob(os.path.join(config_dir, '*.yaml')):
-        target_file = os.path.join(target_dir, os.path.basename(template))
+    for source_file in glob.glob(os.path.join(source_dir, pattern)):
+        target_file = os.path.join(target_dir, os.path.basename(source_file))
         print('Generating file {}'.format(target_file))
-        shutil.copy(template, target_file)
+        shutil.copy(source_file, target_file)
+
+
+def _make_config(args):
+    _copy_files('*.yaml', ('config', 'templates'))
+
+
+def _get_demos(args):
+    _copy_files('*.csv', ('data', 'test'), 'demos')
 
 
 def _get_parser():
@@ -317,6 +331,10 @@ def _get_parser():
     # Make Config
     make_config = subparsers.add_parser('make_config', parents=[logging_args])
     make_config.set_defaults(action=_make_config)
+
+    # Get Demos
+    get_demos = subparsers.add_parser('get_demos', parents=[logging_args])
+    get_demos.set_defaults(action=_get_demos)
 
     return parser
 
