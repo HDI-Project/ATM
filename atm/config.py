@@ -40,12 +40,19 @@ class Config(object):
     def _get_arg(cls, args, name):
         arg_name = cls._add_prefix(name)
         class_value = getattr(cls, name)
+        required = False
         if isinstance(class_value, dict):
+            required = 'default' not in class_value
             default = class_value.get('default')
         elif isinstance(class_value, tuple):
+            required = False
             default = class_value[1]
         else:
+            required = False
             default = None
+
+        if required and arg_name not in args:
+            raise KeyError(arg_name)
 
         return args.get(arg_name, default)
 
