@@ -14,7 +14,6 @@ virtualenv, and execute this command:
 atm start
 ```
 
-
 This will start **ATM** server as a background service. The REST server will be listening at the
 port 5000 of your machine, and if you point your browser at http://127.0.0.1:5000/, you will see
 the documentation website that shows information about all the REST operations allowed by the API.
@@ -293,6 +292,87 @@ And the output will be (note that some parts have been cut):
 }
 ```
 
+### Perform a POST
+
+#### POST Dataset
+
+If you would like to create a `dataset` from the **ATM** REST API you can perform a `POST` action
+where the required fields are:
+
+* `name`, desired name for the dataset.
+* `description`, the description for the dataset.
+* `train_path`, where the `.csv` file is located.
+* `class_column`, target column.
+
+Additionally we can paass the `test_path`, which points to the testing dataset `csv`.
+
+An example of such a POST would be:
+
+```bash
+curl localhost:5000/api/datasets -H 'Content-Type: application/json' \
+-d '{"name": "test", "train_path": "atm/data/test/pollution_1.csv", "class_column": "class", "description": "testing"}'
+```
+
+An output similar to this one should appear in your console:
+
+```bash
+{
+   "size_kb" : 8,
+   "name" : "test",
+   "majority" : 0.516666667,
+   "n_examples" : 60,
+   "id" : 2,
+   "description" : "testing",
+   "train_path" : "atm/data/test/pollution_1.csv",
+   "dataruns" : [],
+   "class_column" : "class",
+   "test_path" : null,
+   "k_classes" : 2,
+   "d_features" : 16
+}
+
+```
+
+
+#### Create a Datarun from a Dataset
+
+If you would like to create the `dataruns` for the dataset that we just created, you can do so by
+making a `POST` call similar to the one before poiting to: `http://127.0.0.1:5000/api/run` .
+
+This post data requires atleast the `dataset_id` parameter.
+
+Optionally accepts the following parameters:
+
+* `description`
+* `run_per_partition`
+* `tuner`
+* `selector`
+* `gridding`
+* `priority`
+* `budget_type`
+* `budget`
+* `metric`
+* `k_window`
+* `r_minimum`
+* `score_target`
+* `deadline`
+
+Information about the values that can be contained above can be found
+[here](https://hdi-project.github.io/ATM/database.html#dataruns)
+
+A simple `POST` to this endpoint:
+
+```bash
+curl localhost:5000/api/run -H 'Content-Type: application/json' -d '{"dataset_id": 2}'
+```
+
+An output like this should print in the console:
+
+```bash
+{"datarun_ids":[37],"status":"OK"}
+```
+
+If you have any workers running with the server, this will launch the workers process.
 
 ## Additional information
 
