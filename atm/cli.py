@@ -13,28 +13,13 @@ from daemon import DaemonContext
 from lockfile.pidlockfile import PIDLockFile
 
 from atm.api import create_app
-# from atm.config import (
-#     add_arguments_aws_s3, add_arguments_datarun, add_arguments_logging, add_arguments_sql,
-#     load_config)
 from atm.config import AWSConfig, DatasetConfig, LogConfig, RunConfig, SQLConfig
 from atm.core import ATM
 
 LOGGER = logging.getLogger(__name__)
 
 
-# def _get_db(args):
-#     """Returns an instance of Database with the given args."""
-#     db_args = {
-#         k[4:]: v
-#         for k, v in vars(args).items()
-#         if k.startswith('sql_') and v is not None
-#     }
-#     return Database(**db_args)
-
-
 def _get_atm(args):
-    # db = _get_db(args)
-    # run_conf, aws_conf, log_conf = load_config(**vars(args))
     sql_conf = SQLConfig(args)
     aws_conf = AWSConfig(args)
     log_conf = LogConfig(args)
@@ -57,9 +42,8 @@ def _work(args, wait=False):
 
 def _serve(args):
     """Launch the ATM API with the given host / port."""
-    # db = _get_db(args)
     atm = _get_atm(args)
-    app = create_app(atm)
+    app = create_app(atm, getattr(args, 'debug', False))
     app.run(host=args.host, port=args.port)
 
 
@@ -210,7 +194,7 @@ def _enter_data(args):
     atm = _get_atm(args)
     run_conf = RunConfig(args)
     dataset_conf = DatasetConfig(args)
-    atm.enter_data(dataset_conf, run_conf, args.run_per_partition)
+    atm.enter_data(dataset_conf, run_conf)
 
 
 def _make_config(args):
@@ -224,13 +208,6 @@ def _make_config(args):
         target_file = os.path.join(target_dir, os.path.basename(template))
         print('Generating file {}'.format(target_file))
         shutil.copy(template, target_file)
-
-
-# load other functions from config.py
-# def _add_common_arguments(parser):
-#     add_arguments_sql(parser)
-#     add_arguments_aws_s3(parser)
-#     add_arguments_logging(parser)
 
 
 def _get_parser():
@@ -261,17 +238,12 @@ def _get_parser():
     ]
     enter_data = subparsers.add_parser('enter_data', parents=enter_data_parents)
     enter_data.set_defaults(action=_enter_data)
-    # _add_common_arguments(enter_data)
-    # add_arguments_datarun(enter_data)
-    enter_data.add_argument('--run-per-partition', default=False, action='store_true',
-                            help='if set, generate a new datarun for each hyperpartition')
 
     # Wroker Args
     worker_args = argparse.ArgumentParser(add_help=False)
     worker_args.add_argument('--cloud-mode', action='store_true', default=False,
                              help='Whether to run this worker in cloud mode')
-    worker_args.add_argument('--no-save', dest='save_files', default=True,
-                             action='store_const', const=False,
+    worker_args.add_argument('--no-save', dest='save_files', action='store_false',
                              help="don't save models and metrics at all")
 
     # Worker
@@ -284,7 +256,6 @@ def _get_parser():
     ]
     worker = subparsers.add_parser('worker', parents=worker_parents)
     worker.set_defaults(action=_work)
-    # _add_common_arguments(worker)
     worker.add_argument('--dataruns', help='Only train on dataruns with these ids', nargs='+')
     worker.add_argument('--total-time', help='Number of seconds to run worker', type=int)
 
@@ -296,6 +267,7 @@ def _get_parser():
     # Server
     server = subparsers.add_parser('server', parents=[logging_args, server_args, sql_args])
     server.set_defaults(action=_serve)
+    server.add_argument('--debug', help='Start in debug mode', action='store_true')
     # add_arguments_sql(server)
 
     # Background Args
@@ -322,7 +294,6 @@ def _get_parser():
     ]
     start = subparsers.add_parser('start', parents=start_parents)
     start.set_defaults(action=_start)
-    # _add_common_arguments(start)
 
     # Status
     status = subparsers.add_parser('status', parents=[logging_args, background_args])
@@ -342,7 +313,6 @@ def _get_parser():
     # restart
     restart = subparsers.add_parser('restart', parents=start_parents + [stop_args])
     restart.set_defaults(action=_restart)
-    # _add_common_arguments(restart)
 
     # Make Config
     make_config = subparsers.add_parser('make_config', parents=[logging_args])

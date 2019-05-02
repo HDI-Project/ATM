@@ -15,9 +15,10 @@ def make_absolute(url):
     return url
 
 
-def create_app(atm):
+def create_app(atm, debug=False):
     db = atm.db
     app = Flask(__name__)
+    app.config['DEBUG'] = debug
     app.config['SQLALCHEMY_DATABASE_URI'] = make_absolute(db.engine.url)
 
     # Create the Flask-Restless API manager.
@@ -29,10 +30,9 @@ def create_app(atm):
             abort(400)
 
         data = request.json
-        run_per_partition = data.get('run_per_partition', False)
         run_conf = RunConfig(data)
 
-        dataruns = atm.create_dataruns(run_conf, run_per_partition)
+        dataruns = atm.create_dataruns(run_conf)
 
         response = {
             'status': 'OK',

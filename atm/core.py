@@ -12,7 +12,7 @@ import logging
 import os
 import random
 import time
-from builtins import map, object
+from builtins import object
 from datetime import datetime, timedelta
 from operator import attrgetter
 
@@ -170,7 +170,7 @@ class ATM(object):
                                          r_minimum=run_conf.r_minimum)
         return datarun
 
-    def create_dataruns(self, run_conf, run_per_partition=False):
+    def create_dataruns(self, run_conf):
         """
         Generate a datarun, including a dataset if necessary.
 
@@ -188,7 +188,7 @@ class ATM(object):
 
         # create hyperpartitions and datarun(s)
         dataruns = []
-        if not run_per_partition:
+        if not run_conf.run_per_partition:
             LOGGER.debug('saving datarun...')
             datarun = self.create_datarun(dataset, run_conf)
             dataruns.append(datarun)
@@ -198,7 +198,7 @@ class ATM(object):
             for part in parts:
                 # if necessary, create a new datarun for each hyperpartition.
                 # This setting is useful for debugging.
-                if run_per_partition:
+                if run_conf.run_per_partition:
                     datarun = self.create_datarun(dataset, run_conf)
                     dataruns.append(datarun)
 
@@ -210,9 +210,25 @@ class ATM(object):
                                               categoricals=part.categoricals,
                                               status=PartitionStatus.INCOMPLETE)
 
+        LOGGER.info('Dataruns created. Summary:')
+        LOGGER.info('\tDataset ID: %d', dataset.id)
+        LOGGER.info('\tTraining data: %s', dataset.train_path)
+        LOGGER.info('\tTest data: %s', (dataset.test_path or 'None'))
+
+        datarun = dataruns[0]
+        if run_conf.run_per_partition:
+            LOGGER.info('\tDatarun IDs: %s', ', '.join(str(datarun.id) for datarun in dataruns))
+
+        else:
+            LOGGER.info('\tDatarun ID: %d', datarun.id)
+
+        LOGGER.info('\tHyperpartition selection strategy: %s', datarun.selector)
+        LOGGER.info('\tParameter tuning strategy: %s', datarun.tuner)
+        LOGGER.info('\tBudget: %d (%s)', datarun.budget, datarun.budget_type)
+
         return dataruns
 
-    def enter_data(self, dataset_conf, run_conf, run_per_partition=False):
+    def enter_data(self, dataset_conf, run_conf):
         """
         Generate a datarun, including a dataset if necessary.
 
@@ -224,20 +240,4 @@ class ATM(object):
             dataset = self.create_dataset(dataset_conf)
             run_conf.dataset_id = dataset.id
 
-        dataruns = self.create_dataruns(run_conf, run_per_partition)
-
-        LOGGER.info('Data entry complete. Summary:')
-        LOGGER.info('\tDataset ID: %d', dataset.id)
-        LOGGER.info('\tTraining data: %s', dataset.train_path)
-        LOGGER.info('\tTest data: %s', (dataset.test_path or 'None'))
-
-        datarun = dataruns[0]
-        if run_per_partition:
-            LOGGER.info('\tDatarun IDs: %s', ', '.join(str(datarun.id) for datarun in dataruns))
-
-        else:
-            LOGGER.info('\tDatarun ID: %d', datarun.id)
-
-        LOGGER.info('\tHyperpartition selection strategy: %s', datarun.selector)
-        LOGGER.info('\tParameter tuning strategy: %s', datarun.tuner)
-        LOGGER.info('\tBudget: %d (%s)', datarun.budget, datarun.budget_type)
+        self.create_dataruns(run_conf)

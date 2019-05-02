@@ -40,7 +40,9 @@ class Config(object):
     def _get_arg(cls, args, name):
         arg_name = cls._add_prefix(name)
         class_value = getattr(cls, name)
-        if isinstance(class_value, tuple):
+        if isinstance(class_value, dict):
+            default = class_value.get('default')
+        elif isinstance(class_value, tuple):
             default = class_value[1]
         else:
             default = None
@@ -67,6 +69,10 @@ class Config(object):
     def get_parser(cls):
         parser = argparse.ArgumentParser(add_help=False)
 
+        # make sure the text for these arguments is formatted correctly
+        # this allows newlines in the help strings
+        parser.formatter_class = argparse.RawTextHelpFormatter
+
         if cls._PREFIX:
             parser.add_argument('--{}-config'.format(cls._PREFIX),
                                 help='path to yaml {} config file'.format(cls._PREFIX))
@@ -75,20 +81,15 @@ class Config(object):
             if not name.startswith('_') and not callable(description):
                 arg_name = '--' + cls._add_prefix(name).replace('_', '-')
 
-                if isinstance(description, tuple):
-                    if len(description) == 3:
-                        description, default, choices = description
-                        parser.add_argument(arg_name, help=description,
-                                            default=default, choices=choices)
-                    else:
-                        description, default = description
-                        if default is False:
-                            parser.add_argument(arg_name, help=description,
-                                                action='store_true')
+                if isinstance(description, dict):
+                    parser.add_argument(arg_name, **description)
 
-                        else:
-                            parser.add_argument(arg_name, help=description,
-                                                default=default)
+                elif isinstance(description, tuple):
+                    description, default = description
+                    parser.add_argument(arg_name, help=description, default=default)
+
+                else:
+                    parser.add_argument(arg_name, help=description)
 
         return parser
 
@@ -127,7 +128,11 @@ class SQLConfig(Config):
     """ Stores configuration for SQL database setup & connection """
     _PREFIX = 'sql'
 
-    dialect = ('Dialect of SQL to use', 'sqlite', SQL_DIALECTS)
+    dialect = {
+        'help': 'Dialect of SQL to use',
+        'default': 'sqlite',
+        'choices': SQL_DIALECTS
+    }
     database = ('Name of, or path to, SQL database', 'atm.db')
     username = 'Username for SQL database'
     password = 'Password for SQL database'
@@ -137,16 +142,16 @@ class SQLConfig(Config):
 
 
 class LogConfig(Config):
-    # log_level_stdout = ('minimum log level to write to stdout', 'ERROR')
-    # log_level_file =('minimum log level to write to the log file', 'INFO')
-    # log_dir = ('Directory where logs will be saved', 'logs')
     model_dir = ('Directory where computed models will be saved', 'models')
     metric_dir = ('Directory where model metrics will be saved', 'metrics')
-    verbose_metrics = (
-        'If set, compute full ROC and PR curves and '
-        'per-label metrics for each classifier',
-        False
-    )
+    verbose_metrics = {
+        'help': (
+            'If set, compute full ROC and PR curves and '
+            'per-label metrics for each classifier'
+        ),
+        'action': 'store_true',
+        'default': False
+    }
 
 
 def option_or_path(options, regex=CUSTOM_CLASS_REGEX):
@@ -162,193 +167,196 @@ def option_or_path(options, regex=CUSTOM_CLASS_REGEX):
             return s
 
         # if both of those fail, there's something wrong
-        raise argparse.ArgumentTypeError('%s is not a valid option or path!' % s)
+        raise argparse.ArgumentTypeError('{} is not a valid option or path!'.format(s))
 
     return type_check
 
 
 class RunConfig(Config):
-    """ Stores configuration for Dataset and Datarun setup """
+    """Stores configuration for Dataset and Datarun setup."""
     _CONFIG = 'run'
 
-    # dataset config
-    # train_path = None
-    # test_path = None
-    # data_description = None
-    # class_column = None
+    dataset_id = {
+        'help': 'ID of dataset, if it is already in the database',
+        'type': int
+    }
 
-    # datarun config
-    dataset_id = None
-    methods = None
-    priority = None
-    budget_type = None
-    budget = None
-    deadline = None
-    tuner = None
-    r_minimum = None
-    gridding = None
-    selector = None
-    k_window = None
-    metric = None
-    score_target = None
+    run_per_partition = {
+        'help': 'if true, generate a new datarun for each hyperpartition',
+        'default': False,
+        'action': 'store_true',
+    }
 
-    @classmethod
-    def get_parser(cls):
-        parser = argparse.ArgumentParser(add_help=False)
+    # Method options:
+    #   logreg - logistic regression
+    #   svm    - support vector machine
+    #   sgd    - linear classifier with stochastic gradient descent
+    #   dt     - decision tree
+    #   et     - extra trees
+    #   rf     - random forest
+    #   gnb    - gaussian naive bayes
+    #   mnb    - multinomial naive bayes
+    #   bnb    - bernoulli naive bayes
+    #   gp     - gaussian process
+    #   pa     - passive aggressive
+    #   knn    - K nearest neighbors
+    #   mlp    - multi-layer perceptron
+    #
+    # Notes:
+    # - Support vector machines (svm) can take a long time to train. It's not an
+    #   error, it's just part of what happens when the method happens to explore
+    #   a crappy set of parameters on a powerful algo like this.
+    # - Stochastic gradient descent (sgd) can sometimes fail on certain
+    #   parameter settings as well. Don't worry, they train SUPER fast, and the
+    #   worker.py will simply log the error and continue.
+    methods = {
+        'help': (
+            'Method or list of methods to use for '
+            'classification. Each method can either be one of the '
+            'pre-defined method codes listed below or a path to a '
+            'JSON file defining a custom method.\n\nOptions: [{}]'
+        ).format(', '.join(str(s) for s in METHODS)),
+        'default': ['logreg', 'dt', 'knn'],
+        'type': option_or_path(METHODS, JSON_REGEX),
+        'nargs': '+'
+    }
 
-        # make sure the text for these arguments is formatted correctly
-        # this allows newlines in the help strings
-        parser.formatter_class = argparse.RawTextHelpFormatter
+    priority = {
+        'help': 'Priority of the datarun (higher = more important',
+        'default': 1,
+        'type': int
+    }
+    budget_type = {
+        'help': 'Type of budget to use',
+        'default': 'classifier',
+        'choices': BUDGET_TYPES,
+    }
+    budget = {
+        'help': 'Value of the budget, either in classifiers or minutes',
+        'default': 100,
+        'type': int,
+    }
+    deadline = (
+        'Deadline for datarun completion. If provided, this '
+        'overrides the configured walltime budget.\nFormat: {}'
+    ).format(TIME_FMT.replace('%', '%%'))
 
-        # Config file
-        parser.add_argument('--run-config', help='path to yaml datarun config file')
+    # Which field to use to judge performance, for the sake of AutoML
+    # options:
+    #   f1        - F1 score (harmonic mean of precision and recall)
+    #   roc_auc   - area under the Receiver Operating Characteristic curve
+    #   accuracy  - percent correct
+    #   cohen_kappa     - measures accuracy, but controls for chance of guessing
+    #                     correctly
+    #   rank_accuracy   - multiclass only: percent of examples for which the true
+    #                     label is in the top 1/3 most likely predicted labels
+    #   ap        - average precision: nearly identical to area under
+    #               precision/recall curve.
+    #   mcc       - matthews correlation coefficient: good for unbalanced classes
+    #
+    # f1 and roc_auc may be appended with _micro or _macro to use with
+    # multiclass problems.
+    metric = {
+        'help': (
+            'Metric by which ATM should evaluate classifiers. '
+            'The metric function specified here will be used to '
+            'compute the "judgment metric" for each classifier.'
+        ),
+        'default': 'f1',
+        'choices': METRICS,
+    }
 
-        #  Dataset Arguments  #####################################################
-        # ##########################################################################
-        parser.add_argument('--dataset-id', type=int,
-                            help="ID of dataset, if it's already in the database")
+    # Which data to use for computing judgment score
+    #   cv   - cross-validated performance on training data
+    #   test - performance on test data
+    #   mu_sigma - lower confidence bound on cv score
+    score_target = {
+        'help': (
+            'Determines which judgment metric will be used to '
+            'search the hyperparameter space. "cv" will use the mean '
+            'cross-validated performance, "test" will use the '
+            'performance on a test dataset, and "mu_sigma" will use '
+            'the lower confidence bound on the CV performance.'
+        ),
+        'default': 'cv',
+        'choices': SCORE_TARGETS
+    }
 
-        # These are only relevant if dataset_id is not provided
-        # parser.add_argument('--train-path', help='Path to raw training data',
-        #                     default=os.path.join(DATA_TEST_PATH, 'pollution_1.csv'))
-        # parser.add_argument('--test-path', help='Path to raw test data (if applicable)')
-        # parser.add_argument('--data-description', help='Description of dataset')
-        # parser.add_argument('--class-column', default='class',
-        #                     help='Name of the class column in the input data')
+    #   AutoML Arguments  ######################################################
+    # ##########################################################################
 
-        #   Datarun Arguments  #####################################################
-        # ##########################################################################
-        # Notes:
-        # - Support vector machines (svm) can take a long time to train. It's not an
-        #   error, it's just part of what happens when the method happens to explore
-        #   a crappy set of parameters on a powerful algo like this.
-        # - Stochastic gradient descent (sgd) can sometimes fail on certain
-        #   parameter settings as well. Don't worry, they train SUPER fast, and the
-        #   worker.py will simply log the error and continue.
-        #
-        # Method options:
-        #   logreg - logistic regression
-        #   svm    - support vector machine
-        #   sgd    - linear classifier with stochastic gradient descent
-        #   dt     - decision tree
-        #   et     - extra trees
-        #   rf     - random forest
-        #   gnb    - gaussian naive bayes
-        #   mnb    - multinomial naive bayes
-        #   bnb    - bernoulli naive bayes
-        #   gp     - gaussian process
-        #   pa     - passive aggressive
-        #   knn    - K nearest neighbors
-        #   mlp    - multi-layer perceptron
-        parser.add_argument('--methods', nargs='+',
-                            type=option_or_path(METHODS, JSON_REGEX),
-                            default=['logreg', 'dt', 'knn'],
-                            help='Method or list of methods to use for '
-                            'classification. Each method can either be one of the '
-                            'pre-defined method codes listed below or a path to a '
-                            'JSON file defining a custom method.'
-                            '\n\nOptions: [%s]' % ', '.join(str(s) for s in METHODS))
-        parser.add_argument('--priority', type=int, default=1,
-                            help='Priority of the datarun (higher = more important')
-        parser.add_argument('--budget-type', choices=BUDGET_TYPES, default='classifier',
-                            help='Type of budget to use')
-        parser.add_argument('--budget', type=int, default=100,
-                            help='Value of the budget, either in classifiers or minutes')
-        parser.add_argument('--deadline',
-                            help='Deadline for datarun completion. If provided, this '
-                            'overrides the configured walltime budget.\nFormat: {}'.format(
-                                TIME_FMT.replace('%', '%%')))
+    # hyperparameter selection strategy
+    # How should ATM sample hyperparameters from a given hyperpartition?
+    #    uniform  - pick randomly! (baseline)
+    #    gp       - vanilla Gaussian Process
+    #    gp_ei    - Gaussian Process expected improvement criterion
+    #    gp_eivel - Gaussian Process expected improvement, with randomness added
+    #               in based on velocity of improvement
+    #   path to custom tuner, defined in python
+    tuner = {
+        'help': (
+            'Type of BTB tuner to use. Can either be one of the pre-configured '
+            'tuners listed below or a path to a custom tuner in the form '
+            '"/path/to/tuner.py:ClassName".\n\nOptions: [{}]'
+        ).format(', '.join(str(s) for s in TUNERS)),
+        'default': 'uniform',
+        'type': option_or_path(TUNERS)
+    }
 
-        # Which field to use to judge performance, for the sake of AutoML
-        # options:
-        #   f1        - F1 score (harmonic mean of precision and recall)
-        #   roc_auc   - area under the Receiver Operating Characteristic curve
-        #   accuracy  - percent correct
-        #   cohen_kappa     - measures accuracy, but controls for chance of guessing
-        #                     correctly
-        #   rank_accuracy   - multiclass only: percent of examples for which the true
-        #                     label is in the top 1/3 most likely predicted labels
-        #   ap        - average precision: nearly identical to area under
-        #               precision/recall curve.
-        #   mcc       - matthews correlation coefficient: good for unbalanced classes
-        #
-        # f1 and roc_auc may be appended with _micro or _macro to use with
-        # multiclass problems.
-        parser.add_argument('--metric', choices=METRICS, default='f1',
-                            help='Metric by which ATM should evaluate classifiers. '
-                            'The metric function specified here will be used to '
-                            'compute the "judgment metric" for each classifier.')
+    # How should ATM select a particular hyperpartition from the set of all
+    # possible hyperpartitions?
+    # Options:
+    #   uniform      - pick randomly
+    #   ucb1         - UCB1 multi-armed bandit
+    #   bestk        - MAB using only the best K runs in each hyperpartition
+    #   bestkvel     - MAB with velocity of best K runs
+    #   purebestkvel - always return hyperpartition with highest velocity
+    #   recentk      - MAB with most recent K runs
+    #   recentkvel   - MAB with velocity of most recent K runs
+    #   hieralg      - hierarchical MAB: choose a classifier first, then choose
+    #                  a partition
+    #   path to custom selector, defined in python
+    selector = {
+        'help': (
+            'Type of BTB selector to use. Can either be one of the pre-configured '
+            'selectors listed below or a path to a custom tuner in the form '
+            '"/path/to/selector.py:ClassName".\n\nOptions: [{}]'
+        ).format(', '.join(str(s) for s in SELECTORS)),
+        'default': 'uniform',
+        'type': option_or_path(SELECTORS)
+    }
 
-        # Which data to use for computing judgment score
-        #   cv   - cross-validated performance on training data
-        #   test - performance on test data
-        #   mu_sigma - lower confidence bound on cv score
-        parser.add_argument('--score-target', choices=SCORE_TARGETS, default='cv',
-                            help='Determines which judgment metric will be used to '
-                            'search the hyperparameter space. "cv" will use the mean '
-                            'cross-validated performance, "test" will use the '
-                            'performance on a test dataset, and "mu_sigma" will use '
-                            'the lower confidence bound on the CV performance.')
+    # r_minimum is the number of random runs performed in each hyperpartition before
+    # allowing bayesian opt to select parameters. Consult the thesis to
+    # understand what those mean, but essentially:
+    #
+    #  if (num_classifiers_trained_in_hyperpartition >= r_minimum)
+    #    # train using sample criteria
+    #  else
+    #    # train using uniform (baseline)
+    r_minimum = {
+        'help': 'number of random runs to perform before tuning can occur',
+        'default': 2,
+        'type': int
+    }
 
-        #   AutoML Arguments  ######################################################
-        # ##########################################################################
-        # hyperparameter selection strategy
-        # How should ATM sample hyperparameters from a given hyperpartition?
-        #    uniform  - pick randomly! (baseline)
-        #    gp       - vanilla Gaussian Process
-        #    gp_ei    - Gaussian Process expected improvement criterion
-        #    gp_eivel - Gaussian Process expected improvement, with randomness added
-        #               in based on velocity of improvement
-        #   path to custom tuner, defined in python
-        parser.add_argument('--tuner', type=option_or_path(TUNERS), default='uniform',
-                            help='Type of BTB tuner to use. Can either be one of '
-                            'the pre-configured tuners listed below or a path to a '
-                            'custom tuner in the form "/path/to/tuner.py:ClassName".'
-                            '\n\nOptions: [%s]' % ', '.join(str(s) for s in TUNERS))
+    # k is number that xxx-k methods use. It is similar to r_minimum, except it is
+    # called k_window and determines how much "history" ATM considers for certain
+    # partition selection logics.
+    k_window = {
+        'help': 'number of previous scores considered by -k selector methods',
+        'default': 3,
+        'type': int
+    }
 
-        # How should ATM select a particular hyperpartition from the set of all
-        # possible hyperpartitions?
-        # Options:
-        #   uniform      - pick randomly
-        #   ucb1         - UCB1 multi-armed bandit
-        #   bestk        - MAB using only the best K runs in each hyperpartition
-        #   bestkvel     - MAB with velocity of best K runs
-        #   purebestkvel - always return hyperpartition with highest velocity
-        #   recentk      - MAB with most recent K runs
-        #   recentkvel   - MAB with velocity of most recent K runs
-        #   hieralg      - hierarchical MAB: choose a classifier first, then choose
-        #                  a partition
-        #   path to custom selector, defined in python
-        parser.add_argument('--selector', type=option_or_path(SELECTORS), default='uniform',
-                            help='Type of BTB selector to use. Can either be one of '
-                            'the pre-configured selectors listed below or a path to a '
-                            'custom tuner in the form "/path/to/selector.py:ClassName".'
-                            '\n\nOptions: [%s]' % ', '.join(str(s) for s in SELECTORS))
-
-        # r_minimum is the number of random runs performed in each hyperpartition before
-        # allowing bayesian opt to select parameters. Consult the thesis to
-        # understand what those mean, but essentially:
-        #
-        #  if (num_classifiers_trained_in_hyperpartition >= r_minimum)
-        #    # train using sample criteria
-        #  else
-        #    # train using uniform (baseline)
-        parser.add_argument('--r-minimum', type=int, default=2,
-                            help='number of random runs to perform before tuning can occur')
-
-        # k is number that xxx-k methods use. It is similar to r_minimum, except it is
-        # called k_window and determines how much "history" ATM considers for certain
-        # partition selection logics.
-        parser.add_argument('--k-window', type=int, default=3,
-                            help='number of previous scores considered by -k selector methods')
-
-        # gridding determines whether or not sample selection will happen on a grid.
-        # If any positive integer, a grid with `gridding` points on each axis is
-        # established, and hyperparameter vectors are sampled from this finite
-        # space. If 0 (or blank), hyperparameters are sampled from continuous
-        # space, and there is no limit to the number of hyperparameter vectors that
-        # may be tried.
-        parser.add_argument('--gridding', type=int, default=0,
-                            help='gridding factor (0: no gridding)')
-
-        return parser
+    # gridding determines whether or not sample selection will happen on a grid.
+    # If any positive integer, a grid with `gridding` points on each axis is
+    # established, and hyperparameter vectors are sampled from this finite
+    # space. If 0 (or blank), hyperparameters are sampled from continuous
+    # space, and there is no limit to the number of hyperparameter vectors that
+    # may be tried.
+    gridding = {
+        'help': 'gridding factor (0: no gridding)',
+        'default': 0,
+        'type': int
+    }
