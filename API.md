@@ -61,20 +61,110 @@ For more detailed information about all the operations supported by the API, ple
 browser to http://127.0.0.1:5000/ and explore the examples provided by the
 [Swagger](https://swagger.io/) interface.
 
+### 0. Make a simple GET to see what's inside the datasets
+
+You can run a simple `GET` petition to the database in order to check if there is somenthing inside
+the database. If it's the first time running, there should be no data inside:
+
+```bash
+curl -X GET --header 'Accept: application/json, application/json' 'http://127.0.0.1:5000/api/datasets'
+```
+
+An ouput like this should be printed if you don't have any data:
+
+```bash
+{
+   "page" : 1,
+   "num_results" : 0,
+   "objects" : [],
+   "total_pages" : 0
+}
+```
+
 ### 1. Generate some data
 
 Before proceeding any further, please make sure the have already populated your data by triggering
 at least one model tuning process.
 
-An easy way to do this is to follow the quickstart from the ATM [README.md](README.md) file,
-which means having run these command:
+#### POST Dataset
 
-```
-atm enter_data
+First you need to create a `dataset`. From the **ATM** REST API you can perform a `POST` action
+to `api/datasets/` where the required fields are:
+
+* `name`, desired name for the dataset.
+* `description`, the description for the dataset.
+* `train_path`, where the `.csv` file is located.
+* `class_column`, target column.
+
+Additionally we can paass the `test_path`, which points to the testing dataset `csv`.
+
+This call will create a simple `dataset` in our database:
+
+```bash
+curl localhost:5000/api/datasets -H 'Content-Type: application/json' \
+-d '{"name": "test", "train_path": "atm/data/test/pollution_1.csv", "class_column": "class", "description": "testing"}'
 ```
 
-The workers that you started before will proceed the data that has been inserted and will populate
-the database.
+An output similar to this one should appear in your console:
+
+```bash
+{
+   "size_kb" : 8,
+   "name" : "test",
+   "majority" : 0.516666667,
+   "n_examples" : 60,
+   "id" : 1,
+   "description" : "testing",
+   "train_path" : "atm/data/test/pollution_1.csv",
+   "dataruns" : [],
+   "class_column" : "class",
+   "test_path" : null,
+   "k_classes" : 2,
+   "d_features" : 16
+}
+```
+
+
+#### Create a Datarun from a Dataset
+
+If you would like to create the `dataruns` for the dataset that we just created, you can do so by
+making a `POST` call similar to the one before poiting to: `http://127.0.0.1:5000/api/run` .
+
+This post data requires atleast the `dataset_id` parameter.
+
+Optionally accepts the following parameters:
+
+* `description`
+* `run_per_partition`
+* `tuner`
+* `selector`
+* `gridding`
+* `priority`
+* `budget_type`
+* `budget`
+* `metric`
+* `k_window`
+* `r_minimum`
+* `score_target`
+* `deadline`
+
+Information about the values that can be contained above can be found
+[here](https://hdi-project.github.io/ATM/database.html#dataruns)
+
+A simple `POST` to this endpoint:
+
+```bash
+curl localhost:5000/api/run -H 'Content-Type: application/json' -d '{"dataset_id": 1}'
+```
+
+An output like this should print in the console:
+
+```bash
+{"datarun_ids":[37],"status":"OK"}
+```
+
+The workers will then start working on this `dataruns` and once they are done (usually it takes
+arround 1-5 minutes depending on your computer / workers) you can proceed with the following steps.
 
 ### 2. REST Models
 
@@ -291,88 +381,6 @@ And the output will be (note that some parts have been cut):
   "total_pages": 1
 }
 ```
-
-### Perform a POST
-
-#### POST Dataset
-
-If you would like to create a `dataset` from the **ATM** REST API you can perform a `POST` action
-where the required fields are:
-
-* `name`, desired name for the dataset.
-* `description`, the description for the dataset.
-* `train_path`, where the `.csv` file is located.
-* `class_column`, target column.
-
-Additionally we can paass the `test_path`, which points to the testing dataset `csv`.
-
-An example of such a POST would be:
-
-```bash
-curl localhost:5000/api/datasets -H 'Content-Type: application/json' \
--d '{"name": "test", "train_path": "atm/data/test/pollution_1.csv", "class_column": "class", "description": "testing"}'
-```
-
-An output similar to this one should appear in your console:
-
-```bash
-{
-   "size_kb" : 8,
-   "name" : "test",
-   "majority" : 0.516666667,
-   "n_examples" : 60,
-   "id" : 2,
-   "description" : "testing",
-   "train_path" : "atm/data/test/pollution_1.csv",
-   "dataruns" : [],
-   "class_column" : "class",
-   "test_path" : null,
-   "k_classes" : 2,
-   "d_features" : 16
-}
-
-```
-
-
-#### Create a Datarun from a Dataset
-
-If you would like to create the `dataruns` for the dataset that we just created, you can do so by
-making a `POST` call similar to the one before poiting to: `http://127.0.0.1:5000/api/run` .
-
-This post data requires atleast the `dataset_id` parameter.
-
-Optionally accepts the following parameters:
-
-* `description`
-* `run_per_partition`
-* `tuner`
-* `selector`
-* `gridding`
-* `priority`
-* `budget_type`
-* `budget`
-* `metric`
-* `k_window`
-* `r_minimum`
-* `score_target`
-* `deadline`
-
-Information about the values that can be contained above can be found
-[here](https://hdi-project.github.io/ATM/database.html#dataruns)
-
-A simple `POST` to this endpoint:
-
-```bash
-curl localhost:5000/api/run -H 'Content-Type: application/json' -d '{"dataset_id": 2}'
-```
-
-An output like this should print in the console:
-
-```bash
-{"datarun_ids":[37],"status":"OK"}
-```
-
-If you have any workers running with the server, this will launch the workers process.
 
 ## Additional information
 
