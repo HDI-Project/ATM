@@ -1,5 +1,4 @@
 import os
-import traceback
 
 from atm.api.utils import auto_abort
 from atm.encoder import MetaData
