@@ -5,14 +5,8 @@ from flask_restless_swagger import SwagAPIManager as APIManager
 from flask_sqlalchemy import SQLAlchemy
 
 from atm.api.preprocessors import DATASET_PREPROCESSORS
+from atm.api.utils import make_absolute
 from atm.config import RunConfig
-
-
-def make_absolute(url):
-    if str(url).startswith('sqlite:///'):
-        url = 'sqlite:///' + os.path.abspath(url.database)
-
-    return url
 
 
 def create_app(atm, debug=False):
