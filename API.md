@@ -5,7 +5,17 @@ it via a REST API server that runs over [flask](http://flask.pocoo.org/).
 
 In this document you will find a briefly explanation how to start it and use it.
 
-## Starting the REST API Server
+
+## Quickstart
+
+In this section we will briefly show the basic usage of the REST API.
+
+For more detailed information about all the operations supported by the API, please point your
+browser to http://127.0.0.1:5000/ and explore the examples provided by the
+[Swagger](https://swagger.io/) interface.
+
+
+### 1. Start the REST API Server
 
 In order to start a REST API server, after installing ATM open a terminal, activate its
 virtualenv, and execute this command:
@@ -53,120 +63,64 @@ atm start --workers 4
 For more detailed options you can run `atm start --help` to obtain a list with the arguments
 that are being accepted.
 
-## Quickstart
+### 2. Create a Dataset
 
-In this section we will briefly show the basic usage of the REST API.
-
-For more detailed information about all the operations supported by the API, please point your
-browser to http://127.0.0.1:5000/ and explore the examples provided by the
-[Swagger](https://swagger.io/) interface.
-
-### 0. Make a simple GET to see what's inside the datasets
-
-You can run a simple `GET` petition to the database in order to check if there is somenthing inside
-the database. If it's the first time running, there should be no data inside:
-
-```bash
-curl -X GET --header 'Accept: application/json, application/json' 'http://127.0.0.1:5000/api/datasets'
-```
-
-An ouput like this should be printed if you don't have any data:
-
-```bash
-{
-   "page" : 1,
-   "num_results" : 0,
-   "objects" : [],
-   "total_pages" : 0
-}
-```
-
-### 1. Generate some data
-
-Before proceeding any further, please make sure the have already populated your data by triggering
-at least one model tuning process.
-
-#### POST Dataset
-
-First you need to create a `dataset`. From the **ATM** REST API you can perform a `POST` action
-to `api/datasets/` where the required fields are:
-
-* `name`, desired name for the dataset.
-* `description`, the description for the dataset.
-* `train_path`, where the `.csv` file is located.
-* `class_column`, target column.
-
-Additionally we can paass the `test_path`, which points to the testing dataset `csv`.
+Once the server is running, you can register your first dataset using the API. To do so, you need
+to send the path to your `CSV` file and the name of your `target_column` in a `POST` request to
+`api/datasets`.
 
 This call will create a simple `dataset` in our database:
 
 ```bash
-curl localhost:5000/api/datasets -H 'Content-Type: application/json' \
--d '{"name": "test", "train_path": "atm/data/test/pollution_1.csv", "class_column": "class", "description": "testing"}'
-```
+POST /api/datasets HTTP/1.1
+Content-Type: application/json
 
-An output similar to this one should appear in your console:
-
-```bash
 {
-   "size_kb" : 8,
-   "name" : "test",
-   "majority" : 0.516666667,
-   "n_examples" : 60,
-   "id" : 1,
-   "description" : "testing",
-   "train_path" : "atm/data/test/pollution_1.csv",
-   "dataruns" : [],
-   "class_column" : "class",
-   "test_path" : null,
-   "k_classes" : 2,
-   "d_features" : 16
+    "class_column": "your_target_column",
+    "train_path": "path/to/your.csv"
 }
 ```
 
-
-#### Create a Datarun from a Dataset
-
-If you would like to create the `dataruns` for the dataset that we just created, you can do so by
-making a `POST` call similar to the one before poiting to: `http://127.0.0.1:5000/api/run` .
-
-This post data requires atleast the `dataset_id` parameter.
-
-Optionally accepts the following parameters:
-
-* `description`
-* `run_per_partition`
-* `tuner`
-* `selector`
-* `gridding`
-* `priority`
-* `budget_type`
-* `budget`
-* `metric`
-* `k_window`
-* `r_minimum`
-* `score_target`
-* `deadline`
-
-Information about the values that can be contained above can be found
-[here](https://hdi-project.github.io/ATM/database.html#dataruns)
-
-A simple `POST` to this endpoint:
+Once you have created some datasets, you can see them by sending a `GET` request:
 
 ```bash
-curl localhost:5000/api/run -H 'Content-Type: application/json' -d '{"dataset_id": 1}'
+GET /api/datasets HTTP/1.1
 ```
 
-An output like this should print in the console:
+This will return a `json` with all the information about the stored datasets.
+
+As an example, you can get and register a demo dataset by running the following two commands:
 
 ```bash
-{"datarun_ids":[37],"status":"OK"}
+atm get_demos
+curl -v localhost:5000/api/datasets -H'Content-Type: application/json' \
+-d'{"class_column": "class", "train_path": "demos/pollution_1.csv"}'
 ```
 
-The workers will then start working on this `dataruns` and once they are done (usually it takes
-arround 1-5 minutes depending on your computer / workers) you can proceed with the following steps.
+### 3. Trigger a Datarun
 
-### 2. REST Models
+In order to trigger a datarun, once you have created a dataset, you have to send the `dataset_id`
+in a `POST` request to `api/run` to trigger the `workers` with the default values.
+
+```bash
+POST /api/datasets HTTP/1.1
+Content-type: application/json
+
+{
+    "dataset_id": id_of_your_dataset
+}
+```
+
+If you have followed the above example and created a `pollution` dataset in the database, you can
+run the following `POST` to trigger it's datarun:
+
+```bash
+curl -v localhost:5000/api/run -H'Content-type: application/json' -d'{"dataset_id": 1}'
+```
+
+**NOTE** atleast one worker should be running in order to process the datarun.
+
+### 4. Browse the results
 
 Once the database is populated, you can use the REST API to explore the following 4 models:
 
@@ -177,7 +131,7 @@ Once the database is populated, you can use the REST API to explore the followin
 
 And these are the operations that can be performed on them:
 
-### 3. Get all objects from a model
+#### Get all objects from a model
 
 In order to get all the objects for a single model, you need to make a `GET` request to
 `/api/<model>`.
@@ -241,7 +195,7 @@ And the output will be:
 }
 ```
 
-### 4. Get a single object by id
+#### Get a single object by id
 
 In order to get one particular objects for a model, you need to make a `GET` request to
 `/api/<model>/<id>`.
@@ -293,7 +247,7 @@ And the output will be:
 }
 ```
 
-### 5. Get all the children objects
+#### Get all the children objects
 
 In order to get all the childre objects from one parent object, you need to make a
 `GET` request to `/api/<parent_model>/<parent_id>/<child_model>`.

@@ -106,6 +106,7 @@ def worker(db, datarun):
 
 
 def get_new_worker(**kwargs):
+    kwargs['dataset_id'] = kwargs.get('dataset_id', None)
     kwargs['methods'] = kwargs.get('methods', ['logreg', 'dt'])
     sql_conf = SQLConfig({'sql_database': DB_PATH})
     run_conf = RunConfig(kwargs)
