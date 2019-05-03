@@ -120,6 +120,14 @@ curl -v localhost:5000/api/run -H'Content-type: application/json' -d'{"dataset_i
 
 **NOTE** atleast one worker should be running in order to process the datarun.
 
+While running, the workers, will log what they are doing in the file `atm.log`.
+
+In order to monitor their activity in real time, you can execute this on another terminal:
+
+```bash
+tail -f atm.log
+```
+
 ### 4. Browse the results
 
 Once the database is populated, you can use the REST API to explore the following 4 models:
