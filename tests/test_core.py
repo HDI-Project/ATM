@@ -3,9 +3,9 @@ import os
 import pytest
 
 from atm import PROJECT_ROOT
-from atm.config import RunConfig, SQLConfig
+from atm.config import DatasetConfig, RunConfig, SQLConfig
+from atm.core import ATM
 from atm.database import Database, db_session
-from atm.models import ATM
 from atm.utilities import get_local_data_path
 
 DB_PATH = '/tmp/atm.db'
@@ -52,6 +52,8 @@ def test_create_dataset(db):
     train_url = DATA_URL + 'pollution_1_train.csv'
     test_url = DATA_URL + 'pollution_1_test.csv'
 
+    sql_conf = SQLConfig({'sql_database': DB_PATH})
+
     train_path_local, _ = get_local_data_path(train_url)
     if os.path.exists(train_path_local):
         os.remove(train_path_local)
@@ -60,14 +62,16 @@ def test_create_dataset(db):
     if os.path.exists(test_path_local):
         os.remove(test_path_local)
 
-    run_conf = RunConfig(train_path=train_url,
-                         test_path=test_url,
-                         data_description='test',
-                         class_column='class')
+    dataset_conf = DatasetConfig({
+        'train_path': train_url,
+        'test_path': test_url,
+        'data_description': 'test',
+        'class_column': 'class'
+    })
 
-    atm = ATM(db, run_conf, None, None)
+    atm = ATM(sql_conf, None, None)
 
-    dataset = atm.create_dataset()
+    dataset = atm.create_dataset(dataset_conf)
     dataset = db.get_dataset(dataset.id)
 
     assert os.path.exists(train_path_local)
@@ -84,53 +88,57 @@ def test_create_dataset(db):
 
 
 def test_enter_data_by_methods(dataset):
-    sql_conf = SQLConfig(database=DB_PATH)
-    db = Database(**vars(sql_conf))
-    run_conf = RunConfig(dataset_id=dataset.id)
+    sql_conf = SQLConfig({'sql_database': DB_PATH})
+    db = Database(**sql_conf.to_dict())
+    run_conf = RunConfig({'dataset_id': dataset.id})
 
-    atm = ATM(db, run_conf, None, None)
+    atm = ATM(sql_conf, None, None)
 
     for method, n_parts in METHOD_HYPERPARTS.items():
         run_conf.methods = [method]
-        run_id = atm.enter_data()
+        run_id = atm.enter_data(None, run_conf)
 
-        assert db.get_datarun(run_id)
         with db_session(db):
-            run = db.get_datarun(run_id)
+            run = db.get_datarun(run_id.id)
             assert run.dataset.id == dataset.id
             assert len(run.hyperpartitions) == n_parts
 
 
 def test_enter_data_all(dataset):
-    sql_conf = SQLConfig(database=DB_PATH)
-    db = Database(**vars(sql_conf))
-    run_conf = RunConfig(dataset_id=dataset.id,
-                         methods=METHOD_HYPERPARTS.keys())
+    sql_conf = SQLConfig({'sql_database': DB_PATH})
+    db = Database(**sql_conf.to_dict())
+    run_conf = RunConfig({'dataset_id': dataset.id, 'methods': METHOD_HYPERPARTS.keys()})
 
-    atm = ATM(db, run_conf, None, None)
+    atm = ATM(sql_conf, None, None)
 
-    run_id = atm.enter_data()
+    run_id = atm.enter_data(None, run_conf)
 
     with db_session(db):
-        run = db.get_datarun(run_id)
+        run = db.get_datarun(run_id.id)
         assert run.dataset.id == dataset.id
         assert len(run.hyperpartitions) == sum(METHOD_HYPERPARTS.values())
 
 
 def test_run_per_partition(dataset):
-    sql_conf = SQLConfig(database=DB_PATH)
-    db = Database(**vars(sql_conf))
+    sql_conf = SQLConfig({'sql_database': DB_PATH})
+    db = Database(**sql_conf.to_dict())
 
-    run_conf = RunConfig(dataset_id=dataset.id, methods=['logreg'])
+    run_conf = RunConfig(
+        {
+            'dataset_id': dataset.id,
+            'methods': ['logreg'],
+            'run_per_partition': True
+        }
+    )
 
-    atm = ATM(db, run_conf, None, None)
+    atm = ATM(sql_conf, None, None)
 
-    run_ids = atm.enter_data(run_per_partition=True)
+    run_ids = atm.enter_data(None, run_conf)
 
     with db_session(db):
         runs = []
         for run_id in run_ids:
-            run = db.get_datarun(run_id)
+            run = db.get_datarun(run_id.id)
             if run is not None:
                 runs.append(run)
 

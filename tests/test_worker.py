@@ -12,10 +12,10 @@ from mock import ANY, Mock, patch
 
 from atm import PROJECT_ROOT
 from atm.classifier import Model
-from atm.config import LogConfig, RunConfig, SQLConfig
+from atm.config import DatasetConfig, LogConfig, RunConfig, SQLConfig
 from atm.constants import METRICS_BINARY, TIME_FMT
+from atm.core import ATM
 from atm.database import Database, db_session
-from atm.models import ATM
 from atm.utilities import download_data, load_metrics, load_model
 from atm.worker import ClassifierError, Worker
 
@@ -106,13 +106,19 @@ def worker(db, datarun):
 
 
 def get_new_worker(**kwargs):
+    kwargs['dataset_id'] = kwargs.get('dataset_id', None)
     kwargs['methods'] = kwargs.get('methods', ['logreg', 'dt'])
-    sql_conf = SQLConfig(database=DB_PATH)
-    run_conf = RunConfig(**kwargs)
-    db = Database(**vars(sql_conf))
-    atm = ATM(db, run_conf, None, None)
-    run_id = atm.enter_data()
-    datarun = db.get_datarun(run_id)
+    sql_conf = SQLConfig({'sql_database': DB_PATH})
+    run_conf = RunConfig(kwargs)
+
+    dataset_conf = DatasetConfig(kwargs)
+
+    db = Database(**sql_conf.to_dict())
+    atm = ATM(sql_conf, None, None)
+
+    run_id = atm.enter_data(dataset_conf, run_conf)
+    datarun = db.get_datarun(run_id.id)
+
     return Worker(db, datarun)
 
 
@@ -183,7 +189,7 @@ def test_test_classifier(db, dataset):
 
 
 def test_save_classifier(db, datarun, model, metrics):
-    log_conf = LogConfig(model_dir=MODEL_DIR, metric_dir=METRIC_DIR)
+    log_conf = LogConfig({'model_dir': MODEL_DIR, 'metric_dir': METRIC_DIR})
     worker = Worker(db, datarun, log_config=log_conf)
     hp = db.get_hyperpartitions(datarun_id=worker.datarun.id)[0]
     classifier = worker.db.start_classifier(hyperpartition_id=hp.id,
