@@ -1,7 +1,16 @@
-atm.api module
-==============
+atm.api package
+===============
 
 .. automodule:: atm.api
     :members:
     :undoc-members:
     :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+
+   atm.api.preprocessors
+   atm.api.utils
+

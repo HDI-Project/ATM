@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>atm.method module &mdash; ATM 0.1.2-dev documentation</title>
+  <title>atm.core module &mdash; ATM 0.1.2-dev documentation</title>
   
 
   
@@ -192,14 +192,14 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>atm.method module</li>
+      <li>atm.core module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
             
-              <a href="https://github.com/HDI-project/ATM/blob/master/docs/api/atm.method.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/HDI-project/ATM/blob/master/docs/api/atm.core.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -213,98 +213,69 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-atm.method">
-<span id="atm-method-module"></span><h1>atm.method module<a class="headerlink" href="#module-atm.method" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-atm.core">
+<span id="atm-core-module"></span><h1>atm.core module<a class="headerlink" href="#module-atm.core" title="Permalink to this headline">¶</a></h1>
+<p>Core ATM module.</p>
+<p>This module contains the ATM class, which is the one responsible for
+executing and orchestrating the main ATM functionalities.</p>
 <dl class="class">
-<dt id="atm.method.Categorical">
-<em class="property">class </em><code class="descclassname">atm.method.</code><code class="descname">Categorical</code><span class="sig-paren">(</span><em>name</em>, <em>type</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/method.html#Categorical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.method.Categorical" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#atm.method.HyperParameter" title="atm.method.HyperParameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">atm.method.HyperParameter</span></code></a></p>
-<dl class="method">
-<dt id="atm.method.Categorical.as_tunable">
-<code class="descname">as_tunable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/method.html#Categorical.as_tunable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.method.Categorical.as_tunable" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="atm.method.Categorical.is_categorical">
-<code class="descname">is_categorical</code><a class="headerlink" href="#atm.method.Categorical.is_categorical" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="atm.method.Categorical.is_constant">
-<code class="descname">is_constant</code><a class="headerlink" href="#atm.method.Categorical.is_constant" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="atm.method.HyperParameter">
-<em class="property">class </em><code class="descclassname">atm.method.</code><code class="descname">HyperParameter</code><a class="reference internal" href="../_modules/atm/method.html#HyperParameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.method.HyperParameter" title="Permalink to this definition">¶</a></dt>
+<dt id="atm.core.ATM">
+<em class="property">class </em><code class="descclassname">atm.core.</code><code class="descname">ATM</code><span class="sig-paren">(</span><em>sql_conf</em>, <em>aws_conf</em>, <em>log_conf</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="attribute">
-<dt id="atm.method.HyperParameter.is_categorical">
-<code class="descname">is_categorical</code><a class="headerlink" href="#atm.method.HyperParameter.is_categorical" title="Permalink to this definition">¶</a></dt>
+<dt id="atm.core.ATM.LOOP_WAIT">
+<code class="descname">LOOP_WAIT</code><em class="property"> = 1</em><a class="headerlink" href="#atm.core.ATM.LOOP_WAIT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt id="atm.method.HyperParameter.is_constant">
-<code class="descname">is_constant</code><a class="headerlink" href="#atm.method.HyperParameter.is_constant" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="atm.method.HyperPartition">
-<em class="property">class </em><code class="descclassname">atm.method.</code><code class="descname">HyperPartition</code><span class="sig-paren">(</span><em>categoricals</em>, <em>constants</em>, <em>tunables</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/method.html#HyperPartition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.method.HyperPartition" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class which holds the hyperparameter settings that define a hyperpartition.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="atm.method.List">
-<em class="property">class </em><code class="descclassname">atm.method.</code><code class="descname">List</code><span class="sig-paren">(</span><em>name</em>, <em>type</em>, <em>list_length</em>, <em>element</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/method.html#List"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.method.List" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#atm.method.HyperParameter" title="atm.method.HyperParameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">atm.method.HyperParameter</span></code></a></p>
 <dl class="method">
-<dt id="atm.method.List.get_elements">
-<code class="descname">get_elements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/method.html#List.get_elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.method.List.get_elements" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="atm.method.List.is_categorical">
-<code class="descname">is_categorical</code><a class="headerlink" href="#atm.method.List.is_categorical" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<dt id="atm.core.ATM.create_datarun">
+<code class="descname">create_datarun</code><span class="sig-paren">(</span><em>dataset</em>, <em>run_conf</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.create_datarun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.create_datarun" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a config, creates a set of dataruns for the config and enters them into
+the database. Returns the ID of the created datarun.</p>
+<p>dataset: Dataset SQLAlchemy ORM object</p>
 </dd></dl>
 
-<dl class="class">
-<dt id="atm.method.Method">
-<em class="property">class </em><code class="descclassname">atm.method.</code><code class="descname">Method</code><span class="sig-paren">(</span><em>method</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/method.html#Method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.method.Method" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This class is initialized with the name of a json configuration file.
-The config contains information about a classification method and the
-hyperparameter arguments it needs to run. Its main purpose is to generate
-hyperpartitions (possible combinations of categorical hyperparameters).</p>
 <dl class="method">
-<dt id="atm.method.Method.get_hyperpartitions">
-<code class="descname">get_hyperpartitions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/method.html#Method.get_hyperpartitions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.method.Method.get_hyperpartitions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Traverse the CPT and enumerate all possible hyperpartitions of
-categorical parameters for this method.</p>
+<dt id="atm.core.ATM.create_dataruns">
+<code class="descname">create_dataruns</code><span class="sig-paren">(</span><em>run_conf</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.create_dataruns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.create_dataruns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a datarun, including a dataset if necessary.</p>
+<p>Returns: ID of the generated datarun</p>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="class">
-<dt id="atm.method.Numeric">
-<em class="property">class </em><code class="descclassname">atm.method.</code><code class="descname">Numeric</code><span class="sig-paren">(</span><em>name</em>, <em>type</em>, <em>range</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/method.html#Numeric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.method.Numeric" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#atm.method.HyperParameter" title="atm.method.HyperParameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">atm.method.HyperParameter</span></code></a></p>
 <dl class="method">
-<dt id="atm.method.Numeric.as_tunable">
-<code class="descname">as_tunable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/method.html#Numeric.as_tunable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.method.Numeric.as_tunable" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="atm.core.ATM.create_dataset">
+<code class="descname">create_dataset</code><span class="sig-paren">(</span><em>dataset_conf</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.create_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.create_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a dataset and add it to the ModelHub database.</p>
+</dd></dl>
 
-<dl class="attribute">
-<dt id="atm.method.Numeric.is_constant">
-<code class="descname">is_constant</code><a class="headerlink" href="#atm.method.Numeric.is_constant" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="method">
+<dt id="atm.core.ATM.enter_data">
+<code class="descname">enter_data</code><span class="sig-paren">(</span><em>dataset_conf</em>, <em>run_conf</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.enter_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.enter_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a datarun, including a dataset if necessary.</p>
+<p>Returns: ID of the generated datarun</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="atm.core.ATM.work">
+<code class="descname">work</code><span class="sig-paren">(</span><em>datarun_ids=None</em>, <em>save_files=False</em>, <em>choose_randomly=True</em>, <em>cloud_mode=False</em>, <em>total_time=None</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.work"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.work" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the ModelHub database for unfinished dataruns, and spawn workers to
+work on them as they are added. This process will continue to run until it
+exceeds total_time or is broken with ctrl-C.</p>
+<dl class="simple">
+<dt>datarun_ids (optional): list of IDs of dataruns to compute on. If None,</dt><dd><p>this will work on all unfinished dataruns in the database.</p>
+</dd>
+<dt>choose_randomly: if True, work on all highest-priority dataruns in random</dt><dd><p>order. If False, work on them in sequential order (by ID)</p>
+</dd>
+<dt>cloud_mode: if True, save processed datasets to AWS. If this option is set,</dt><dd><p>aws_config must be supplied.</p>
+</dd>
+<dt>total_time (optional): if set to an integer, this worker will only work for</dt><dd><p>total_time seconds. Otherwise, it will continue working until all
+dataruns are complete (or indefinitely).</p>
+</dd>
+<dt>wait: if True, once all dataruns in the database are complete, keep spinning</dt><dd><p>and wait for new runs to be added. If False, exit once all dataruns are
+complete.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

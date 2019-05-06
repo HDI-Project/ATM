@@ -107,13 +107,16 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">REST API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#starting-the-rest-api-server">Starting the REST API Server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#quickstart">Quickstart</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#generate-some-data">1. Generate some data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#rest-models">2. REST Models</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-all-objects-from-a-model">3. Get all objects from a model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-a-single-object-by-id">4. Get a single object by id</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-all-the-children-objects">5. Get all the children objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#create-a-dataset">2. Create a Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#browse-the-results">4. Browse the results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-a-single-object-by-id">Get a single object by id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-all-the-children-objects">Get all the children objects</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#additional-information">Additional information</a><ul>
@@ -213,7 +216,6 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">past.utils</span> <span class="k">import</span> <span class="n">old_div</span>
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">LabelEncoder</span><span class="p">,</span> <span class="n">OneHotEncoder</span>
 
 
@@ -235,13 +237,14 @@
         <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;object&#39;</span><span class="p">:</span>
                 <span class="n">total_features</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="p">]))</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="n">majority_percentage</span> <span class="o">=</span> <span class="n">old_div</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">counts</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">counts</span><span class="p">)))</span>
+
+        <span class="n">majority_percentage</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">counts</span><span class="p">))</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">counts</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">n_examples</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">d_features</span> <span class="o">=</span> <span class="n">total_features</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">k_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">class_column</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">majority</span> <span class="o">=</span> <span class="n">majority_percentage</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">nbytes</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">nbytes</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="DataEncoder"><a class="viewcode-back" href="../../api/atm.encoder.html#atm.encoder.DataEncoder">[docs]</a><span class="k">class</span> <span class="nc">DataEncoder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>

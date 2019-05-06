@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>atm.api module &mdash; ATM 0.1.2-dev documentation</title>
+  <title>atm.api package &mdash; ATM 0.1.2-dev documentation</title>
   
 
   
@@ -107,13 +107,16 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">REST API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../api.html#starting-the-rest-api-server">Starting the REST API Server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#quickstart">Quickstart</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#generate-some-data">1. Generate some data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#rest-models">2. REST Models</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#get-all-objects-from-a-model">3. Get all objects from a model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#get-a-single-object-by-id">4. Get a single object by id</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#get-all-the-children-objects">5. Get all the children objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#create-a-dataset">2. Create a Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#browse-the-results">4. Browse the results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api.html#get-a-single-object-by-id">Get a single object by id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api.html#get-all-the-children-objects">Get all the children objects</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#additional-information">Additional information</a><ul>
@@ -189,7 +192,7 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>atm.api module</li>
+      <li>atm.api package</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -211,17 +214,21 @@
            <div itemprop="articleBody">
             
   <div class="section" id="module-atm.api">
-<span id="atm-api-module"></span><h1>atm.api module<a class="headerlink" href="#module-atm.api" title="Permalink to this headline">¶</a></h1>
+<span id="atm-api-package"></span><h1>atm.api package<a class="headerlink" href="#module-atm.api" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="atm.api.create_app">
-<code class="descclassname">atm.api.</code><code class="descname">create_app</code><span class="sig-paren">(</span><em>db</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/api.html#create_app"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.api.create_app" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">atm.api.</code><code class="descname">create_app</code><span class="sig-paren">(</span><em>atm</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/api.html#create_app"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.api.create_app" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
-<dt id="atm.api.make_absolute">
-<code class="descclassname">atm.api.</code><code class="descname">make_absolute</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/api.html#make_absolute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.api.make_absolute" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="atm.api.preprocessors.html">atm.api.preprocessors module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="atm.api.utils.html">atm.api.utils module</a></li>
+</ul>
+</div>
+</div>
 </div>
 
 

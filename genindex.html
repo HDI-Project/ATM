@@ -108,13 +108,16 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">REST API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api.html#starting-the-rest-api-server">Starting the REST API Server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#quickstart">Quickstart</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api.html#generate-some-data">1. Generate some data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#rest-models">2. REST Models</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#get-all-objects-from-a-model">3. Get all objects from a model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#get-a-single-object-by-id">4. Get a single object by id</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#get-all-the-children-objects">5. Get all the children objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#create-a-dataset">2. Create a Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#browse-the-results">4. Browse the results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#get-a-single-object-by-id">Get a single object by id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#get-all-the-children-objects">Get all the children objects</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#additional-information">Additional information</a><ul>
@@ -224,32 +227,29 @@
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
+ | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
  
 </div>
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.api.utils.html#atm.api.utils.abort">abort() (in module atm.api.utils)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.AWSConfig.access_key">access_key (atm.config.AWSConfig attribute)</a>
+</li>
       <li><a href="api/atm.constants.html#atm.constants.Metrics.ACCURACY">ACCURACY (atm.constants.Metrics attribute)</a>
-</li>
-      <li><a href="api/atm.config.html#atm.config.add_arguments_aws_ec2">add_arguments_aws_ec2() (in module atm.config)</a>
-</li>
-      <li><a href="api/atm.config.html#atm.config.add_arguments_aws_s3">add_arguments_aws_s3() (in module atm.config)</a>
-</li>
-      <li><a href="api/atm.config.html#atm.config.add_arguments_datarun">add_arguments_datarun() (in module atm.config)</a>
-</li>
-      <li><a href="api/atm.config.html#atm.config.add_arguments_logging">add_arguments_logging() (in module atm.config)</a>
-</li>
-      <li><a href="api/atm.config.html#atm.config.add_arguments_sql">add_arguments_sql() (in module atm.config)</a>
 </li>
       <li><a href="api/atm.constants.html#atm.constants.Metrics.AP">AP (atm.constants.Metrics attribute)</a>
 </li>
@@ -259,23 +259,29 @@
         <li><a href="api/atm.method.html#atm.method.Numeric.as_tunable">(atm.method.Numeric method)</a>
 </li>
       </ul></li>
-      <li><a href="api/atm.models.html#atm.models.ATM">ATM (class in atm.models)</a>
+      <li><a href="api/atm.core.html#atm.core.ATM">ATM (class in atm.core)</a>
 </li>
       <li><a href="api/atm.html#module-atm">atm (module)</a>
 </li>
       <li><a href="api/atm.api.html#module-atm.api">atm.api (module)</a>
 </li>
+      <li><a href="api/atm.api.preprocessors.html#module-atm.api.preprocessors">atm.api.preprocessors (module)</a>
+</li>
+      <li><a href="api/atm.api.utils.html#module-atm.api.utils">atm.api.utils (module)</a>
+</li>
       <li><a href="api/atm.classifier.html#module-atm.classifier">atm.classifier (module)</a>
+</li>
+      <li><a href="api/atm.cli.html#module-atm.cli">atm.cli (module)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/atm.cli.html#module-atm.cli">atm.cli (module)</a>
-</li>
       <li><a href="api/atm.compat.html#module-atm.compat">atm.compat (module)</a>
 </li>
       <li><a href="api/atm.config.html#module-atm.config">atm.config (module)</a>
 </li>
       <li><a href="api/atm.constants.html#module-atm.constants">atm.constants (module)</a>
+</li>
+      <li><a href="api/atm.core.html#module-atm.core">atm.core (module)</a>
 </li>
       <li><a href="api/atm.database.html#module-atm.database">atm.database (module)</a>
 </li>
@@ -285,13 +291,13 @@
 </li>
       <li><a href="api/atm.metrics.html#module-atm.metrics">atm.metrics (module)</a>
 </li>
-      <li><a href="api/atm.models.html#module-atm.models">atm.models (module)</a>
-</li>
       <li><a href="api/atm.utilities.html#module-atm.utilities">atm.utilities (module)</a>
 </li>
       <li><a href="api/atm.worker.html#module-atm.worker">atm.worker (module)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.ATM_KEYS">ATM_KEYS (atm.classifier.Model attribute)</a>
+</li>
+      <li><a href="api/atm.api.utils.html#atm.api.utils.auto_abort">auto_abort() (in module atm.api.utils)</a>
 </li>
       <li><a href="api/atm.config.html#atm.config.AWSConfig">AWSConfig (class in atm.config)</a>
 </li>
@@ -304,12 +310,20 @@
       <li><a href="api/atm.utilities.html#atm.utilities.base_64_to_object">base_64_to_object() (in module atm.utilities)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.config.html#atm.config.RunConfig.budget">budget (atm.config.RunConfig attribute)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.RunConfig.budget_type">budget_type (atm.config.RunConfig attribute)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.method.html#atm.method.Categorical">Categorical (class in atm.method)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.DatasetConfig.class_column">class_column (atm.config.DatasetConfig attribute)</a>
 </li>
       <li><a href="api/atm.worker.html#atm.worker.ClassifierError">ClassifierError</a>
 </li>
@@ -333,16 +347,18 @@
 </li>
       <li><a href="api/atm.database.html#atm.database.Database.create_classifier">create_classifier() (atm.database.Database method)</a>
 </li>
-      <li><a href="api/atm.database.html#atm.database.Database.create_datarun">create_datarun() (atm.database.Database method)</a>
+      <li><a href="api/atm.core.html#atm.core.ATM.create_datarun">create_datarun() (atm.core.ATM method)</a>
 
       <ul>
-        <li><a href="api/atm.models.html#atm.models.ATM.create_datarun">(atm.models.ATM method)</a>
+        <li><a href="api/atm.database.html#atm.database.Database.create_datarun">(atm.database.Database method)</a>
 </li>
       </ul></li>
-      <li><a href="api/atm.database.html#atm.database.Database.create_dataset">create_dataset() (atm.database.Database method)</a>
+      <li><a href="api/atm.core.html#atm.core.ATM.create_dataruns">create_dataruns() (atm.core.ATM method)</a>
+</li>
+      <li><a href="api/atm.core.html#atm.core.ATM.create_dataset">create_dataset() (atm.core.ATM method)</a>
 
       <ul>
-        <li><a href="api/atm.models.html#atm.models.ATM.create_dataset">(atm.models.ATM method)</a>
+        <li><a href="api/atm.database.html#atm.database.Database.create_dataset">(atm.database.Database method)</a>
 </li>
       </ul></li>
       <li><a href="api/atm.database.html#atm.database.Database.create_hyperpartition">create_hyperpartition() (atm.database.Database method)</a>
@@ -357,26 +373,26 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.config.html#atm.config.DatasetConfig.data_description">data_description (atm.config.DatasetConfig attribute)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.SQLConfig.database">database (atm.config.SQLConfig attribute)</a>
+</li>
       <li><a href="api/atm.database.html#atm.database.Database">Database (class in atm.database)</a>
 </li>
       <li><a href="api/atm.encoder.html#atm.encoder.DataEncoder">DataEncoder (class in atm.encoder)</a>
 </li>
-      <li><a href="api/atm.database.html#atm.database.db_session">db_session (class in atm.database)</a>
+      <li><a href="api/atm.config.html#atm.config.RunConfig.dataset_id">dataset_id (atm.config.RunConfig attribute)</a>
 </li>
-      <li><a href="api/atm.config.html#atm.config.AWSConfig.DEFAULTS">DEFAULTS (atm.config.AWSConfig attribute)</a>
-
-      <ul>
-        <li><a href="api/atm.config.html#atm.config.Config.DEFAULTS">(atm.config.Config attribute)</a>
+      <li><a href="api/atm.config.html#atm.config.DatasetConfig">DatasetConfig (class in atm.config)</a>
 </li>
-        <li><a href="api/atm.config.html#atm.config.LogConfig.DEFAULTS">(atm.config.LogConfig attribute)</a>
-</li>
-        <li><a href="api/atm.config.html#atm.config.RunConfig.DEFAULTS">(atm.config.RunConfig attribute)</a>
-</li>
-        <li><a href="api/atm.config.html#atm.config.SQLConfig.DEFAULTS">(atm.config.SQLConfig attribute)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.database.html#atm.database.db_session">db_session (class in atm.database)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.RunConfig.deadline">deadline (atm.config.RunConfig attribute)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.SQLConfig.dialect">dialect (atm.config.SQLConfig attribute)</a>
+</li>
       <li><a href="api/atm.utilities.html#atm.utilities.download_data">download_data() (in module atm.utilities)</a>
 </li>
       <li><a href="api/atm.utilities.html#atm.utilities.download_file_http">download_file_http() (in module atm.utilities)</a>
@@ -391,7 +407,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.utilities.html#atm.utilities.ensure_directory">ensure_directory() (in module atm.utilities)</a>
 </li>
-      <li><a href="api/atm.models.html#atm.models.ATM.enter_data">enter_data() (atm.models.ATM method)</a>
+      <li><a href="api/atm.core.html#atm.core.ATM.enter_data">enter_data() (atm.core.ATM method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -453,10 +469,10 @@
       </ul></li>
       <li><a href="api/atm.utilities.html#atm.utilities.get_instance">get_instance() (in module atm.utilities)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.utilities.html#atm.utilities.get_local_data_path">get_local_data_path() (in module atm.utilities)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.database.html#atm.database.Database.get_maximum_y">get_maximum_y() (atm.database.Database method)</a>
 </li>
       <li><a href="api/atm.database.html#atm.database.Database.get_methods">get_methods() (atm.database.Database method)</a>
@@ -467,6 +483,8 @@
 </li>
       <li><a href="api/atm.database.html#atm.database.Database.get_number_of_hyperpartition_errors">get_number_of_hyperpartition_errors() (atm.database.Database method)</a>
 </li>
+      <li><a href="api/atm.config.html#atm.config.Config.get_parser">get_parser() (atm.config.Config class method)</a>
+</li>
       <li><a href="api/atm.metrics.html#atm.metrics.get_per_class_matrix">get_per_class_matrix() (in module atm.metrics)</a>
 </li>
       <li><a href="api/atm.metrics.html#atm.metrics.get_pr_roc_curves">get_pr_roc_curves() (in module atm.metrics)</a>
@@ -474,6 +492,8 @@
       <li><a href="api/atm.utilities.html#atm.utilities.get_public_ip">get_public_ip() (in module atm.utilities)</a>
 </li>
       <li><a href="api/atm.compat.html#atm.compat.getargs">getargs() (in module atm.compat)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.RunConfig.gridding">gridding (atm.config.RunConfig attribute)</a>
 </li>
       <li><a href="api/atm.constants.html#atm.constants.PartitionStatus.GRIDDING_DONE">GRIDDING_DONE (atm.constants.PartitionStatus attribute)</a>
 </li>
@@ -491,6 +511,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.config.html#atm.config.SQLConfig.host">host (atm.config.SQLConfig attribute)</a>
+</li>
       <li><a href="api/atm.constants.html#atm.constants.FileType.HTTP">HTTP (atm.constants.FileType attribute)</a>
 </li>
       <li><a href="api/atm.method.html#atm.method.HyperParameter">HyperParameter (class in atm.method)</a>
@@ -504,8 +526,6 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.constants.html#atm.constants.PartitionStatus.INCOMPLETE">INCOMPLETE (atm.constants.PartitionStatus attribute)</a>
-</li>
-      <li><a href="api/atm.config.html#atm.config.initialize_logging">initialize_logging() (in module atm.config)</a>
 </li>
       <li><a href="api/atm.method.html#atm.method.Categorical.is_categorical">is_categorical (atm.method.Categorical attribute)</a>
 
@@ -532,12 +552,18 @@
   </ul></td>
 </tr></table>
 
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.config.html#atm.config.RunConfig.k_window">k_window (atm.config.RunConfig attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.method.html#atm.method.List">List (class in atm.method)</a>
-</li>
-      <li><a href="api/atm.config.html#atm.config.load_config">load_config() (in module atm.config)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.load_data">load_data() (atm.classifier.Model method)</a>
 </li>
@@ -563,7 +589,7 @@
 </li>
       <li><a href="api/atm.config.html#atm.config.LogConfig">LogConfig (class in atm.config)</a>
 </li>
-      <li><a href="api/atm.models.html#atm.models.ATM.LOOP_WAIT">LOOP_WAIT (atm.models.ATM attribute)</a>
+      <li><a href="api/atm.core.html#atm.core.ATM.LOOP_WAIT">LOOP_WAIT (atm.core.ATM attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -573,7 +599,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.cli.html#atm.cli.main">main() (in module atm.cli)</a>
 </li>
-      <li><a href="api/atm.api.html#atm.api.make_absolute">make_absolute() (in module atm.api)</a>
+      <li><a href="api/atm.api.utils.html#atm.api.utils.make_absolute">make_absolute() (in module atm.api.utils)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.make_pipeline">make_pipeline() (atm.classifier.Model method)</a>
 </li>
@@ -585,23 +611,31 @@
 </li>
       <li><a href="api/atm.database.html#atm.database.Database.mark_datarun_running">mark_datarun_running() (atm.database.Database method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.database.html#atm.database.Database.mark_hyperpartition_errored">mark_hyperpartition_errored() (atm.database.Database method)</a>
 </li>
       <li><a href="api/atm.database.html#atm.database.Database.mark_hyperpartition_gridding_done">mark_hyperpartition_gridding_done() (atm.database.Database method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.constants.html#atm.constants.Metrics.MCC">MCC (atm.constants.Metrics attribute)</a>
 </li>
       <li><a href="api/atm.encoder.html#atm.encoder.MetaData">MetaData (class in atm.encoder)</a>
 </li>
       <li><a href="api/atm.method.html#atm.method.Method">Method (class in atm.method)</a>
 </li>
+      <li><a href="api/atm.config.html#atm.config.RunConfig.methods">methods (atm.config.RunConfig attribute)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.RunConfig.metric">metric (atm.config.RunConfig attribute)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.LogConfig.metric_dir">metric_dir (atm.config.LogConfig attribute)</a>
+</li>
       <li><a href="api/atm.constants.html#atm.constants.Metrics">Metrics (class in atm.constants)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.MINMAX">MINMAX (atm.classifier.Model attribute)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model">Model (class in atm.classifier)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.LogConfig.model_dir">model_dir (atm.config.LogConfig attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -635,33 +669,35 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/atm.config.html#atm.config.AWSConfig.PARAMETERS">PARAMETERS (atm.config.AWSConfig attribute)</a>
-
-      <ul>
-        <li><a href="api/atm.config.html#atm.config.Config.PARAMETERS">(atm.config.Config attribute)</a>
-</li>
-        <li><a href="api/atm.config.html#atm.config.LogConfig.PARAMETERS">(atm.config.LogConfig attribute)</a>
-</li>
-        <li><a href="api/atm.config.html#atm.config.RunConfig.PARAMETERS">(atm.config.RunConfig attribute)</a>
-</li>
-        <li><a href="api/atm.config.html#atm.config.SQLConfig.PARAMETERS">(atm.config.SQLConfig attribute)</a>
-</li>
-      </ul></li>
       <li><a href="api/atm.utilities.html#atm.utilities.params_to_vectors">params_to_vectors() (in module atm.utilities)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.constants.html#atm.constants.PartitionStatus">PartitionStatus (class in atm.constants)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.SQLConfig.password">password (atm.config.SQLConfig attribute)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.PCA">PCA (atm.classifier.Model attribute)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.PCA_DIMS">PCA_DIMS (atm.classifier.Model attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.constants.html#atm.constants.RunStatus.PENDING">PENDING (atm.constants.RunStatus attribute)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.SQLConfig.port">port (atm.config.SQLConfig attribute)</a>
 </li>
       <li><a href="api/atm.constants.html#atm.constants.Metrics.PR_CURVE">PR_CURVE (atm.constants.Metrics attribute)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.predict">predict() (atm.classifier.Model method)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.RunConfig.priority">priority (atm.config.RunConfig attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.config.html#atm.config.SQLConfig.query">query (atm.config.SQLConfig attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -669,6 +705,8 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.config.html#atm.config.RunConfig.r_minimum">r_minimum (atm.config.RunConfig attribute)</a>
+</li>
       <li><a href="api/atm.constants.html#atm.constants.Metrics.RANK_ACCURACY">RANK_ACCURACY (atm.constants.Metrics attribute)</a>
 </li>
       <li><a href="api/atm.metrics.html#atm.metrics.rank_n_accuracy">rank_n_accuracy() (in module atm.metrics)</a>
@@ -684,6 +722,8 @@
       <li><a href="api/atm.constants.html#atm.constants.Metrics.ROC_CURVE">ROC_CURVE (atm.constants.Metrics attribute)</a>
 </li>
       <li><a href="api/atm.worker.html#atm.worker.Worker.run_classifier">run_classifier() (atm.worker.Worker method)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.RunConfig.run_per_partition">run_per_partition (atm.config.RunConfig attribute)</a>
 </li>
       <li><a href="api/atm.config.html#atm.config.RunConfig">RunConfig (class in atm.config)</a>
 </li>
@@ -703,6 +743,10 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.constants.html#atm.constants.FileType.S3">S3 (atm.constants.FileType attribute)</a>
 </li>
+      <li><a href="api/atm.config.html#atm.config.AWSConfig.s3_bucket">s3_bucket (atm.config.AWSConfig attribute)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.AWSConfig.s3_folder">s3_folder (atm.config.AWSConfig attribute)</a>
+</li>
       <li><a href="api/atm.worker.html#atm.worker.Worker.save_classifier">save_classifier() (atm.worker.Worker method)</a>
 </li>
       <li><a href="api/atm.worker.html#atm.worker.Worker.save_classifier_cloud">save_classifier_cloud() (atm.worker.Worker method)</a>
@@ -715,7 +759,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.SCALE">SCALE (atm.classifier.Model attribute)</a>
 </li>
+      <li><a href="api/atm.config.html#atm.config.RunConfig.score_target">score_target (atm.config.RunConfig attribute)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.AWSConfig.secret_key">secret_key (atm.config.AWSConfig attribute)</a>
+</li>
       <li><a href="api/atm.worker.html#atm.worker.Worker.select_hyperpartition">select_hyperpartition() (atm.worker.Worker method)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.RunConfig.selector">selector (atm.config.RunConfig attribute)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.special_conversions">special_conversions() (atm.classifier.Model method)</a>
 </li>
@@ -733,12 +783,18 @@
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.test_final_model">test_final_model() (atm.classifier.Model method)</a>
 </li>
+      <li><a href="api/atm.config.html#atm.config.DatasetConfig.test_path">test_path (atm.config.DatasetConfig attribute)</a>
+</li>
       <li><a href="api/atm.metrics.html#atm.metrics.test_pipeline">test_pipeline() (in module atm.metrics)</a>
 </li>
       <li><a href="api/atm.database.html#atm.database.Database.to_csv">to_csv() (atm.database.Database method)</a>
 </li>
+      <li><a href="api/atm.config.html#atm.config.Config.to_dict">to_dict() (atm.config.Config method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.config.html#atm.config.DatasetConfig.train_path">train_path (atm.config.DatasetConfig attribute)</a>
+</li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.train_test">train_test() (atm.classifier.Model method)</a>
 </li>
       <li><a href="api/atm.encoder.html#atm.encoder.DataEncoder.transform">transform() (atm.encoder.DataEncoder method)</a>
@@ -746,6 +802,8 @@
       <li><a href="api/atm.database.html#atm.database.try_with_session">try_with_session() (in module atm.database)</a>
 </li>
       <li><a href="api/atm.worker.html#atm.worker.Worker.tune_hyperparameters">tune_hyperparameters() (atm.worker.Worker method)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.RunConfig.tuner">tuner (atm.config.RunConfig attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -756,6 +814,18 @@
       <li><a href="api/atm.utilities.html#atm.utilities.update_params">update_params() (in module atm.utilities)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.config.html#atm.config.SQLConfig.username">username (atm.config.SQLConfig attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.config.html#atm.config.LogConfig.verbose_metrics">verbose_metrics (atm.config.LogConfig attribute)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="W">W</h2>
@@ -763,7 +833,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.WHITEN">WHITEN (atm.classifier.Model attribute)</a>
 </li>
-      <li><a href="api/atm.models.html#atm.models.ATM.work">work() (atm.models.ATM method)</a>
+      <li><a href="api/atm.core.html#atm.core.ATM.work">work() (atm.core.ATM method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>

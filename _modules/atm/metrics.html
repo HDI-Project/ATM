@@ -107,13 +107,16 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">REST API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#starting-the-rest-api-server">Starting the REST API Server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#quickstart">Quickstart</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#generate-some-data">1. Generate some data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#rest-models">2. REST Models</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-all-objects-from-a-model">3. Get all objects from a model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-a-single-object-by-id">4. Get a single object by id</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-all-the-children-objects">5. Get all the children objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#create-a-dataset">2. Create a Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#browse-the-results">4. Browse the results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-a-single-object-by-id">Get a single object by id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-all-the-children-objects">Get all the children objects</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#additional-information">Additional information</a><ul>
@@ -213,7 +216,6 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">past.utils</span> <span class="k">import</span> <span class="n">old_div</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">average_precision_score</span><span class="p">,</span> <span class="n">cohen_kappa_score</span><span class="p">,</span> <span class="n">f1_score</span><span class="p">,</span> <span class="n">matthews_corrcoef</span><span class="p">,</span>
     <span class="n">precision_recall_curve</span><span class="p">,</span> <span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">roc_curve</span><span class="p">)</span>
@@ -246,7 +248,7 @@
         <span class="k">if</span> <span class="n">y_true</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">in</span> <span class="n">rankings</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]:</span>
             <span class="n">correct_sample_count</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="k">return</span> <span class="n">old_div</span><span class="p">(</span><span class="n">correct_sample_count</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">correct_sample_count</span> <span class="o">/</span> <span class="n">num_samples</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_per_class_matrix"><a class="viewcode-back" href="../../api/atm.metrics.html#atm.metrics.get_per_class_matrix">[docs]</a><span class="k">def</span> <span class="nf">get_per_class_matrix</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

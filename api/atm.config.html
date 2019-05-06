@@ -107,13 +107,16 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">REST API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../api.html#starting-the-rest-api-server">Starting the REST API Server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#quickstart">Quickstart</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#generate-some-data">1. Generate some data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#rest-models">2. REST Models</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#get-all-objects-from-a-model">3. Get all objects from a model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#get-a-single-object-by-id">4. Get a single object by id</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#get-all-the-children-objects">5. Get all the children objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#create-a-dataset">2. Create a Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#browse-the-results">4. Browse the results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api.html#get-a-single-object-by-id">Get a single object by id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api.html#get-all-the-children-objects">Get all the children objects</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#additional-information">Additional information</a><ul>
@@ -214,24 +217,34 @@
 <span id="atm-config-module"></span><h1>atm.config module<a class="headerlink" href="#module-atm.config" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="atm.config.AWSConfig">
-<em class="property">class </em><code class="descclassname">atm.config.</code><code class="descname">AWSConfig</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#AWSConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.AWSConfig" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">atm.config.</code><code class="descname">AWSConfig</code><span class="sig-paren">(</span><em>args</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#AWSConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.AWSConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#atm.config.Config" title="atm.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">atm.config.Config</span></code></a></p>
-<p>Stores configuration for AWS S3 and EC2 connections</p>
+<p>Stores configuration for AWS S3 connections</p>
 <dl class="attribute">
-<dt id="atm.config.AWSConfig.DEFAULTS">
-<code class="descname">DEFAULTS</code><em class="property"> = {}</em><a class="headerlink" href="#atm.config.AWSConfig.DEFAULTS" title="Permalink to this definition">¶</a></dt>
+<dt id="atm.config.AWSConfig.access_key">
+<code class="descname">access_key</code><em class="property"> = 'AWS access key'</em><a class="headerlink" href="#atm.config.AWSConfig.access_key" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="atm.config.AWSConfig.PARAMETERS">
-<code class="descname">PARAMETERS</code><em class="property"> = ['access_key', 'secret_key', 's3_bucket', 's3_folder', 'ec2_region', 'ec2_amis', 'ec2_key_pair', 'ec2_keyfile', 'ec2_instance_type', 'ec2_username', 'num_instances', 'num_workers_per_instance']</em><a class="headerlink" href="#atm.config.AWSConfig.PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dt id="atm.config.AWSConfig.s3_bucket">
+<code class="descname">s3_bucket</code><em class="property"> = 'AWS S3 bucket to store data'</em><a class="headerlink" href="#atm.config.AWSConfig.s3_bucket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.AWSConfig.s3_folder">
+<code class="descname">s3_folder</code><em class="property"> = 'Folder in AWS S3 bucket in which to store data'</em><a class="headerlink" href="#atm.config.AWSConfig.s3_folder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.AWSConfig.secret_key">
+<code class="descname">secret_key</code><em class="property"> = 'AWS secret key'</em><a class="headerlink" href="#atm.config.AWSConfig.secret_key" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="atm.config.Config">
-<em class="property">class </em><code class="descclassname">atm.config.</code><code class="descname">Config</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#Config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.Config" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">atm.config.</code><code class="descname">Config</code><span class="sig-paren">(</span><em>args</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#Config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.Config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class which stores configuration for one aspect of ATM. Subclasses of
 Config should define the list of all configurable parameters and any
@@ -245,128 +258,183 @@ conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>var
 </div></blockquote>
 <p>and only relevant parameters will be set.</p>
 <p>Subclasses do not need to define __init__ or any other methods.</p>
+<dl class="classmethod">
+<dt id="atm.config.Config.get_parser">
+<em class="property">classmethod </em><code class="descname">get_parser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#Config.get_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.Config.get_parser" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="atm.config.Config.to_dict">
+<code class="descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#Config.to_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.Config.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="atm.config.DatasetConfig">
+<em class="property">class </em><code class="descclassname">atm.config.</code><code class="descname">DatasetConfig</code><span class="sig-paren">(</span><em>args</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#DatasetConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.DatasetConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#atm.config.Config" title="atm.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">atm.config.Config</span></code></a></p>
+<p>Stores configuration of a Dataset</p>
 <dl class="attribute">
-<dt id="atm.config.Config.DEFAULTS">
-<code class="descname">DEFAULTS</code><em class="property"> = {}</em><a class="headerlink" href="#atm.config.Config.DEFAULTS" title="Permalink to this definition">¶</a></dt>
+<dt id="atm.config.DatasetConfig.class_column">
+<code class="descname">class_column</code><em class="property"> = ('Name of the class column in the input data', 'class')</em><a class="headerlink" href="#atm.config.DatasetConfig.class_column" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="atm.config.Config.PARAMETERS">
-<code class="descname">PARAMETERS</code><em class="property"> = []</em><a class="headerlink" href="#atm.config.Config.PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dt id="atm.config.DatasetConfig.data_description">
+<code class="descname">data_description</code><em class="property"> = 'Description of dataset'</em><a class="headerlink" href="#atm.config.DatasetConfig.data_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.DatasetConfig.test_path">
+<code class="descname">test_path</code><em class="property"> = 'Path to raw test data (if applicable)'</em><a class="headerlink" href="#atm.config.DatasetConfig.test_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.DatasetConfig.train_path">
+<code class="descname">train_path</code><em class="property"> = ('Path to raw training data', '/home/travis/build/HDI-Project/ATM/atm/data/test/pollution_1.csv')</em><a class="headerlink" href="#atm.config.DatasetConfig.train_path" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="atm.config.LogConfig">
-<em class="property">class </em><code class="descclassname">atm.config.</code><code class="descname">LogConfig</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#LogConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.LogConfig" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">atm.config.</code><code class="descname">LogConfig</code><span class="sig-paren">(</span><em>args</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#LogConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.LogConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#atm.config.Config" title="atm.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">atm.config.Config</span></code></a></p>
 <dl class="attribute">
-<dt id="atm.config.LogConfig.DEFAULTS">
-<code class="descname">DEFAULTS</code><em class="property"> = {'log_dir': 'logs', 'log_level_file': 'INFO', 'log_level_stdout': 'ERROR', 'metric_dir': 'metrics', 'model_dir': 'models', 'verbose_metrics': False}</em><a class="headerlink" href="#atm.config.LogConfig.DEFAULTS" title="Permalink to this definition">¶</a></dt>
+<dt id="atm.config.LogConfig.metric_dir">
+<code class="descname">metric_dir</code><em class="property"> = ('Directory where model metrics will be saved', 'metrics')</em><a class="headerlink" href="#atm.config.LogConfig.metric_dir" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="atm.config.LogConfig.PARAMETERS">
-<code class="descname">PARAMETERS</code><em class="property"> = ['log_level_stdout', 'log_level_file', 'log_dir', 'model_dir', 'metric_dir', 'verbose_metrics']</em><a class="headerlink" href="#atm.config.LogConfig.PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dt id="atm.config.LogConfig.model_dir">
+<code class="descname">model_dir</code><em class="property"> = ('Directory where computed models will be saved', 'models')</em><a class="headerlink" href="#atm.config.LogConfig.model_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.LogConfig.verbose_metrics">
+<code class="descname">verbose_metrics</code><em class="property"> = {'action': 'store_true', 'default': False, 'help': 'If set, compute full ROC and PR curves and per-label metrics for each classifier'}</em><a class="headerlink" href="#atm.config.LogConfig.verbose_metrics" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="atm.config.RunConfig">
-<em class="property">class </em><code class="descclassname">atm.config.</code><code class="descname">RunConfig</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#RunConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.RunConfig" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">atm.config.</code><code class="descname">RunConfig</code><span class="sig-paren">(</span><em>args</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#RunConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.RunConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#atm.config.Config" title="atm.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">atm.config.Config</span></code></a></p>
-<p>Stores configuration for Dataset and Datarun setup</p>
+<p>Stores configuration for Dataset and Datarun setup.</p>
 <dl class="attribute">
-<dt id="atm.config.RunConfig.DEFAULTS">
-<code class="descname">DEFAULTS</code><em class="property"> = {'budget': 100, 'budget_type': 'classifier', 'class_column': 'class', 'gridding': 0, 'k_window': 3, 'methods': ['logreg', 'dt', 'knn'], 'metric': 'f1', 'priority': 1, 'r_minimum': 2, 'score_target': 'cv', 'selector': 'uniform', 'train_path': '/home/travis/build/HDI-Project/ATM/atm/data/test/pollution_1.csv', 'tuner': 'uniform'}</em><a class="headerlink" href="#atm.config.RunConfig.DEFAULTS" title="Permalink to this definition">¶</a></dt>
+<dt id="atm.config.RunConfig.budget">
+<code class="descname">budget</code><em class="property"> = {'default': 100, 'help': 'Value of the budget, either in classifiers or minutes', 'type': &lt;class 'int'&gt;}</em><a class="headerlink" href="#atm.config.RunConfig.budget" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="atm.config.RunConfig.PARAMETERS">
-<code class="descname">PARAMETERS</code><em class="property"> = ['train_path', 'test_path', 'data_description', 'class_column', 'dataset_id', 'methods', 'priority', 'budget_type', 'budget', 'deadline', 'tuner', 'r_minimum', 'gridding', 'selector', 'k_window', 'metric', 'score_target']</em><a class="headerlink" href="#atm.config.RunConfig.PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dt id="atm.config.RunConfig.budget_type">
+<code class="descname">budget_type</code><em class="property"> = {'choices': ['none', 'classifier', 'walltime'], 'default': 'classifier', 'help': 'Type of budget to use'}</em><a class="headerlink" href="#atm.config.RunConfig.budget_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.RunConfig.dataset_id">
+<code class="descname">dataset_id</code><em class="property"> = {'help': 'ID of dataset, if it is already in the database', 'type': &lt;class 'int'&gt;}</em><a class="headerlink" href="#atm.config.RunConfig.dataset_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.RunConfig.deadline">
+<code class="descname">deadline</code><em class="property"> = 'Deadline for datarun completion. If provided, this overrides the configured walltime budget.\nFormat: %%Y-%%m-%%d %%H:%%M'</em><a class="headerlink" href="#atm.config.RunConfig.deadline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.RunConfig.gridding">
+<code class="descname">gridding</code><em class="property"> = {'default': 0, 'help': 'gridding factor (0: no gridding)', 'type': &lt;class 'int'&gt;}</em><a class="headerlink" href="#atm.config.RunConfig.gridding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.RunConfig.k_window">
+<code class="descname">k_window</code><em class="property"> = {'default': 3, 'help': 'number of previous scores considered by -k selector methods', 'type': &lt;class 'int'&gt;}</em><a class="headerlink" href="#atm.config.RunConfig.k_window" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.RunConfig.methods">
+<code class="descname">methods</code><em class="property"> = {'default': ['logreg', 'dt', 'knn'], 'help': 'Method or list of methods to use for classification. Each method can either be one of the pre-defined method codes listed below or a path to a JSON file defining a custom method.\n\nOptions: [logreg, svm, sgd, dt, et, rf, gnb, mnb, bnb, gp, pa, knn, mlp, ada]', 'nargs': '+', 'type': &lt;function option_or_path.&lt;locals&gt;.type_check&gt;}</em><a class="headerlink" href="#atm.config.RunConfig.methods" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.RunConfig.metric">
+<code class="descname">metric</code><em class="property"> = {'choices': ['f1', 'rank_accuracy', 'mcc', 'roc_auc', 'cohen_kappa', 'ap', 'f1_micro', 'f1_macro', 'roc_auc_micro', 'roc_auc_macro', 'accuracy'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.RunConfig.priority">
+<code class="descname">priority</code><em class="property"> = {'default': 1, 'help': 'Priority of the datarun (higher = more important', 'type': &lt;class 'int'&gt;}</em><a class="headerlink" href="#atm.config.RunConfig.priority" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.RunConfig.r_minimum">
+<code class="descname">r_minimum</code><em class="property"> = {'default': 2, 'help': 'number of random runs to perform before tuning can occur', 'type': &lt;class 'int'&gt;}</em><a class="headerlink" href="#atm.config.RunConfig.r_minimum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.RunConfig.run_per_partition">
+<code class="descname">run_per_partition</code><em class="property"> = {'action': 'store_true', 'default': False, 'help': 'if true, generate a new datarun for each hyperpartition'}</em><a class="headerlink" href="#atm.config.RunConfig.run_per_partition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.RunConfig.score_target">
+<code class="descname">score_target</code><em class="property"> = {'choices': ['cv', 'test', 'mu_sigma'], 'default': 'cv', 'help': 'Determines which judgment metric will be used to search the hyperparameter space. &quot;cv&quot; will use the mean cross-validated performance, &quot;test&quot; will use the performance on a test dataset, and &quot;mu_sigma&quot; will use the lower confidence bound on the CV performance.'}</em><a class="headerlink" href="#atm.config.RunConfig.score_target" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.RunConfig.selector">
+<code class="descname">selector</code><em class="property"> = {'default': 'uniform', 'help': 'Type of BTB selector to use. Can either be one of the pre-configured selectors listed below or a path to a custom tuner in the form &quot;/path/to/selector.py:ClassName&quot;.\n\nOptions: [uniform, ucb1, bestk, bestkvel, purebestkvel, recentk, recentkvel, hieralg]', 'type': &lt;function option_or_path.&lt;locals&gt;.type_check&gt;}</em><a class="headerlink" href="#atm.config.RunConfig.selector" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.RunConfig.tuner">
+<code class="descname">tuner</code><em class="property"> = {'default': 'uniform', 'help': 'Type of BTB tuner to use. Can either be one of the pre-configured tuners listed below or a path to a custom tuner in the form &quot;/path/to/tuner.py:ClassName&quot;.\n\nOptions: [uniform, gp, gp_ei, gp_eivel]', 'type': &lt;function option_or_path.&lt;locals&gt;.type_check&gt;}</em><a class="headerlink" href="#atm.config.RunConfig.tuner" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="atm.config.SQLConfig">
-<em class="property">class </em><code class="descclassname">atm.config.</code><code class="descname">SQLConfig</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#SQLConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.SQLConfig" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">atm.config.</code><code class="descname">SQLConfig</code><span class="sig-paren">(</span><em>args</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#SQLConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.SQLConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#atm.config.Config" title="atm.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">atm.config.Config</span></code></a></p>
 <p>Stores configuration for SQL database setup &amp; connection</p>
 <dl class="attribute">
-<dt id="atm.config.SQLConfig.DEFAULTS">
-<code class="descname">DEFAULTS</code><em class="property"> = {'database': 'atm.db', 'dialect': 'sqlite'}</em><a class="headerlink" href="#atm.config.SQLConfig.DEFAULTS" title="Permalink to this definition">¶</a></dt>
+<dt id="atm.config.SQLConfig.database">
+<code class="descname">database</code><em class="property"> = ('Name of, or path to, SQL database', 'atm.db')</em><a class="headerlink" href="#atm.config.SQLConfig.database" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="atm.config.SQLConfig.PARAMETERS">
-<code class="descname">PARAMETERS</code><em class="property"> = ['dialect', 'database', 'username', 'password', 'host', 'port', 'query']</em><a class="headerlink" href="#atm.config.SQLConfig.PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dt id="atm.config.SQLConfig.dialect">
+<code class="descname">dialect</code><em class="property"> = {'choices': ['sqlite', 'mysql'], 'default': 'sqlite', 'help': 'Dialect of SQL to use'}</em><a class="headerlink" href="#atm.config.SQLConfig.dialect" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</dd></dl>
-
-<dl class="function">
-<dt id="atm.config.add_arguments_aws_ec2">
-<code class="descclassname">atm.config.</code><code class="descname">add_arguments_aws_ec2</code><span class="sig-paren">(</span><em>parser</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#add_arguments_aws_ec2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.add_arguments_aws_ec2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add all argparse arguments needed to parse AWS EC2 configuration from the
-command line. This is separate from aws_s3 because usually only one set of
-arguments or the other is needed.
-parser: an argparse.ArgumentParser object</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="atm.config.add_arguments_aws_s3">
-<code class="descclassname">atm.config.</code><code class="descname">add_arguments_aws_s3</code><span class="sig-paren">(</span><em>parser</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#add_arguments_aws_s3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.add_arguments_aws_s3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add all argparse arguments needed to parse AWS S3 configuration from the
-command line. This is separate from aws_ec2 because usually only one set of
-arguments or the other is needed.
-parser: an argparse.ArgumentParser object</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="atm.config.add_arguments_datarun">
-<code class="descclassname">atm.config.</code><code class="descname">add_arguments_datarun</code><span class="sig-paren">(</span><em>parser</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#add_arguments_datarun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.add_arguments_datarun" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add all argparse arguments needed to parse dataset and datarun configuration
-from the command line.</p>
-<p>parser: an argparse.ArgumentParser object</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="atm.config.add_arguments_logging">
-<code class="descclassname">atm.config.</code><code class="descname">add_arguments_logging</code><span class="sig-paren">(</span><em>parser</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#add_arguments_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.add_arguments_logging" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add all argparse arguments needed to parse logging configuration from the
-command line.
-parser: an argparse.ArgumentParser object</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="atm.config.add_arguments_sql">
-<code class="descclassname">atm.config.</code><code class="descname">add_arguments_sql</code><span class="sig-paren">(</span><em>parser</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#add_arguments_sql"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.add_arguments_sql" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add all argparse arguments needed to parse configuration for the ModelHub
-SQL database from the command line.</p>
-<p>parser: an argparse.ArgumentParser object</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="atm.config.initialize_logging">
-<code class="descclassname">atm.config.</code><code class="descname">initialize_logging</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#initialize_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.initialize_logging" title="Permalink to this definition">¶</a></dt>
+<dl class="attribute">
+<dt id="atm.config.SQLConfig.host">
+<code class="descname">host</code><em class="property"> = 'Hostname for database machine'</em><a class="headerlink" href="#atm.config.SQLConfig.host" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
-<dt id="atm.config.load_config">
-<code class="descclassname">atm.config.</code><code class="descname">load_config</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#load_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.load_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load config objects from yaml files and command line arguments. Command line
-args override yaml files where applicable.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> – miscellaneous arguments specifying individual configuration
-parameters. Any kwargs beginning with <a href="#id3"><span class="problematic" id="id4">sql_</span></a> are SQL config
-arguments, any beginning with <a href="#id5"><span class="problematic" id="id6">aws_</span></a> are AWS config.</p>
-</dd>
-</dl>
-<p>Returns: run_conf, aws_conf, log_conf</p>
+<dl class="attribute">
+<dt id="atm.config.SQLConfig.password">
+<code class="descname">password</code><em class="property"> = 'Password for SQL database'</em><a class="headerlink" href="#atm.config.SQLConfig.password" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.SQLConfig.port">
+<code class="descname">port</code><em class="property"> = 'Port used to connect to database'</em><a class="headerlink" href="#atm.config.SQLConfig.port" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.SQLConfig.query">
+<code class="descname">query</code><em class="property"> = 'Specify extra login details'</em><a class="headerlink" href="#atm.config.SQLConfig.query" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="atm.config.SQLConfig.username">
+<code class="descname">username</code><em class="property"> = 'Username for SQL database'</em><a class="headerlink" href="#atm.config.SQLConfig.username" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="function">

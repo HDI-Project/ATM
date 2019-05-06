@@ -107,13 +107,16 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">REST API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#starting-the-rest-api-server">Starting the REST API Server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#quickstart">Quickstart</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#generate-some-data">1. Generate some data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#rest-models">2. REST Models</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-all-objects-from-a-model">3. Get all objects from a model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-a-single-object-by-id">4. Get a single object by id</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-all-the-children-objects">5. Get all the children objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#create-a-dataset">2. Create a Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#browse-the-results">4. Browse the results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-a-single-object-by-id">Get a single object by id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-all-the-children-objects">Get all the children objects</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#additional-information">Additional information</a><ul>
@@ -207,21 +210,17 @@
            <div itemprop="articleBody">
             
   <h1>Source code for atm.api</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-
-<span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">redirect</span>
+<span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">request</span>
 <span class="kn">from</span> <span class="nn">flask_restless_swagger</span> <span class="k">import</span> <span class="n">SwagAPIManager</span> <span class="k">as</span> <span class="n">APIManager</span>
 <span class="kn">from</span> <span class="nn">flask_sqlalchemy</span> <span class="k">import</span> <span class="n">SQLAlchemy</span>
 
-
-<div class="viewcode-block" id="make_absolute"><a class="viewcode-back" href="../../api/atm.api.html#atm.api.make_absolute">[docs]</a><span class="k">def</span> <span class="nf">make_absolute</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;sqlite:///&#39;</span><span class="p">):</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;sqlite:///&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">database</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">url</span></div>
+<span class="kn">from</span> <span class="nn">atm.api.preprocessors</span> <span class="k">import</span> <span class="n">DATASET_PREPROCESSORS</span>
+<span class="kn">from</span> <span class="nn">atm.api.utils</span> <span class="k">import</span> <span class="n">auto_abort</span><span class="p">,</span> <span class="n">make_absolute</span>
+<span class="kn">from</span> <span class="nn">atm.config</span> <span class="k">import</span> <span class="n">RunConfig</span>
 
 
-<div class="viewcode-block" id="create_app"><a class="viewcode-back" href="../../api/atm.api.html#atm.api.create_app">[docs]</a><span class="k">def</span> <span class="nf">create_app</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="create_app"><a class="viewcode-back" href="../../api/atm.api.html#atm.api.create_app">[docs]</a><span class="k">def</span> <span class="nf">create_app</span><span class="p">(</span><span class="n">atm</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">db</span>
     <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
     <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">debug</span>
     <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;SQLALCHEMY_DATABASE_URI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">make_absolute</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
@@ -229,14 +228,28 @@
     <span class="c1"># Create the Flask-Restless API manager.</span>
     <span class="n">manager</span> <span class="o">=</span> <span class="n">APIManager</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">flask_sqlalchemy_db</span><span class="o">=</span><span class="n">SQLAlchemy</span><span class="p">(</span><span class="n">app</span><span class="p">))</span>
 
-    <span class="c1"># Create API endpoints, which will be available at /api/&lt;tablename&gt; by</span>
-    <span class="c1"># default. Allowed HTTP methods can be specified as well.</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/api/run&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+    <span class="nd">@auto_abort</span><span class="p">((</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">atm_run</span><span class="p">():</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span>
+        <span class="n">run_conf</span> <span class="o">=</span> <span class="n">RunConfig</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="n">dataruns</span> <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">create_dataruns</span><span class="p">(</span><span class="n">run_conf</span><span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+            <span class="s1">&#39;datarun_ids&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">datarun</span> <span class="ow">in</span> <span class="n">dataruns</span><span class="p">]</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
 
     <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">swagger</span><span class="p">():</span>
         <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;/static/swagger/swagger-ui/index.html&#39;</span><span class="p">)</span>
 
-    <span class="n">manager</span><span class="o">.</span><span class="n">create_api</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+    <span class="c1"># Create API endpoints, which will be available at /api/&lt;tablename&gt; by</span>
+    <span class="c1"># default. Allowed HTTP methods can be specified as well.</span>
+    <span class="n">manager</span><span class="o">.</span><span class="n">create_api</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">],</span> <span class="n">preprocessors</span><span class="o">=</span><span class="n">DATASET_PREPROCESSORS</span><span class="p">)</span>
     <span class="n">manager</span><span class="o">.</span><span class="n">create_api</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Datarun</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
     <span class="n">manager</span><span class="o">.</span><span class="n">create_api</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Hyperpartition</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
     <span class="n">manager</span><span class="o">.</span><span class="n">create_api</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Classifier</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>

@@ -107,13 +107,16 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">REST API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#starting-the-rest-api-server">Starting the REST API Server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#quickstart">Quickstart</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#generate-some-data">1. Generate some data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#rest-models">2. REST Models</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-all-objects-from-a-model">3. Get all objects from a model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-a-single-object-by-id">4. Get a single object by id</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#get-all-the-children-objects">5. Get all the children objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#create-a-dataset">2. Create a Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#browse-the-results">4. Browse the results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-a-single-object-by-id">Get a single object by id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-all-the-children-objects">Get all the children objects</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#additional-information">Additional information</a><ul>
@@ -209,20 +212,16 @@
   <h1>Source code for atm.config</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">socket</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">argparse</span> <span class="k">import</span> <span class="n">ArgumentError</span><span class="p">,</span> <span class="n">ArgumentTypeError</span><span class="p">,</span> <span class="n">RawTextHelpFormatter</span>
-<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">map</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">str</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">str</span>
 
 <span class="kn">import</span> <span class="nn">yaml</span>
 
 <span class="kn">from</span> <span class="nn">atm.constants</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">BUDGET_TYPES</span><span class="p">,</span> <span class="n">CUSTOM_CLASS_REGEX</span><span class="p">,</span> <span class="n">DATA_TEST_PATH</span><span class="p">,</span> <span class="n">JSON_REGEX</span><span class="p">,</span> <span class="n">LOG_LEVELS</span><span class="p">,</span> <span class="n">METHODS</span><span class="p">,</span> <span class="n">METRICS</span><span class="p">,</span>
-    <span class="n">SCORE_TARGETS</span><span class="p">,</span> <span class="n">SELECTORS</span><span class="p">,</span> <span class="n">SQL_DIALECTS</span><span class="p">,</span> <span class="n">TIME_FMT</span><span class="p">,</span> <span class="n">TUNERS</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">atm.utilities</span> <span class="k">import</span> <span class="n">ensure_directory</span>
+    <span class="n">BUDGET_TYPES</span><span class="p">,</span> <span class="n">CUSTOM_CLASS_REGEX</span><span class="p">,</span> <span class="n">DATA_TEST_PATH</span><span class="p">,</span> <span class="n">JSON_REGEX</span><span class="p">,</span> <span class="n">METHODS</span><span class="p">,</span> <span class="n">METRICS</span><span class="p">,</span> <span class="n">SCORE_TARGETS</span><span class="p">,</span>
+    <span class="n">SELECTORS</span><span class="p">,</span> <span class="n">SQL_DIALECTS</span><span class="p">,</span> <span class="n">TIME_FMT</span><span class="p">,</span> <span class="n">TUNERS</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Config"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.Config">[docs]</a><span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -239,170 +238,139 @@
 
 <span class="sd">    Subclasses do not need to define __init__ or any other methods.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># list of all parameters which may be set on this config object</span>
-    <span class="n">PARAMETERS</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="c1"># default values for all required parameters</span>
-    <span class="n">DEFAULTS</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_PREFIX</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_CONFIG</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PARAMETERS</span><span class="p">:</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_add_prefix</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_PREFIX</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_PREFIX</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">name</span>
 
-            <span class="c1"># Here, if a keyword argument is set to None, it will be overridden</span>
-            <span class="c1"># by the default value. AFAIK, this is the only way to deal with</span>
-            <span class="c1"># keyword args passed in from argparse that weren&#39;t set on the</span>
-            <span class="c1"># command line. That means you shouldn&#39;t define any PARAMETERS for</span>
-            <span class="c1"># which None is a meaningful value; if you do, make sure None is</span>
-            <span class="c1"># also the default.</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULTS</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULTS</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_arg</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">arg_name</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_add_prefix</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">class_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">required</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">class_value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">required</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">class_value</span>
+            <span class="n">default</span> <span class="o">=</span> <span class="n">class_value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">class_value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">required</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">default</span> <span class="o">=</span> <span class="n">class_value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">required</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
 
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">arg_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">arg_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">arg_name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">):</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+        <span class="n">config_arg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_CONFIG</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PREFIX</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span> <span class="ow">and</span> <span class="n">config_arg</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">config_arg</span> <span class="o">+</span> <span class="s1">&#39;_config&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">path</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_arg</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Config.get_parser"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.Config.get_parser">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_parser</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">add_help</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># make sure the text for these arguments is formatted correctly</span>
+        <span class="c1"># this allows newlines in the help strings</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">formatter_class</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">RawTextHelpFormatter</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_PREFIX</span><span class="p">:</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--</span><span class="si">{}</span><span class="s1">-config&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_PREFIX</span><span class="p">),</span>
+                                <span class="n">help</span><span class="o">=</span><span class="s1">&#39;path to yaml </span><span class="si">{}</span><span class="s1"> config file&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_PREFIX</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">description</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">description</span><span class="p">):</span>
+                <span class="n">arg_name</span> <span class="o">=</span> <span class="s1">&#39;--&#39;</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_add_prefix</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="n">arg_name</span><span class="p">,</span> <span class="o">**</span><span class="n">description</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                    <span class="n">description</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="n">description</span>
+                    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="n">arg_name</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="n">arg_name</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">parser</span></div>
+
+<div class="viewcode-block" id="Config.to_dict"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.Config.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">name</span><span class="p">:</span> <span class="n">value</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="p">}</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="AWSConfig"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.AWSConfig">[docs]</a><span class="k">class</span> <span class="nc">AWSConfig</span><span class="p">(</span><span class="n">Config</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Stores configuration for AWS S3 and EC2 connections &quot;&quot;&quot;</span>
-    <span class="n">PARAMETERS</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="c1"># universal config</span>
-        <span class="s1">&#39;access_key&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;secret_key&#39;</span><span class="p">,</span>
+    <span class="sd">&quot;&quot;&quot; Stores configuration for AWS S3 connections &quot;&quot;&quot;</span>
+    <span class="n">_PREFIX</span> <span class="o">=</span> <span class="s1">&#39;aws&#39;</span>
 
-        <span class="c1"># s3 config</span>
-        <span class="s1">&#39;s3_bucket&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;s3_folder&#39;</span><span class="p">,</span>
+    <span class="n">access_key</span> <span class="o">=</span> <span class="s1">&#39;AWS access key&#39;</span>
+    <span class="n">secret_key</span> <span class="o">=</span> <span class="s1">&#39;AWS secret key&#39;</span>
+    <span class="n">s3_bucket</span> <span class="o">=</span> <span class="s1">&#39;AWS S3 bucket to store data&#39;</span>
+    <span class="n">s3_folder</span> <span class="o">=</span> <span class="s1">&#39;Folder in AWS S3 bucket in which to store data&#39;</span></div>
 
-        <span class="c1"># ec2 config</span>
-        <span class="s1">&#39;ec2_region&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;ec2_amis&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;ec2_key_pair&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;ec2_keyfile&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;ec2_instance_type&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;ec2_username&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;num_instances&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;num_workers_per_instance&#39;</span>
-    <span class="p">]</span>
 
-    <span class="n">DEFAULTS</span> <span class="o">=</span> <span class="p">{}</span></div>
+<div class="viewcode-block" id="DatasetConfig"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.DatasetConfig">[docs]</a><span class="k">class</span> <span class="nc">DatasetConfig</span><span class="p">(</span><span class="n">Config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Stores configuration of a Dataset &quot;&quot;&quot;</span>
+    <span class="n">_CONFIG</span> <span class="o">=</span> <span class="s1">&#39;run&#39;</span>
+
+    <span class="n">train_path</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Path to raw training data&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_TEST_PATH</span><span class="p">,</span> <span class="s1">&#39;pollution_1.csv&#39;</span><span class="p">))</span>
+    <span class="n">test_path</span> <span class="o">=</span> <span class="s1">&#39;Path to raw test data (if applicable)&#39;</span>
+    <span class="n">data_description</span> <span class="o">=</span> <span class="s1">&#39;Description of dataset&#39;</span>
+    <span class="n">class_column</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Name of the class column in the input data&#39;</span><span class="p">,</span> <span class="s1">&#39;class&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SQLConfig"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.SQLConfig">[docs]</a><span class="k">class</span> <span class="nc">SQLConfig</span><span class="p">(</span><span class="n">Config</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Stores configuration for SQL database setup &amp; connection &quot;&quot;&quot;</span>
-    <span class="n">PARAMETERS</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s1">&#39;dialect&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;database&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;username&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;password&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;host&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;port&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;query&#39;</span>
-    <span class="p">]</span>
+    <span class="n">_PREFIX</span> <span class="o">=</span> <span class="s1">&#39;sql&#39;</span>
 
-    <span class="n">DEFAULTS</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;dialect&#39;</span><span class="p">:</span> <span class="s1">&#39;sqlite&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;database&#39;</span><span class="p">:</span> <span class="s1">&#39;atm.db&#39;</span><span class="p">,</span>
-    <span class="p">}</span></div>
-
-
-<div class="viewcode-block" id="RunConfig"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.RunConfig">[docs]</a><span class="k">class</span> <span class="nc">RunConfig</span><span class="p">(</span><span class="n">Config</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Stores configuration for Dataset and Datarun setup &quot;&quot;&quot;</span>
-    <span class="n">PARAMETERS</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="c1"># dataset config</span>
-        <span class="s1">&#39;train_path&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;test_path&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;data_description&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;class_column&#39;</span><span class="p">,</span>
-
-        <span class="c1"># datarun config</span>
-        <span class="s1">&#39;dataset_id&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;methods&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;priority&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;budget_type&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;budget&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;deadline&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;tuner&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;r_minimum&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;gridding&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;selector&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;k_window&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;metric&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;score_target&#39;</span>
-    <span class="p">]</span>
-
-    <span class="n">DEFAULTS</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;train_path&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_TEST_PATH</span><span class="p">,</span> <span class="s1">&#39;pollution_1.csv&#39;</span><span class="p">),</span>
-        <span class="s1">&#39;class_column&#39;</span><span class="p">:</span> <span class="s1">&#39;class&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;methods&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;logreg&#39;</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">,</span> <span class="s1">&#39;knn&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;priority&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s1">&#39;budget_type&#39;</span><span class="p">:</span> <span class="s1">&#39;classifier&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;budget&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
-        <span class="s1">&#39;tuner&#39;</span><span class="p">:</span> <span class="s1">&#39;uniform&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;selector&#39;</span><span class="p">:</span> <span class="s1">&#39;uniform&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;r_minimum&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s1">&#39;k_window&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-        <span class="s1">&#39;gridding&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="s1">&#39;metric&#39;</span><span class="p">:</span> <span class="s1">&#39;f1&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;score_target&#39;</span><span class="p">:</span> <span class="s1">&#39;cv&#39;</span><span class="p">,</span>
-    <span class="p">}</span></div>
+    <span class="n">dialect</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Dialect of SQL to use&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;sqlite&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="n">SQL_DIALECTS</span>
+    <span class="p">}</span>
+    <span class="n">database</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Name of, or path to, SQL database&#39;</span><span class="p">,</span> <span class="s1">&#39;atm.db&#39;</span><span class="p">)</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="s1">&#39;Username for SQL database&#39;</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="s1">&#39;Password for SQL database&#39;</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;Hostname for database machine&#39;</span>
+    <span class="n">port</span> <span class="o">=</span> <span class="s1">&#39;Port used to connect to database&#39;</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;Specify extra login details&#39;</span></div>
 
 
 <div class="viewcode-block" id="LogConfig"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.LogConfig">[docs]</a><span class="k">class</span> <span class="nc">LogConfig</span><span class="p">(</span><span class="n">Config</span><span class="p">):</span>
-    <span class="n">PARAMETERS</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s1">&#39;log_level_stdout&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;log_level_file&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;log_dir&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;model_dir&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;metric_dir&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;verbose_metrics&#39;</span><span class="p">,</span>
-    <span class="p">]</span>
-
-    <span class="n">DEFAULTS</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;log_level_stdout&#39;</span><span class="p">:</span> <span class="s1">&#39;ERROR&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;log_level_file&#39;</span><span class="p">:</span> <span class="s1">&#39;INFO&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;log_dir&#39;</span><span class="p">:</span> <span class="s1">&#39;logs&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;model_dir&#39;</span><span class="p">:</span> <span class="s1">&#39;models&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;metric_dir&#39;</span><span class="p">:</span> <span class="s1">&#39;metrics&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;verbose_metrics&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">model_dir</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Directory where computed models will be saved&#39;</span><span class="p">,</span> <span class="s1">&#39;models&#39;</span><span class="p">)</span>
+    <span class="n">metric_dir</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Directory where model metrics will be saved&#39;</span><span class="p">,</span> <span class="s1">&#39;metrics&#39;</span><span class="p">)</span>
+    <span class="n">verbose_metrics</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s1">&#39;If set, compute full ROC and PR curves and &#39;</span>
+            <span class="s1">&#39;per-label metrics for each classifier&#39;</span>
+        <span class="p">),</span>
+        <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span>
     <span class="p">}</span></div>
-
-
-<div class="viewcode-block" id="initialize_logging"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.initialize_logging">[docs]</a><span class="k">def</span> <span class="nf">initialize_logging</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
-    <span class="n">file_level</span> <span class="o">=</span> <span class="n">LOG_LEVELS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">log_level_file</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span>
-                                <span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">)</span>
-    <span class="n">stdout_level</span> <span class="o">=</span> <span class="n">LOG_LEVELS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">log_level_stdout</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span>
-                                  <span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">)</span>
-
-    <span class="n">handlers</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">if</span> <span class="n">file_level</span> <span class="o">&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">:</span>
-        <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%(asctime)-15s</span><span class="s1"> </span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1">  </span><span class="si">%(message)s</span><span class="s1">&#39;</span>
-        <span class="n">ensure_directory</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">log_dir</span><span class="p">)</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">log_dir</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;.txt&#39;</span><span class="p">)</span>
-        <span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fmt</span><span class="p">))</span>
-        <span class="n">handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">file_level</span><span class="p">)</span>
-        <span class="n">handlers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">stdout_level</span> <span class="o">&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">:</span>
-        <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%(message)s</span><span class="s1">&#39;</span>
-        <span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
-        <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fmt</span><span class="p">))</span>
-        <span class="n">handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">stdout_level</span><span class="p">)</span>
-        <span class="n">handlers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">handlers</span><span class="p">):</span>
-        <span class="n">handlers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
-
-    <span class="k">for</span> <span class="n">lib</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;atm&#39;</span><span class="p">,</span> <span class="s1">&#39;btb&#39;</span><span class="p">]:</span>
-        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">lib</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">file_level</span><span class="p">,</span> <span class="n">stdout_level</span><span class="p">))</span>
-
-        <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">removeHandler</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">handlers</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
-
-        <span class="n">logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Logging is active for module </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="n">lib</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="option_or_path"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.option_or_path">[docs]</a><span class="k">def</span> <span class="nf">option_or_path</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="n">CUSTOM_CLASS_REGEX</span><span class="p">):</span>
@@ -418,164 +386,26 @@
             <span class="k">return</span> <span class="n">s</span>
 
         <span class="c1"># if both of those fail, there&#39;s something wrong</span>
-        <span class="k">raise</span> <span class="n">ArgumentTypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid option or path!&#39;</span> <span class="o">%</span> <span class="n">s</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> is not a valid option or path!&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">type_check</span></div>
 
 
-<div class="viewcode-block" id="add_arguments_logging"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.add_arguments_logging">[docs]</a><span class="k">def</span> <span class="nf">add_arguments_logging</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Add all argparse arguments needed to parse logging configuration from the</span>
-<span class="sd">    command line.</span>
-<span class="sd">    parser: an argparse.ArgumentParser object</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Config file path</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--log-config&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;path to yaml logging config file&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="RunConfig"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.RunConfig">[docs]</a><span class="k">class</span> <span class="nc">RunConfig</span><span class="p">(</span><span class="n">Config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Stores configuration for Dataset and Datarun setup.&quot;&quot;&quot;</span>
+    <span class="n">_CONFIG</span> <span class="o">=</span> <span class="s1">&#39;run&#39;</span>
 
-    <span class="c1"># paths to saved files</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--model-dir&#39;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Directory where computed models will be saved&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--metric-dir&#39;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Directory where model metrics will be saved&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--log-dir&#39;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Directory where logs will be saved&#39;</span><span class="p">)</span>
+    <span class="n">dataset_id</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;ID of dataset, if it is already in the database&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">}</span>
 
-    <span class="c1"># hoe much information to log or save</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--verbose-metrics&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;If set, compute full ROC and PR curves and &#39;</span>
-                        <span class="s1">&#39;per-label metrics for each classifier&#39;</span><span class="p">)</span>
+    <span class="n">run_per_partition</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;if true, generate a new datarun for each hyperpartition&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
 
-    <span class="n">log_levels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">LOG_LEVELS</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--log-level-file&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">log_levels</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;minimum log level to write to the log file&#39;</span><span class="p">)</span>
-    <span class="c1"># if this is being called from the command line, print more information to</span>
-    <span class="c1"># stdout by default</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--log-level-stdout&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">log_levels</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;minimum log level to write to stdout&#39;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">parser</span></div>
-
-
-<div class="viewcode-block" id="add_arguments_aws_s3"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.add_arguments_aws_s3">[docs]</a><span class="k">def</span> <span class="nf">add_arguments_aws_s3</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Add all argparse arguments needed to parse AWS S3 configuration from the</span>
-<span class="sd">    command line. This is separate from aws_ec2 because usually only one set of</span>
-<span class="sd">    arguments or the other is needed.</span>
-<span class="sd">    parser: an argparse.ArgumentParser object</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Config file</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--aws-config&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;path to yaml AWS config file&#39;</span><span class="p">)</span>
-
-    <span class="c1"># All of these arguments must start with --aws-, and must correspond to</span>
-    <span class="c1"># keys present in the AWS config example file.</span>
-    <span class="c1"># AWS API access key pair</span>
-    <span class="c1"># try... catch because this might be called after aws_s3</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--aws-access-key&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;AWS access key&#39;</span><span class="p">)</span>
-        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--aws-secret-key&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;AWS secret key&#39;</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">ArgumentError</span><span class="p">:</span>
-        <span class="k">pass</span>
-
-    <span class="c1"># S3-specific arguments</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--aws-s3-bucket&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;AWS S3 bucket to store data&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--aws-s3-folder&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Folder in AWS S3 bucket in which to store data&#39;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">parser</span></div>
-
-
-<div class="viewcode-block" id="add_arguments_aws_ec2"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.add_arguments_aws_ec2">[docs]</a><span class="k">def</span> <span class="nf">add_arguments_aws_ec2</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Add all argparse arguments needed to parse AWS EC2 configuration from the</span>
-<span class="sd">    command line. This is separate from aws_s3 because usually only one set of</span>
-<span class="sd">    arguments or the other is needed.</span>
-<span class="sd">    parser: an argparse.ArgumentParser object</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Config file</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--aws-config&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;path to yaml AWS config file&#39;</span><span class="p">)</span>
-
-    <span class="c1"># All of these arguments must start with --aws-, and must correspond to</span>
-    <span class="c1"># keys present in the AWS config example file.</span>
-    <span class="c1"># AWS API access key pair</span>
-    <span class="c1"># try... catch because this might be called after aws_s3</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--aws-access-key&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;AWS access key&#39;</span><span class="p">)</span>
-        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--aws-secret-key&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;AWS secret key&#39;</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">ArgumentError</span><span class="p">:</span>
-        <span class="k">pass</span>
-
-    <span class="c1"># AWS EC2 configurations</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--num-instances&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Number of EC2 instances to start&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--num-workers-per-instance&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Number of ATM workers per instances&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--ec2-region&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Region to start instances in&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--ec2-ami&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Name of ATM AMI&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--ec2-key-pair&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;AWS key pair to use for EC2 instances&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--ec2-keyfile&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Local path to key file (must match ec2-key-pair)&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--ec2-instance-type&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Type of EC2 instance to start&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--ec2-username&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Username to log into EC2 instance&#39;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">parser</span></div>
-
-
-<div class="viewcode-block" id="add_arguments_sql"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.add_arguments_sql">[docs]</a><span class="k">def</span> <span class="nf">add_arguments_sql</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Add all argparse arguments needed to parse configuration for the ModelHub</span>
-<span class="sd">    SQL database from the command line.</span>
-
-<span class="sd">    parser: an argparse.ArgumentParser object</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Config file</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--sql-config&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;path to yaml SQL config file&#39;</span><span class="p">)</span>
-
-    <span class="c1"># All of these arguments must start with --sql-, and must correspond to</span>
-    <span class="c1"># keys present in the SQL config example file.</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--sql-dialect&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">SQL_DIALECTS</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;sqlite&#39;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Dialect of SQL to use&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--sql-database&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;atm.db&#39;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Name of, or path to, SQL database&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--sql-username&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Username for SQL database&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--sql-password&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Password for SQL database&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--sql-host&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Hostname for database machine&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--sql-port&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Port used to connect to database&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--sql-query&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Specify extra login details&#39;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">parser</span></div>
-
-
-<div class="viewcode-block" id="add_arguments_datarun"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.add_arguments_datarun">[docs]</a><span class="k">def</span> <span class="nf">add_arguments_datarun</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Add all argparse arguments needed to parse dataset and datarun configuration</span>
-<span class="sd">    from the command line.</span>
-
-<span class="sd">    parser: an argparse.ArgumentParser object</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># make sure the text for these arguments is formatted correctly</span>
-    <span class="c1"># this allows newlines in the help strings</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">formatter_class</span> <span class="o">=</span> <span class="n">RawTextHelpFormatter</span>
-
-    <span class="c1"># Config file</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--run-config&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;path to yaml datarun config file&#39;</span><span class="p">)</span>
-
-    <span class="c1">#  Dataset Arguments  #####################################################</span>
-    <span class="c1"># ##########################################################################</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--dataset-id&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;ID of dataset, if it&#39;s already in the database&quot;</span><span class="p">)</span>
-
-    <span class="c1"># These are only relevant if dataset_id is not provided</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--train-path&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path to raw training data&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--test-path&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path to raw test data (if applicable)&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--data-description&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Description of dataset&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--class-column&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Name of the class column in the input data&#39;</span><span class="p">)</span>
-
-    <span class="c1">#   Datarun Arguments  #####################################################</span>
-    <span class="c1"># ##########################################################################</span>
-    <span class="c1"># Notes:</span>
-    <span class="c1"># - Support vector machines (svm) can take a long time to train. It&#39;s not an</span>
-    <span class="c1">#   error, it&#39;s just part of what happens when the method happens to explore</span>
-    <span class="c1">#   a crappy set of parameters on a powerful algo like this.</span>
-    <span class="c1"># - Stochastic gradient descent (sgd) can sometimes fail on certain</span>
-    <span class="c1">#   parameter settings as well. Don&#39;t worry, they train SUPER fast, and the</span>
-    <span class="c1">#   worker.py will simply log the error and continue.</span>
-    <span class="c1">#</span>
     <span class="c1"># Method options:</span>
     <span class="c1">#   logreg - logistic regression</span>
     <span class="c1">#   svm    - support vector machine</span>
@@ -590,23 +420,45 @@
     <span class="c1">#   pa     - passive aggressive</span>
     <span class="c1">#   knn    - K nearest neighbors</span>
     <span class="c1">#   mlp    - multi-layer perceptron</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--methods&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span>
-                        <span class="nb">type</span><span class="o">=</span><span class="n">option_or_path</span><span class="p">(</span><span class="n">METHODS</span><span class="p">,</span> <span class="n">JSON_REGEX</span><span class="p">),</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Method or list of methods to use for &#39;</span>
-                        <span class="s1">&#39;classification. Each method can either be one of the &#39;</span>
-                        <span class="s1">&#39;pre-defined method codes listed below or a path to a &#39;</span>
-                        <span class="s1">&#39;JSON file defining a custom method.&#39;</span>
-                        <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">Options: [</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">METHODS</span><span class="p">))</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--priority&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Priority of the datarun (higher = more important&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--budget-type&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">BUDGET_TYPES</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Type of budget to use&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--budget&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Value of the budget, either in classifiers or minutes&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--deadline&#39;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Deadline for datarun completion. If provided, this &#39;</span>
-                        <span class="s1">&#39;overrides the configured walltime budget.</span><span class="se">\n</span><span class="s1">Format: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                            <span class="n">TIME_FMT</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%%</span><span class="s1">&#39;</span><span class="p">)))</span>
+    <span class="c1">#</span>
+    <span class="c1"># Notes:</span>
+    <span class="c1"># - Support vector machines (svm) can take a long time to train. It&#39;s not an</span>
+    <span class="c1">#   error, it&#39;s just part of what happens when the method happens to explore</span>
+    <span class="c1">#   a crappy set of parameters on a powerful algo like this.</span>
+    <span class="c1"># - Stochastic gradient descent (sgd) can sometimes fail on certain</span>
+    <span class="c1">#   parameter settings as well. Don&#39;t worry, they train SUPER fast, and the</span>
+    <span class="c1">#   worker.py will simply log the error and continue.</span>
+    <span class="n">methods</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s1">&#39;Method or list of methods to use for &#39;</span>
+            <span class="s1">&#39;classification. Each method can either be one of the &#39;</span>
+            <span class="s1">&#39;pre-defined method codes listed below or a path to a &#39;</span>
+            <span class="s1">&#39;JSON file defining a custom method.</span><span class="se">\n\n</span><span class="s1">Options: [</span><span class="si">{}</span><span class="s1">]&#39;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">METHODS</span><span class="p">)),</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;logreg&#39;</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">,</span> <span class="s1">&#39;knn&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">option_or_path</span><span class="p">(</span><span class="n">METHODS</span><span class="p">,</span> <span class="n">JSON_REGEX</span><span class="p">),</span>
+        <span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;+&#39;</span>
+    <span class="p">}</span>
+
+    <span class="n">priority</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Priority of the datarun (higher = more important&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">}</span>
+    <span class="n">budget_type</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Type of budget to use&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;classifier&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="n">BUDGET_TYPES</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">budget</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Value of the budget, either in classifiers or minutes&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">deadline</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;Deadline for datarun completion. If provided, this &#39;</span>
+        <span class="s1">&#39;overrides the configured walltime budget.</span><span class="se">\n</span><span class="s1">Format: </span><span class="si">{}</span><span class="s1">&#39;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">TIME_FMT</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%%</span><span class="s1">&#39;</span><span class="p">))</span>
 
     <span class="c1"># Which field to use to judge performance, for the sake of AutoML</span>
     <span class="c1"># options:</span>
@@ -623,24 +475,35 @@
     <span class="c1">#</span>
     <span class="c1"># f1 and roc_auc may be appended with _micro or _macro to use with</span>
     <span class="c1"># multiclass problems.</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--metric&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">METRICS</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Metric by which ATM should evaluate classifiers. &#39;</span>
-                        <span class="s1">&#39;The metric function specified here will be used to &#39;</span>
-                        <span class="s1">&#39;compute the &quot;judgment metric&quot; for each classifier.&#39;</span><span class="p">)</span>
+    <span class="n">metric</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s1">&#39;Metric by which ATM should evaluate classifiers. &#39;</span>
+            <span class="s1">&#39;The metric function specified here will be used to &#39;</span>
+            <span class="s1">&#39;compute the &quot;judgment metric&quot; for each classifier.&#39;</span>
+        <span class="p">),</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;f1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="n">METRICS</span><span class="p">,</span>
+    <span class="p">}</span>
 
     <span class="c1"># Which data to use for computing judgment score</span>
     <span class="c1">#   cv   - cross-validated performance on training data</span>
     <span class="c1">#   test - performance on test data</span>
     <span class="c1">#   mu_sigma - lower confidence bound on cv score</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--score-target&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">SCORE_TARGETS</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Determines which judgment metric will be used to &#39;</span>
-                        <span class="s1">&#39;search the hyperparameter space. &quot;cv&quot; will use the mean &#39;</span>
-                        <span class="s1">&#39;cross-validated performance, &quot;test&quot; will use the &#39;</span>
-                        <span class="s1">&#39;performance on a test dataset, and &quot;mu_sigma&quot; will use &#39;</span>
-                        <span class="s1">&#39;the lower confidence bound on the CV performance.&#39;</span><span class="p">)</span>
+    <span class="n">score_target</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s1">&#39;Determines which judgment metric will be used to &#39;</span>
+            <span class="s1">&#39;search the hyperparameter space. &quot;cv&quot; will use the mean &#39;</span>
+            <span class="s1">&#39;cross-validated performance, &quot;test&quot; will use the &#39;</span>
+            <span class="s1">&#39;performance on a test dataset, and &quot;mu_sigma&quot; will use &#39;</span>
+            <span class="s1">&#39;the lower confidence bound on the CV performance.&#39;</span>
+        <span class="p">),</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;cv&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="n">SCORE_TARGETS</span>
+    <span class="p">}</span>
 
     <span class="c1">#   AutoML Arguments  ######################################################</span>
     <span class="c1"># ##########################################################################</span>
+
     <span class="c1"># hyperparameter selection strategy</span>
     <span class="c1"># How should ATM sample hyperparameters from a given hyperpartition?</span>
     <span class="c1">#    uniform  - pick randomly! (baseline)</span>
@@ -649,11 +512,15 @@
     <span class="c1">#    gp_eivel - Gaussian Process expected improvement, with randomness added</span>
     <span class="c1">#               in based on velocity of improvement</span>
     <span class="c1">#   path to custom tuner, defined in python</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--tuner&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">option_or_path</span><span class="p">(</span><span class="n">TUNERS</span><span class="p">),</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Type of BTB tuner to use. Can either be one of &#39;</span>
-                        <span class="s1">&#39;the pre-configured tuners listed below or a path to a &#39;</span>
-                        <span class="s1">&#39;custom tuner in the form &quot;/path/to/tuner.py:ClassName&quot;.&#39;</span>
-                        <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">Options: [</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">TUNERS</span><span class="p">))</span>
+    <span class="n">tuner</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s1">&#39;Type of BTB tuner to use. Can either be one of the pre-configured &#39;</span>
+            <span class="s1">&#39;tuners listed below or a path to a custom tuner in the form &#39;</span>
+            <span class="s1">&#39;&quot;/path/to/tuner.py:ClassName&quot;.</span><span class="se">\n\n</span><span class="s1">Options: [</span><span class="si">{}</span><span class="s1">]&#39;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">TUNERS</span><span class="p">)),</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;uniform&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">option_or_path</span><span class="p">(</span><span class="n">TUNERS</span><span class="p">)</span>
+    <span class="p">}</span>
 
     <span class="c1"># How should ATM select a particular hyperpartition from the set of all</span>
     <span class="c1"># possible hyperpartitions?</span>
@@ -668,11 +535,15 @@
     <span class="c1">#   hieralg      - hierarchical MAB: choose a classifier first, then choose</span>
     <span class="c1">#                  a partition</span>
     <span class="c1">#   path to custom selector, defined in python</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--selector&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">option_or_path</span><span class="p">(</span><span class="n">SELECTORS</span><span class="p">),</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Type of BTB selector to use. Can either be one of &#39;</span>
-                        <span class="s1">&#39;the pre-configured selectors listed below or a path to a &#39;</span>
-                        <span class="s1">&#39;custom tuner in the form &quot;/path/to/selector.py:ClassName&quot;.&#39;</span>
-                        <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">Options: [</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">SELECTORS</span><span class="p">))</span>
+    <span class="n">selector</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s1">&#39;Type of BTB selector to use. Can either be one of the pre-configured &#39;</span>
+            <span class="s1">&#39;selectors listed below or a path to a custom tuner in the form &#39;</span>
+            <span class="s1">&#39;&quot;/path/to/selector.py:ClassName&quot;.</span><span class="se">\n\n</span><span class="s1">Options: [</span><span class="si">{}</span><span class="s1">]&#39;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">SELECTORS</span><span class="p">)),</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;uniform&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">option_or_path</span><span class="p">(</span><span class="n">SELECTORS</span><span class="p">)</span>
+    <span class="p">}</span>
 
     <span class="c1"># r_minimum is the number of random runs performed in each hyperpartition before</span>
     <span class="c1"># allowing bayesian opt to select parameters. Consult the thesis to</span>
@@ -682,14 +553,20 @@
     <span class="c1">#    # train using sample criteria</span>
     <span class="c1">#  else</span>
     <span class="c1">#    # train using uniform (baseline)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--r-minimum&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;number of random runs to perform before tuning can occur&#39;</span><span class="p">)</span>
+    <span class="n">r_minimum</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;number of random runs to perform before tuning can occur&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">}</span>
 
     <span class="c1"># k is number that xxx-k methods use. It is similar to r_minimum, except it is</span>
     <span class="c1"># called k_window and determines how much &quot;history&quot; ATM considers for certain</span>
     <span class="c1"># partition selection logics.</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--k-window&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;number of previous scores considered by -k selector methods&#39;</span><span class="p">)</span>
+    <span class="n">k_window</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;number of previous scores considered by -k selector methods&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">}</span>
 
     <span class="c1"># gridding determines whether or not sample selection will happen on a grid.</span>
     <span class="c1"># If any positive integer, a grid with `gridding` points on each axis is</span>
@@ -697,68 +574,11 @@
     <span class="c1"># space. If 0 (or blank), hyperparameters are sampled from continuous</span>
     <span class="c1"># space, and there is no limit to the number of hyperparameter vectors that</span>
     <span class="c1"># may be tried.</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--gridding&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;gridding factor (0: no gridding)&#39;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">parser</span></div>
-
-
-<div class="viewcode-block" id="load_config"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.load_config">[docs]</a><span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Load config objects from yaml files and command line arguments. Command line</span>
-<span class="sd">    args override yaml files where applicable.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        **kwargs: miscellaneous arguments specifying individual configuration</span>
-<span class="sd">            parameters. Any kwargs beginning with sql_ are SQL config</span>
-<span class="sd">            arguments, any beginning with aws_ are AWS config.</span>
-
-<span class="sd">    Returns: run_conf, aws_conf, log_conf</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">run_args</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">aws_args</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">log_args</span> <span class="o">=</span> <span class="p">{}</span>
-
-    <span class="c1"># kwargs are most likely generated by argparse.</span>
-    <span class="c1"># Any unspecified argparse arguments will be None, so ignore those. We only</span>
-    <span class="c1"># care about arguments explicitly specified by the user.</span>
-    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
-
-    <span class="c1"># check the keyword args for config paths</span>
-    <span class="n">run_path</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;run_config&#39;</span><span class="p">)</span>
-    <span class="n">aws_path</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;aws_config&#39;</span><span class="p">)</span>
-    <span class="n">log_path</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;log_config&#39;</span><span class="p">)</span>
-
-    <span class="c1"># load any yaml config files for which paths were provided</span>
-
-    <span class="k">if</span> <span class="n">run_path</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">run_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">run_args</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">aws_path</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">aws_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">aws_args</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">log_path</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">log_args</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-
-    <span class="c1"># Use keyword args to override yaml config values</span>
-    <span class="n">aws_args</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;aws_&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
-                     <span class="k">if</span> <span class="s1">&#39;aws_&#39;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">})</span>
-    <span class="n">run_args</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span>
-                     <span class="n">RunConfig</span><span class="o">.</span><span class="n">PARAMETERS</span><span class="p">})</span>
-    <span class="n">log_args</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span>
-                     <span class="n">LogConfig</span><span class="o">.</span><span class="n">PARAMETERS</span><span class="p">})</span>
-
-    <span class="c1"># It&#39;s ok if there are some extra arguments that get passed in here; only</span>
-    <span class="c1"># kwargs that correspond to real config values will be stored on the config</span>
-    <span class="c1"># objects.</span>
-    <span class="n">aws_conf</span> <span class="o">=</span> <span class="n">AWSConfig</span><span class="p">(</span><span class="o">**</span><span class="n">aws_args</span><span class="p">)</span>
-    <span class="n">run_conf</span> <span class="o">=</span> <span class="n">RunConfig</span><span class="p">(</span><span class="o">**</span><span class="n">run_args</span><span class="p">)</span>
-    <span class="n">log_conf</span> <span class="o">=</span> <span class="n">LogConfig</span><span class="p">(</span><span class="o">**</span><span class="n">log_args</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">run_conf</span><span class="p">,</span> <span class="n">aws_conf</span><span class="p">,</span> <span class="n">log_conf</span></div>
+    <span class="n">gridding</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;gridding factor (0: no gridding)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">}</span></div>
 </pre></div>
 
            </div>

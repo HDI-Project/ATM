@@ -6,22 +6,28 @@ atm package
     :undoc-members:
     :show-inheritance:
 
+Subpackages
+-----------
+
+.. toctree::
+
+    atm.api
+
 Submodules
 ----------
 
 .. toctree::
 
-   atm.api
    atm.classifier
    atm.cli
    atm.compat
    atm.config
    atm.constants
+   atm.core
    atm.database
    atm.encoder
    atm.method
    atm.metrics
-   atm.models
    atm.utilities
    atm.worker
 

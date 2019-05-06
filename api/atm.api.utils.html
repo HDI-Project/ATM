@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>atm.models module &mdash; ATM 0.1.2-dev documentation</title>
+  <title>atm.api.utils module &mdash; ATM 0.1.2-dev documentation</title>
   
 
   
@@ -107,13 +107,16 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">REST API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../api.html#starting-the-rest-api-server">Starting the REST API Server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#quickstart">Quickstart</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#generate-some-data">1. Generate some data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#rest-models">2. REST Models</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#get-all-objects-from-a-model">3. Get all objects from a model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#get-a-single-object-by-id">4. Get a single object by id</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#get-all-the-children-objects">5. Get all the children objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#create-a-dataset">2. Create a Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#browse-the-results">4. Browse the results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api.html#get-a-single-object-by-id">Get a single object by id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api.html#get-all-the-children-objects">Get all the children objects</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#additional-information">Additional information</a><ul>
@@ -189,14 +192,14 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>atm.models module</li>
+      <li>atm.api.utils module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
             
-              <a href="https://github.com/HDI-project/ATM/blob/master/docs/api/atm.models.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/HDI-project/ATM/blob/master/docs/api/atm.api.utils.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -210,62 +213,22 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-atm.models">
-<span id="atm-models-module"></span><h1>atm.models module<a class="headerlink" href="#module-atm.models" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="atm.models.ATM">
-<em class="property">class </em><code class="descclassname">atm.models.</code><code class="descname">ATM</code><span class="sig-paren">(</span><em>db</em>, <em>run_conf</em>, <em>aws_conf</em>, <em>log_conf</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/models.html#ATM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.models.ATM" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Thiss class is code API instance that allows you to use ATM in your python code.</p>
-<dl class="attribute">
-<dt id="atm.models.ATM.LOOP_WAIT">
-<code class="descname">LOOP_WAIT</code><em class="property"> = 1</em><a class="headerlink" href="#atm.models.ATM.LOOP_WAIT" title="Permalink to this definition">¶</a></dt>
+  <div class="section" id="module-atm.api.utils">
+<span id="atm-api-utils-module"></span><h1>atm.api.utils module<a class="headerlink" href="#module-atm.api.utils" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="atm.api.utils.abort">
+<code class="descclassname">atm.api.utils.</code><code class="descname">abort</code><span class="sig-paren">(</span><em>code</em>, <em>message=None</em>, <em>error=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/api/utils.html#abort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.api.utils.abort" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="atm.models.ATM.create_datarun">
-<code class="descname">create_datarun</code><span class="sig-paren">(</span><em>dataset</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/models.html#ATM.create_datarun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.models.ATM.create_datarun" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a config, creates a set of dataruns for the config and enters them into
-the database. Returns the ID of the created datarun.</p>
-<p>dataset: Dataset SQLAlchemy ORM object</p>
-</dd></dl>
+<dl class="function">
+<dt id="atm.api.utils.auto_abort">
+<code class="descclassname">atm.api.utils.</code><code class="descname">auto_abort</code><span class="sig-paren">(</span><em>exceptions</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/api/utils.html#auto_abort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.api.utils.auto_abort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<dl class="method">
-<dt id="atm.models.ATM.create_dataset">
-<code class="descname">create_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/models.html#ATM.create_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.models.ATM.create_dataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a dataset and add it to the ModelHub database.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="atm.models.ATM.enter_data">
-<code class="descname">enter_data</code><span class="sig-paren">(</span><em>run_per_partition=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/models.html#ATM.enter_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.models.ATM.enter_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a datarun, including a dataset if necessary.</p>
-<p>Returns: ID of the generated datarun</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="atm.models.ATM.work">
-<code class="descname">work</code><span class="sig-paren">(</span><em>datarun_ids=None</em>, <em>save_files=False</em>, <em>choose_randomly=True</em>, <em>cloud_mode=False</em>, <em>total_time=None</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/models.html#ATM.work"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.models.ATM.work" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check the ModelHub database for unfinished dataruns, and spawn workers to
-work on them as they are added. This process will continue to run until it
-exceeds total_time or is broken with ctrl-C.</p>
-<dl class="simple">
-<dt>datarun_ids (optional): list of IDs of dataruns to compute on. If None,</dt><dd><p>this will work on all unfinished dataruns in the database.</p>
-</dd>
-<dt>choose_randomly: if True, work on all highest-priority dataruns in random</dt><dd><p>order. If False, work on them in sequential order (by ID)</p>
-</dd>
-<dt>cloud_mode: if True, save processed datasets to AWS. If this option is set,</dt><dd><p>aws_config must be supplied.</p>
-</dd>
-<dt>total_time (optional): if set to an integer, this worker will only work for</dt><dd><p>total_time seconds. Otherwise, it will continue working until all
-dataruns are complete (or indefinitely).</p>
-</dd>
-<dt>wait: if True, once all dataruns in the database are complete, keep spinning</dt><dd><p>and wait for new runs to be added. If False, exit once all dataruns are
-complete.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
+<dl class="function">
+<dt id="atm.api.utils.make_absolute">
+<code class="descclassname">atm.api.utils.</code><code class="descname">make_absolute</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/api/utils.html#make_absolute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.api.utils.make_absolute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 
