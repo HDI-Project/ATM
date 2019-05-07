@@ -4,7 +4,6 @@ from builtins import range
 
 import numpy as np
 import pandas as pd
-from past.utils import old_div
 from sklearn.metrics import (
     accuracy_score, average_precision_score, cohen_kappa_score, f1_score, matthews_corrcoef,
     precision_recall_curve, roc_auc_score, roc_curve)
@@ -37,7 +36,7 @@ def rank_n_accuracy(y_true, y_prob_mat, n=0.33):
         if y_true[i] in rankings[i, :]:
             correct_sample_count += 1
 
-    return old_div(correct_sample_count, num_samples)
+    return int(correct_sample_count / num_samples)
 
 
 def get_per_class_matrix(y, classes=None):

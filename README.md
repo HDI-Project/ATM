@@ -6,8 +6,8 @@
 
 
 [![CircleCI][circleci-img]][circleci-url]
+[![Travis][travis-img]][travis-url]
 [![Coverage status][codecov-img]][codecov-url]
-[![Documentation][rtd-img]][rtd-url]
 
 [circleci-img]: https://circleci.com/gh/HDI-Project/ATM.svg?style=shield
 [circleci-url]: https://circleci.com/gh/HDI-Project/ATM
@@ -17,14 +17,12 @@
 [pypi-url]: https://pypi.python.org/pypi/atm
 [codecov-img]: https://codecov.io/gh/HDI-project/ATM/branch/master/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/HDI-project/ATM
-[rtd-img]: https://readthedocs.org/projects/atm/badge/?version=latest
-[rtd-url]: http://atm.readthedocs.io/en/latest/
 
 
 # ATM - Auto Tune Models
 
 - Free software: MIT license
-- Documentation: http://atm.readthedocs.io/en/latest/
+- Documentation: https://hdi-project.github.io/ATM/
 
 
 ATM is an open source software library under the
@@ -310,6 +308,15 @@ database for its datarun!
    atm worker --sql-config config/sql.yaml \
               --aws-config config/aws.yaml \
    ```
+
+
+## REST API Server
+
+**ATM** comes with the possibility to start a server process that enables interacting with
+the ModelHub Database via a REST API server that runs over [flask](http://flask.pocoo.org/).
+
+For more details about how to start and use this REST API please check the [API.md](API.md) document.
+
 
 <!--## Testing Tuners and Selectors-->
 

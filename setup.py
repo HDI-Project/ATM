@@ -17,12 +17,19 @@ install_requires = [
     'mysqlclient>=1.2',
     'numpy>=1.13.1',
     'pandas>=0.22.0',
+    'psutil>=5.6.1',
+    'python-daemon>=2.2.3',
     'pyyaml>=3.12',
     'requests>=2.18.4',
     'scikit-learn>=0.18.2',
     'scipy>=0.19.1',
     'sklearn-pandas>=1.5.0',
     'sqlalchemy>=1.1.14',
+    'flask>=1.0.2',
+    'flask-restless>=0.17.0',
+    'flask-sqlalchemy>=2.3.2',
+    'flask-restless-swagger-2>=0.0.3',
+    'simplejson>=3.16.0',
 ]
 
 setup_requires = [
@@ -35,6 +42,7 @@ tests_require = [
     'pytest-runner>=3.0',
     'pytest-xdist>=1.20.1',
     'pytest>=3.2.3',
+    'google-compute-engine==2.8.12',    # required by travis
 ]
 
 development_requires = [
@@ -102,6 +110,6 @@ setup(
     test_suite='tests',
     tests_require=tests_require,
     url='https://github.com/HDI-project/ATM',
-    version='0.1.1',
+    version='0.1.2-dev',
     zip_safe=False,
 )

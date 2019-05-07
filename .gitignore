@@ -92,7 +92,7 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/build/
+docs/_build/
 docs/modules.rst
 docs/atm.rst
 docs/atm.*.rst
@@ -136,3 +136,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# pid
+*.pid

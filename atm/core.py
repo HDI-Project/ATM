@@ -1,45 +1,39 @@
+# -*- coding: utf-8 -*-
+
+"""Core ATM module.
+
+This module contains the ATM class, which is the one responsible for
+executing and orchestrating the main ATM functionalities.
+"""
+
 from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import os
 import random
 import time
-from builtins import map, object
+from builtins import object
 from datetime import datetime, timedelta
 from operator import attrgetter
 
-from past.utils import old_div
-
-from atm.config import initialize_logging, load_config
-from atm.constants import PROJECT_ROOT, TIME_FMT, PartitionStatus
+from atm.constants import TIME_FMT, PartitionStatus
 from atm.database import Database
 from atm.encoder import MetaData
 from atm.method import Method
 from atm.utilities import download_data, get_public_ip
 from atm.worker import ClassifierError, Worker
 
-# load the library-wide logger
-logger = logging.getLogger('atm')
+LOGGER = logging.getLogger(__name__)
 
 
 class ATM(object):
-    """
-    Thiss class is code API instance that allows you to use ATM in your python code.
-    """
 
     LOOP_WAIT = 1
 
-    def __init__(self, **kwargs):
-
-        if kwargs.get('log_config') is None:
-            kwargs['log_config'] = os.path.join(PROJECT_ROOT,
-                                                'config/templates/log-script.yaml')
-
-        self.sql_conf, self.run_conf, self.aws_conf, self.log_conf = load_config(**kwargs)
-
-        self.db = Database(**vars(self.sql_conf))
-
-        initialize_logging(self.log_conf)
+    def __init__(self, sql_conf, aws_conf, log_conf):
+        self.db = Database(**sql_conf.to_dict())
+        self.aws_conf = aws_conf
+        self.log_conf = log_conf
 
     def work(self, datarun_ids=None, save_files=False, choose_randomly=True,
              cloud_mode=False, total_time=None, wait=True):
@@ -71,13 +65,13 @@ class ATM(object):
             dataruns = self.db.get_dataruns(include_ids=datarun_ids, ignore_complete=True)
             if not dataruns:
                 if wait:
-                    logger.warning('No dataruns found. Sleeping %d seconds and trying again.',
-                                   ATM.LOOP_WAIT)
+                    LOGGER.debug('No dataruns found. Sleeping %d seconds and trying again.',
+                                 ATM.LOOP_WAIT)
                     time.sleep(ATM.LOOP_WAIT)
                     continue
 
                 else:
-                    logger.warning('No dataruns found. Exiting.')
+                    LOGGER.info('No dataruns found. Exiting.')
                     break
 
             max_priority = max([datarun.priority for datarun in dataruns])
@@ -92,7 +86,7 @@ class ATM(object):
             # say we've started working on this datarun, if we haven't already
             self.db.mark_datarun_running(run.id)
 
-            logger.info('Computing on datarun %d' % run.id)
+            LOGGER.info('Computing on datarun %d' % run.id)
             # actual work happens here
             worker = Worker(self.db, run, save_files=save_files,
                             cloud_mode=cloud_mode, aws_config=self.aws_conf,
@@ -103,21 +97,21 @@ class ATM(object):
             except ClassifierError:
                 # the exception has already been handled; just wait a sec so we
                 # don't go out of control reporting errors
-                logger.warning('Something went wrong. Sleeping %d seconds.', ATM.LOOP_WAIT)
+                LOGGER.error('Something went wrong. Sleeping %d seconds.', ATM.LOOP_WAIT)
                 time.sleep(ATM.LOOP_WAIT)
 
             elapsed_time = (datetime.now() - start_time).total_seconds()
             if total_time is not None and elapsed_time >= total_time:
-                logger.warning('Total run time for worker exceeded; exiting.')
+                LOGGER.info('Total run time for worker exceeded; exiting.')
                 break
 
-    def create_dataset(self):
+    def create_dataset(self, dataset_conf):
         """
         Create a dataset and add it to the ModelHub database.
         """
         # download data to the local filesystem to extract metadata
-        train_local, test_local = download_data(self.run_conf.train_path,
-                                                self.run_conf.test_path,
+        train_local, test_local = download_data(dataset_conf.train_path,
+                                                dataset_conf.test_path,
                                                 self.aws_conf)
 
         # create the name of the dataset from the path to the data
@@ -125,22 +119,22 @@ class ATM(object):
         name = name.replace("_train.csv", "").replace(".csv", "")
 
         # process the data into the form ATM needs and save it to disk
-        meta = MetaData(self.run_conf.class_column, train_local, test_local)
+        meta = MetaData(dataset_conf.class_column, train_local, test_local)
 
         # enter dataset into database
         dataset = self.db.create_dataset(name=name,
-                                         description=self.run_conf.data_description,
-                                         train_path=self.run_conf.train_path,
-                                         test_path=self.run_conf.test_path,
-                                         class_column=self.run_conf.class_column,
+                                         description=dataset_conf.data_description,
+                                         train_path=dataset_conf.train_path,
+                                         test_path=dataset_conf.test_path,
+                                         class_column=dataset_conf.class_column,
                                          n_examples=meta.n_examples,
                                          k_classes=meta.k_classes,
                                          d_features=meta.d_features,
                                          majority=meta.majority,
-                                         size_kb=old_div(meta.size, 1000))
+                                         size_kb=meta.size)
         return dataset
 
-    def create_datarun(self, dataset):
+    def create_datarun(self, dataset, run_conf):
         """
         Given a config, creates a set of dataruns for the config and enters them into
         the database. Returns the ID of the created datarun.
@@ -148,72 +142,67 @@ class ATM(object):
         dataset: Dataset SQLAlchemy ORM object
         """
         # describe the datarun by its tuner and selector
-        run_description = '__'.join([self.run_conf.tuner, self.run_conf.selector])
+        run_description = '__'.join([run_conf.tuner, run_conf.selector])
 
         # set the deadline, if applicable
-        deadline = self.run_conf.deadline
+        deadline = run_conf.deadline
         if deadline:
             deadline = datetime.strptime(deadline, TIME_FMT)
             # this overrides the otherwise configured budget_type
             # TODO: why not walltime and classifiers budget simultaneously?
-            self.run_conf.budget_type = 'walltime'
-        elif self.run_conf.budget_type == 'walltime':
-            deadline = datetime.now() + timedelta(minutes=self.run_conf.budget)
+            run_conf.budget_type = 'walltime'
+        elif run_conf.budget_type == 'walltime':
+            deadline = datetime.now() + timedelta(minutes=run_conf.budget)
 
-        target = self.run_conf.score_target + '_judgment_metric'
+        target = run_conf.score_target + '_judgment_metric'
         datarun = self.db.create_datarun(dataset_id=dataset.id,
                                          description=run_description,
-                                         tuner=self.run_conf.tuner,
-                                         selector=self.run_conf.selector,
-                                         gridding=self.run_conf.gridding,
-                                         priority=self.run_conf.priority,
-                                         budget_type=self.run_conf.budget_type,
-                                         budget=self.run_conf.budget,
+                                         tuner=run_conf.tuner,
+                                         selector=run_conf.selector,
+                                         gridding=run_conf.gridding,
+                                         priority=run_conf.priority,
+                                         budget_type=run_conf.budget_type,
+                                         budget=run_conf.budget,
                                          deadline=deadline,
-                                         metric=self.run_conf.metric,
+                                         metric=run_conf.metric,
                                          score_target=target,
-                                         k_window=self.run_conf.k_window,
-                                         r_minimum=self.run_conf.r_minimum)
+                                         k_window=run_conf.k_window,
+                                         r_minimum=run_conf.r_minimum)
         return datarun
 
-    def enter_data(self, run_per_partition=False):
+    def create_dataruns(self, run_conf):
         """
         Generate a datarun, including a dataset if necessary.
 
         Returns: ID of the generated datarun
         """
-        # connect to the database
-
-        # if the user has provided a dataset id, use that. Otherwise, create a new
-        # dataset based on the arguments we were passed.
-        if self.run_conf.dataset_id is None:
-            dataset = self.create_dataset()
-            self.run_conf.dataset_id = dataset.id
-        else:
-            dataset = self.db.get_dataset(self.run_conf.dataset_id)
+        dataset = self.db.get_dataset(run_conf.dataset_id)
+        if not dataset:
+            raise ValueError('Invalid Dataset ID: {}'.format(run_conf.dataset_id))
 
         method_parts = {}
-        for m in self.run_conf.methods:
+        for m in run_conf.methods:
             # enumerate all combinations of categorical variables for this method
             method = Method(m)
             method_parts[m] = method.get_hyperpartitions()
-            logger.info('method %s has %d hyperpartitions' %
+            LOGGER.info('method %s has %d hyperpartitions' %
                         (m, len(method_parts[m])))
 
         # create hyperpartitions and datarun(s)
-        run_ids = []
-        if not run_per_partition:
-            logger.debug('saving datarun...')
-            datarun = self.create_datarun(dataset)
+        dataruns = []
+        if not run_conf.run_per_partition:
+            LOGGER.debug('saving datarun...')
+            datarun = self.create_datarun(dataset, run_conf)
+            dataruns.append(datarun)
 
-        logger.debug('saving hyperpartions...')
+        LOGGER.debug('saving hyperpartions...')
         for method, parts in list(method_parts.items()):
             for part in parts:
                 # if necessary, create a new datarun for each hyperpartition.
                 # This setting is useful for debugging.
-                if run_per_partition:
-                    datarun = self.create_datarun(dataset)
-                    run_ids.append(datarun.id)
+                if run_conf.run_per_partition:
+                    datarun = self.create_datarun(dataset, run_conf)
+                    dataruns.append(datarun)
 
                 # create a new hyperpartition in the database
                 self.db.create_hyperpartition(datarun_id=datarun.id,
@@ -223,19 +212,35 @@ class ATM(object):
                                               categoricals=part.categoricals,
                                               status=PartitionStatus.INCOMPLETE)
 
-        logger.info('Data entry complete. Summary:')
-        logger.info('\tDataset ID: %d', dataset.id)
-        logger.info('\tTraining data: %s', dataset.train_path)
-        logger.info('\tTest data: %s', (dataset.test_path or 'None'))
+        LOGGER.info('Dataruns created. Summary:')
+        LOGGER.info('\tDataset ID: %d', dataset.id)
+        LOGGER.info('\tTraining data: %s', dataset.train_path)
+        LOGGER.info('\tTest data: %s', (dataset.test_path or 'None'))
 
-        if run_per_partition:
-            logger.info('\tDatarun IDs: %s', ', '.join(map(str, run_ids)))
+        datarun = dataruns[0]
+        if run_conf.run_per_partition:
+            LOGGER.info('\tDatarun IDs: %s', ', '.join(str(datarun.id) for datarun in dataruns))
 
         else:
-            logger.info('\tDatarun ID: %d', datarun.id)
+            LOGGER.info('\tDatarun ID: %d', datarun.id)
 
-        logger.info('\tHyperpartition selection strategy: %s', datarun.selector)
-        logger.info('\tParameter tuning strategy: %s', datarun.tuner)
-        logger.info('\tBudget: %d (%s)', datarun.budget, datarun.budget_type)
+        LOGGER.info('\tHyperpartition selection strategy: %s', datarun.selector)
+        LOGGER.info('\tParameter tuning strategy: %s', datarun.tuner)
+        LOGGER.info('\tBudget: %d (%s)', datarun.budget, datarun.budget_type)
 
-        return run_ids or datarun.id
+        return dataruns
+
+    def enter_data(self, dataset_conf, run_conf):
+        """
+        Generate a datarun, including a dataset if necessary.
+
+        Returns: ID of the generated datarun
+        """
+        # if the user has provided a dataset id, use that. Otherwise, create a new
+        # dataset based on the arguments we were passed.
+        if run_conf.dataset_id is None:
+            dataset = self.create_dataset(dataset_conf)
+            run_conf.dataset_id = dataset.id
+
+        dataruns = self.create_dataruns(run_conf)
+        return dataruns[0] if not run_conf.run_per_partition else dataruns
