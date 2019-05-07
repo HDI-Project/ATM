@@ -25,9 +25,6 @@ install_requires = [
     'scipy>=0.19.1',
     'sklearn-pandas>=1.5.0',
     'sqlalchemy>=1.1.14',
-]
-
-api_requires = [
     'flask>=1.0.2',
     'flask-restless>=0.17.0',
     'flask-sqlalchemy>=2.3.2',
@@ -98,8 +95,7 @@ setup(
         ]
     },
     extras_require={
-        'api': api_requires,
-        'dev': api_requires + development_requires + tests_require,
+        'dev': development_requires + tests_require,
         'tests': tests_require,
     },
     include_package_data=True,
