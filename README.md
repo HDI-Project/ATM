@@ -75,25 +75,20 @@ ATM is compatible with and has been tested on Python 2.7, 3.5, and 3.6.
 
 1. **Install a database**
 
-   You will need to install the libmysqlclient-dev package (for sqlalchemy)
+    ATM requires a SQL-like database to store information about datasets, dataruns,
+    and classifiers. It's currently compatible with the SQLite3 and MySQL dialects.
+    For first-time and casual users, we recommend installing SQLite:
 
-   ```
-   sudo apt install libmysqlclient-dev
-   ```
+    ```bash
+    sudo apt-get install sqlite3
+    ```
 
-   and at least one of the following databases.
+    If you're planning on running large, distributed, or performance-intensive jobs,
+    you might prefer using MySQL. Run the following command and following the instructions:
 
-   - for SQLite (simpler):
-
-   ```
-   sudo apt install sqlite3
-   ```
-
-   - for MySQL:
-
-   ```
-   sudo apt install mysql-server mysql-client
-   ```
+    ```bash
+    sudo apt-get install mysql-server mysql-client
+    ```
 
 2. **Install ATM**
 

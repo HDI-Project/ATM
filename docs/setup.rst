@@ -65,11 +65,6 @@ you might prefer using MySQL. Run::
 
 and following the instructions.
 
-No matter which you choose, you'll need to install the mysql client developer
-library in order for SQLAlchemy to work correctly::
-
-    $ sudo apt-get install libmysqlclient-dev
-
 3. Start using ATM!
 -------------------
 
