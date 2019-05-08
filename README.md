@@ -84,7 +84,7 @@ ATM is compatible with and has been tested on Python 2.7, 3.5, and 3.6.
     ```
 
     If you're planning on running large, distributed, or performance-intensive jobs,
-    you might prefer using MySQL. Run the following command and following the instructions:
+    you might prefer using MySQL. Run the following command and follow the instructions:
 
     ```bash
     sudo apt-get install mysql-server mysql-client
