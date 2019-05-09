@@ -338,47 +338,47 @@ run the following <code class="docutils literal notranslate"><span class="pre">P
 </pre></div>
 </div>
 <p>And the output will be:</p>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>{
-  &quot;num_results&quot;: 1,
-  &quot;objects&quot;: [
-    {
-      &quot;class_column&quot;: &quot;class&quot;,
-      &quot;d_features&quot;: 16,
-      &quot;dataruns&quot;: [
-        {
-          &quot;budget&quot;: 100,
-          &quot;budget_type&quot;: &quot;classifier&quot;,
-          &quot;dataset_id&quot;: 1,
-          &quot;deadline&quot;: null,
-          &quot;description&quot;: &quot;uniform__uniform&quot;,
-          &quot;end_time&quot;: &quot;2019-04-11T20:58:11.346733&quot;,
-          &quot;gridding&quot;: 0,
-          &quot;id&quot;: 1,
-          &quot;k_window&quot;: 3,
-          &quot;metric&quot;: &quot;f1&quot;,
-          &quot;priority&quot;: 1,
-          &quot;r_minimum&quot;: 2,
-          &quot;score_target&quot;: &quot;cv_judgment_metric&quot;,
-          &quot;selector&quot;: &quot;uniform&quot;,
-          &quot;start_time&quot;: &quot;2019-04-11T20:58:02.514514&quot;,
-          &quot;status&quot;: &quot;complete&quot;,
-          &quot;tuner&quot;: &quot;uniform&quot;
-        }
-      ],
-      &quot;description&quot;: null,
-      &quot;id&quot;: 1,
-      &quot;k_classes&quot;: 2,
-      &quot;majority&quot;: 0.516666667,
-      &quot;n_examples&quot;: 60,
-      &quot;name&quot;: &quot;pollution_1&quot;,
-      &quot;size_kb&quot;: 8,
-      &quot;test_path&quot;: null,
-      &quot;train_path&quot;: &quot;/path/to/atm/data/test/pollution_1.csv&quot;
-    }
-  ],
-  &quot;page&quot;: 1,
-  &quot;total_pages&quot;: 1
-}
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="err">{</span>
+  <span class="ss">&quot;num_results&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="ss">&quot;objects&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="err">{</span>
+      <span class="ss">&quot;class_column&quot;</span><span class="p">:</span> <span class="ss">&quot;class&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;d_features&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+      <span class="ss">&quot;dataruns&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="err">{</span>
+          <span class="ss">&quot;budget&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+          <span class="ss">&quot;budget_type&quot;</span><span class="p">:</span> <span class="ss">&quot;classifier&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;dataset_id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+          <span class="ss">&quot;deadline&quot;</span><span class="p">:</span> <span class="k">null</span><span class="p">,</span>
+          <span class="ss">&quot;description&quot;</span><span class="p">:</span> <span class="ss">&quot;uniform__uniform&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;end_time&quot;</span><span class="p">:</span> <span class="ss">&quot;2019-04-11T20:58:11.346733&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;gridding&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+          <span class="ss">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+          <span class="ss">&quot;k_window&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+          <span class="ss">&quot;metric&quot;</span><span class="p">:</span> <span class="ss">&quot;f1&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;priority&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+          <span class="ss">&quot;r_minimum&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+          <span class="ss">&quot;score_target&quot;</span><span class="p">:</span> <span class="ss">&quot;cv_judgment_metric&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;selector&quot;</span><span class="p">:</span> <span class="ss">&quot;uniform&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;start_time&quot;</span><span class="p">:</span> <span class="ss">&quot;2019-04-11T20:58:02.514514&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;status&quot;</span><span class="p">:</span> <span class="ss">&quot;complete&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;tuner&quot;</span><span class="p">:</span> <span class="ss">&quot;uniform&quot;</span>
+        <span class="err">}</span>
+      <span class="p">],</span>
+      <span class="ss">&quot;description&quot;</span><span class="p">:</span> <span class="k">null</span><span class="p">,</span>
+      <span class="ss">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="ss">&quot;k_classes&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+      <span class="ss">&quot;majority&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">516666667</span><span class="p">,</span>
+      <span class="ss">&quot;n_examples&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span>
+      <span class="ss">&quot;name&quot;</span><span class="p">:</span> <span class="ss">&quot;pollution_1&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;size_kb&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+      <span class="ss">&quot;test_path&quot;</span><span class="p">:</span> <span class="k">null</span><span class="p">,</span>
+      <span class="ss">&quot;train_path&quot;</span><span class="p">:</span> <span class="ss">&quot;/path/to/atm/data/test/pollution_1.csv&quot;</span>
+    <span class="err">}</span>
+  <span class="p">],</span>
+  <span class="ss">&quot;page&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="ss">&quot;total_pages&quot;</span><span class="p">:</span> <span class="mi">1</span>
+<span class="err">}</span>
 </pre></div>
 </div>
 </div>
@@ -392,40 +392,40 @@ run the following <code class="docutils literal notranslate"><span class="pre">P
 </pre></div>
 </div>
 <p>And the output will be:</p>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>{
-  &quot;class_column&quot;: &quot;class&quot;,
-  &quot;d_features&quot;: 16,
-  &quot;dataruns&quot;: [
-    {
-      &quot;budget&quot;: 100,
-      &quot;budget_type&quot;: &quot;classifier&quot;,
-      &quot;dataset_id&quot;: 1,
-      &quot;deadline&quot;: null,
-      &quot;description&quot;: &quot;uniform__uniform&quot;,
-      &quot;end_time&quot;: &quot;2019-04-11T20:58:11.346733&quot;,
-      &quot;gridding&quot;: 0,
-      &quot;id&quot;: 1,
-      &quot;k_window&quot;: 3,
-      &quot;metric&quot;: &quot;f1&quot;,
-      &quot;priority&quot;: 1,
-      &quot;r_minimum&quot;: 2,
-      &quot;score_target&quot;: &quot;cv_judgment_metric&quot;,
-      &quot;selector&quot;: &quot;uniform&quot;,
-      &quot;start_time&quot;: &quot;2019-04-11T20:58:02.514514&quot;,
-      &quot;status&quot;: &quot;complete&quot;,
-      &quot;tuner&quot;: &quot;uniform&quot;
-    }
-  ],
-  &quot;description&quot;: null,
-  &quot;id&quot;: 1,
-  &quot;k_classes&quot;: 2,
-  &quot;majority&quot;: 0.516666667,
-  &quot;n_examples&quot;: 60,
-  &quot;name&quot;: &quot;pollution_1&quot;,
-  &quot;size_kb&quot;: 8,
-  &quot;test_path&quot;: null,
-  &quot;train_path&quot;: &quot;/path/to/atm/data/test/pollution_1.csv&quot;
-}
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="err">{</span>
+  <span class="ss">&quot;class_column&quot;</span><span class="p">:</span> <span class="ss">&quot;class&quot;</span><span class="p">,</span>
+  <span class="ss">&quot;d_features&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+  <span class="ss">&quot;dataruns&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="err">{</span>
+      <span class="ss">&quot;budget&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+      <span class="ss">&quot;budget_type&quot;</span><span class="p">:</span> <span class="ss">&quot;classifier&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;dataset_id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="ss">&quot;deadline&quot;</span><span class="p">:</span> <span class="k">null</span><span class="p">,</span>
+      <span class="ss">&quot;description&quot;</span><span class="p">:</span> <span class="ss">&quot;uniform__uniform&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;end_time&quot;</span><span class="p">:</span> <span class="ss">&quot;2019-04-11T20:58:11.346733&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;gridding&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="ss">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="ss">&quot;k_window&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+      <span class="ss">&quot;metric&quot;</span><span class="p">:</span> <span class="ss">&quot;f1&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;priority&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="ss">&quot;r_minimum&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+      <span class="ss">&quot;score_target&quot;</span><span class="p">:</span> <span class="ss">&quot;cv_judgment_metric&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;selector&quot;</span><span class="p">:</span> <span class="ss">&quot;uniform&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;start_time&quot;</span><span class="p">:</span> <span class="ss">&quot;2019-04-11T20:58:02.514514&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;status&quot;</span><span class="p">:</span> <span class="ss">&quot;complete&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;tuner&quot;</span><span class="p">:</span> <span class="ss">&quot;uniform&quot;</span>
+    <span class="err">}</span>
+  <span class="p">],</span>
+  <span class="ss">&quot;description&quot;</span><span class="p">:</span> <span class="k">null</span><span class="p">,</span>
+  <span class="ss">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="ss">&quot;k_classes&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+  <span class="ss">&quot;majority&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">516666667</span><span class="p">,</span>
+  <span class="ss">&quot;n_examples&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span>
+  <span class="ss">&quot;name&quot;</span><span class="p">:</span> <span class="ss">&quot;pollution_1&quot;</span><span class="p">,</span>
+  <span class="ss">&quot;size_kb&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+  <span class="ss">&quot;test_path&quot;</span><span class="p">:</span> <span class="k">null</span><span class="p">,</span>
+  <span class="ss">&quot;train_path&quot;</span><span class="p">:</span> <span class="ss">&quot;/path/to/atm/data/test/pollution_1.csv&quot;</span>
+<span class="err">}</span>
 </pre></div>
 </div>
 </div>
@@ -440,76 +440,76 @@ children model, but with the results filtered by the parent one.</p>
 </pre></div>
 </div>
 <p>And the output will be (note that some parts have been cut):</p>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>{
-  &quot;num_results&quot;: 1,
-  &quot;objects&quot;: [
-    {
-      &quot;budget&quot;: 100,
-      &quot;budget_type&quot;: &quot;classifier&quot;,
-      &quot;classifiers&quot;: [
-        {
-          &quot;cv_judgment_metric&quot;: 0.8444444444,
-          &quot;cv_judgment_metric_stdev&quot;: 0.1507184441,
-          &quot;datarun_id&quot;: 1,
-          &quot;end_time&quot;: &quot;2019-04-11T20:58:02.600185&quot;,
-          &quot;error_message&quot;: null,
-          &quot;host&quot;: &quot;83.56.245.36&quot;,
-          &quot;hyperparameter_values_64&quot;: &quot;gAN9cQAoWAsAAABuX25laWdoYm9yc3EBY251bXB5LmNvcmUubXVsdGlhcnJheQpzY2FsYXIKcQJjbnVtcHkKZHR5cGUKcQNYAgAAAGk4cQRLAEsBh3EFUnEGKEsDWAEAAAA8cQdOTk5K/////0r/////SwB0cQhiQwgPAAAAAAAAAHEJhnEKUnELWAkAAABsZWFmX3NpemVxDGgCaAZDCCsAAAAAAAAAcQ2GcQ5ScQ9YBwAAAHdlaWdodHNxEFgIAAAAZGlzdGFuY2VxEVgJAAAAYWxnb3JpdGhtcRJYCQAAAGJhbGxfdHJlZXETWAYAAABtZXRyaWNxFFgJAAAAbWFuaGF0dGFucRVYBgAAAF9zY2FsZXEWiHUu&quot;,
-          &quot;hyperpartition_id&quot;: 23,
-          &quot;id&quot;: 1,
-          &quot;metrics_location&quot;: &quot;metrics/pollution_1-4bc39b14.metric&quot;,
-          &quot;model_location&quot;: &quot;models/pollution_1-4bc39b14.model&quot;,
-          &quot;start_time&quot;: &quot;2019-04-11T20:58:02.539046&quot;,
-          &quot;status&quot;: &quot;complete&quot;,
-          &quot;test_judgment_metric&quot;: 0.6250000000
-        },
-        ...
-      ],
-      &quot;dataset&quot;: {
-        &quot;class_column&quot;: &quot;class&quot;,
-        &quot;d_features&quot;: 16,
-        &quot;description&quot;: null,
-        &quot;id&quot;: 1,
-        &quot;k_classes&quot;: 2,
-        &quot;majority&quot;: 0.516666667,
-        &quot;n_examples&quot;: 60,
-        &quot;name&quot;: &quot;pollution_1&quot;,
-        &quot;size_kb&quot;: 8,
-        &quot;test_path&quot;: null,
-        &quot;train_path&quot;: &quot;/path/to/atm/data/test/pollution_1.csv&quot;
-      },
-      &quot;dataset_id&quot;: 1,
-      &quot;deadline&quot;: null,
-      &quot;description&quot;: &quot;uniform__uniform&quot;,
-      &quot;end_time&quot;: &quot;2019-04-11T20:58:11.346733&quot;,
-      &quot;gridding&quot;: 0,
-      &quot;hyperpartitions&quot;: [
-        {
-          &quot;categorical_hyperparameters_64&quot;: &quot;gANdcQAoWAcAAABwZW5hbHR5cQFYAgAAAGwxcQKGcQNYDQAAAGZpdF9pbnRlcmNlcHRxBIiGcQVlLg==&quot;,
-          &quot;constant_hyperparameters_64&quot;: &quot;gANdcQAoWAwAAABjbGFzc193ZWlnaHRxAVgIAAAAYmFsYW5jZWRxAoZxA1gGAAAAX3NjYWxlcQSIhnEFZS4=&quot;,
-          &quot;datarun_id&quot;: 1,
-          &quot;id&quot;: 1,
-          &quot;method&quot;: &quot;logreg&quot;,
-          &quot;status&quot;: &quot;incomplete&quot;,
-          &quot;tunable_hyperparameters_64&quot;: &quot;gANdcQAoWAEAAABDcQFjYnRiLmh5cGVyX3BhcmFtZXRlcgpGbG9hdEV4cEh5cGVyUGFyYW1ldGVyCnECY2J0Yi5oeXBlcl9wYXJhbWV0ZXIKUGFyYW1UeXBlcwpxA0sFhXEEUnEFXXEGKEc+5Pi1iONo8UdA+GoAAAAAAGWGcQeBcQh9cQkoWAwAAABfcGFyYW1fcmFuZ2VxCmgGWAUAAAByYW5nZXELXXEMKEfAFAAAAAAAAEdAFAAAAAAAAGV1YoZxDVgDAAAAdG9scQ5oAmgFXXEPKEc+5Pi1iONo8UdA+GoAAAAAAGWGcRCBcRF9cRIoaApoD2gLXXETKEfAFAAAAAAAAEdAFAAAAAAAAGV1YoZxFGUu&quot;
-        },
-        ...
-      ],
-      &quot;id&quot;: 1,
-      &quot;k_window&quot;: 3,
-      &quot;metric&quot;: &quot;f1&quot;,
-      &quot;priority&quot;: 1,
-      &quot;r_minimum&quot;: 2,
-      &quot;score_target&quot;: &quot;cv_judgment_metric&quot;,
-      &quot;selector&quot;: &quot;uniform&quot;,
-      &quot;start_time&quot;: &quot;2019-04-11T20:58:02.514514&quot;,
-      &quot;status&quot;: &quot;complete&quot;,
-      &quot;tuner&quot;: &quot;uniform&quot;
-    }
-  ],
-  &quot;page&quot;: 1,
-  &quot;total_pages&quot;: 1
-}
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="err">{</span>
+  <span class="ss">&quot;num_results&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="ss">&quot;objects&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="err">{</span>
+      <span class="ss">&quot;budget&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+      <span class="ss">&quot;budget_type&quot;</span><span class="p">:</span> <span class="ss">&quot;classifier&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;classifiers&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="err">{</span>
+          <span class="ss">&quot;cv_judgment_metric&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">8444444444</span><span class="p">,</span>
+          <span class="ss">&quot;cv_judgment_metric_stdev&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">1507184441</span><span class="p">,</span>
+          <span class="ss">&quot;datarun_id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+          <span class="ss">&quot;end_time&quot;</span><span class="p">:</span> <span class="ss">&quot;2019-04-11T20:58:02.600185&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;error_message&quot;</span><span class="p">:</span> <span class="k">null</span><span class="p">,</span>
+          <span class="ss">&quot;host&quot;</span><span class="p">:</span> <span class="ss">&quot;83.56.245.36&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;hyperparameter_values_64&quot;</span><span class="p">:</span> <span class="ss">&quot;gAN9cQAoWAsAAABuX25laWdoYm9yc3EBY251bXB5LmNvcmUubXVsdGlhcnJheQpzY2FsYXIKcQJjbnVtcHkKZHR5cGUKcQNYAgAAAGk4cQRLAEsBh3EFUnEGKEsDWAEAAAA8cQdOTk5K/////0r/////SwB0cQhiQwgPAAAAAAAAAHEJhnEKUnELWAkAAABsZWFmX3NpemVxDGgCaAZDCCsAAAAAAAAAcQ2GcQ5ScQ9YBwAAAHdlaWdodHNxEFgIAAAAZGlzdGFuY2VxEVgJAAAAYWxnb3JpdGhtcRJYCQAAAGJhbGxfdHJlZXETWAYAAABtZXRyaWNxFFgJAAAAbWFuaGF0dGFucRVYBgAAAF9zY2FsZXEWiHUu&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;hyperpartition_id&quot;</span><span class="p">:</span> <span class="mi">23</span><span class="p">,</span>
+          <span class="ss">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+          <span class="ss">&quot;metrics_location&quot;</span><span class="p">:</span> <span class="ss">&quot;metrics/pollution_1-4bc39b14.metric&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;model_location&quot;</span><span class="p">:</span> <span class="ss">&quot;models/pollution_1-4bc39b14.model&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;start_time&quot;</span><span class="p">:</span> <span class="ss">&quot;2019-04-11T20:58:02.539046&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;status&quot;</span><span class="p">:</span> <span class="ss">&quot;complete&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;test_judgment_metric&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">6250000000</span>
+        <span class="err">}</span><span class="p">,</span>
+        <span class="p">...</span>
+      <span class="p">],</span>
+      <span class="ss">&quot;dataset&quot;</span><span class="p">:</span> <span class="err">{</span>
+        <span class="ss">&quot;class_column&quot;</span><span class="p">:</span> <span class="ss">&quot;class&quot;</span><span class="p">,</span>
+        <span class="ss">&quot;d_features&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="ss">&quot;description&quot;</span><span class="p">:</span> <span class="k">null</span><span class="p">,</span>
+        <span class="ss">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="ss">&quot;k_classes&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="ss">&quot;majority&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">516666667</span><span class="p">,</span>
+        <span class="ss">&quot;n_examples&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span>
+        <span class="ss">&quot;name&quot;</span><span class="p">:</span> <span class="ss">&quot;pollution_1&quot;</span><span class="p">,</span>
+        <span class="ss">&quot;size_kb&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="ss">&quot;test_path&quot;</span><span class="p">:</span> <span class="k">null</span><span class="p">,</span>
+        <span class="ss">&quot;train_path&quot;</span><span class="p">:</span> <span class="ss">&quot;/path/to/atm/data/test/pollution_1.csv&quot;</span>
+      <span class="err">}</span><span class="p">,</span>
+      <span class="ss">&quot;dataset_id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="ss">&quot;deadline&quot;</span><span class="p">:</span> <span class="k">null</span><span class="p">,</span>
+      <span class="ss">&quot;description&quot;</span><span class="p">:</span> <span class="ss">&quot;uniform__uniform&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;end_time&quot;</span><span class="p">:</span> <span class="ss">&quot;2019-04-11T20:58:11.346733&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;gridding&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="ss">&quot;hyperpartitions&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="err">{</span>
+          <span class="ss">&quot;categorical_hyperparameters_64&quot;</span><span class="p">:</span> <span class="ss">&quot;gANdcQAoWAcAAABwZW5hbHR5cQFYAgAAAGwxcQKGcQNYDQAAAGZpdF9pbnRlcmNlcHRxBIiGcQVlLg==&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;constant_hyperparameters_64&quot;</span><span class="p">:</span> <span class="ss">&quot;gANdcQAoWAwAAABjbGFzc193ZWlnaHRxAVgIAAAAYmFsYW5jZWRxAoZxA1gGAAAAX3NjYWxlcQSIhnEFZS4=&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;datarun_id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+          <span class="ss">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+          <span class="ss">&quot;method&quot;</span><span class="p">:</span> <span class="ss">&quot;logreg&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;status&quot;</span><span class="p">:</span> <span class="ss">&quot;incomplete&quot;</span><span class="p">,</span>
+          <span class="ss">&quot;tunable_hyperparameters_64&quot;</span><span class="p">:</span> <span class="ss">&quot;gANdcQAoWAEAAABDcQFjYnRiLmh5cGVyX3BhcmFtZXRlcgpGbG9hdEV4cEh5cGVyUGFyYW1ldGVyCnECY2J0Yi5oeXBlcl9wYXJhbWV0ZXIKUGFyYW1UeXBlcwpxA0sFhXEEUnEFXXEGKEc+5Pi1iONo8UdA+GoAAAAAAGWGcQeBcQh9cQkoWAwAAABfcGFyYW1fcmFuZ2VxCmgGWAUAAAByYW5nZXELXXEMKEfAFAAAAAAAAEdAFAAAAAAAAGV1YoZxDVgDAAAAdG9scQ5oAmgFXXEPKEc+5Pi1iONo8UdA+GoAAAAAAGWGcRCBcRF9cRIoaApoD2gLXXETKEfAFAAAAAAAAEdAFAAAAAAAAGV1YoZxFGUu&quot;</span>
+        <span class="err">}</span><span class="p">,</span>
+        <span class="p">...</span>
+      <span class="p">],</span>
+      <span class="ss">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="ss">&quot;k_window&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+      <span class="ss">&quot;metric&quot;</span><span class="p">:</span> <span class="ss">&quot;f1&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;priority&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="ss">&quot;r_minimum&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+      <span class="ss">&quot;score_target&quot;</span><span class="p">:</span> <span class="ss">&quot;cv_judgment_metric&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;selector&quot;</span><span class="p">:</span> <span class="ss">&quot;uniform&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;start_time&quot;</span><span class="p">:</span> <span class="ss">&quot;2019-04-11T20:58:02.514514&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;status&quot;</span><span class="p">:</span> <span class="ss">&quot;complete&quot;</span><span class="p">,</span>
+      <span class="ss">&quot;tuner&quot;</span><span class="p">:</span> <span class="ss">&quot;uniform&quot;</span>
+    <span class="err">}</span>
+  <span class="p">],</span>
+  <span class="ss">&quot;page&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="ss">&quot;total_pages&quot;</span><span class="p">:</span> <span class="mi">1</span>
+<span class="err">}</span>
 </pre></div>
 </div>
 </div>

@@ -243,7 +243,7 @@ features, all numeric, and and a binary label column called “class”.</p>
 <div class="section" id="create-a-datarun">
 <h2>Create a datarun<a class="headerlink" href="#create-a-datarun" title="Permalink to this headline">¶</a></h2>
 <p>Before we can train any classifiers, we need to create a datarun. In ATM, a
-datarun is a single logical machine learning task. The <code class="docutils literal notranslate"><span class="pre">enter_data.py</span></code> script
+datarun is a single logical machine learning task. The <code class="docutils literal notranslate"><span class="pre">enter_data</span></code> command
 will set up everything you need.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(atm-env) $ atm enter_data
 </pre></div>
@@ -283,7 +283,7 @@ reference that when you want to actually compute on the datarun.</p>
 <p>An ATM <em>worker</em> is a process that connects to a ModelHub, asks it what dataruns
 need to be worked on, and trains and tests classifiers until all the work is
 done. To run one, use the following command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(atm-env) $ atm worker.py
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(atm-env) $ atm worker
 </pre></div>
 </div>
 <p>This will start a process that builds classifiers, tests them, and saves them to

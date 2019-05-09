@@ -31,7 +31,7 @@ Create a datarun
 ----------------
 
 Before we can train any classifiers, we need to create a datarun. In ATM, a
-datarun is a single logical machine learning task. The ``enter_data.py`` script
+datarun is a single logical machine learning task. The ``enter_data`` command
 will set up everything you need.::
 
 (atm-env) $ atm enter_data
@@ -75,7 +75,7 @@ An ATM *worker* is a process that connects to a ModelHub, asks it what dataruns
 need to be worked on, and trains and tests classifiers until all the work is
 done. To run one, use the following command::
 
-(atm-env) $ atm worker.py
+(atm-env) $ atm worker
 
 This will start a process that builds classifiers, tests them, and saves them to
 the ./models/ directory. As it runs, it should print output indicating which

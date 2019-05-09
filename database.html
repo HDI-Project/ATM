@@ -232,18 +232,16 @@ paper.</p>
 models by ATM. The table stores information about the location of the data as
 well as metadata to help with analysis.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> (Int): Unique identifier for the dataset.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code> (Int): Unique identifier for the dataset.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">name</span></code> (String): Identifier string for a classification technique.</p></li>
-<li><dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">description</span></code> (String): Human-readable description of the dataset.</dt><dd><ul>
-<li><p>not described in the paper</p></li>
-</ul>
-</dd>
-</dl>
-</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">class_column</span></code> (String): Name of the class label column.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">train_path</span></code> (String): Location of the dataset train file.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">test_path</span></code> (String): Location of the dataset test file.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">class_column</span></code> (String): Name of the class label column.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">description</span></code> (String): Human-readable description of the dataset.</p>
+<ul>
+<li><p>not described in the paper</p></li>
+</ul>
+</li>
 </ul>
 <p>The metadata fields below are not described in the paper.</p>
 <ul class="simple">
@@ -261,15 +259,10 @@ the number of samples in all other classes.</p></li>
 contains a reference to a dataset, configuration for ATM and BTB, and
 state information.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">datarun_id</span></code> (Int): Unique identifier for the datarun.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code> (Int): Unique identifier for the datarun.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> (Int): ID of the dataset associated with this datarun.</p></li>
-<li><dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">description</span></code> (String): Human-readable description of the datarun.</dt><dd><ul>
-<li><p>not in the paper</p></li>
-</ul>
-</dd>
-</dl>
-</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">description</span></code> (String): Human-readable description of the datarun.
+- not described in the paper</p></li>
 </ul>
 <p>BTB configuration:</p>
 <ul>
@@ -305,7 +298,7 @@ evenly-spaced values. If set to 0 or NULL, values will be chosen from the
 full, continuous space of possibilities.</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>not in the paper</p></li>
+<li><p>not described in the paper</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -331,7 +324,7 @@ amount of time to train classifiers (in minutes).</p>
 <code class="docutils literal notranslate"><span class="pre">budget</span></code> column.</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>not in the paper</p></li>
+<li><p>not described in the paper</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -342,7 +335,7 @@ comparison purposes. Can be one of [“accuracy”, “cohen_kappa”, “f1”,
 multiclass problems</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>not in the paper</p></li>
+<li><p>not described in the paper</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -358,7 +351,7 @@ score.</p></li>
 </ul>
 </div></blockquote>
 <ul class="simple">
-<li><p>not in the paper</p></li>
+<li><p>not described in the paper</p></li>
 </ul>
 </li>
 </ul>
@@ -370,7 +363,7 @@ score.</p></li>
 been finished. One of [“pending”, “running”, “complete”].</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>not in the paper</p></li>
+<li><p>not described in the paper</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -385,11 +378,11 @@ instance must be associated with a single datarun; the performance of a
 hyperpartition in a previous datarun is assumed to have no bearing on its
 performance in the future.</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">hyperparition_id</span></code> (Int): Unique identifier for the hyperparition.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code> (Int): Unique identifier for the hyperparition.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">datarun_id</span></code> (Int): ID of the datarun associated with this hyperpartition.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">method</span></code> (String): Code for, or path to a JSON file describing, this
 hyperpartition’s classification method (e.g. “svm”, “knn”).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">categoricals</span></code> (Base64-encoded object): List of categorical hyperparameters
+<li><p><code class="docutils literal notranslate"><span class="pre">categoricals_hyperparameters_64</span></code> (Base64-encoded object): List of categorical hyperparameters
 whose values are fixed to define this hyperpartition.</p>
 <blockquote>
 <div><ul class="simple">
@@ -397,7 +390,7 @@ whose values are fixed to define this hyperpartition.</p>
 </ul>
 </div></blockquote>
 </li>
-<li><p><code class="docutils literal notranslate"><span class="pre">tunables</span></code> (Base64-encoded object): List of continuous hyperparameters which
+<li><p><code class="docutils literal notranslate"><span class="pre">tunables_hyperparameters_64</span></code> (Base64-encoded object): List of continuous hyperparameters which
 are free; their values must be selected by a Tuner.</p>
 <blockquote>
 <div><ul class="simple">
@@ -405,13 +398,13 @@ are free; their values must be selected by a Tuner.</p>
 </ul>
 </div></blockquote>
 </li>
-<li><p><code class="docutils literal notranslate"><span class="pre">constants</span></code> (Base64-encoded object): List of categorical or continuous
+<li><p><code class="docutils literal notranslate"><span class="pre">constants_hyperparameters_64</span></code> (Base64-encoded object): List of categorical or continuous
 parameters whose values are always fixed. These do not define the
 hyperpartition, but their values must be passed to the classification method
 to fully parameterize it.</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>not in the paper</p></li>
+<li><p>not described in the paper</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -420,7 +413,7 @@ classifiers to error, or whether the grid for this partition has been fully
 explored. One of [“incomplete”, “gridding_done”, “errored”].</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>not in the paper</p></li>
+<li><p>not described in the paper</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -430,7 +423,7 @@ explored. One of [“incomplete”, “gridding_done”, “errored”].</p>
 <h2>Classifiers<a class="headerlink" href="#classifiers" title="Permalink to this headline">¶</a></h2>
 <p>A Classifier represents a single train/test run using a method and a set of hyperparameters with a particular dataset.</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">classifier_id</span></code> (Int): Unique identifier for the classifier.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code> (Int): Unique identifier for the classifier.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">datarun_id</span></code> (Int): ID of the datarun associated with this classifier.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">hyperpartition_id</span></code> (Int): ID of the hyperpartition associated with this
 classifier.</p></li>
@@ -438,7 +431,7 @@ classifier.</p></li>
 was tested.</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>not in the paper</p></li>
+<li><p>not described in the paper</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -449,9 +442,10 @@ testing.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">cv_judgment_metric</span></code> (Number): Mean of the judgement metrics from the
 cross-validated training data.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">cv_judgment_metric_stdev</span></code> (Number): Standard deviation of the
-cross-validation test.</p></li>
+cross-validation test.
+- not described in the paper</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">test_judgment_metric</span></code> (Number): Judgment metric computed on the test data.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">hyperparameters_values</span></code> (Base64-encoded object): The full set of
+<li><p><code class="docutils literal notranslate"><span class="pre">hyperparameters_values_64</span></code> (Base64-encoded object): The full set of
 hyperparameter values used to create this classifier.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">start_time</span></code> (DateTime): Time that a worker started working on the
 classifier.</p></li>
