@@ -4,10 +4,10 @@
 </p>
 
 
-
 [![CircleCI][circleci-img]][circleci-url]
 [![Travis][travis-img]][travis-url]
-[![Coverage status][codecov-img]][codecov-url]
+[![Version][pypi-img]][pypi-url]
+[![Coverage Status][codecov-img]][codecov-url]
 
 [circleci-img]: https://circleci.com/gh/HDI-Project/ATM.svg?style=shield
 [circleci-url]: https://circleci.com/gh/HDI-Project/ATM
@@ -23,7 +23,6 @@
 
 - Free software: MIT license
 - Documentation: https://hdi-project.github.io/ATM/
-
 
 ATM is an open source software library under the
 [*Human Data Interaction* project](https://hdi-dai.lids.mit.edu/)
@@ -63,52 +62,42 @@ classifier it has trained.
 ATM and the accompanying library BTB are under active development.
 We have made the transition and improvements.
 
-## Setup/Installation
+## Setup
 
 This section describes the quickest way to get started with ATM on a machine running Ubuntu Linux.
 We hope to have more in-depth guides in the future, but for now, you should be able to substitute
 commands for the package manager of your choice to get ATM up and running on most modern
 Unix-based systems.
 
+### Requirements
+
 ATM is compatible with and has been tested on Python 2.7, 3.5, and 3.6.
 
+Also, although it is not strictly required, the usage of a [virtualenv](https://virtualenv.pypa.io/en/latest/)
+is highly recommended in order to avoid interfering with other software installed in the system
+where **ATM** is run.
 
-1. **Install a database**
+### Installation
 
-    ATM requires a SQL-like database to store information about datasets, dataruns,
-    and classifiers. It's currently compatible with the SQLite3 and MySQL dialects.
-    For first-time and casual users, we recommend installing SQLite:
+To get started with **ATM**, we recommend using [pip](https://pip.pypa.io/en/stable/).
 
-    ```bash
-    sudo apt-get install sqlite3
-    ```
+Once you have created and activated your virtualenv, execute:
 
-    If you're planning on running large, distributed, or performance-intensive jobs,
-    you might prefer using MySQL. Run the following command and follow the instructions:
+```bash
+pip install atm
+```
 
-    ```bash
-    sudo apt-get install mysql-server mysql-client
-    ```
+Alternatively, you can clone the repository and install it from source by running
+`make install`:
 
-2. **Install ATM**
+```bash
+git clone git@github.com:HDI-Project/ATM.git
+cd ATM
+make install
+```
 
-    To get started with **ATM**, we recommend using `pip`:
-
-    ```bash
-    pip install atm
-    ```
-
-    Alternatively, you can clone the repository and install it from source by running
-    `make install`:
-
-    ```bash
-    git clone git@github.com:HDI-Project/ATM.git
-    cd ATM
-    make install
-    ```
-
-    For development, you can use the `make install-develop` command instead in order to install all
-    the required dependencies for testing and linting.
+For development, you can use the `make install-develop` command instead in order to install all
+the required dependencies for testing and linting.
 
 
 ## Quick Usage
@@ -208,6 +197,73 @@ all workers will exit gracefully.
 ATM's default configuration is fully controlled by the intern code. Our documentation will
 cover the configuration in more detail, but this section provides a brief overview of how
 to specify the most important values.
+
+
+### Setting up a distributed Database
+
+ATM uses a database  to store information about datasets, dataruns and classifiers.
+It's currently compatible with the SQLite3 and MySQL dialects.
+
+For first-time and casual users, the SQLite3 is used by default without any required
+step from the user.
+
+However, if you're planning on running large, distributed, or performance-intensive jobs,
+you might prefer using MySQL.
+
+If you do not have a MySQL database already prepared, you can follow the next steps in order
+install it and parepare it for ATM:
+
+
+1. **Install mysql-server**
+
+```bash
+sudo apt-get install mysql-server
+```
+
+In the latest versions of MySQL no input for the user is required for this step, but
+in older versions the installation process will require the user to input a password
+for the MySQL root user.
+
+If this happens, keep track of the password that you set, as you will need it in the
+next step.
+
+2. **Log into your MySQL instance as root**
+
+If no password was required during the installation of MySQL, you should be able to
+log in with the following command.
+
+```bash
+sudo mysql
+```
+
+If a MySQL Root password was required, you will need to execute this other command:
+
+```bash
+sudo mysql -u root -p
+```
+
+and input the password that you used during the installation when prompted.
+
+3. **Create a new Database for ATM**
+
+Once you are logged in, execute the following three commands to create a database
+called `atm` and a user also called `atm` with write permissions on it:
+
+```bash
+$ mysql> CREATE DATABASE atm;
+$ mysql> CREATE USER 'atm'@'localhost' IDENTIFIED BY 'set-your-own-password-here';
+$ mysql> GRANT ALL PRIVILEGES ON atm.* TO 'atm'@'localhost';
+```
+
+4. **Test your settings**
+
+After you have executed the previous three commands and exited the mysql prompt,
+you can test your settings by executing the following command and inputing the
+password that you used in the previous step when prompted:
+
+```bash
+mysql -u atm -p
+```
 
 ### Running ATM on your own data
 
