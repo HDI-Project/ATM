@@ -15,6 +15,7 @@ install_requires = [
     'future>=0.16.0',
     'joblib>=0.11',
     'pymysql>=0.9.3',
+    'cryptography>=2.6.1',
     'numpy>=1.13.1',
     'pandas>=0.22.0',
     'psutil>=5.6.1',

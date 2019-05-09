@@ -7,7 +7,9 @@ from builtins import object
 from datetime import datetime
 from operator import attrgetter
 
+import numpy as np
 import pandas as pd
+import pymysql
 from sqlalchemy import (
     Column, DateTime, Enum, ForeignKey, Integer, MetaData, Numeric, String, Text, and_,
     create_engine, func, inspect)
@@ -76,6 +78,13 @@ class Database(object):
         Accepts configuration for a database connection, and defines SQLAlchemy
         ORM objects for all the tables in the database.
         """
+
+        # Prepare environment for pymysql
+        pymysql.install_as_MySQLdb()
+        pymysql.converters.encoders[np.float64] = pymysql.converters.escape_float
+        pymysql.converters.conversions = pymysql.converters.encoders.copy()
+        pymysql.converters.conversions.update(pymysql.converters.decoders)
+
         db_url = URL(drivername=dialect, database=database, username=username,
                      password=password, host=host, port=port, query=query)
         self.engine = create_engine(db_url)
