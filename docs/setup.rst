@@ -49,21 +49,63 @@ also install all the required dependencies for testing and linting.
           virtualenv has been activated if you can see the **(atm-env)** prefix on your prompt.
           If you do not, activate it again!
 
-2. Install a database
----------------------
+2. Install a database (Optional)
+--------------------------------
 
-ATM requires a SQL-like database to store information about datasets, dataruns,
-and classifiers. It's currently compatible with the SQLite3 and MySQL dialects.
-For first-time and casual users, we recommend installing SQLite::
+ATM uses a database to store information about datasets, dataruns and classifiers.
+It's currently compatible with the SQLite3 and MySQL dialects.
 
-    $ sudo apt-get install sqlite3
+For first-time and casual users, the SQLite3 is used by default without any required
+step from the user.
 
-If you're planning on running large, distributed, or performance-intensive jobs,
-you might prefer using MySQL. Run::
+However, if you're planning on running large, distributed, or performance-intensive jobs,
+you might prefer using MySQL.
 
-    $ sudo apt-get install mysql-server mysql-client
+If you do not have a MySQL database already prepared, you can follow the next steps in order
+install it and parepare it for ATM:
 
-and following the instructions.
+1. **Install mysql-server**
+
+First install mysql-server using the following command::
+
+    sudo apt-get install mysql-server
+
+In the latest versions of MySQL no input for the user is required for this step, but
+in older versions the installation process will require the user to input a password
+for the MySQL root user.
+
+If this happens, keep track of the password that you set, as you will need it in the
+next step.
+
+2. **Log into your MySQL instance as root**
+
+If no password was required during the installation of MySQL, you should be able to
+log in with the following command::
+
+    sudo mysql
+
+If a MySQL Root password was required, you will need to execute this other command::
+
+    sudo mysql -u root -p
+
+and input the password that you used during the installation when prompted.
+
+3. **Create a new Database for ATM**
+
+Once you are logged in, execute the following three commands to create a database
+called `atm` and a user also called `atm` with write permissions on it::
+
+    $ mysql> CREATE DATABASE atm;
+    $ mysql> CREATE USER 'atm'@'localhost' IDENTIFIED BY 'set-your-own-password-here';
+    $ mysql> GRANT ALL PRIVILEGES ON atm.* TO 'atm'@'localhost';
+
+4. **Test your settings**
+
+After you have executed the previous three commands and exited the mysql prompt,
+you can test your settings by executing the following command and inputing the
+password that you used in the previous step when prompted::
+
+    mysql -u atm -p
 
 3. Start using ATM!
 -------------------

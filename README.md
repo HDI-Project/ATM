@@ -201,7 +201,7 @@ to specify the most important values.
 
 ### Setting up a distributed Database
 
-ATM uses a database  to store information about datasets, dataruns and classifiers.
+ATM uses a database to store information about datasets, dataruns and classifiers.
 It's currently compatible with the SQLite3 and MySQL dialects.
 
 For first-time and casual users, the SQLite3 is used by default without any required
