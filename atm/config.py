@@ -37,9 +37,12 @@ class Config(object):
             return name
 
     @classmethod
-    def _get_arg(cls, args, name):
-        arg_name = cls._add_prefix(name)
+    def _get_arg(cls, args, name, use_prefix):
         class_value = getattr(cls, name)
+
+        if use_prefix:
+            name = cls._add_prefix(name)
+
         required = False
         if isinstance(class_value, dict):
             required = 'default' not in class_value
@@ -51,10 +54,10 @@ class Config(object):
             required = False
             default = None
 
-        if required and arg_name not in args:
-            raise KeyError(arg_name)
+        if required and name not in args:
+            raise KeyError(name)
 
-        return args.get(arg_name, default)
+        return args.get(name, default)
 
     def __init__(self, args, path=None):
         if isinstance(args, argparse.Namespace):
@@ -67,10 +70,13 @@ class Config(object):
         if path:
             with open(path, 'r') as f:
                 args = yaml.load(f)
+                use_prefix = False
+        else:
+            use_prefix = True
 
         for name, value in vars(self.__class__).items():
             if not name.startswith('_') and not callable(value):
-                setattr(self, name, self._get_arg(args, name))
+                setattr(self, name, self._get_arg(args, name, use_prefix))
 
     @classmethod
     def get_parser(cls):

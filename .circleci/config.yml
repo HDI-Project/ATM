@@ -6,6 +6,4 @@ jobs:
       - image: themattrix/tox
     steps:
       - checkout
-      - run: apt-get -qq update
-      - run: apt-get -qq -y install libmysqlclient-dev
       - run: tox
