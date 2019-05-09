@@ -90,7 +90,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../setup.html#install-from-source">Install from source</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../setup.html#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#install-a-database-optional">2. Install a database (Optional)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../setup.html#start-using-atm">3. Start using ATM!</a></li>
 </ul>
 </li>
@@ -360,7 +360,7 @@ conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>var
 
 <dl class="attribute">
 <dt id="atm.config.RunConfig.metric">
-<code class="descname">metric</code><em class="property"> = {'choices': ['f1_micro', 'f1_macro', 'f1', 'mcc', 'ap', 'roc_auc_macro', 'roc_auc_micro', 'rank_accuracy', 'accuracy', 'roc_auc', 'cohen_kappa'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
+<code class="descname">metric</code><em class="property"> = {'choices': ['roc_auc', 'roc_auc_micro', 'rank_accuracy', 'f1_micro', 'accuracy', 'roc_auc_macro', 'ap', 'cohen_kappa', 'f1', 'f1_macro', 'mcc'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">

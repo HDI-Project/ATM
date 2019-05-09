@@ -92,7 +92,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#install-from-source">Install from source</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#install-a-database">2. Install a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-a-database-optional">2. Install a database (Optional)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#start-using-atm">3. Start using ATM!</a></li>
 </ul>
 </li>
@@ -264,23 +264,58 @@ If you do not, activate it again!</p>
 </div>
 </div>
 </div>
-<div class="section" id="install-a-database">
-<h2>2. Install a database<a class="headerlink" href="#install-a-database" title="Permalink to this headline">¶</a></h2>
-<p>ATM requires a SQL-like database to store information about datasets, dataruns,
-and classifiers. It’s currently compatible with the SQLite3 and MySQL dialects.
-For first-time and casual users, we recommend installing SQLite:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo apt-get install sqlite3
+<div class="section" id="install-a-database-optional">
+<h2>2. Install a database (Optional)<a class="headerlink" href="#install-a-database-optional" title="Permalink to this headline">¶</a></h2>
+<p>ATM uses a database to store information about datasets, dataruns and classifiers.
+It’s currently compatible with the SQLite3 and MySQL dialects.</p>
+<p>For first-time and casual users, the SQLite3 is used by default without any required
+step from the user.</p>
+<p>However, if you’re planning on running large, distributed, or performance-intensive jobs,
+you might prefer using MySQL.</p>
+<p>If you do not have a MySQL database already prepared, you can follow the next steps in order
+install it and parepare it for ATM:</p>
+<ol class="arabic simple">
+<li><p><strong>Install mysql-server</strong></p></li>
+</ol>
+<p>First install mysql-server using the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">mysql</span><span class="o">-</span><span class="n">server</span>
 </pre></div>
 </div>
-<p>If you’re planning on running large, distributed, or performance-intensive jobs,
-you might prefer using MySQL. Run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo apt-get install mysql-server mysql-client
+<p>In the latest versions of MySQL no input for the user is required for this step, but
+in older versions the installation process will require the user to input a password
+for the MySQL root user.</p>
+<p>If this happens, keep track of the password that you set, as you will need it in the
+next step.</p>
+<ol class="arabic simple" start="2">
+<li><p><strong>Log into your MySQL instance as root</strong></p></li>
+</ol>
+<p>If no password was required during the installation of MySQL, you should be able to
+log in with the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">mysql</span>
 </pre></div>
 </div>
-<p>and following the instructions.</p>
-<p>No matter which you choose, you’ll need to install the mysql client developer
-library in order for SQLAlchemy to work correctly:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo apt-get install libmysqlclient-dev
+<p>If a MySQL Root password was required, you will need to execute this other command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">mysql</span> <span class="o">-</span><span class="n">u</span> <span class="n">root</span> <span class="o">-</span><span class="n">p</span>
+</pre></div>
+</div>
+<p>and input the password that you used during the installation when prompted.</p>
+<ol class="arabic simple" start="3">
+<li><p><strong>Create a new Database for ATM</strong></p></li>
+</ol>
+<p>Once you are logged in, execute the following three commands to create a database
+called <cite>atm</cite> and a user also called <cite>atm</cite> with write permissions on it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mysql&gt; CREATE DATABASE atm;
+$ mysql&gt; CREATE USER &#39;atm&#39;@&#39;localhost&#39; IDENTIFIED BY &#39;set-your-own-password-here&#39;;
+$ mysql&gt; GRANT ALL PRIVILEGES ON atm.* TO &#39;atm&#39;@&#39;localhost&#39;;
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p><strong>Test your settings</strong></p></li>
+</ol>
+<p>After you have executed the previous three commands and exited the mysql prompt,
+you can test your settings by executing the following command and inputing the
+password that you used in the previous step when prompted:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mysql</span> <span class="o">-</span><span class="n">u</span> <span class="n">atm</span> <span class="o">-</span><span class="n">p</span>
 </pre></div>
 </div>
 </div>
