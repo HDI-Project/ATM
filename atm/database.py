@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
+import hashlib
 import json
 import os
 import pickle
@@ -155,10 +156,20 @@ class Database(object):
                 self.k_classes = len(np.unique(data[self.class_column]))
                 self.size_kb = int(np.array(data).nbytes / 1000)
 
+            @staticmethod
+            def _make_name(path):
+                md5 = hashlib.md5(path)
+                try:
+                    md5.encode('utf-8')
+                except AttributeError:    # Python 2
+                    pass
+
+                return md5.hexdigest()
+
             def __init__(self, class_column, train_path, name=None,
                          description=None, test_path=None, aws_conf=None):
 
-                self.name = name or os.path.basename(train_path)
+                self.name = name or self._make_name(path)
                 self.class_column = class_column
                 self.description = description
                 self.train_path = train_path
