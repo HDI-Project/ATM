@@ -51,7 +51,8 @@ class DataEncoder(object):
         if self.categorical_columns:
             self.feature_encoder = OneHotEncoder(
                 categorical_features=self.categorical_columns,
-                sparse=False
+                sparse=False,
+                handle_unknown='ignore'
             )
             self.feature_encoder.fit(X)
 

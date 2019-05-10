@@ -187,22 +187,11 @@ class Model(object):
                 self.judgment_metric = Metrics.ROC_AUC_MACRO
 
         # load training data
-        train_data = dataset.load_train()
-        test_data = dataset.load_test()
-
-        # if necessary, generate permanent train/test split
-        if test_data is not None:
-            all_data = pd.concat([train_data, test_data])
-
-        else:
-            all_data = train_data
-            train_data, test_data = train_test_split(train_data,
-                                                     test_size=self.testing_ratio,
-                                                     random_state=self.random_state)
+        train_data, test_data = dataset.load(self.testing_ratio, self.random_state)
 
         # extract feature matrix and labels from raw data
         self.encoder = DataEncoder(class_column=self.class_column)
-        self.encoder.fit(all_data)
+        self.encoder.fit(train_data)
         X_train, y_train = self.encoder.transform(train_data)
         X_test, y_test = self.encoder.transform(test_data)
 

@@ -1,10 +1,13 @@
 import pandas as pd
 
 
-def load_data(path, dropvals=None, sep=','):
-    # load data as a Pandas dataframe
-    data = pd.read_csv(path, skipinitialspace=True,
-                       na_values=dropvals, sep=sep)
+def download(path):
+    pass
 
-    # drop rows with any NA values
-    return data.dropna(how='any')
+
+def load_data(path):
+    if not os.path.isfile(path):
+        download(path)
+
+    # load data as a Pandas dataframe
+    return pd.read_csv(path).dropna(how='any')
