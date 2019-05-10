@@ -108,27 +108,14 @@ class ATM(object):
         """
         Create a dataset and add it to the ModelHub database.
         """
-        # download data to the local filesystem to extract metadata
-        train_local, test_local = download_data(dataset_conf.train_path,
-                                                dataset_conf.test_path,
-                                                self.aws_conf)
-
-        # create the name of the dataset from the path to the data
-        name = os.path.basename(train_local)
-        name = name.replace("_train.csv", "").replace(".csv", "")
-
-        # enter dataset into database
-        dataset = self.db.create_dataset(name=name,
-                                         description=dataset_conf.data_description,
-                                         train_path=dataset_conf.train_path,
-                                         test_path=dataset_conf.test_path,
-                                         class_column=dataset_conf.class_column,
-                                         n_examples=dataset_conf.n_examples,
-                                         k_classes=dataset_conf.k_classes,
-                                         d_features=dataset_conf.d_features,
-                                         majority=dataset_conf.majority,
-                                         size_kb=dataset_conf.size_kb)
-        return dataset
+        return self.db.create_dataset(
+            name=dataset_conf.name,
+            description=dataset_conf.data_description,
+            train_path=dataset_conf.train_path,
+            test_path=dataset_conf.test_path,
+            class_column=dataset_conf.class_column,
+            aws_conf=self.aws_conf
+        )
 
     def create_datarun(self, dataset, run_conf):
         """

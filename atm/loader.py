@@ -5,7 +5,7 @@ def download(path):
     pass
 
 
-def load_data(path):
+def load_data(path, aws_conf=None):
     if not os.path.isfile(path):
         download(path)
 

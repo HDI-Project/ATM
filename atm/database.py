@@ -128,17 +128,17 @@ class Database(object):
             majority = Column(Numeric(precision=10, scale=9), nullable=False)
             size_kb = Column(Integer, nullable=False)
 
-            def load_(self, test_size=0.3, random_state=0):
-                data = load_data(self.train_path)
+            def load_(self, test_size=0.3, random_state=0, aws_conf=None):
+                data = load_data(self.train_path, aws_conf)
 
                 if self.test_path:
-                    test_data = load_data(self.test_path)
+                    test_data = load_data(self.test_path, aws_conf)
                     return data, test_data
                 else:
                     return train_test_split(data, test_size=test_size, random_state=random_state)
 
-            def _add_extra_fields(self):
-                data = load_data(self.train_path)
+            def _add_extra_fields(self, aws_conf):
+                data = load_data(self.train_path, aws_conf)
 
                 # compute the portion of labels that are the most common value
                 counts = data[self.class_column].value_counts()
@@ -156,7 +156,7 @@ class Database(object):
                 self.size_kb = int(np.array(data).nbytes / 1000)
 
             def __init__(self, class_column, train_path, name=None,
-                         description=None, test_path=None):
+                         description=None, test_path=None, aws_conf=None):
 
                 self.name = name or os.path.basename(train_path)
                 self.class_column = class_column
@@ -164,7 +164,7 @@ class Database(object):
                 self.train_path = train_path
                 self.test_path = test_path
 
-                self._add_extra_fields()
+                self._add_extra_fields(aws_conf)
 
             def __repr__(self):
                 base = "<%s: %s, %d classes, %d features, %d rows>"
