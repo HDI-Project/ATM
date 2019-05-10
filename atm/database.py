@@ -21,6 +21,7 @@ from sqlalchemy.orm.properties import ColumnProperty
 from atm.constants import (
     BUDGET_TYPES, CLASSIFIER_STATUS, DATARUN_STATUS, METRICS, PARTITION_STATUS, SCORE_TARGETS,
     ClassifierStatus, PartitionStatus, RunStatus)
+from atm.loader import load_data
 from atm.utilities import base_64_to_object, object_to_base_64
 
 # The maximum number of errors allowed in a single hyperpartition. If more than
@@ -127,10 +128,48 @@ class Database(object):
             majority = Column(Numeric(precision=10, scale=9), nullable=False)
             size_kb = Column(Integer, nullable=False)
 
+            def __init__(self, class_column, train_path, name=None, description=None,
+                         test_path=None, n_examples=None, k_classes=None,
+                         d_features=None, majority=None, size_kb=None):
+
+                data = pd.read_csv(train_path)
+                if test_path is not None:
+                    data = data.append(pd.read_csv(test_path))
+
+                # compute the portion of labels that are the most common value
+                counts = data[class_column].value_counts()
+                total_features = data.shape[1] - 1
+                for c in data.columns:
+                    if data[c].dtype == 'object':
+                        total_features += len(np.unique(data[c])) - 1
+
+                majority_percentage = float(max(counts)) / float(sum(counts))
+
+                if name is None:
+                    name = os.path.basename(train_path)
+                    name = name.replace("_train.csv", "").replace(".csv", "")
+
+                self.name = name
+                self.class_column = class_column
+                self.description = description or name
+                self.train_path = train_path
+                self.test_path = test_path
+                self.n_examples = n_examples or data.shape[0]
+                self.d_features = d_features or total_features
+                self.k_classes = k_classes or len(np.unique(data[class_column]))
+                self.majority = majority or majority_percentage
+                self.size_kb = size_kb or int(np.array(data).nbytes / 1000)
+
             def __repr__(self):
                 base = "<%s: %s, %d classes, %d features, %d rows>"
                 return base % (self.name, self.description, self.k_classes,
                                self.d_features, self.n_examples)
+
+            def load_train(self):
+                return load_data(self.train_path)
+
+            def load_test(self):
+                return load_data(self.test_path) if self.test_path else None
 
         class Datarun(Base):
             __tablename__ = 'dataruns'

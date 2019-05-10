@@ -18,7 +18,6 @@ from operator import attrgetter
 
 from atm.constants import TIME_FMT, PartitionStatus
 from atm.database import Database
-from atm.encoder import MetaData
 from atm.method import Method
 from atm.utilities import download_data, get_public_ip
 from atm.worker import ClassifierError, Worker
@@ -118,20 +117,17 @@ class ATM(object):
         name = os.path.basename(train_local)
         name = name.replace("_train.csv", "").replace(".csv", "")
 
-        # process the data into the form ATM needs and save it to disk
-        meta = MetaData(dataset_conf.class_column, train_local, test_local)
-
         # enter dataset into database
         dataset = self.db.create_dataset(name=name,
                                          description=dataset_conf.data_description,
                                          train_path=dataset_conf.train_path,
                                          test_path=dataset_conf.test_path,
                                          class_column=dataset_conf.class_column,
-                                         n_examples=meta.n_examples,
-                                         k_classes=meta.k_classes,
-                                         d_features=meta.d_features,
-                                         majority=meta.majority,
-                                         size_kb=meta.size)
+                                         n_examples=dataset_conf.n_examples,
+                                         k_classes=dataset_conf.k_classes,
+                                         d_features=dataset_conf.d_features,
+                                         majority=dataset_conf.majority,
+                                         size_kb=dataset_conf.size_kb)
         return dataset
 
     def create_datarun(self, dataset, run_conf):

@@ -208,7 +208,7 @@ class Worker(object):
                                               self.dataset.test_path,
                                               self.aws_config)
 
-        metrics = model.train_test(train_path=train_path, test_path=test_path)
+        metrics = model.train_test(self.dataset)
 
         target = self.datarun.score_target
 

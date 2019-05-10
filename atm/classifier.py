@@ -22,7 +22,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from atm.constants import Metrics
-from atm.encoder import DataEncoder, MetaData
+from atm.encoder import DataEncoder
 from atm.method import Method
 from atm.metrics import cross_validate_pipeline, test_pipeline
 
@@ -81,14 +81,6 @@ class Model(object):
 
         # persistent random state
         self.random_state = np.random.randint(1e7)
-
-    def load_data(self, path, dropvals=None, sep=','):
-        # load data as a Pandas dataframe
-        data = pd.read_csv(path, skipinitialspace=True,
-                           na_values=dropvals, sep=sep)
-
-        # drop rows with any NA values
-        return data.dropna(how='any')
 
     def make_pipeline(self):
         """
@@ -176,13 +168,10 @@ class Model(object):
 
         return test_scores
 
-    def train_test(self, train_path, test_path=None):
-        # load train and (maybe) test data
-        metadata = MetaData(class_column=self.class_column,
-                            train_path=train_path,
-                            test_path=test_path)
-        self.num_classes = metadata.k_classes
-        self.num_features = metadata.d_features
+    def train_test(self, dataset):
+
+        self.num_classes = dataset.k_classes
+        self.num_features = dataset.d_features
 
         # if necessary, cast judgment metric into its binary/multiary equivalent
         if self.num_classes == 2:
@@ -198,12 +187,13 @@ class Model(object):
                 self.judgment_metric = Metrics.ROC_AUC_MACRO
 
         # load training data
-        train_data = self.load_data(train_path)
+        train_data = dataset.load_train()
+        test_data = dataset.load_test()
 
         # if necessary, generate permanent train/test split
-        if test_path is not None:
-            test_data = self.load_data(test_path)
+        if test_data is not None:
             all_data = pd.concat([train_data, test_data])
+
         else:
             all_data = train_data
             train_data, test_data = train_test_split(train_data,
