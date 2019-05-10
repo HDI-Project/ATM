@@ -9,7 +9,6 @@ executing and orchestrating the main ATM functionalities.
 from __future__ import absolute_import, division, unicode_literals
 
 import logging
-import os
 import random
 import time
 from builtins import object
@@ -19,7 +18,7 @@ from operator import attrgetter
 from atm.constants import TIME_FMT, PartitionStatus
 from atm.database import Database
 from atm.method import Method
-from atm.utilities import download_data, get_public_ip
+from atm.utilities import get_public_ip
 from atm.worker import ClassifierError, Worker
 
 LOGGER = logging.getLogger(__name__)

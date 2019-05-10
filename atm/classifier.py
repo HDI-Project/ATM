@@ -17,7 +17,6 @@ import pandas as pd
 from sklearn import decomposition
 from sklearn.gaussian_process.kernels import (
     RBF, ConstantKernel, ExpSineSquared, Matern, RationalQuadratic)
-from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 

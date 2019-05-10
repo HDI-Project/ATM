@@ -11,6 +11,7 @@ from operator import attrgetter
 import numpy as np
 import pandas as pd
 import pymysql
+from sklearn.model_selection import train_test_split
 from sqlalchemy import (
     Column, DateTime, Enum, ForeignKey, Integer, MetaData, Numeric, String, Text, and_,
     create_engine, func, inspect)
@@ -22,7 +23,7 @@ from sqlalchemy.orm.properties import ColumnProperty
 from atm.constants import (
     BUDGET_TYPES, CLASSIFIER_STATUS, DATARUN_STATUS, METRICS, PARTITION_STATUS, SCORE_TARGETS,
     ClassifierStatus, PartitionStatus, RunStatus)
-from atm.loader import load_data
+from atm.dataloader import load_data
 from atm.utilities import base_64_to_object, object_to_base_64
 
 # The maximum number of errors allowed in a single hyperpartition. If more than
@@ -169,7 +170,7 @@ class Database(object):
             def __init__(self, class_column, train_path, name=None,
                          description=None, test_path=None, aws_conf=None):
 
-                self.name = name or self._make_name(path)
+                self.name = name or self._make_name(train_path)
                 self.class_column = class_column
                 self.description = description
                 self.train_path = train_path
