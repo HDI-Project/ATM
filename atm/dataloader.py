@@ -29,7 +29,7 @@ def download_from_s3(path, local_path, **kwargs):
     )
 
     bucket = path.split('/')[2]
-    file_to_download = bucket.pop('s3://{}/'.format(bucket))
+    file_to_download = path.replace('s3://{}/'.format(bucket), '')
 
     try:
         LOGGER.info('Downloading {}'.format(path))
@@ -73,6 +73,10 @@ def download(path, local_path, **kwargs):
 def get_local_path(name, path, aws_config):
     cwd = os.getcwd()
     data_path = os.path.join(cwd, 'data')
+
+    if not name.endswith('csv'):
+        name = name + '.csv'
+
     local_path = os.path.join(data_path, name)
 
     if os.path.isfile(local_path):
@@ -80,7 +84,7 @@ def get_local_path(name, path, aws_config):
 
     if not os.path.isfile(local_path):
         if not os.path.exists(data_path):
-            os.path.makedirs(data_path)
+            os.makedirs(data_path)
 
         download(path, local_path, aws_config=aws_config)
         return local_path
