@@ -23,7 +23,7 @@ from sqlalchemy.orm.properties import ColumnProperty
 from atm.constants import (
     BUDGET_TYPES, CLASSIFIER_STATUS, DATARUN_STATUS, METRICS, PARTITION_STATUS, SCORE_TARGETS,
     ClassifierStatus, PartitionStatus, RunStatus)
-from atm.dataloader import load_data
+from atm.data import load_data
 from atm.utilities import base_64_to_object, object_to_base_64
 
 # The maximum number of errors allowed in a single hyperpartition. If more than
@@ -130,7 +130,7 @@ class Database(object):
             majority = Column(Numeric(precision=10, scale=9), nullable=False)
             size_kb = Column(Integer, nullable=False)
 
-            def load_(self, test_size=0.3, random_state=0, aws_conf=None):
+            def load(self, test_size=0.3, random_state=0, aws_conf=None):
                 data = load_data(self.name, self.train_path, aws_conf)
 
                 if self.test_path:

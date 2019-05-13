@@ -5,8 +5,8 @@ import pytest
 from atm import PROJECT_ROOT
 from atm.config import DatasetConfig, RunConfig, SQLConfig
 from atm.core import ATM
+from atm.data import get_local_path
 from atm.database import Database, db_session
-from atm.dataloader import get_local_path
 
 DB_PATH = '/tmp/atm.db'
 DB_CACHE_PATH = os.path.join(PROJECT_ROOT, 'data/modelhub/test/')
@@ -75,7 +75,7 @@ def test_create_dataset(db):
     dataset = atm.create_dataset(dataset_conf)
     dataset = db.get_dataset(dataset.id)
 
-    train, test = dataset.load_()  # This will create the test_path_local
+    train, test = dataset.load()  # This will create the test_path_local
 
     assert os.path.exists(train_path_local)
     assert os.path.exists(test_path_local)

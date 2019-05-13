@@ -202,7 +202,7 @@ class Worker(object):
                       class_column=self.dataset.class_column,
                       verbose_metrics=self.verbose_metrics)
 
-        train_path, test_path = self.dataset.load_()
+        train_path, test_path = self.dataset.load()
 
         metrics = model.train_test(self.dataset)
 
