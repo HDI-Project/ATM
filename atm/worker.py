@@ -11,9 +11,8 @@ import warnings
 from builtins import object, str
 from collections import defaultdict
 
+import boto3
 import numpy as np
-from boto.s3.connection import Key as S3Key
-from boto.s3.connection import S3Connection
 
 from atm.classifier import Model
 from atm.config import LogConfig
@@ -28,7 +27,7 @@ warnings.filterwarnings('ignore')
 os.environ['GNUMPY_IMPLICIT_CONVERSION'] = 'allow'
 
 # load the library-wide logger
-logger = logging.getLogger('atm')
+LOGGER = logging.getLogger('atm')
 
 
 # Exception thrown when something goes wrong for the worker, but the worker
@@ -83,7 +82,7 @@ class Worker(object):
             mod = imp.load_source('btb.selection.custom', path)
             Selector = getattr(mod, classname)
 
-        logger.info('Selector: %s' % Selector)
+        LOGGER.info('Selector: %s' % Selector)
 
         # generate the arguments we need to initialize the selector
         hyperpartitions = self.db.get_hyperpartitions(datarun_id=self.datarun.id)
@@ -115,7 +114,7 @@ class Worker(object):
             mod = imp.load_source('btb.tuning.custom', path)
             self.Tuner = getattr(mod, classname)
 
-        logger.info('Tuner: %s' % self.Tuner)
+        LOGGER.info('Tuner: %s' % self.Tuner)
 
     def select_hyperpartition(self):
         """
@@ -156,7 +155,7 @@ class Worker(object):
         # If there aren't any tunable parameters, we're done. Return the vector
         # of values in the hyperpartition and mark the set as finished.
         if not len(tunables):
-            logger.warning('No tunables for hyperpartition %d' % hyperpartition.id)
+            LOGGER.warning('No tunables for hyperpartition %d' % hyperpartition.id)
             self.db.mark_hyperpartition_gridding_done(hyperpartition.id)
             return update_params(params=[],
                                  tunables=tunables,
@@ -183,7 +182,7 @@ class Worker(object):
 
         params = tuner.propose()
         if params is None and self.datarun.gridding:
-            logger.info('Gridding done for hyperpartition %d' % hyperpartition.id)
+            LOGGER.info('Gridding done for hyperpartition %d' % hyperpartition.id)
             self.db.mark_hyperpartition_gridding_done(hyperpartition.id)
             return None
 
@@ -216,7 +215,7 @@ class Worker(object):
             else:
                 return '%.3f' % model.test_judgment_metric
 
-        logger.info('Judgment metric (%s, %s): %s' % (self.datarun.metric,
+        LOGGER.info('Judgment metric (%s, %s): %s' % (self.datarun.metric,
                                                       target[:-len('_judgment_metric')],
                                                       metric_string(model)))
 
@@ -224,10 +223,10 @@ class Worker(object):
                                                score_target=target)
         if old_best is not None:
             if getattr(model, target) > getattr(old_best, target):
-                logger.info('New best score! Previous best (classifier %s): %s',
+                LOGGER.info('New best score! Previous best (classifier %s): %s',
                             old_best.id, metric_string(old_best))
             else:
-                logger.info('Best so far (classifier %s): %s',
+                LOGGER.info('Best so far (classifier %s): %s',
                             old_best.id, metric_string(old_best))
 
         return model, metrics
@@ -259,7 +258,7 @@ class Worker(object):
 
                 except Exception:
                     msg = traceback.format_exc()
-                    logger.error('Error in save_classifier_cloud()')
+                    LOGGER.error('Error in save_classifier_cloud()')
                     self.db.mark_classifier_errored(classifier_id, error_message=msg)
         else:
             model_path = None
@@ -274,9 +273,9 @@ class Worker(object):
                                     test_score=model.test_judgment_metric)
 
         # update this session's hyperpartition entry
-        logger.info('Saved classifier %d.' % classifier_id)
+        LOGGER.info('Saved classifier %d.' % classifier_id)
 
-    def save_classifier_cloud(self, local_model_path, local_metric_path):
+    def save_classifier_cloud(self, local_model_path, local_metric_path, delete_local=False):
         """
         Save a classifier to the S3 bucket supplied by aws_config. Saves a
         serialized representaion of the model as well as a detailed set
@@ -286,35 +285,40 @@ class Worker(object):
         local_metric_path: path to serialized metrics in the local file system
         """
 
-        # TODO: This does not work
-        conn = S3Connection(self.aws_config.access_key, self.aws_config.secret_key)
-        bucket = conn.get_bucket(self.aws_config.s3_bucket)
+        aws_access_key = None
+        aws_secret_key = None
+
+        if self.aws_config:
+            aws_access_key = self.aws_config.access_key
+            aws_secret_key = self.aws_config.secret_key
+
+        client = boto3.client(
+            's3',
+            aws_access_key_id=aws_access_key,
+            aws_secret_access_key=aws_secret_key,
+        )
 
         if self.aws_config.aws_folder:
             aws_model_path = os.path.join(self.aws_config.aws_folder, local_model_path)
             aws_metric_path = os.path.join(self.aws_config.aws_folder, local_metric_path)
+
         else:
             aws_model_path = local_model_path
             aws_metric_path = local_metric_path
 
-        kmodel = S3Key(bucket)
-        kmodel.key = aws_model_path
-        kmodel.set_contents_from_filename(local_model_path)
-        logger.info('Uploading model at %s to S3 bucket %s',
+        client.upload_file(aws_model_path, self.aws_config.bucket, aws_model_path)
+        LOGGER.info('Uploading model at %s to S3 bucket %s',
                     self.aws_config.s3_bucket, local_model_path)
 
-        kmodel = S3Key(bucket)
-        kmodel.key = aws_metric_path
-        kmodel.set_contents_from_filename(local_metric_path)
-        logger.info('Uploading metrics at %s to S3 bucket %s',
+        client.upload_file(aws_metric_path, self.aws_config.bucket, aws_metric_path)
+        LOGGER.info('Uploading metrics at %s to S3 bucket %s',
                     self.aws_config.s3_bucket, local_metric_path)
 
-        # delete the local copy of the model & metrics so that they don't fill
-        # up the worker instance's hard drive
-        logger.info('Deleting local copies of %s and %s',
-                    local_model_path, local_metric_path)
-        os.remove(local_model_path)
-        os.remove(local_metric_path)
+        if delete_local:
+            LOGGER.info('Deleting local copies of %s and %s',
+                        local_model_path, local_metric_path)
+            os.remove(local_model_path)
+            os.remove(local_metric_path)
 
     def is_datarun_finished(self):
         """
@@ -323,7 +327,7 @@ class Worker(object):
         """
         hyperpartitions = self.db.get_hyperpartitions(datarun_id=self.datarun.id)
         if not hyperpartitions:
-            logger.warning('No incomplete hyperpartitions for datarun %d present in database.'
+            LOGGER.warning('No incomplete hyperpartitions for datarun %d present in database.'
                            % self.datarun.id)
             return True
 
@@ -332,13 +336,13 @@ class Worker(object):
             # is created, so this will count running, errored, and complete.
             n_completed = len(self.db.get_classifiers(datarun_id=self.datarun.id))
             if n_completed >= self.datarun.budget:
-                logger.warning('Classifier budget has run out!')
+                LOGGER.warning('Classifier budget has run out!')
                 return True
 
         elif self.datarun.budget_type == 'walltime':
             deadline = self.datarun.deadline
             if datetime.datetime.now() > deadline:
-                logger.warning('Walltime budget has run out!')
+                LOGGER.warning('Walltime budget has run out!')
                 return True
 
         return False
@@ -351,15 +355,15 @@ class Worker(object):
         if self.is_datarun_finished():
             # marked the run as done successfully
             self.db.mark_datarun_complete(self.datarun.id)
-            logger.warning('Datarun %d has ended.' % self.datarun.id)
+            LOGGER.warning('Datarun %d has ended.' % self.datarun.id)
             return
 
         try:
-            logger.debug('Choosing hyperparameters...')
+            LOGGER.debug('Choosing hyperparameters...')
             if hyperpartition_id is not None:
                 hyperpartition = self.db.get_hyperpartition(hyperpartition_id)
                 if hyperpartition.datarun_id != self.datarun.id:
-                    logger.error('Hyperpartition %d is not a part of datarun %d'
+                    LOGGER.error('Hyperpartition %d is not a part of datarun %d'
                                  % (hyperpartition_id, self.datarun.id))
                     return
             else:
@@ -370,12 +374,12 @@ class Worker(object):
             params = self.tune_hyperparameters(hyperpartition)
 
         except Exception:
-            logger.error('Error choosing hyperparameters: datarun=%s' % str(self.datarun))
-            logger.error(traceback.format_exc())
+            LOGGER.error('Error choosing hyperparameters: datarun=%s' % str(self.datarun))
+            LOGGER.error(traceback.format_exc())
             raise ClassifierError()
 
         if params is None:
-            logger.warning('No parameters chosen: hyperpartition %d is finished.'
+            LOGGER.warning('No parameters chosen: hyperpartition %d is finished.'
                            % hyperpartition.id)
             return
 
@@ -383,23 +387,23 @@ class Worker(object):
         for k in sorted(params.keys()):
             param_info += '\n\t%s = %s' % (k, params[k])
 
-        logger.info(param_info)
+        LOGGER.info(param_info)
 
-        logger.debug('Creating classifier...')
+        LOGGER.debug('Creating classifier...')
         classifier = self.db.start_classifier(hyperpartition_id=hyperpartition.id,
                                               datarun_id=self.datarun.id,
                                               host=self.public_ip,
                                               hyperparameter_values=params)
 
         try:
-            logger.debug('Testing classifier...')
+            LOGGER.debug('Testing classifier...')
             model, metrics = self.test_classifier(hyperpartition.method, params)
-            logger.debug('Saving classifier...')
+            LOGGER.debug('Saving classifier...')
             self.save_classifier(classifier.id, model, metrics)
 
         except Exception:
             msg = traceback.format_exc()
-            logger.error('Error testing classifier: datarun=%s' % str(self.datarun))
-            logger.error(msg)
+            LOGGER.error('Error testing classifier: datarun=%s' % str(self.datarun))
+            LOGGER.error(msg)
             self.db.mark_classifier_errored(classifier.id, error_message=msg)
             raise ClassifierError()
