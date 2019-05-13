@@ -131,16 +131,22 @@ class Database(object):
             size_kb = Column(Integer, nullable=False)
 
             def load_(self, test_size=0.3, random_state=0, aws_conf=None):
-                data = load_data(self.train_path, aws_conf)
+                data = load_data(self.name, self.train_path, aws_conf)
 
                 if self.test_path:
-                    test_data = load_data(self.test_path, aws_conf)
+                    if self.name.endswith('.csv'):
+                        test_name = self.name.replace('.csv', '_test.csv')
+                    else:
+                        test_name = self.name + '_test'
+
+                    test_data = load_data(test_name, self.test_path, aws_conf)
                     return data, test_data
+
                 else:
                     return train_test_split(data, test_size=test_size, random_state=random_state)
 
             def _add_extra_fields(self, aws_conf):
-                data = load_data(self.train_path, aws_conf)
+                data = load_data(self.name, self.train_path, aws_conf)
 
                 # compute the portion of labels that are the most common value
                 counts = data[self.class_column].value_counts()
@@ -159,16 +165,11 @@ class Database(object):
 
             @staticmethod
             def _make_name(path):
-                md5 = hashlib.md5(path)
-                try:
-                    md5.encode('utf-8')
-                except AttributeError:    # Python 2
-                    pass
-
+                md5 = hashlib.md5(path.encode('utf-8'))
                 return md5.hexdigest()
 
-            def __init__(self, class_column, train_path, name=None,
-                         description=None, test_path=None, aws_conf=None):
+            def __init__(self, class_column, train_path, name=None, description=None,
+                         test_path=None, aws_conf=None, **kwargs):
 
                 self.name = name or self._make_name(train_path)
                 self.class_column = class_column

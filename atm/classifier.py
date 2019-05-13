@@ -186,7 +186,7 @@ class Model(object):
                 self.judgment_metric = Metrics.ROC_AUC_MACRO
 
         # load training data
-        train_data, test_data = dataset.load(self.testing_ratio, self.random_state)
+        train_data, test_data = dataset.load_(self.testing_ratio, self.random_state)
 
         # extract feature matrix and labels from raw data
         self.encoder = DataEncoder(class_column=self.class_column)
