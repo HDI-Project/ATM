@@ -6,8 +6,6 @@ import pandas as pd
 import requests
 from botocore.exceptions import ClientError
 
-# from atm.config import CONFIG
-
 LOGGER = logging.getLogger('atm')
 
 
