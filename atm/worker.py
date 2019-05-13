@@ -19,8 +19,7 @@ from atm.classifier import Model
 from atm.config import LogConfig
 from atm.constants import CUSTOM_CLASS_REGEX, SELECTORS_MAP, TUNERS_MAP
 from atm.database import ClassifierStatus, db_session
-from atm.utilities import (
-    download_data, ensure_directory, get_instance, save_metrics, save_model, update_params)
+from atm.utilities import ensure_directory, get_instance, save_metrics, save_model, update_params
 
 # shhh
 warnings.filterwarnings('ignore')
@@ -204,9 +203,7 @@ class Worker(object):
                       class_column=self.dataset.class_column,
                       verbose_metrics=self.verbose_metrics)
 
-        train_path, test_path = download_data(self.dataset.train_path,
-                                              self.dataset.test_path,
-                                              self.aws_config)
+        train_path, test_path = self.dataset.load_()
 
         metrics = model.train_test(self.dataset)
 

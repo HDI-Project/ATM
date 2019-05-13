@@ -6,7 +6,7 @@ from atm import PROJECT_ROOT
 from atm.config import DatasetConfig, RunConfig, SQLConfig
 from atm.core import ATM
 from atm.database import Database, db_session
-from atm.utilities import get_local_data_path
+from atm.dataloader import get_local_path
 
 DB_PATH = '/tmp/atm.db'
 DB_CACHE_PATH = os.path.join(PROJECT_ROOT, 'data/modelhub/test/')
@@ -54,15 +54,16 @@ def test_create_dataset(db):
 
     sql_conf = SQLConfig({'sql_database': DB_PATH})
 
-    train_path_local, _ = get_local_data_path(train_url)
+    train_path_local = get_local_path('pollution_test.csv', train_url, None)
     if os.path.exists(train_path_local):
         os.remove(train_path_local)
 
-    test_path_local, _ = get_local_data_path(test_url)
+    test_path_local = get_local_path('pollution_test_test.csv', test_url, None)
     if os.path.exists(test_path_local):
         os.remove(test_path_local)
 
     dataset_conf = DatasetConfig({
+        'name': 'pollution_test',
         'train_path': train_url,
         'test_path': test_url,
         'data_description': 'test',
@@ -74,6 +75,8 @@ def test_create_dataset(db):
     dataset = atm.create_dataset(dataset_conf)
     dataset = db.get_dataset(dataset.id)
 
+    train, test = dataset.load_()  # This will create the test_path_local
+
     assert os.path.exists(train_path_local)
     assert os.path.exists(test_path_local)
 
@@ -81,10 +84,17 @@ def test_create_dataset(db):
     assert dataset.test_path == test_url
     assert dataset.description == 'test'
     assert dataset.class_column == 'class'
-    assert dataset.n_examples == 60
+    assert dataset.n_examples == 40
     assert dataset.d_features == 16
     assert dataset.k_classes == 2
     assert dataset.majority >= 0.5
+
+    # remove test dataset
+    if os.path.exists(train_path_local):
+        os.remove(train_path_local)
+
+    if os.path.exists(test_path_local):
+        os.remove(test_path_local)
 
 
 def test_enter_data_by_methods(dataset):

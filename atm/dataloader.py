@@ -71,6 +71,10 @@ def download(path, local_path, **kwargs):
 
 
 def get_local_path(name, path, aws_config):
+
+    if os.path.isfile(path):
+        return path
+
     cwd = os.getcwd()
     data_path = os.path.join(cwd, 'data')
 
