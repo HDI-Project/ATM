@@ -223,16 +223,14 @@
 <span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">str</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
 
+<span class="kn">import</span> <span class="nn">boto3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">boto.s3.connection</span> <span class="k">import</span> <span class="n">Key</span> <span class="k">as</span> <span class="n">S3Key</span>
-<span class="kn">from</span> <span class="nn">boto.s3.connection</span> <span class="k">import</span> <span class="n">S3Connection</span>
 
 <span class="kn">from</span> <span class="nn">atm.classifier</span> <span class="k">import</span> <span class="n">Model</span>
 <span class="kn">from</span> <span class="nn">atm.config</span> <span class="k">import</span> <span class="n">LogConfig</span>
 <span class="kn">from</span> <span class="nn">atm.constants</span> <span class="k">import</span> <span class="n">CUSTOM_CLASS_REGEX</span><span class="p">,</span> <span class="n">SELECTORS_MAP</span><span class="p">,</span> <span class="n">TUNERS_MAP</span>
 <span class="kn">from</span> <span class="nn">atm.database</span> <span class="k">import</span> <span class="n">ClassifierStatus</span><span class="p">,</span> <span class="n">db_session</span>
-<span class="kn">from</span> <span class="nn">atm.utilities</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">download_data</span><span class="p">,</span> <span class="n">ensure_directory</span><span class="p">,</span> <span class="n">get_instance</span><span class="p">,</span> <span class="n">save_metrics</span><span class="p">,</span> <span class="n">save_model</span><span class="p">,</span> <span class="n">update_params</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">atm.utilities</span> <span class="k">import</span> <span class="n">ensure_directory</span><span class="p">,</span> <span class="n">get_instance</span><span class="p">,</span> <span class="n">save_metrics</span><span class="p">,</span> <span class="n">save_model</span><span class="p">,</span> <span class="n">update_params</span>
 
 <span class="c1"># shhh</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
@@ -241,7 +239,7 @@
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GNUMPY_IMPLICIT_CONVERSION&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;allow&#39;</span>
 
 <span class="c1"># load the library-wide logger</span>
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;atm&#39;</span><span class="p">)</span>
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;atm&#39;</span><span class="p">)</span>
 
 
 <span class="c1"># Exception thrown when something goes wrong for the worker, but the worker</span>
@@ -296,7 +294,7 @@
             <span class="n">mod</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">load_source</span><span class="p">(</span><span class="s1">&#39;btb.selection.custom&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
             <span class="n">Selector</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">classname</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Selector: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">Selector</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Selector: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">Selector</span><span class="p">)</span>
 
         <span class="c1"># generate the arguments we need to initialize the selector</span>
         <span class="n">hyperpartitions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_hyperpartitions</span><span class="p">(</span><span class="n">datarun_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
@@ -328,7 +326,7 @@
             <span class="n">mod</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">load_source</span><span class="p">(</span><span class="s1">&#39;btb.tuning.custom&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Tuner</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">classname</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Tuner: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">Tuner</span><span class="p">)</span></div>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Tuner: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">Tuner</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Worker.select_hyperpartition"><a class="viewcode-back" href="../../api/atm.worker.html#atm.worker.Worker.select_hyperpartition">[docs]</a>    <span class="k">def</span> <span class="nf">select_hyperpartition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -369,7 +367,7 @@
         <span class="c1"># If there aren&#39;t any tunable parameters, we&#39;re done. Return the vector</span>
         <span class="c1"># of values in the hyperpartition and mark the set as finished.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">tunables</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No tunables for hyperpartition </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">hyperpartition</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No tunables for hyperpartition </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">hyperpartition</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">mark_hyperpartition_gridding_done</span><span class="p">(</span><span class="n">hyperpartition</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">update_params</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="p">[],</span>
                                  <span class="n">tunables</span><span class="o">=</span><span class="n">tunables</span><span class="p">,</span>
@@ -396,7 +394,7 @@
 
         <span class="n">params</span> <span class="o">=</span> <span class="n">tuner</span><span class="o">.</span><span class="n">propose</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">gridding</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Gridding done for hyperpartition </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">hyperpartition</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Gridding done for hyperpartition </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">hyperpartition</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">mark_hyperpartition_gridding_done</span><span class="p">(</span><span class="n">hyperpartition</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
 
@@ -416,11 +414,9 @@
                       <span class="n">class_column</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">class_column</span><span class="p">,</span>
                       <span class="n">verbose_metrics</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose_metrics</span><span class="p">)</span>
 
-        <span class="n">train_path</span><span class="p">,</span> <span class="n">test_path</span> <span class="o">=</span> <span class="n">download_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">train_path</span><span class="p">,</span>
-                                              <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">test_path</span><span class="p">,</span>
-                                              <span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="p">)</span>
+        <span class="n">train_path</span><span class="p">,</span> <span class="n">test_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 
-        <span class="n">metrics</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_test</span><span class="p">(</span><span class="n">train_path</span><span class="o">=</span><span class="n">train_path</span><span class="p">,</span> <span class="n">test_path</span><span class="o">=</span><span class="n">test_path</span><span class="p">)</span>
+        <span class="n">metrics</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_test</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
 
         <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">score_target</span>
 
@@ -431,7 +427,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">model</span><span class="o">.</span><span class="n">test_judgment_metric</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Judgment metric (</span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">): </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Judgment metric (</span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">): </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span>
                                                       <span class="n">target</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;_judgment_metric&#39;</span><span class="p">)],</span>
                                                       <span class="n">metric_string</span><span class="p">(</span><span class="n">model</span><span class="p">)))</span>
 
@@ -439,10 +435,10 @@
                                                <span class="n">score_target</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">old_best</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">old_best</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;New best score! Previous best (classifier </span><span class="si">%s</span><span class="s1">): </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;New best score! Previous best (classifier </span><span class="si">%s</span><span class="s1">): </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
                             <span class="n">old_best</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">metric_string</span><span class="p">(</span><span class="n">old_best</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Best so far (classifier </span><span class="si">%s</span><span class="s1">): </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Best so far (classifier </span><span class="si">%s</span><span class="s1">): </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
                             <span class="n">old_best</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">metric_string</span><span class="p">(</span><span class="n">old_best</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">metrics</span></div>
@@ -474,7 +470,7 @@
 
                 <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                     <span class="n">msg</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Error in save_classifier_cloud()&#39;</span><span class="p">)</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Error in save_classifier_cloud()&#39;</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">mark_classifier_errored</span><span class="p">(</span><span class="n">classifier_id</span><span class="p">,</span> <span class="n">error_message</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">model_path</span> <span class="o">=</span> <span class="kc">None</span>
@@ -489,9 +485,9 @@
                                     <span class="n">test_score</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">test_judgment_metric</span><span class="p">)</span>
 
         <span class="c1"># update this session&#39;s hyperpartition entry</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Saved classifier </span><span class="si">%d</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="n">classifier_id</span><span class="p">)</span></div>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Saved classifier </span><span class="si">%d</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="n">classifier_id</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Worker.save_classifier_cloud"><a class="viewcode-back" href="../../api/atm.worker.html#atm.worker.Worker.save_classifier_cloud">[docs]</a>    <span class="k">def</span> <span class="nf">save_classifier_cloud</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_model_path</span><span class="p">,</span> <span class="n">local_metric_path</span><span class="p">):</span>
+<div class="viewcode-block" id="Worker.save_classifier_cloud"><a class="viewcode-back" href="../../api/atm.worker.html#atm.worker.Worker.save_classifier_cloud">[docs]</a>    <span class="k">def</span> <span class="nf">save_classifier_cloud</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_model_path</span><span class="p">,</span> <span class="n">local_metric_path</span><span class="p">,</span> <span class="n">delete_local</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Save a classifier to the S3 bucket supplied by aws_config. Saves a</span>
 <span class="sd">        serialized representaion of the model as well as a detailed set</span>
@@ -501,35 +497,40 @@
 <span class="sd">        local_metric_path: path to serialized metrics in the local file system</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># TODO: This does not work</span>
-        <span class="n">conn</span> <span class="o">=</span> <span class="n">S3Connection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">access_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">secret_key</span><span class="p">)</span>
-        <span class="n">bucket</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">get_bucket</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">s3_bucket</span><span class="p">)</span>
+        <span class="n">aws_access_key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">aws_secret_key</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="p">:</span>
+            <span class="n">aws_access_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">access_key</span>
+            <span class="n">aws_secret_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">secret_key</span>
+
+        <span class="n">client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span>
+            <span class="s1">&#39;s3&#39;</span><span class="p">,</span>
+            <span class="n">aws_access_key_id</span><span class="o">=</span><span class="n">aws_access_key</span><span class="p">,</span>
+            <span class="n">aws_secret_access_key</span><span class="o">=</span><span class="n">aws_secret_key</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">aws_folder</span><span class="p">:</span>
             <span class="n">aws_model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">aws_folder</span><span class="p">,</span> <span class="n">local_model_path</span><span class="p">)</span>
             <span class="n">aws_metric_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">aws_folder</span><span class="p">,</span> <span class="n">local_metric_path</span><span class="p">)</span>
+
         <span class="k">else</span><span class="p">:</span>
             <span class="n">aws_model_path</span> <span class="o">=</span> <span class="n">local_model_path</span>
             <span class="n">aws_metric_path</span> <span class="o">=</span> <span class="n">local_metric_path</span>
 
-        <span class="n">kmodel</span> <span class="o">=</span> <span class="n">S3Key</span><span class="p">(</span><span class="n">bucket</span><span class="p">)</span>
-        <span class="n">kmodel</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">aws_model_path</span>
-        <span class="n">kmodel</span><span class="o">.</span><span class="n">set_contents_from_filename</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Uploading model at </span><span class="si">%s</span><span class="s1"> to S3 bucket </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="n">aws_model_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="n">aws_model_path</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Uploading model at </span><span class="si">%s</span><span class="s1"> to S3 bucket </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">s3_bucket</span><span class="p">,</span> <span class="n">local_model_path</span><span class="p">)</span>
 
-        <span class="n">kmodel</span> <span class="o">=</span> <span class="n">S3Key</span><span class="p">(</span><span class="n">bucket</span><span class="p">)</span>
-        <span class="n">kmodel</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">aws_metric_path</span>
-        <span class="n">kmodel</span><span class="o">.</span><span class="n">set_contents_from_filename</span><span class="p">(</span><span class="n">local_metric_path</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Uploading metrics at </span><span class="si">%s</span><span class="s1"> to S3 bucket </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="n">aws_metric_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="n">aws_metric_path</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Uploading metrics at </span><span class="si">%s</span><span class="s1"> to S3 bucket </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">aws_config</span><span class="o">.</span><span class="n">s3_bucket</span><span class="p">,</span> <span class="n">local_metric_path</span><span class="p">)</span>
 
-        <span class="c1"># delete the local copy of the model &amp; metrics so that they don&#39;t fill</span>
-        <span class="c1"># up the worker instance&#39;s hard drive</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Deleting local copies of </span><span class="si">%s</span><span class="s1"> and </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
-                    <span class="n">local_model_path</span><span class="p">,</span> <span class="n">local_metric_path</span><span class="p">)</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">)</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">local_metric_path</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">delete_local</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Deleting local copies of </span><span class="si">%s</span><span class="s1"> and </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                        <span class="n">local_model_path</span><span class="p">,</span> <span class="n">local_metric_path</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">local_metric_path</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Worker.is_datarun_finished"><a class="viewcode-back" href="../../api/atm.worker.html#atm.worker.Worker.is_datarun_finished">[docs]</a>    <span class="k">def</span> <span class="nf">is_datarun_finished</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -538,7 +539,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">hyperpartitions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_hyperpartitions</span><span class="p">(</span><span class="n">datarun_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">hyperpartitions</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No incomplete hyperpartitions for datarun </span><span class="si">%d</span><span class="s1"> present in database.&#39;</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No incomplete hyperpartitions for datarun </span><span class="si">%d</span><span class="s1"> present in database.&#39;</span>
                            <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">True</span>
 
@@ -547,13 +548,13 @@
             <span class="c1"># is created, so this will count running, errored, and complete.</span>
             <span class="n">n_completed</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_classifiers</span><span class="p">(</span><span class="n">datarun_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">n_completed</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">budget</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Classifier budget has run out!&#39;</span><span class="p">)</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Classifier budget has run out!&#39;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">True</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">budget_type</span> <span class="o">==</span> <span class="s1">&#39;walltime&#39;</span><span class="p">:</span>
             <span class="n">deadline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">deadline</span>
             <span class="k">if</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">deadline</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Walltime budget has run out!&#39;</span><span class="p">)</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Walltime budget has run out!&#39;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">True</span>
 
         <span class="k">return</span> <span class="kc">False</span></div>
@@ -566,15 +567,15 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_datarun_finished</span><span class="p">():</span>
             <span class="c1"># marked the run as done successfully</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">mark_datarun_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Datarun </span><span class="si">%d</span><span class="s1"> has ended.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Datarun </span><span class="si">%d</span><span class="s1"> has ended.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Choosing hyperparameters...&#39;</span><span class="p">)</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Choosing hyperparameters...&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">hyperpartition_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">hyperpartition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_hyperpartition</span><span class="p">(</span><span class="n">hyperpartition_id</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">hyperpartition</span><span class="o">.</span><span class="n">datarun_id</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Hyperpartition </span><span class="si">%d</span><span class="s1"> is not a part of datarun </span><span class="si">%d</span><span class="s1">&#39;</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Hyperpartition </span><span class="si">%d</span><span class="s1"> is not a part of datarun </span><span class="si">%d</span><span class="s1">&#39;</span>
                                  <span class="o">%</span> <span class="p">(</span><span class="n">hyperpartition_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
                     <span class="k">return</span>
             <span class="k">else</span><span class="p">:</span>
@@ -585,12 +586,12 @@
             <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tune_hyperparameters</span><span class="p">(</span><span class="n">hyperpartition</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Error choosing hyperparameters: datarun=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="p">))</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Error choosing hyperparameters: datarun=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="p">))</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
             <span class="k">raise</span> <span class="n">ClassifierError</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No parameters chosen: hyperpartition </span><span class="si">%d</span><span class="s1"> is finished.&#39;</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No parameters chosen: hyperpartition </span><span class="si">%d</span><span class="s1"> is finished.&#39;</span>
                            <span class="o">%</span> <span class="n">hyperpartition</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
             <span class="k">return</span>
 
@@ -598,24 +599,24 @@
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
             <span class="n">param_info</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">param_info</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">param_info</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating classifier...&#39;</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating classifier...&#39;</span><span class="p">)</span>
         <span class="n">classifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">start_classifier</span><span class="p">(</span><span class="n">hyperpartition_id</span><span class="o">=</span><span class="n">hyperpartition</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
                                               <span class="n">datarun_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
                                               <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_ip</span><span class="p">,</span>
                                               <span class="n">hyperparameter_values</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Testing classifier...&#39;</span><span class="p">)</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Testing classifier...&#39;</span><span class="p">)</span>
             <span class="n">model</span><span class="p">,</span> <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_classifier</span><span class="p">(</span><span class="n">hyperpartition</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Saving classifier...&#39;</span><span class="p">)</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Saving classifier...&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">save_classifier</span><span class="p">(</span><span class="n">classifier</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">metrics</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Error testing classifier: datarun=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="p">))</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Error testing classifier: datarun=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datarun</span><span class="p">))</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">mark_classifier_errored</span><span class="p">(</span><span class="n">classifier</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">error_message</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">ClassifierError</span><span class="p">()</span></div></div>
 </pre></div>

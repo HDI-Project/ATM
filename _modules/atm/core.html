@@ -221,7 +221,6 @@
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">unicode_literals</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">object</span>
@@ -230,9 +229,8 @@
 
 <span class="kn">from</span> <span class="nn">atm.constants</span> <span class="k">import</span> <span class="n">TIME_FMT</span><span class="p">,</span> <span class="n">PartitionStatus</span>
 <span class="kn">from</span> <span class="nn">atm.database</span> <span class="k">import</span> <span class="n">Database</span>
-<span class="kn">from</span> <span class="nn">atm.encoder</span> <span class="k">import</span> <span class="n">MetaData</span>
 <span class="kn">from</span> <span class="nn">atm.method</span> <span class="k">import</span> <span class="n">Method</span>
-<span class="kn">from</span> <span class="nn">atm.utilities</span> <span class="k">import</span> <span class="n">download_data</span><span class="p">,</span> <span class="n">get_public_ip</span>
+<span class="kn">from</span> <span class="nn">atm.utilities</span> <span class="k">import</span> <span class="n">get_public_ip</span>
 <span class="kn">from</span> <span class="nn">atm.worker</span> <span class="k">import</span> <span class="n">ClassifierError</span><span class="p">,</span> <span class="n">Worker</span>
 
 <span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -321,30 +319,14 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a dataset and add it to the ModelHub database.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># download data to the local filesystem to extract metadata</span>
-        <span class="n">train_local</span><span class="p">,</span> <span class="n">test_local</span> <span class="o">=</span> <span class="n">download_data</span><span class="p">(</span><span class="n">dataset_conf</span><span class="o">.</span><span class="n">train_path</span><span class="p">,</span>
-                                                <span class="n">dataset_conf</span><span class="o">.</span><span class="n">test_path</span><span class="p">,</span>
-                                                <span class="bp">self</span><span class="o">.</span><span class="n">aws_conf</span><span class="p">)</span>
-
-        <span class="c1"># create the name of the dataset from the path to the data</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">train_local</span><span class="p">)</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_train.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-
-        <span class="c1"># process the data into the form ATM needs and save it to disk</span>
-        <span class="n">meta</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">(</span><span class="n">dataset_conf</span><span class="o">.</span><span class="n">class_column</span><span class="p">,</span> <span class="n">train_local</span><span class="p">,</span> <span class="n">test_local</span><span class="p">)</span>
-
-        <span class="c1"># enter dataset into database</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-                                         <span class="n">description</span><span class="o">=</span><span class="n">dataset_conf</span><span class="o">.</span><span class="n">data_description</span><span class="p">,</span>
-                                         <span class="n">train_path</span><span class="o">=</span><span class="n">dataset_conf</span><span class="o">.</span><span class="n">train_path</span><span class="p">,</span>
-                                         <span class="n">test_path</span><span class="o">=</span><span class="n">dataset_conf</span><span class="o">.</span><span class="n">test_path</span><span class="p">,</span>
-                                         <span class="n">class_column</span><span class="o">=</span><span class="n">dataset_conf</span><span class="o">.</span><span class="n">class_column</span><span class="p">,</span>
-                                         <span class="n">n_examples</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">n_examples</span><span class="p">,</span>
-                                         <span class="n">k_classes</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">k_classes</span><span class="p">,</span>
-                                         <span class="n">d_features</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">d_features</span><span class="p">,</span>
-                                         <span class="n">majority</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">majority</span><span class="p">,</span>
-                                         <span class="n">size_kb</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">dataset</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">dataset_conf</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">dataset_conf</span><span class="o">.</span><span class="n">data_description</span><span class="p">,</span>
+            <span class="n">train_path</span><span class="o">=</span><span class="n">dataset_conf</span><span class="o">.</span><span class="n">train_path</span><span class="p">,</span>
+            <span class="n">test_path</span><span class="o">=</span><span class="n">dataset_conf</span><span class="o">.</span><span class="n">test_path</span><span class="p">,</span>
+            <span class="n">class_column</span><span class="o">=</span><span class="n">dataset_conf</span><span class="o">.</span><span class="n">class_column</span><span class="p">,</span>
+            <span class="n">aws_conf</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aws_conf</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ATM.create_datarun"><a class="viewcode-back" href="../../api/atm.core.html#atm.core.ATM.create_datarun">[docs]</a>    <span class="k">def</span> <span class="nf">create_datarun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">run_conf</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

@@ -229,12 +229,11 @@
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="k">import</span> <span class="n">decomposition</span>
 <span class="kn">from</span> <span class="nn">sklearn.gaussian_process.kernels</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">RBF</span><span class="p">,</span> <span class="n">ConstantKernel</span><span class="p">,</span> <span class="n">ExpSineSquared</span><span class="p">,</span> <span class="n">Matern</span><span class="p">,</span> <span class="n">RationalQuadratic</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
 <span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="k">import</span> <span class="n">Pipeline</span>
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">MinMaxScaler</span><span class="p">,</span> <span class="n">StandardScaler</span>
 
 <span class="kn">from</span> <span class="nn">atm.constants</span> <span class="k">import</span> <span class="n">Metrics</span>
-<span class="kn">from</span> <span class="nn">atm.encoder</span> <span class="k">import</span> <span class="n">DataEncoder</span><span class="p">,</span> <span class="n">MetaData</span>
+<span class="kn">from</span> <span class="nn">atm.encoder</span> <span class="k">import</span> <span class="n">DataEncoder</span>
 <span class="kn">from</span> <span class="nn">atm.method</span> <span class="k">import</span> <span class="n">Method</span>
 <span class="kn">from</span> <span class="nn">atm.metrics</span> <span class="k">import</span> <span class="n">cross_validate_pipeline</span><span class="p">,</span> <span class="n">test_pipeline</span>
 
@@ -293,14 +292,6 @@
 
         <span class="c1"># persistent random state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mf">1e7</span><span class="p">)</span>
-
-<div class="viewcode-block" id="Model.load_data"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.classifier.Model.load_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">dropvals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">):</span>
-        <span class="c1"># load data as a Pandas dataframe</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">skipinitialspace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                           <span class="n">na_values</span><span class="o">=</span><span class="n">dropvals</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">)</span>
-
-        <span class="c1"># drop rows with any NA values</span>
-        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Model.make_pipeline"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.classifier.Model.make_pipeline">[docs]</a>    <span class="k">def</span> <span class="nf">make_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -388,13 +379,10 @@
 
         <span class="k">return</span> <span class="n">test_scores</span></div>
 
-<div class="viewcode-block" id="Model.train_test"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.classifier.Model.train_test">[docs]</a>    <span class="k">def</span> <span class="nf">train_test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_path</span><span class="p">,</span> <span class="n">test_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="c1"># load train and (maybe) test data</span>
-        <span class="n">metadata</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">(</span><span class="n">class_column</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">class_column</span><span class="p">,</span>
-                            <span class="n">train_path</span><span class="o">=</span><span class="n">train_path</span><span class="p">,</span>
-                            <span class="n">test_path</span><span class="o">=</span><span class="n">test_path</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">k_classes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_features</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">d_features</span>
+<div class="viewcode-block" id="Model.train_test"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.classifier.Model.train_test">[docs]</a>    <span class="k">def</span> <span class="nf">train_test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">k_classes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_features</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">d_features</span>
 
         <span class="c1"># if necessary, cast judgment metric into its binary/multiary equivalent</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
@@ -410,21 +398,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">judgment_metric</span> <span class="o">=</span> <span class="n">Metrics</span><span class="o">.</span><span class="n">ROC_AUC_MACRO</span>
 
         <span class="c1"># load training data</span>
-        <span class="n">train_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="n">train_path</span><span class="p">)</span>
-
-        <span class="c1"># if necessary, generate permanent train/test split</span>
-        <span class="k">if</span> <span class="n">test_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">test_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="n">test_path</span><span class="p">)</span>
-            <span class="n">all_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">all_data</span> <span class="o">=</span> <span class="n">train_data</span>
-            <span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span>
-                                                     <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">testing_ratio</span><span class="p">,</span>
-                                                     <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+        <span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">testing_ratio</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
 
         <span class="c1"># extract feature matrix and labels from raw data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">DataEncoder</span><span class="p">(</span><span class="n">class_column</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">class_column</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">all_data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span>
         <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span>
         <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
 

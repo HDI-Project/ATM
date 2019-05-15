@@ -214,7 +214,6 @@
 <span class="kn">from</span> <span class="nn">flask_restless_swagger</span> <span class="k">import</span> <span class="n">SwagAPIManager</span> <span class="k">as</span> <span class="n">APIManager</span>
 <span class="kn">from</span> <span class="nn">flask_sqlalchemy</span> <span class="k">import</span> <span class="n">SQLAlchemy</span>
 
-<span class="kn">from</span> <span class="nn">atm.api.preprocessors</span> <span class="k">import</span> <span class="n">DATASET_PREPROCESSORS</span>
 <span class="kn">from</span> <span class="nn">atm.api.utils</span> <span class="k">import</span> <span class="n">auto_abort</span><span class="p">,</span> <span class="n">make_absolute</span>
 <span class="kn">from</span> <span class="nn">atm.config</span> <span class="k">import</span> <span class="n">RunConfig</span>
 
@@ -249,7 +248,7 @@
 
     <span class="c1"># Create API endpoints, which will be available at /api/&lt;tablename&gt; by</span>
     <span class="c1"># default. Allowed HTTP methods can be specified as well.</span>
-    <span class="n">manager</span><span class="o">.</span><span class="n">create_api</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">],</span> <span class="n">preprocessors</span><span class="o">=</span><span class="n">DATASET_PREPROCESSORS</span><span class="p">)</span>
+    <span class="n">manager</span><span class="o">.</span><span class="n">create_api</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
     <span class="n">manager</span><span class="o">.</span><span class="n">create_api</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Datarun</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
     <span class="n">manager</span><span class="o">.</span><span class="n">create_api</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Hyperpartition</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
     <span class="n">manager</span><span class="o">.</span><span class="n">create_api</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Classifier</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>

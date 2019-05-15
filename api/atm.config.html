@@ -286,6 +286,11 @@ conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>var
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="atm.config.DatasetConfig.name">
+<code class="descname">name</code><em class="property"> = 'Given name for this dataset.'</em><a class="headerlink" href="#atm.config.DatasetConfig.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="atm.config.DatasetConfig.test_path">
 <code class="descname">test_path</code><em class="property"> = 'Path to raw test data (if applicable)'</em><a class="headerlink" href="#atm.config.DatasetConfig.test_path" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -360,7 +365,7 @@ conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>var
 
 <dl class="attribute">
 <dt id="atm.config.RunConfig.metric">
-<code class="descname">metric</code><em class="property"> = {'choices': ['roc_auc', 'roc_auc_micro', 'rank_accuracy', 'f1_micro', 'accuracy', 'roc_auc_macro', 'ap', 'cohen_kappa', 'f1', 'f1_macro', 'mcc'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
+<code class="descname">metric</code><em class="property"> = {'choices': ['roc_auc_macro', 'accuracy', 'rank_accuracy', 'mcc', 'f1', 'cohen_kappa', 'roc_auc', 'f1_micro', 'roc_auc_micro', 'ap', 'f1_macro'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">

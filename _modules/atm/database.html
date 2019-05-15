@@ -212,6 +212,7 @@
   <h1>Source code for atm.database</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
 
+<span class="kn">import</span> <span class="nn">hashlib</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
@@ -222,6 +223,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">pymysql</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
 <span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">Column</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">MetaData</span><span class="p">,</span> <span class="n">Numeric</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="n">and_</span><span class="p">,</span>
     <span class="n">create_engine</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">inspect</span><span class="p">)</span>
@@ -233,6 +235,7 @@
 <span class="kn">from</span> <span class="nn">atm.constants</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">BUDGET_TYPES</span><span class="p">,</span> <span class="n">CLASSIFIER_STATUS</span><span class="p">,</span> <span class="n">DATARUN_STATUS</span><span class="p">,</span> <span class="n">METRICS</span><span class="p">,</span> <span class="n">PARTITION_STATUS</span><span class="p">,</span> <span class="n">SCORE_TARGETS</span><span class="p">,</span>
     <span class="n">ClassifierStatus</span><span class="p">,</span> <span class="n">PartitionStatus</span><span class="p">,</span> <span class="n">RunStatus</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">atm.data</span> <span class="k">import</span> <span class="n">load_data</span>
 <span class="kn">from</span> <span class="nn">atm.utilities</span> <span class="k">import</span> <span class="n">base_64_to_object</span><span class="p">,</span> <span class="n">object_to_base_64</span>
 
 <span class="c1"># The maximum number of errors allowed in a single hyperpartition. If more than</span>
@@ -338,6 +341,70 @@
             <span class="n">d_features</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">majority</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Numeric</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">9</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">size_kb</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">aws_conf</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_path</span><span class="p">,</span> <span class="n">aws_conf</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_path</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.csv&#39;</span><span class="p">):</span>
+                        <span class="n">test_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;_test.csv&#39;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">test_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_test&#39;</span>
+
+                    <span class="n">test_data</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="n">test_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_path</span><span class="p">,</span> <span class="n">aws_conf</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">test_data</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">_add_extra_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aws_conf</span><span class="p">):</span>
+
+                <span class="n">data</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_path</span><span class="p">,</span> <span class="n">aws_conf</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_examples</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">n_examples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_classes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">k_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">class_column</span><span class="p">]))</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_features</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">total_features</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+                    <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;object&#39;</span><span class="p">:</span>
+                            <span class="n">total_features</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">column</span><span class="p">]))</span> <span class="o">-</span> <span class="mi">1</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">d_features</span> <span class="o">=</span> <span class="n">total_features</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">majority</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">counts</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">class_column</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">majority</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">counts</span><span class="p">))</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">counts</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_kb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">size_kb</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">nbytes</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span>
+
+            <span class="nd">@staticmethod</span>
+            <span class="k">def</span> <span class="nf">_make_name</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="n">md5</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">md5</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+            <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">class_column</span><span class="p">,</span> <span class="n">train_path</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">test_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aws_conf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_examples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">majority</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">k_classes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size_kb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">d_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_name</span><span class="p">(</span><span class="n">train_path</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">class_column</span> <span class="o">=</span> <span class="n">class_column</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">train_path</span> <span class="o">=</span> <span class="n">train_path</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">test_path</span> <span class="o">=</span> <span class="n">test_path</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">n_examples</span> <span class="o">=</span> <span class="n">n_examples</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">d_features</span> <span class="o">=</span> <span class="n">d_features</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">majority</span> <span class="o">=</span> <span class="n">majority</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">k_classes</span> <span class="o">=</span> <span class="n">k_classes</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">size_kb</span> <span class="o">=</span> <span class="n">size_kb</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">_add_extra_fields</span><span class="p">(</span><span class="n">aws_conf</span><span class="p">)</span>
 
             <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="n">base</span> <span class="o">=</span> <span class="s2">&quot;&lt;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">, </span><span class="si">%d</span><span class="s2"> classes, </span><span class="si">%d</span><span class="s2"> features, </span><span class="si">%d</span><span class="s2"> rows&gt;&quot;</span>

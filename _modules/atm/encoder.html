@@ -215,36 +215,7 @@
 <span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">object</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">LabelEncoder</span><span class="p">,</span> <span class="n">OneHotEncoder</span>
-
-
-<div class="viewcode-block" id="MetaData"><a class="viewcode-back" href="../../api/atm.encoder.html#atm.encoder.MetaData">[docs]</a><span class="k">class</span> <span class="nc">MetaData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">class_column</span><span class="p">,</span> <span class="n">train_path</span><span class="p">,</span> <span class="n">test_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compute a bunch of metadata about the dataset.</span>
-
-<span class="sd">        class_column: name of dataframe column containing labels</span>
-<span class="sd">        data_paths: paths to csvs with the same columns</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">train_path</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">test_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">test_path</span><span class="p">))</span>
-
-        <span class="c1"># compute the portion of labels that are the most common value</span>
-        <span class="n">counts</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">class_column</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
-        <span class="n">total_features</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;object&#39;</span><span class="p">:</span>
-                <span class="n">total_features</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="p">]))</span> <span class="o">-</span> <span class="mi">1</span>
-
-        <span class="n">majority_percentage</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">counts</span><span class="p">))</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">counts</span><span class="p">))</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_examples</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">d_features</span> <span class="o">=</span> <span class="n">total_features</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">k_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">class_column</span><span class="p">]))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">majority</span> <span class="o">=</span> <span class="n">majority_percentage</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">nbytes</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="DataEncoder"><a class="viewcode-back" href="../../api/atm.encoder.html#atm.encoder.DataEncoder">[docs]</a><span class="k">class</span> <span class="nc">DataEncoder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -292,7 +263,8 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_columns</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">feature_encoder</span> <span class="o">=</span> <span class="n">OneHotEncoder</span><span class="p">(</span>
                 <span class="n">categorical_features</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_columns</span><span class="p">,</span>
-                <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span>
+                <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">handle_unknown</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">feature_encoder</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 

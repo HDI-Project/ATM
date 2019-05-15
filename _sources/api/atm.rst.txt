@@ -24,6 +24,7 @@ Submodules
    atm.config
    atm.constants
    atm.core
+   atm.data
    atm.database
    atm.encoder
    atm.method

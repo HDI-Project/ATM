@@ -223,25 +223,6 @@ Decode base64-encoded string and then unpickle it.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="atm.utilities.download_data">
-<code class="descclassname">atm.utilities.</code><code class="descname">download_data</code><span class="sig-paren">(</span><em>train_path</em>, <em>test_path=None</em>, <em>aws_config=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#download_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.download_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download a set of train/test data from AWS (if necessary) and return the
-path to the local data.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="atm.utilities.download_file_http">
-<code class="descclassname">atm.utilities.</code><code class="descname">download_file_http</code><span class="sig-paren">(</span><em>url</em>, <em>local_folder='/home/travis/build/HDI-Project/ATM/atm/data/downloads'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#download_file_http"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.download_file_http" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download a file from a public URL and save it locally.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="atm.utilities.download_file_s3">
-<code class="descclassname">atm.utilities.</code><code class="descname">download_file_s3</code><span class="sig-paren">(</span><em>aws_path</em>, <em>aws_config</em>, <em>local_folder='/home/travis/build/HDI-Project/ATM/atm/data/downloads'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#download_file_s3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.download_file_s3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download a file from an S3 bucket and save it in the local folder.</p>
-</dd></dl>
-
-<dl class="function">
 <dt id="atm.utilities.ensure_directory">
 <code class="descclassname">atm.utilities.</code><code class="descname">ensure_directory</code><span class="sig-paren">(</span><em>directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#ensure_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.ensure_directory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create directory if it doesn’t exist.</p>
@@ -262,13 +243,6 @@ path to the local data.</p>
 <dd class="field-even"><p>instance of specific class with the args that accepts.</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="atm.utilities.get_local_data_path">
-<code class="descclassname">atm.utilities.</code><code class="descname">get_local_data_path</code><span class="sig-paren">(</span><em>data_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/utilities.html#get_local_data_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.utilities.get_local_data_path" title="Permalink to this definition">¶</a></dt>
-<dd><p>given a data path of the form “s3://…” or “http://…”, return the local
-path where the file should be stored once it’s downloaded.</p>
 </dd></dl>
 
 <dl class="function">

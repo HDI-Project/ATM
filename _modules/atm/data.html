@@ -1,0 +1,353 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>atm.data &mdash; ATM 0.1.3-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> ATM
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">ATM: Scalable model selection and tuning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#requirements">0. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-atm">1. Install ATM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-using-pip">Install using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-from-source">Install from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-a-database-optional">2. Install a database (Optional)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#start-using-atm">3. Start using ATM!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#create-a-datarun">Create a datarun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#execute-the-datarun">Execute the datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../database.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../database.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">REST API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#create-a-dataset">2. Create a Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#browse-the-results">4. Browse the results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-a-single-object-by-id">Get a single object by id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-all-the-children-objects">Get all the children objects</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#additional-information">Additional information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#restart-the-atm-process">Restart the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#stop-the-atm-process">Stop the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to ATM and BTB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#style">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#docs">Docs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../add_method.html">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../add_method.html#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../add_method.html#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>atm.data</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for atm.data</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">boto3</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">botocore.exceptions</span> <span class="k">import</span> <span class="n">ClientError</span>
+
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;atm&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="download_from_s3"><a class="viewcode-back" href="../../api/atm.data.html#atm.data.download_from_s3">[docs]</a><span class="k">def</span> <span class="nf">download_from_s3</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">local_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+    <span class="n">aws_conf</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;aws_config&#39;</span><span class="p">)</span>
+
+    <span class="n">aws_access_key</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">aws_secret_key</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">aws_conf</span><span class="p">:</span>
+        <span class="n">aws_access_key</span> <span class="o">=</span> <span class="n">aws_conf</span><span class="o">.</span><span class="n">access_key</span>
+        <span class="n">aws_secret_key</span> <span class="o">=</span> <span class="n">aws_conf</span><span class="o">.</span><span class="n">secret_key</span>
+
+    <span class="n">client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span>
+        <span class="s1">&#39;s3&#39;</span><span class="p">,</span>
+        <span class="n">aws_access_key_id</span><span class="o">=</span><span class="n">aws_access_key</span><span class="p">,</span>
+        <span class="n">aws_secret_access_key</span><span class="o">=</span><span class="n">aws_secret_key</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">bucket</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">file_to_download</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;s3://</span><span class="si">{}</span><span class="s1">/&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bucket</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Downloading </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="n">file_to_download</span><span class="p">,</span> <span class="n">local_path</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">local_path</span>
+
+    <span class="k">except</span> <span class="n">ClientError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;An error occurred trying to download from AWS3.&#39;</span>
+                     <span class="s1">&#39;The following error has been returned: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="download_from_url"><a class="viewcode-back" href="../../api/atm.data.html#atm.data.download_from_url">[docs]</a><span class="k">def</span> <span class="nf">download_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">local_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;File saved at </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">local_path</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">local_path</span></div>
+
+
+<span class="n">DOWNLOADERS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;s3&#39;</span><span class="p">:</span> <span class="n">download_from_s3</span><span class="p">,</span>
+    <span class="s1">&#39;http&#39;</span><span class="p">:</span> <span class="n">download_from_url</span><span class="p">,</span>
+    <span class="s1">&#39;https&#39;</span><span class="p">:</span> <span class="n">download_from_url</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="download"><a class="viewcode-back" href="../../api/atm.data.html#atm.data.download">[docs]</a><span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">local_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">protocol</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">downloader</span> <span class="o">=</span> <span class="n">DOWNLOADERS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">protocol</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">downloader</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown protocol: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">protocol</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">downloader</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">local_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_local_path"><a class="viewcode-back" href="../../api/atm.data.html#atm.data.get_local_path">[docs]</a><span class="k">def</span> <span class="nf">get_local_path</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">aws_config</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">path</span>
+
+    <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="n">data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;csv&#39;</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.csv&#39;</span>
+
+    <span class="n">local_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">local_path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">local_path</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">local_path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">data_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span>
+
+        <span class="n">download</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">local_path</span><span class="p">,</span> <span class="n">aws_config</span><span class="o">=</span><span class="n">aws_config</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">local_path</span></div>
+
+
+<div class="viewcode-block" id="load_data"><a class="viewcode-back" href="../../api/atm.data.html#atm.data.load_data">[docs]</a><span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">aws_config</span><span class="p">):</span>
+    <span class="n">local_path</span> <span class="o">=</span> <span class="n">get_local_path</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">aws_config</span><span class="p">)</span>
+
+    <span class="c1"># load data as a Pandas dataframe</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

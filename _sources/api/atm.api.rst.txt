@@ -11,6 +11,5 @@ Submodules
 
 .. toctree::
 
-   atm.api.preprocessors
    atm.api.utils
 
