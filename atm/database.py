@@ -110,6 +110,7 @@ class Database(object):
         """
         metadata = MetaData(bind=self.engine)
         Base = declarative_base(metadata=metadata)
+        db = self
 
         class Dataset(Base):
             __tablename__ = 'datasets'
@@ -236,6 +237,33 @@ class Database(object):
                 base = "<ID = %d, dataset ID = %s, strategy = %s, budget = %s (%s), status: %s>"
                 return base % (self.id, self.dataset_id, self.description,
                                self.budget_type, self.budget, self.status)
+
+            def get_scores(self):
+                classifiers = db.get_classifiers(datarun_id=self.id)
+                scores = [
+                    {
+                        key: value
+                        for key, value in vars(classifier).items()
+                        if not key.startswith('_')
+                    }
+                    for classifier in classifiers
+                ]
+
+                scores = pd.DataFrame(scores)
+                del scores['hyperparameter_values']
+
+                return scores
+
+            def get_best_classifier(self):
+                return db.get_best_classifier(self.score_target, datarun_id=self.id)
+
+            def export_best_classifier(self, path):
+                classifier = self.get_best_classifier()
+                model = db.load_model(classifier.id)
+                with open(path, 'wb') as pickle_file:
+                    pickle.dump(model, pickle_file)
+
+                print("Classifier {} saved as {}".format(classifier.id, path))
 
         Dataset.dataruns = relationship('Datarun', order_by='Datarun.id',
                                         back_populates='dataset')
