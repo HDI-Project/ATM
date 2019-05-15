@@ -16,7 +16,7 @@ from atm.config import DatasetConfig, LogConfig, RunConfig, SQLConfig
 from atm.constants import METRICS_BINARY, TIME_FMT
 from atm.core import ATM
 from atm.database import Database, db_session
-from atm.utilities import download_data, load_metrics, load_model
+from atm.utilities import load_metrics, load_model
 from atm.worker import ClassifierError, Worker
 
 DB_CACHE_PATH = os.path.join(PROJECT_ROOT, 'data/modelhub/test/')
@@ -85,11 +85,10 @@ def hyperpartition(db):
 
 @pytest.fixture
 def model(dataset):
-    train_path, _ = download_data(dataset.train_path)
     model = Model(method='dt', params=DT_PARAMS,
                   judgment_metric='roc_auc',
                   class_column=dataset.class_column)
-    model.train_test(train_path=train_path)
+    model.train_test(dataset)
     return model
 
 

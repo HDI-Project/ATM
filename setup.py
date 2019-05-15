@@ -11,7 +11,7 @@ with open('HISTORY.md') as history_file:
 
 install_requires = [
     'baytune==0.2.5',
-    'boto>=2.48.0',
+    'boto3>=1.9.146',
     'future>=0.16.0',
     'joblib>=0.11',
     'pymysql>=0.9.3',

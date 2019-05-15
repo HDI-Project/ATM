@@ -131,6 +131,7 @@ class DatasetConfig(Config):
     """ Stores configuration of a Dataset """
     _CONFIG = 'run'
 
+    name = 'Given name for this dataset.'
     train_path = ('Path to raw training data', os.path.join(DATA_TEST_PATH, 'pollution_1.csv'))
     test_path = 'Path to raw test data (if applicable)'
     data_description = 'Description of dataset'

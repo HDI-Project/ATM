@@ -9,7 +9,6 @@ executing and orchestrating the main ATM functionalities.
 from __future__ import absolute_import, division, unicode_literals
 
 import logging
-import os
 import random
 import time
 from builtins import object
@@ -18,9 +17,8 @@ from operator import attrgetter
 
 from atm.constants import TIME_FMT, PartitionStatus
 from atm.database import Database
-from atm.encoder import MetaData
 from atm.method import Method
-from atm.utilities import download_data, get_public_ip
+from atm.utilities import get_public_ip
 from atm.worker import ClassifierError, Worker
 
 LOGGER = logging.getLogger(__name__)
@@ -109,30 +107,14 @@ class ATM(object):
         """
         Create a dataset and add it to the ModelHub database.
         """
-        # download data to the local filesystem to extract metadata
-        train_local, test_local = download_data(dataset_conf.train_path,
-                                                dataset_conf.test_path,
-                                                self.aws_conf)
-
-        # create the name of the dataset from the path to the data
-        name = os.path.basename(train_local)
-        name = name.replace("_train.csv", "").replace(".csv", "")
-
-        # process the data into the form ATM needs and save it to disk
-        meta = MetaData(dataset_conf.class_column, train_local, test_local)
-
-        # enter dataset into database
-        dataset = self.db.create_dataset(name=name,
-                                         description=dataset_conf.data_description,
-                                         train_path=dataset_conf.train_path,
-                                         test_path=dataset_conf.test_path,
-                                         class_column=dataset_conf.class_column,
-                                         n_examples=meta.n_examples,
-                                         k_classes=meta.k_classes,
-                                         d_features=meta.d_features,
-                                         majority=meta.majority,
-                                         size_kb=meta.size)
-        return dataset
+        return self.db.create_dataset(
+            name=dataset_conf.name,
+            description=dataset_conf.data_description,
+            train_path=dataset_conf.train_path,
+            test_path=dataset_conf.test_path,
+            class_column=dataset_conf.class_column,
+            aws_conf=self.aws_conf
+        )
 
     def create_datarun(self, dataset, run_conf):
         """

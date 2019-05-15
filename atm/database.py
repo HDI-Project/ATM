@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
+import hashlib
 import json
 import os
 import pickle
@@ -10,6 +11,7 @@ from operator import attrgetter
 import numpy as np
 import pandas as pd
 import pymysql
+from sklearn.model_selection import train_test_split
 from sqlalchemy import (
     Column, DateTime, Enum, ForeignKey, Integer, MetaData, Numeric, String, Text, and_,
     create_engine, func, inspect)
@@ -21,6 +23,7 @@ from sqlalchemy.orm.properties import ColumnProperty
 from atm.constants import (
     BUDGET_TYPES, CLASSIFIER_STATUS, DATARUN_STATUS, METRICS, PARTITION_STATUS, SCORE_TARGETS,
     ClassifierStatus, PartitionStatus, RunStatus)
+from atm.data import load_data
 from atm.utilities import base_64_to_object, object_to_base_64
 
 # The maximum number of errors allowed in a single hyperpartition. If more than
@@ -126,6 +129,70 @@ class Database(object):
             d_features = Column(Integer, nullable=False)
             majority = Column(Numeric(precision=10, scale=9), nullable=False)
             size_kb = Column(Integer, nullable=False)
+
+            def load(self, test_size=0.3, random_state=0, aws_conf=None):
+                data = load_data(self.name, self.train_path, aws_conf)
+
+                if self.test_path:
+                    if self.name.endswith('.csv'):
+                        test_name = self.name.replace('.csv', '_test.csv')
+                    else:
+                        test_name = self.name + '_test'
+
+                    test_data = load_data(test_name, self.test_path, aws_conf)
+                    return data, test_data
+
+                else:
+                    return train_test_split(data, test_size=test_size, random_state=random_state)
+
+            def _add_extra_fields(self, aws_conf):
+
+                data = load_data(self.name, self.train_path, aws_conf)
+
+                if self.n_examples is None:
+                    self.n_examples = len(data)
+
+                if self.k_classes is None:
+                    self.k_classes = len(np.unique(data[self.class_column]))
+
+                if self.d_features is None:
+                    total_features = data.shape[1] - 1
+                    for column in data.columns:
+                        if data[column].dtype == 'object':
+                            total_features += len(np.unique(data[column])) - 1
+
+                    self.d_features = total_features
+
+                if self.majority is None:
+                    counts = data[self.class_column].value_counts()
+                    self.majority = float(max(counts)) / float(sum(counts))
+
+                if self.size_kb is None:
+                    self.size_kb = int(np.array(data).nbytes / 1000)
+
+            @staticmethod
+            def _make_name(path):
+                md5 = hashlib.md5(path.encode('utf-8'))
+                return md5.hexdigest()
+
+            def __init__(self, class_column, train_path, id=None, name=None, description=None,
+                         test_path=None, aws_conf=None, n_examples=None, majority=None,
+                         k_classes=None, size_kb=None, d_features=None):
+
+                self.id = id
+                self.name = name or self._make_name(train_path)
+                self.class_column = class_column
+                self.train_path = train_path
+                self.test_path = test_path
+                self.description = description or self.name
+
+                self.n_examples = n_examples
+                self.d_features = d_features
+                self.majority = majority
+                self.k_classes = k_classes
+                self.size_kb = size_kb
+
+                self._add_extra_fields(aws_conf)
 
             def __repr__(self):
                 base = "<%s: %s, %d classes, %d features, %d rows>"
