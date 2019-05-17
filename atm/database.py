@@ -6,8 +6,10 @@ import os
 import pickle
 from builtins import object
 from datetime import datetime
+from io import BytesIO
 from operator import attrgetter
 
+import boto3
 import numpy as np
 import pandas as pd
 import pymysql
@@ -239,31 +241,55 @@ class Database(object):
                                self.budget_type, self.budget, self.status)
 
             def get_scores(self):
+                columns = [
+                    'id',
+                    'cv_judgment_metric',
+                    'cv_judgment_metric_stdev',
+                    'test_judgment_metric',
+                ]
+
                 classifiers = db.get_classifiers(datarun_id=self.id)
                 scores = [
                     {
                         key: value
                         for key, value in vars(classifier).items()
-                        if not key.startswith('_')
+                        if key in columns
                     }
                     for classifier in classifiers
                 ]
 
                 scores = pd.DataFrame(scores)
-                del scores['hyperparameter_values']
+                scores.sort_values(by='cv_judgment_metric', ascending=False, inplace=True)
+                scores['rank'] = scores['cv_judgment_metric'].rank(ascending=0)
 
-                return scores
+                return scores.reset_index(drop=True)
 
             def get_best_classifier(self):
                 return db.get_best_classifier(self.score_target, datarun_id=self.id)
 
             def export_best_classifier(self, path):
                 classifier = self.get_best_classifier()
-                model = db.load_model(classifier.id)
+                model = classifier.load_model()
                 with open(path, 'wb') as pickle_file:
                     pickle.dump(model, pickle_file)
 
                 print("Classifier {} saved as {}".format(classifier.id, path))
+
+            def describe(self):
+                dataset = db.get_dataset(self.dataset_id)
+
+                elapsed = self.end_time - self.start_time if self.end_time else 'Not finished yet.'
+
+                to_print = [
+                    'Datarun {} summary:'.format(self.id),
+                    "\tDataset: '{}'".format(dataset.train_path),
+                    "\tColumn Name: '{}'".format(dataset.class_column),
+                    "\tJudgment Metric: '{}'".format(self.metric),
+                    '\tClassifiers Tested: {}'.format(len(db.get_classifiers(datarun_id=self.id))),
+                    '\tElapsed Time: {}'.format(elapsed),
+                ]
+
+                print('\n'.join(to_print))
 
         Dataset.dataruns = relationship('Datarun', order_by='Datarun.id',
                                         back_populates='dataset')
@@ -384,13 +410,71 @@ class Database(object):
                 return (self.cv_judgment_metric - 2 * self.cv_judgment_metric_stdev)
 
             def __repr__(self):
-                params = ', '.join(['%s: %s' % i for i in
-                                    list(self.hyperparameter_values.items())])
-                return "<id=%d, params=(%s)>" % (self.id, params)
+
+                params = '\n'.join(
+                    [
+                        '\t{}: {}'.format(name, value)
+                        for name, value in self.hyperparameter_values.items()
+                    ]
+                )
+
+                to_print = [
+                    'Classifier id: {}'.format(self.id),
+                    'Classifier type: {}'.format(
+                        db.get_hyperpartition(self.hyperpartition_id).method),
+                    'Params chosen: \n{}'.format(params),
+                    'Cross Validation Score: {:.3f} +- {:.3f}'.format(
+                        self.cv_judgment_metric, self.cv_judgment_metric_stdev),
+                    'Test Score: {:.3f}'.format(self.test_judgment_metric),
+                ]
+
+                return '\n'.join(to_print)
+
+            def load_s3_data(self, s3_url, aws_conf=None):
+                """Returns raw data from S3"""
+                aws_access_key = None
+                aws_secret_key = None
+
+                if aws_conf:
+                    aws_access_key = aws_conf.access_key
+                    aws_secret_key = aws_conf.secret_key
+
+                client = boto3.client(
+                    's3',
+                    aws_access_key_id=aws_access_key,
+                    aws_secret_access_key=aws_secret_key,
+                )
+
+                bucket = s3_url.split('/')[2]
+                path_to_read = s3_url.replace('s3://{}/'.format(bucket), '')
+
+                with BytesIO() as data:
+                    client.download_fileobj(bucket, path_to_read, data)
+                    data.seek(0)
+                    return data
+
+            def load_model(self, aws_conf=None):
+                """Return the model's insntance."""
+                if self.model_location.startswith('s3'):
+                    return pickle.load(self.load_s3_data(self.model_location, aws_conf))
+
+                else:
+                    with open(self.model_location, 'rb') as f:
+                        return pickle.load(f)
+
+            def load_metrics(self, aws_conf=None):
+                """Return the metrics"""
+                if self.metrics_location.startswith('s3'):
+                    return json.load(self.load_s3_data(self.metrics_location, aws_conf))
+
+                else:
+                    with open(self.metrics_location, 'rb') as f:
+                        return json.load(f)
 
         Datarun.classifiers = relationship('Classifier',
                                            order_by='Classifier.id',
                                            back_populates='datarun')
+
         Hyperpartition.classifiers = relationship('Classifier',
                                                   order_by='Classifier.id',
                                                   back_populates='hyperpartition')
