@@ -60,7 +60,7 @@ class ATM:
                 self.log_conf = LogConfig(locals())
 
     def add_dataset(self, train_path=None, test_path=None, name=None,
-                    description=None, column_name=None, dataset_conf=None):
+                    description=None, class_column=None, dataset_conf=None):
 
         if dataset_conf:
             return self.db.create_dataset(**dataset_conf.to_dict())
@@ -71,7 +71,7 @@ class ATM:
                 description=description,
                 train_path=train_path,
                 test_path=test_path,
-                class_column=column_name,
+                class_column=class_column,
                 aws_conf=self.aws_conf
             )
 

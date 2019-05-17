@@ -66,13 +66,13 @@ def test_create_dataset(db):
         'name': 'pollution_test',
         'train_path': train_url,
         'test_path': test_url,
-        'data_description': 'test',
+        'description': 'test',
         'class_column': 'class'
     })
 
-    atm = ATM(sql_conf, None, None)
+    atm = ATM(sql_conf=sql_conf)
 
-    dataset = atm.create_dataset(dataset_conf)
+    dataset = atm.add_dataset(**dataset_conf.to_dict())
     dataset = db.get_dataset(dataset.id)
 
     train, test = dataset.load()  # This will create the test_path_local
@@ -102,7 +102,7 @@ def test_enter_data_by_methods(dataset):
     db = Database(**sql_conf.to_dict())
     run_conf = RunConfig({'dataset_id': dataset.id})
 
-    atm = ATM(sql_conf, None, None)
+    atm = ATM(sql_conf=sql_conf)
 
     for method, n_parts in METHOD_HYPERPARTS.items():
         run_conf.methods = [method]
@@ -119,7 +119,7 @@ def test_enter_data_all(dataset):
     db = Database(**sql_conf.to_dict())
     run_conf = RunConfig({'dataset_id': dataset.id, 'methods': METHOD_HYPERPARTS.keys()})
 
-    atm = ATM(sql_conf, None, None)
+    atm = ATM(sql_conf=sql_conf)
 
     run_id = atm.enter_data(None, run_conf)
 
