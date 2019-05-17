@@ -23,7 +23,8 @@ def _get_atm(args):
     sql_conf = SQLConfig(args)
     aws_conf = AWSConfig(args)
     log_conf = LogConfig(args)
-    return ATM(sql_conf, aws_conf, log_conf)
+
+    return ATM(sql_conf=sql_conf, aws_conf=aws_conf, log_conf=log_conf)
 
 
 def _work(args, wait=False):

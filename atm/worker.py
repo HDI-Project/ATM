@@ -254,7 +254,7 @@ class Worker(object):
             # if necessary, save model and metrics to Amazon S3 bucket
             if self.cloud_mode:
                 try:
-                    self.save_classifier_cloud(model_path, metric_path)
+                    model_path, metric_path = self.save_classifier_cloud(model_path, metric_path)
 
                 except Exception:
                     msg = traceback.format_exc()
@@ -298,7 +298,7 @@ class Worker(object):
             aws_secret_access_key=aws_secret_key,
         )
 
-        if self.aws_config.aws_folder:
+        if self.aws_config.s3_folder:
             aws_model_path = os.path.join(self.aws_config.aws_folder, local_model_path)
             aws_metric_path = os.path.join(self.aws_config.aws_folder, local_metric_path)
 
@@ -306,11 +306,11 @@ class Worker(object):
             aws_model_path = local_model_path
             aws_metric_path = local_metric_path
 
-        client.upload_file(aws_model_path, self.aws_config.bucket, aws_model_path)
+        client.upload_file(aws_model_path, self.aws_config.s3_bucket, aws_model_path)
         LOGGER.info('Uploading model at %s to S3 bucket %s',
                     self.aws_config.s3_bucket, local_model_path)
 
-        client.upload_file(aws_metric_path, self.aws_config.bucket, aws_metric_path)
+        client.upload_file(aws_metric_path, self.aws_config.s3_bucket, aws_metric_path)
         LOGGER.info('Uploading metrics at %s to S3 bucket %s',
                     self.aws_config.s3_bucket, local_metric_path)
 
@@ -319,6 +319,11 @@ class Worker(object):
                         local_model_path, local_metric_path)
             os.remove(local_model_path)
             os.remove(local_metric_path)
+
+        return (
+            's3://{}/{}'.format(self.aws_config.s3_bucket, aws_model_path),
+            's3://{}/{}'.format(self.aws_config.s3_bucket, aws_metric_path)
+        )
 
     def is_datarun_finished(self):
         """

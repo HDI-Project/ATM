@@ -134,7 +134,7 @@ class DatasetConfig(Config):
     name = 'Given name for this dataset.'
     train_path = ('Path to raw training data', os.path.join(DATA_TEST_PATH, 'pollution_1.csv'))
     test_path = 'Path to raw test data (if applicable)'
-    data_description = 'Description of dataset'
+    description = 'Description of dataset'
     class_column = ('Name of the class column in the input data', 'class')
 
 
