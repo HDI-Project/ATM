@@ -141,7 +141,7 @@ def test_run_per_partition(dataset):
         }
     )
 
-    atm = ATM(sql_conf, None, None)
+    atm = ATM(sql_conf=sql_conf)
 
     run_ids = atm.enter_data(None, run_conf)
 
