@@ -15,7 +15,7 @@ from operator import attrgetter
 import yaml
 
 from atm.config import AWSConfig, LogConfig, SQLConfig
-from atm.constants import PartitionStatus
+from atm.constants import TIME_FMT, PartitionStatus
 from atm.database import Database
 from atm.method import Method
 from atm.utilities import get_public_ip
@@ -81,6 +81,13 @@ class ATM:
                     selector='uniform', tuner='uniform', deadline=None):
 
         dataruns = list()
+
+        if deadline:
+            deadline = datetime.strptime(deadline, TIME_FMT)
+            budget_type = 'walltime'
+
+        elif budget_type == 'walltime':
+            deadline = datetime.now() + timedelta(minutes=budget)
 
         run_description = '___'.join([tuner, selector])
         target = score_target + '_judgment_metric'

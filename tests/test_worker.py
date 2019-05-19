@@ -115,8 +115,8 @@ def get_new_worker(**kwargs):
     db = Database(**sql_conf.to_dict())
     atm = ATM(sql_conf=sql_conf)
 
-    run_id = atm.enter_data(dataset_conf, run_conf)
-    datarun = db.get_datarun(run_id.id)
+    datarun = atm.enter_data(dataset_conf, run_conf)
+    # datarun = db.get_datarun(run_id.id)
 
     return Worker(db, datarun)
 
