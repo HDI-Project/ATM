@@ -1,5 +1,7 @@
+import glob
 import logging
 import os
+import shutil
 
 import boto3
 import pandas as pd
@@ -7,6 +9,34 @@ import requests
 from botocore.exceptions import ClientError
 
 LOGGER = logging.getLogger('atm')
+
+
+def copy_files(pattern, source, target=None):
+    if isinstance(source, (list, tuple)):
+        source = os.path.join(*source)
+
+    if target is None:
+        target = source
+
+    source_dir = os.path.join(os.path.dirname(__file__), source)
+    target_dir = os.path.join(os.getcwd(), target)
+
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
+
+    datasets = dict()
+
+    for source_file in glob.glob(os.path.join(source_dir, pattern)):
+        file_name = os.path.basename(source_file)
+        target_file = os.path.join(target_dir, file_name)
+        print('Generating file {}'.format(target_file))
+        shutil.copy(source_file, target_file)
+        datasets[file_name] = target_file
+
+    return datasets
+
+def get_demos(args=None):
+    return copy_files('*.csv', ('data', 'test'), 'demos')
 
 
 def download_from_s3(path, local_path, **kwargs):

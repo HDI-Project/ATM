@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import glob
 import logging
 import multiprocessing
 import os
-import shutil
 import time
 
 import psutil
@@ -15,6 +13,7 @@ from lockfile.pidlockfile import PIDLockFile
 from atm.api import create_app
 from atm.config import AWSConfig, DatasetConfig, LogConfig, RunConfig, SQLConfig
 from atm.core import ATM
+from atm.data import copy_files, get_demos
 
 LOGGER = logging.getLogger(__name__)
 
@@ -198,31 +197,12 @@ def _enter_data(args):
     atm.enter_data(dataset_conf, run_conf)
 
 
-def _copy_files(pattern, source, target=None):
-    if isinstance(source, (list, tuple)):
-        source = os.path.join(*source)
-
-    if target is None:
-        target = source
-
-    source_dir = os.path.join(os.path.dirname(__file__), source)
-    target_dir = os.path.join(os.getcwd(), target)
-
-    if not os.path.exists(target_dir):
-        os.makedirs(target_dir)
-
-    for source_file in glob.glob(os.path.join(source_dir, pattern)):
-        target_file = os.path.join(target_dir, os.path.basename(source_file))
-        print('Generating file {}'.format(target_file))
-        shutil.copy(source_file, target_file)
-
-
 def _make_config(args):
-    _copy_files('*.yaml', ('config', 'templates'))
+    copy_files('*.yaml', ('config', 'templates'))
 
 
 def _get_demos(args):
-    _copy_files('*.csv', ('data', 'test'), 'demos')
+    get_demos(args)
 
 
 def _get_parser():
