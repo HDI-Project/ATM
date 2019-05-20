@@ -9,13 +9,14 @@ executing and orchestrating the main ATM functionalities.
 import logging
 import random
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from operator import attrgetter
 
 import yaml
+from tqdm import tqdm
 
 from atm.config import AWSConfig, LogConfig, SQLConfig
-from atm.constants import TIME_FMT, PartitionStatus
+from atm.constants import TIME_FMT, ClassifierStatus, PartitionStatus, RunStatus
 from atm.database import Database
 from atm.method import Method
 from atm.utilities import get_public_ip
@@ -229,53 +230,8 @@ class ATM:
 
         return dataruns
 
-    def run(self, train_path=None, test_path=None, name=None, description=None,
-            column_name='class', budget=100, budget_type='classifier', gridding=0, k_window=3,
-            metric='f1', methods=['logreg', 'dt', 'knn'], r_minimum=2, run_per_partition=False,
-            score_target='cv', selector='uniform', tuner='uniform', deadline=None, priority=1,
-            save_files=False, choose_randomly=True, cloud_mode=False, total_time=None,
-            wait=True, dataset_conf=None, run_conf=None):
-        """Returns Datarun."""
-
-        if dataset_conf:
-            dataset = self.add_dataset(**dataset_conf.to_dict())
-
-        else:
-            dataset = self.add_dataset(train_path, test_path, name, description, column_name)
-
-        if run_conf:
-            datarun = self.add_datarun(**run_conf.to_dict())
-
-        else:
-            datarun = self.add_datarun(
-                dataset.id,
-                budget,
-                budget_type,
-                gridding,
-                k_window,
-                metric,
-                methods,
-                r_minimum,
-                run_per_partition,
-                score_target,
-                priority,
-                selector,
-                tuner,
-                deadline
-            )
-
-        if run_per_partition:
-            datarun_ids = [_datarun.id for _datarun in datarun]
-
-        else:
-            datarun_ids = [datarun.id]
-
-        self.work(datarun_ids, save_files, choose_randomly, cloud_mode, total_time, False)
-
-        return datarun
-
     def work(self, datarun_ids=None, save_files=False, choose_randomly=True,
-             cloud_mode=False, total_time=None, wait=True):
+             cloud_mode=False, total_time=None, wait=True, show_tqdm=False):
         """
         Check the ModelHub database for unfinished dataruns, and spawn workers to
         work on them as they are added. This process will continue to run until it
@@ -331,7 +287,57 @@ class ATM:
                             cloud_mode=cloud_mode, aws_config=self.aws_conf,
                             log_config=self.log_conf, public_ip=public_ip)
             try:
-                worker.run_classifier()
+                if run.budget_type == 'classifier':
+                    completed = len(
+                        self.db.get_classifiers(
+                            datarun_id=run.id,
+                            status=ClassifierStatus.COMPLETE))
+                    pbar = tqdm(
+                        total=run.budget,
+                        ascii=True,
+                        initial=completed,
+                        disable=not show_tqdm)
+                    while run.status != RunStatus.COMPLETE:
+                        worker.run_classifier()
+                        completed = len(
+                            self.db.get_classifiers(
+                                datarun_id=run.id,
+                                status=ClassifierStatus.COMPLETE))
+
+                        pbar.update(completed - pbar.last_print_n)
+
+                        run = self.db.get_datarun(run.id)
+
+                    pbar.close()
+
+                elif run.budget_type == 'walltime':
+                    completed = len(
+                        self.db.get_classifiers(
+                            datarun_id=run.id,
+                            status=ClassifierStatus.COMPLETE)
+                    )
+
+                    pbar = tqdm(
+                        disable=not show_tqdm,
+                        ascii=True,
+                        initial=completed,
+                        unit=' Classifiers'
+                    )
+
+                    while run.status != RunStatus.COMPLETE:
+                        worker.run_classifier()
+
+                        completed = len(
+                            self.db.get_classifiers(
+                                datarun_id=run.id,
+                                status=ClassifierStatus.COMPLETE)
+                        )
+
+                        pbar.update(completed - pbar.last_print_n)
+
+                        run = self.db.get_datarun(run.id)
+
+                    pbar.close()
 
             except ClassifierError:
                 # the exception has already been handled; just wait a sec so we
@@ -343,6 +349,59 @@ class ATM:
             if total_time is not None and elapsed_time >= total_time:
                 LOGGER.info('Total run time for worker exceeded; exiting.')
                 break
+
+    def run(self, train_path=None, test_path=None, name=None, description=None,
+            column_name='class', budget=100, budget_type='classifier', gridding=0, k_window=3,
+            metric='f1', methods=['logreg', 'dt', 'knn'], r_minimum=2, run_per_partition=False,
+            score_target='cv', selector='uniform', tuner='uniform', deadline=None, priority=1,
+            save_files=False, choose_randomly=True, cloud_mode=False, total_time=None,
+            wait=True, dataset_conf=None, run_conf=None, verbose=True):
+        """Returns Datarun."""
+
+        if dataset_conf:
+            dataset = self.add_dataset(**dataset_conf.to_dict())
+
+        else:
+            dataset = self.add_dataset(train_path, test_path, name, description, column_name)
+
+        if run_conf:
+            datarun = self.add_datarun(**run_conf.to_dict())
+
+        else:
+            datarun = self.add_datarun(
+                dataset.id,
+                budget,
+                budget_type,
+                gridding,
+                k_window,
+                metric,
+                methods,
+                r_minimum,
+                run_per_partition,
+                score_target,
+                priority,
+                selector,
+                tuner,
+                deadline
+            )
+
+        if run_per_partition:
+            datarun_ids = [_datarun.id for _datarun in datarun]
+
+        else:
+            datarun_ids = [datarun.id]
+
+        self.work(
+            datarun_ids,
+            save_files,
+            choose_randomly,
+            cloud_mode,
+            total_time,
+            False,
+            show_tqdm=verbose
+        )
+
+        return datarun
 
     def load_model(self, classifier_id):
         """Returns a Model instance."""

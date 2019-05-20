@@ -31,6 +31,7 @@ install_requires = [
     'flask-sqlalchemy>=2.3.2',
     'flask-restless-swagger-2>=0.0.3',
     'simplejson>=3.16.0',
+    'tqdm>=4.31.1',
 ]
 
 setup_requires = [
