@@ -35,6 +35,7 @@ def copy_files(pattern, source, target=None):
 
     return datasets
 
+
 def get_demos(args=None):
     return copy_files('*.csv', ('data', 'test'), 'demos')
 
