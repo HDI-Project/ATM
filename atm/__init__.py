@@ -5,8 +5,8 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 
-from atm.core import ATM
 from atm.classifier import Model
+from atm.core import ATM
 
 __author__ = """MIT Data To AI Lab"""
 __email__ = 'dailabmit@gmail.com'

@@ -16,7 +16,7 @@ import yaml
 from tqdm import tqdm
 
 from atm.config import AWSConfig, LogConfig, SQLConfig
-from atm.constants import TIME_FMT, ClassifierStatus, PartitionStatus, RunStatus
+from atm.constants import TIME_FMT, PartitionStatus, RunStatus
 from atm.database import Database
 from atm.method import Method
 from atm.utilities import get_public_ip
