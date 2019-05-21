@@ -6,6 +6,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import logging
+import pickle
 import re
 import time
 from builtins import object
@@ -267,3 +268,10 @@ class Model(object):
 
         # return the updated parameter vector
         return params
+
+    @classmethod
+    def load(cls, path):
+        """Loads a saved instance from a path."""
+
+        with open(path, 'rb') as classifier:
+            return pickle.load(classifier)
