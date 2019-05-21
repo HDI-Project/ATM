@@ -103,7 +103,7 @@ the required dependencies for testing and linting.
 ## Quick Usage
 
 Below we will give a quick tutorial of how to run ATM on your desktop.
-We will use a featurized dataset, already saved in `data/test/pollution_1.csv`.
+We will use a featurized dataset, named `pollution_1.csv`, reffer to section `0` to generate it.
 This is one of the datasets available on [openml.org](https://www.openml.org).
 More details can be found [here](https://www.openml.org/d/542).
 In this problem the goal is predict `mortality` using the metrics associated with the air
@@ -125,6 +125,26 @@ The data has 15 features and the last column is the `class` label.
 |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |
 |37    |31    |75    |8     |3.26  |11.9  |78.4  |4259  |13.1  |49.6  |13.9  |23    |9     |15    |58    |1     |
 |35    |46    |85    |7.1   |3.22  |11.8  |79.9  |1441  |14.8  |51.2  |16.1  |1     |1     |1     |54    |0     |
+
+
+0. **Generate the demo datasets**
+
+    In order to follow this guide, you will have to get the demo datasets that we provide with this
+    package.
+
+    To do so, we provide you with a simple command:
+
+    ```bash
+    atm get_demos
+    ```
+
+    The command generates four datasets in the current directory inside a folder `demos`.
+    ```bash
+    Generating file demos/pollution_1.csv
+    Generating file demos/iris.data.csv
+    Generating file demos/pitchfork_genres.csv
+    Generating file demos/adult_data_300.csv
+    ```
 
 
 1. **Create a datarun**
@@ -191,6 +211,169 @@ it with the same command; it will pick up right where it left off. You can also 
 command simultaneously in different terminals to parallelize the work -- all workers will
 refer to the same ModelHub database. When all 100 classifiers in your budget have been built,
 all workers will exit gracefully.
+
+
+### Using ATM with Python
+
+0. **Generate the demo datasets**
+
+    If you have not generated the demo datasets, you can do so by calling `get_demos` method from
+    the `data` module without arguments:
+
+    ```python
+    from atm import data
+
+    demo_datasets = data.get_demos()
+    ```
+
+    The method `get_demos` will print and also return a dictionary where the files have been
+    generated.
+
+
+1. **Auto Tune Models over a CSV file**
+
+    In order to Auto Tume Models over a csv file, we first have to create a instance of `ATM`.
+
+    ```python
+    from atm import ATM
+
+    atm = ATM()
+    ```
+
+    This will create an instance with the default settings for `ATM`.
+
+    Once you have the instance ready, you can use the method `run`, by setting the argument
+    `train_path` to the csv training path. **Note** we will use the `dictionary` generated before
+    to get the path of the `pollution_1.csv`.
+
+    ```python
+    path = demo_datasets.get('pollution_1.csv')
+
+    results = atm.run(train_path=path)
+    ```
+
+    This process will display a progress bar during it's execution, on your python interpreter, you
+    will be able to see something similar to this:
+
+    ```python
+    Processing dataset demos/pollution_1.csv
+    100%|##########################| 100/100 [00:10<00:00,  6.09it/s]Classifier budget has run out!
+    Datarun 1 has ended.
+    ```
+
+
+2. **Explore the results**
+
+    Once the `run` method has finished, we can explore the `results` object which is of type
+    `Datarun`.
+
+    **Get a summary of the `Datarun`**:
+
+    ```python
+    results.describe()
+    ```
+
+    An output similar to this will be printed:
+
+    ```python
+    Datarun 1 summary:
+        Dataset: 'demos/pollution_1.csv'
+        Column Name: 'class'
+        Judgment Metric: 'f1'
+        Classifiers Tested: 100
+        Elapsed Time: 0:00:07.638668
+    ```
+
+    **Get a summary of the best classifier**:
+
+    ```python
+    results.get_best_classifier()
+    ```
+
+    Which will print  the classifiers properties:
+
+    ```python
+    Classifier id: 94
+    Classifier type: knn
+    Params chosen:
+        n_neighbors: 13
+        leaf_size: 38
+        weights: uniform
+        algorithm: kd_tree
+        metric: manhattan
+        _scale: True
+    Cross Validation Score: 0.858 +- 0.096
+    Test Score: 0.714
+    ```
+
+    **Get a dataframe with all the scores**:
+
+    ```python
+    scores = results.get_scores()
+    ```
+
+    Here we can explore the dataframe as we would like, where the most important field to have
+    in mind is the `id` of this classifier in case we would like to recover it.
+
+    If we run `scores.head()` we should get the top 5 classifiers:
+
+    ```python
+      cv_judgment_metric cv_judgment_metric_stdev  id test_judgment_metric  rank
+    0       0.8584126984             0.0960095737  94         0.7142857143   1.0
+    1       0.8222222222             0.0623609564  12         0.6250000000   2.0
+    2       0.8147619048             0.1117618135  64         0.8750000000   3.0
+    3       0.8139393939             0.0588721670  68         0.6086956522   4.0
+    4       0.8067754468             0.0875180564  50         0.6250000000   5.0
+    ```
+
+
+3. **Saving and loading the best classifier**:
+
+    **Saving the best classifier**:
+    In order to save the best classifier, the `results` object provides you with a method that
+    does it for you:
+
+    ```python
+    results.export_best_classifier('path/to/model.pkl')
+    ```
+
+    If the classifier has been saved correctly, a message will be printed indicating so:
+
+    ```python
+    Classifier 94 saved as path/to/model.pkl
+    ```
+
+    If the path that you provide already exists, you can ovewrite it by adding the argument
+    `force=True`.
+
+    **Loading the best classifier**:
+
+    Once it's exported you can load it back by calling the `load` method of `Model` that **ATM**
+    provides:
+
+    ```python
+    from atm import Model
+
+    model = Model.load('path/to/model.pkl')
+    ```
+
+    And once you have loaded your model, you can use it's methods to make predictions:
+
+    ```python
+    predictions = model.predict(data)
+    ```
+
+    **Load the classifier in memory**:
+
+    In case that you want to use the model without exporting it, you can use the `load_model` from
+    the `classifier` directly:
+
+    ```python
+    classifier = results.get_best_classifier()
+    model = classifier.load_model()
+
+    model.predict(data)
+    ```
 
 ## Customizing ATM's configuration and using your own data
 
@@ -369,48 +552,6 @@ the ModelHub Database via a REST API server that runs over [flask](http://flask.
 For more details about how to start and use this REST API please check the [API.md](API.md) document.
 
 
-<!--## Testing Tuners and Selectors-->
-
-<!--The script `test_btb.py`, in the main directory, allows you to test different-->
-<!--BTB Tuners and Selectors using ATM. You will need AWS access keys from DAI lab-->
-<!--in order to download data from the S3 bucket. To use the script, -->
-<!--config file as described above, then add the following fields (replacing the-->
-<!--API keys with your own):-->
-
-<!--```-->
-<!--[aws]-->
-<!--access_key: YOURACCESSKEY-->
-<!--secret_key: YoUrSECr3tKeY-->
-<!--s3_bucket: mit-dai-delphi-datastore-->
-<!--s3_folder: downloaded-->
-<!--```-->
-
-<!--Then, add the name of the data file you want to test:-->
-
-<!--```-->
-<!--[data]-->
-<!--alldatapath: filename.csv-->
-<!--```-->
-
-<!--To test a custom implementation of a BTB tuner or selector, define a new class called:-->
-  <!--* for Tuners, CustomTuner (inheriting from btb.tuning.Tuner)-->
-  <!--* for Selectors, CustomSelector (inheriting from btb.selection.Selector)-->
-<!--You can see examples of custom implementations in-->
-<!--btb/selection/custom\_selector.py and btb/tuning/custom\_tuning.py. Then, run-->
-<!--the script:-->
-
-<!--```-->
-<!--python test_btb.py --config config/atm.cnf --tuner /path/to/custom_tuner.py --selector /path/to/custom_selector.py-->
-<!--```-->
-
-<!--This will create a new datarun and start a worker to run it to completion. You-->
-<!--can also choose to use the default tuners and selectors included with BTB:-->
-
-<!--```-->
-<!--python test_btb.py --config config/atm.cnf --tuner gp --selector ucb1-->
-<!--```-->
-
-<!--Note: Any dataset with less than 30 samples will fail for the DBN classifier unless the DBN `minibatch_size` constant is changed to match the number of samples.-->
 ## Citing ATM
 
 If you use ATM, please consider citing the following paper:
