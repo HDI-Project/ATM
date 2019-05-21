@@ -13,7 +13,7 @@ from mock import ANY, Mock, patch
 from atm import PROJECT_ROOT
 from atm.classifier import Model
 from atm.config import DatasetConfig, LogConfig, RunConfig, SQLConfig
-from atm.constants import METRICS_BINARY, PROJECT_ROOT, TIME_FMT
+from atm.constants import METRICS_BINARY, TIME_FMT
 from atm.core import ATM
 from atm.database import Database, db_session
 from atm.utilities import load_metrics, load_model
