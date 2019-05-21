@@ -138,12 +138,11 @@ The data has 15 features and the last column is the `class` label.
     atm get_demos
     ```
 
-    The command generates four datasets in the current directory inside a folder `demos`.
+    The command generates three datasets in the current directory inside a folder `demos`.
     ```bash
     Generating file demos/pollution_1.csv
     Generating file demos/iris.data.csv
     Generating file demos/pitchfork_genres.csv
-    Generating file demos/adult_data_300.csv
     ```
 
 
