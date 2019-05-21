@@ -13,7 +13,7 @@ from mock import ANY, Mock, patch
 from atm import PROJECT_ROOT
 from atm.classifier import Model
 from atm.config import DatasetConfig, LogConfig, RunConfig, SQLConfig
-from atm.constants import METRICS_BINARY, TIME_FMT
+from atm.constants import METRICS_BINARY, PROJECT_ROOT, TIME_FMT
 from atm.core import ATM
 from atm.database import Database, db_session
 from atm.utilities import load_metrics, load_model
@@ -111,6 +111,8 @@ def get_new_worker(**kwargs):
     run_conf = RunConfig(kwargs)
 
     dataset_conf = DatasetConfig(kwargs)
+    dataset_conf.train_path = os.path.join(
+        os.path.join(os.path.join(PROJECT_ROOT, 'data'), 'test'), 'pollution_1.csv')
 
     db = Database(**sql_conf.to_dict())
     atm = ATM(sql_conf=sql_conf)
