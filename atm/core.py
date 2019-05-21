@@ -171,67 +171,8 @@ class ATM:
 
         return dataruns if run_per_partition else dataruns[0]
 
-    def create_dataruns(self, run_conf):
-        """
-        Generate a datarun, including a dataset if necessary.
-
-        Returns: ID of the generated datarun
-        """
-        dataset = self.db.get_dataset(run_conf.dataset_id)
-        if not dataset:
-            raise ValueError('Invalid Dataset ID: {}'.format(run_conf.dataset_id))
-
-        method_parts = {}
-        for m in run_conf.methods:
-            # enumerate all combinations of categorical variables for this method
-            method = Method(m)
-            method_parts[m] = method.get_hyperpartitions()
-            LOGGER.info('method %s has %d hyperpartitions' % (m, len(method_parts[m])))
-
-        # create hyperpartitions and datarun(s)
-        dataruns = []
-        if not run_conf.run_per_partition:
-            LOGGER.debug('saving datarun...')
-            datarun = self.create_datarun(dataset, run_conf)
-            dataruns.append(datarun)
-
-        LOGGER.debug('saving hyperpartions...')
-        for method, parts in list(method_parts.items()):
-            for part in parts:
-                # if necessary, create a new datarun for each hyperpartition.
-                # This setting is useful for debugging.
-                if run_conf.run_per_partition:
-                    datarun = self.create_datarun(dataset, run_conf)
-                    dataruns.append(datarun)
-
-                # create a new hyperpartition in the database
-                self.db.create_hyperpartition(datarun_id=datarun.id,
-                                              method=method,
-                                              tunables=part.tunables,
-                                              constants=part.constants,
-                                              categoricals=part.categoricals,
-                                              status=PartitionStatus.INCOMPLETE)
-
-        LOGGER.info('Dataruns created. Summary:')
-        LOGGER.info('\tDataset ID: %d', dataset.id)
-        LOGGER.info('\tTraining data: %s', dataset.train_path)
-        LOGGER.info('\tTest data: %s', (dataset.test_path or 'None'))
-
-        datarun = dataruns[0]
-        if run_conf.run_per_partition:
-            LOGGER.info('\tDatarun IDs: %s', ', '.join(str(datarun.id) for datarun in dataruns))
-
-        else:
-            LOGGER.info('\tDatarun ID: %d', datarun.id)
-
-        LOGGER.info('\tHyperpartition selection strategy: %s', datarun.selector)
-        LOGGER.info('\tParameter tuning strategy: %s', datarun.tuner)
-        LOGGER.info('\tBudget: %d (%s)', datarun.budget, datarun.budget_type)
-
-        return dataruns
-
-    def work(self, datarun_ids=None, save_files=False, choose_randomly=True,
-             cloud_mode=False, total_time=None, wait=True, show_tqdm=False):
+    def work(self, datarun_ids=None, save_files=True, choose_randomly=True,
+             cloud_mode=False, total_time=None, wait=True, verbose=False):
         """
         Check the ModelHub database for unfinished dataruns, and spawn workers to
         work on them as they are added. This process will continue to run until it
@@ -269,12 +210,9 @@ class ATM:
                     LOGGER.info('No dataruns found. Exiting.')
                     break
 
-            max_priority = max([datarun.priority for datarun in dataruns])
-            priority_runs = [r for r in dataruns if r.priority == max_priority]
-
-            # either choose a run randomly, or take the run with the lowest ID
+            # either choose a run randomly between priority, or take the run with the lowest ID
             if choose_randomly:
-                run = random.choice(priority_runs)
+                run = random.choice(dataruns)
             else:
                 run = sorted(dataruns, key=attrgetter('id'))[0]
 
@@ -288,54 +226,34 @@ class ATM:
                             log_config=self.log_conf, public_ip=public_ip)
             try:
                 if run.budget_type == 'classifier':
-                    completed = len(
-                        self.db.get_classifiers(
-                            datarun_id=run.id,
-                            status=ClassifierStatus.COMPLETE))
                     pbar = tqdm(
                         total=run.budget,
                         ascii=True,
-                        initial=completed,
-                        disable=not show_tqdm)
+                        initial=run.completed_classifiers,
+                        disable=not verbose
+                    )
+
                     while run.status != RunStatus.COMPLETE:
                         worker.run_classifier()
-                        completed = len(
-                            self.db.get_classifiers(
-                                datarun_id=run.id,
-                                status=ClassifierStatus.COMPLETE))
-
-                        pbar.update(completed - pbar.last_print_n)
-
                         run = self.db.get_datarun(run.id)
+                        if verbose and run.completed_classifiers > pbar.last_print_n:
+                            pbar.update(run.completed_classifiers - pbar.last_print_n)
 
                     pbar.close()
 
                 elif run.budget_type == 'walltime':
-                    completed = len(
-                        self.db.get_classifiers(
-                            datarun_id=run.id,
-                            status=ClassifierStatus.COMPLETE)
-                    )
-
                     pbar = tqdm(
-                        disable=not show_tqdm,
+                        disable=not verbose,
                         ascii=True,
-                        initial=completed,
+                        initial=run.completed_classifiers,
                         unit=' Classifiers'
                     )
 
                     while run.status != RunStatus.COMPLETE:
                         worker.run_classifier()
-
-                        completed = len(
-                            self.db.get_classifiers(
-                                datarun_id=run.id,
-                                status=ClassifierStatus.COMPLETE)
-                        )
-
-                        pbar.update(completed - pbar.last_print_n)
-
-                        run = self.db.get_datarun(run.id)
+                        run = self.db.get_datarun(run.id)  # Refresh the datarun object.
+                        if verbose and run.completed_classifiers > pbar.last_print_n:
+                            pbar.update(run.completed_classifiers - pbar.last_print_n)
 
                     pbar.close()
 
@@ -351,18 +269,21 @@ class ATM:
                 break
 
     def run(self, train_path=None, test_path=None, name=None, description=None,
-            column_name='class', budget=100, budget_type='classifier', gridding=0, k_window=3,
+            class_column='class', budget=100, budget_type='classifier', gridding=0, k_window=3,
             metric='f1', methods=['logreg', 'dt', 'knn'], r_minimum=2, run_per_partition=False,
             score_target='cv', selector='uniform', tuner='uniform', deadline=None, priority=1,
-            save_files=False, choose_randomly=True, cloud_mode=False, total_time=None,
+            save_files=True, choose_randomly=True, cloud_mode=False, total_time=None,
             wait=True, dataset_conf=None, run_conf=None, verbose=True):
         """Returns Datarun."""
+
+        if train_path is None:
+            raise ValueError('train_path can not be None, please provide a train_path.')
 
         if dataset_conf:
             dataset = self.add_dataset(**dataset_conf.to_dict())
 
         else:
-            dataset = self.add_dataset(train_path, test_path, name, description, column_name)
+            dataset = self.add_dataset(train_path, test_path, name, description, class_column)
 
         if run_conf:
             datarun = self.add_datarun(**run_conf.to_dict())
@@ -391,6 +312,9 @@ class ATM:
         else:
             datarun_ids = [datarun.id]
 
+        if verbose:
+            print('Processing dataset {}'.format(train_path))
+
         self.work(
             datarun_ids,
             save_files,
@@ -398,10 +322,20 @@ class ATM:
             cloud_mode,
             total_time,
             False,
-            show_tqdm=verbose
+            verbose=verbose
         )
 
-        return datarun
+        dataruns = self.db.get_dataruns(
+            include_ids=datarun_ids,
+            ignore_complete=False,
+            ignore_pending=True
+        )
+
+        if run_per_partition:
+            return dataruns
+
+        elif len(dataruns) == 1:
+            return dataruns[0]
 
     def load_model(self, classifier_id):
         """Returns a Model instance."""
@@ -410,7 +344,7 @@ class ATM:
     def enter_data(self, dataset_conf, run_conf):
         """
         Generate a datarun, including a dataset if necessary.
-        Returns: ID of the generated datarun
+        Returns: Generated Datarun/s
         """
         # if the user has provided a dataset id, use that. Otherwise, create a new
         # dataset based on the arguments we were passed.

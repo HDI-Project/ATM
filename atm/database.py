@@ -240,6 +240,10 @@ class Database(object):
                 return base % (self.id, self.dataset_id, self.description,
                                self.budget_type, self.budget, self.status)
 
+            @property
+            def completed_classifiers(self):
+                return len(self.get_complete_classifiers())
+
             def get_scores(self):
                 columns = [
                     'id',
@@ -267,7 +271,17 @@ class Database(object):
             def get_best_classifier(self):
                 return db.get_best_classifier(self.score_target, datarun_id=self.id)
 
-            def export_best_classifier(self, path):
+            def get_complete_classifiers(self):
+                return db.get_classifiers(datarun_id=self.id, status=ClassifierStatus.COMPLETE)
+
+            def export_best_classifier(self, path, force=False):
+                if os.path.exists(path) and not force:
+                    print('The indicated path already exists. Use `force=True` to overwrite.')
+
+                base_path = os.path.dirname(path)
+                if not os.path.exists(base_path):
+                    os.makedirs(base_path)
+
                 classifier = self.get_best_classifier()
                 model = classifier.load_model()
                 with open(path, 'wb') as pickle_file:
