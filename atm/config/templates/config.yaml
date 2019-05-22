@@ -1,0 +1,40 @@
+# Database related
+# SQL dialect
+dialect: sqlite
+# Name of the database
+database: atm.db
+# Username to gain access to the database
+username:
+# Password to gain access to the database
+password:
+# Host name of the device hosting the database
+host:
+# Port on host listening for database connections
+port:
+# Optional field for specifying login details
+query:
+
+# Log and save related
+# Log
+log_level_stdout: 'error'
+log_level_file: 'info'
+log_dir: 'logs'
+# Saving directories
+model_dir: 'models'
+metric_dir: 'metrics'
+# Verbose metrics
+verbose_metrics: False
+
+# Amazon S3 related
+# AWS access key
+access_key:
+# AWS secret key
+secret_key:
+# Number of AWS instances to start
+num_instances:
+# Number of BTB workers per instances
+num_workers_per_instance:
+# AWS S3 bucket to store data
+s3_bucket:
+# Folder in AWS S3 bucket in which to store data
+s3_folder:

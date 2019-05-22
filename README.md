@@ -21,14 +21,13 @@
 
 # ATM - Auto Tune Models
 
-- Free software: MIT license
+- License: MIT
 - Documentation: https://hdi-project.github.io/ATM/
+- Homepage: https://github.com/HDI-Project/ATM
 
-ATM is an open source software library under the
-[*Human Data Interaction* project](https://hdi-dai.lids.mit.edu/)
-(HDI) at MIT. It is a distributed, scalable AutoML system designed with ease of use in mind.
+## Overview
 
-## Summary
+**ATM** is a distributed, scalable AutoML system designed with ease of use in mind.
 
 For a given classification problem, ATM's goal is to find
 
@@ -38,57 +37,36 @@ or *random forest*, and
 
 which generate the best classifier possible.
 
-ATM takes in a dataset with pre-extracted feature vectors and labels as a CSV file.
-It then begins training and testing classifiers (machine learning models) in parallel.
-As time goes on, ATM will use the results of previous classifiers to intelligently select
-which methods and hyperparameters to try next.
-Along the way, ATM saves data about each classifier it trains, including the hyperparameters
-used to train it, extensive performance metrics, and a serialized version of the model itself.
-
-ATM has the following features:
-
-* It allows users to run the system for multiple datasets and multiple
-problem configurations in parallel.
-* It can be run locally, on AWS\*, or on a custom compute cluster\*
-* It can be configured to use a variety of AutoML approaches for hyperparameter tuning and
-selection, available in the accompanying library [btb](https://github.com/hdi-project/btb)
-* It stores models, metrics and cross validated accuracy information about each
-classifier it has trained.
-
-\**work in progress! See issue [#40](https://github.com/HDI-Project/ATM/issues/40)*
-
-## Current status
-
-ATM and the accompanying library BTB are under active development.
-We have made the transition and improvements.
-
-## Setup
-
-This section describes the quickest way to get started with ATM on a machine running Ubuntu Linux.
-We hope to have more in-depth guides in the future, but for now, you should be able to substitute
-commands for the package manager of your choice to get ATM up and running on most modern
-Unix-based systems.
+## Getting Started
 
 ### Requirements
 
-ATM is compatible with and has been tested on Python 2.7, 3.5, and 3.6.
+#### Python
 
-Also, although it is not strictly required, the usage of a [virtualenv](https://virtualenv.pypa.io/en/latest/)
-is highly recommended in order to avoid interfering with other software installed in the system
-where **ATM** is run.
+**ATM** has been developed and been tested on [Python 2.7, 3.5, and 3.6](https://www.python.org)
 
-### Installation
+Also, although it is not strictly required, the usage of a
+[virtualenv](https://virtualenv.pypa.io/en/latest/) is highly recommended in order to avoid
+interfering with other software installed in the system where **ATM** is run.
 
-To get started with **ATM**, we recommend using [pip](https://pip.pypa.io/en/stable/).
+It's recommended that you create a virtualenv. In this example, we will create it using
+[VirtualEnvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/):
 
-Once you have created and activated your virtualenv, execute:
+```bash
+mkvirtualenv -p $(which python3.6) -a $(pwd) ATM
+```
+
+### Install
+
+After creating the virtualenv and activating it, we recommend using
+[pip](https://pip.pypa.io/en/stable/) in order to install **ATM**:
 
 ```bash
 pip install atm
 ```
 
-Alternatively, you can clone the repository and install it from source by running
-`make install`:
+Alternatively, with your virtualenv activated, you can clone the repository and install it from
+source by running `make install`:
 
 ```bash
 git clone git@github.com:HDI-Project/ATM.git
@@ -96,183 +74,98 @@ cd ATM
 make install
 ```
 
-For development, you can use the `make install-develop` command instead in order to install all
-the required dependencies for testing and linting.
+For development, use the following command instead, which will install some additional dependencies
+for code linting and testing.
+
+```bash
+make install-develop
+```
 
 
-## Quick Usage
+## Quickstart
 
-Below we will give a quick tutorial of how to run ATM on your desktop.
-We will use a featurized dataset, named `pollution_1.csv`, reffer to section `0` to generate it.
-This is one of the datasets available on [openml.org](https://www.openml.org).
-More details can be found [here](https://www.openml.org/d/542).
-In this problem the goal is predict `mortality` using the metrics associated with the air
-pollution. Below we show a snapshot of the `csv` file.
-The data has 15 features and the last column is the `class` label.
+In this short tutorial we will guide you through a series of steps that will help you getting
+started with **ATM**.
 
+### Training data
 
-|PREC  |JANT  |JULT  |OVR65 |POPN  |EDUC  |HOUS  |DENS  |NONW  |WWDRK |POOR  |HC    |NOX   |SO@   |HUMID |class |
-|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
-|35    |23    |72    |11.1  |3.14  |11    |78.8  |4281  |3.5   |50.7  |14.4  |8     |10    |39    |57    |1     |
-|44    |29    |74    |10.4  |3.21  |9.8   |81.6  |4260  |0.8   |39.4  |12.4  |6     |6     |33    |54    |1     |
-|47    |45    |79    |6.5   |3.41  |11.1  |77.5  |3125  |27.1  |50.2  |20.6  |18    |8     |24    |56    |1     |
-|43    |35    |77    |7.6   |3.44  |9.6   |84.6  |6441  |24.4  |43.7  |14.3  |43    |38    |206   |55    |1     |
-|53    |45    |80    |7.7   |3.45  |10.2  |66.8  |3325  |38.5  |43.1  |25.5  |30    |32    |72    |54    |1     |
-|43    |30    |74    |10.9  |3.23  |12.1  |83.9  |4679  |3.5   |49.2  |11.3  |21    |32    |62    |56    |0     |
-|45    |30    |73    |9.3   |3.29  |10.6  |86    |2140  |5.3   |40.4  |10.5  |6     |4     |4     |56    |0     |
-|..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |
-|..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |
-|..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |..    |
-|37    |31    |75    |8     |3.26  |11.9  |78.4  |4259  |13.1  |49.6  |13.9  |23    |9     |15    |58    |1     |
-|35    |46    |85    |7.1   |3.22  |11.8  |79.9  |1441  |14.8  |51.2  |16.1  |1     |1     |1     |54    |0     |
+At the moment, **ATM**, works with classification problems, and all it requieres as a training data
+is a dataset with pre-extracted feature vectors and labels as a CSV file.
 
-
-0. **Generate the demo datasets**
-
-    In order to follow this guide, you will have to get the demo datasets that we provide with this
-    package.
-
-    To do so, we provide you with a simple command:
-
-    ```bash
-    atm get_demos
-    ```
-
-    The command generates three datasets in the current directory inside a folder `demos`.
-    ```bash
-    Generating file demos/pollution_1.csv
-    Generating file demos/iris.data.csv
-    Generating file demos/pitchfork_genres.csv
-    ```
-
-
-1. **Create a datarun**
-
-   ```
-   atm enter_data
-   ```
-
-   This command will create a `datarun`. In ATM, a "datarun" is a single logical machine learning
-   task. If you run the above command without any arguments, it will use the default settings
-   found in the code to create a new SQLite3 database at `./atm.db`, create a new
-   `dataset` instance which refers to the data above, and create a `datarun` instance which
-   points to that dataset. More about what is stored in this database and what is it used for
-   can be found [here](https://cyphe.rs/static/atm.pdf).
-
-   The command should produce a lot of output, the end of which looks something like this:
-
-   ```
-   ========== Summary ==========
-   Training data: data/test/pollution_1.csv
-   Test data: <None>
-   Dataset ID: 1
-   Frozen set selection strategy: uniform
-   Parameter tuning strategy: gp_ei
-   Budget: 100 (classifier)
-   Datarun ID: 1
-   ```
-
-   The most important piece of information is the datarun ID.
-
-
-2. **Start a worker**
-
-   ```
-   atm worker
-   ```
-
-   This will start a process that builds classifiers, tests them, and saves them to the
-   `./models/` directory. The output should show which hyperparameters are being tested
-   and the performance of each classifier (the "judgment metric"), plus the best overall
-   performance so far.
-
-   ```
-   Classifier type: classify_logreg
-   Params chosen:
-           C = 8904.06127554
-           _scale = True
-           fit_intercept = False
-           penalty = l2
-           tol = 4.60893080631
-           dual = True
-           class_weight = auto
-
-   Judgment metric (f1): 0.536 +- 0.067
-   Best so far (classifier 21): 0.716 +- 0.035
-   ```
-
-   Occasionally, a worker will encounter an error in the process of building and testing a
-   classifier. When this happens, the worker will print error data to the terminal, log the
-   error in the database, and move on to the next classifier.
-
-And that's it! You can break out of the worker with <kbd>Ctrl</kbd>+<kbd>c</kbd> and restart
-it with the same command; it will pick up right where it left off. You can also run the
-command simultaneously in different terminals to parallelize the work -- all workers will
-refer to the same ModelHub database. When all 100 classifiers in your budget have been built,
-all workers will exit gracefully.
-
+All you will need to provide to **ATM** in order to generate models, is the path to such a CSV file.
 
 ### Using ATM with Python
 
-0. **Generate the demo datasets**
+#### 1. Generate the demo data
 
-    If you have not generated the demo datasets, you can do so by calling `get_demos` method from
-    the `data` module without arguments:
+In order to get started, you will need some demo data as described before. ATM provides you with
+a simple command that will download a few datasets in order to run this Quickstart guide.
 
-    ```python
-    from atm import data
+```python
+from atm import data
 
-    demo_datasets = data.get_demos()
-    ```
+demo_datasets = data.get_demos()
+```
 
-    The method `get_demos` will print and also return a dictionary where the files have been
-    generated.
+Inside the `demo_datasets` variable, we will store the returned paths to this datasets:
 
+```python
+demo_datasets
 
-1. **Auto Tune Models over a CSV file**
+{
+    'iris.data.csv': 'demos/iris.data.csv',
+    'pollution_1.csv': 'demos/pollution_1.csv',
+    'pitchfork_genres.csv': 'demos/pitchfork_genres.csv'
+}
+```
 
-    In order to Auto Tume Models over a csv file, we first have to create a instance of `ATM`.
+#### 2. Auto Tune Model over a CSV file
 
-    ```python
-    from atm import ATM
+In order to Auto Tune Models over a CSV file, first you will need to create an instance of `ATM`:
 
-    atm = ATM()
-    ```
+```python
+from atm import ATM
 
-    This will create an instance with the default settings for `ATM`.
+atm = ATM()
+```
 
-    Once you have the instance ready, you can use the method `run`, by setting the argument
-    `train_path` to the csv training path. **Note** we will use the `dictionary` generated before
-    to get the path of the `pollution_1.csv`.
+This will create an instance with the default settings for `ATM`.
 
-    ```python
-    path = demo_datasets.get('pollution_1.csv')
+Once you have the instance ready, you can use the method `run` by giving the argument `train_path`
+to where the `CSV` file that contains your dataset (in this case we will use `pollution_1`) is
+located:
 
-    results = atm.run(train_path=path)
-    ```
+```python
+path_to_csv = demo_datasets.get('pollution_1.csv')  # this is equal to 'demos/pollution_1.csv'
 
-    This process will display a progress bar during it's execution, on your python interpreter, you
-    will be able to see something similar to this:
+results = atm.run(train_path=path_to_csv)
+```
 
-    ```python
-    Processing dataset demos/pollution_1.csv
-    100%|##########################| 100/100 [00:10<00:00,  6.09it/s]Classifier budget has run out!
-    Datarun 1 has ended.
-    ```
+This process will display a progress bar during it's execution to keep track on the progress that
+**ATM** is doing.
 
+```python
+Processing dataset demos/pollution_1.csv
+100%|##########################| 100/100 [00:10<00:00,  6.09it/s]
+Classifier budget has run out!
+Datarun 1 has ended.
+```
 
-2. **Explore the results**
+Once this process has ended, a message will print that the `Datarun` has ended. Then we can
+explore the `results` object.
 
-    Once the `run` method has finished, we can explore the `results` object which is of type
-    `Datarun`.
+#### 2. Explore the results
 
-    **Get a summary of the `Datarun`**:
+Once the `run` process has finished, we can explore the `results` object with the methods that it
+offers.
+
+- Get a summary of the `Datarun`:
 
     ```python
     results.describe()
     ```
 
-    An output similar to this will be printed:
+    This will print a short description of this `datarun`:
 
     ```python
     Datarun 1 summary:
@@ -283,13 +176,13 @@ all workers will exit gracefully.
         Elapsed Time: 0:00:07.638668
     ```
 
-    **Get a summary of the best classifier**:
+- Get a summary of the best classifier:
 
     ```python
     results.get_best_classifier()
     ```
 
-    Which will print  the classifiers properties:
+    This will print the best classifier that was found during this run:
 
     ```python
     Classifier id: 94
@@ -305,7 +198,7 @@ all workers will exit gracefully.
     Test Score: 0.714
     ```
 
-    **Get a dataframe with all the scores**:
+- Get a dataframe with all the scores:
 
     ```python
     scores = results.get_scores()
@@ -325,223 +218,174 @@ all workers will exit gracefully.
     4       0.8067754468             0.0875180564  50         0.6250000000   5.0
     ```
 
+#### 3. Saving and loading the best classifier:
 
-3. **Saving and loading the best classifier**:
+##### Saving the best classifier:
+In order to save the best classifier, the `results` object provides you with a method that
+does it for you:
 
-    **Saving the best classifier**:
-    In order to save the best classifier, the `results` object provides you with a method that
-    does it for you:
-
-    ```python
-    results.export_best_classifier('path/to/model.pkl')
-    ```
-
-    If the classifier has been saved correctly, a message will be printed indicating so:
-
-    ```python
-    Classifier 94 saved as path/to/model.pkl
-    ```
-
-    If the path that you provide already exists, you can ovewrite it by adding the argument
-    `force=True`.
-
-    **Loading the best classifier**:
-
-    Once it's exported you can load it back by calling the `load` method of `Model` that **ATM**
-    provides:
-
-    ```python
-    from atm import Model
-
-    model = Model.load('path/to/model.pkl')
-    ```
-
-    And once you have loaded your model, you can use it's methods to make predictions:
-
-    ```python
-    predictions = model.predict(data)
-    ```
-
-    **Load the classifier in memory**:
-
-    In case that you want to use the model without exporting it, you can use the `load_model` from
-    the `classifier` directly:
-
-    ```python
-    classifier = results.get_best_classifier()
-    model = classifier.load_model()
-
-    model.predict(data)
-    ```
-
-## Customizing ATM's configuration and using your own data
-
-ATM's default configuration is fully controlled by the intern code. Our documentation will
-cover the configuration in more detail, but this section provides a brief overview of how
-to specify the most important values.
-
-
-### Setting up a distributed Database
-
-ATM uses a database to store information about datasets, dataruns and classifiers.
-It's currently compatible with the SQLite3 and MySQL dialects.
-
-For first-time and casual users, the SQLite3 is used by default without any required
-step from the user.
-
-However, if you're planning on running large, distributed, or performance-intensive jobs,
-you might prefer using MySQL.
-
-If you do not have a MySQL database already prepared, you can follow the next steps in order
-install it and parepare it for ATM:
-
-
-1. **Install mysql-server**
-
-```bash
-sudo apt-get install mysql-server
+```python
+results.export_best_classifier('path/to/model.pkl')
 ```
 
-In the latest versions of MySQL no input for the user is required for this step, but
-in older versions the installation process will require the user to input a password
-for the MySQL root user.
+If the classifier has been saved correctly, a message will be printed indicating so:
 
-If this happens, keep track of the password that you set, as you will need it in the
-next step.
-
-2. **Log into your MySQL instance as root**
-
-If no password was required during the installation of MySQL, you should be able to
-log in with the following command.
-
-```bash
-sudo mysql
+```python
+Classifier 94 saved as path/to/model.pkl
 ```
 
-If a MySQL Root password was required, you will need to execute this other command:
+If the path that you provide already exists, you can ovewrite it by adding the argument
+`force=True`.
 
-```bash
-sudo mysql -u root -p
+##### Loading the best classifier:
+
+Once it's exported you can load it back by calling the `load` method of `Model` that **ATM**
+provides:
+
+```python
+from atm import Model
+
+model = Model.load('path/to/model.pkl')
 ```
 
-and input the password that you used during the installation when prompted.
+And once you have loaded your model, you can use it's methods to make predictions:
 
-3. **Create a new Database for ATM**
+```python
+import pandas as pd
 
-Once you are logged in, execute the following three commands to create a database
-called `atm` and a user also called `atm` with write permissions on it:
+data = pd.read_csv(demo_datasets.get('pollution_1.csv'))
 
-```bash
-$ mysql> CREATE DATABASE atm;
-$ mysql> CREATE USER 'atm'@'localhost' IDENTIFIED BY 'set-your-own-password-here';
-$ mysql> GRANT ALL PRIVILEGES ON atm.* TO 'atm'@'localhost';
+predictions = model.predict(data[0])
 ```
 
-4. **Test your settings**
+**Note** data is the dataframe that we used to train our model, at this step you should be using
+data that you would like to predict.
 
-After you have executed the previous three commands and exited the mysql prompt,
-you can test your settings by executing the following command and inputing the
-password that you used in the previous step when prompted:
+##### Load the classifier in memory:
 
-```bash
-mysql -u atm -p
+In case that you want to use the model without exporting it, you can use the `load_model` from
+the `classifier` directly:
+
+```python
+classifier = results.get_best_classifier()
+
+model = classifier.load_model()
+
+predictions = model.predict(data[0])
 ```
 
-### Running ATM on your own data
+#### Using your own data with the `run` method
 
-If you want to use the system for your own dataset, convert your data to a CSV file similar
-to the example shown above. The format is:
+If you would like to use your datasets with **ATM**, please reffer to
+[CUSTOM USAGE](CUSTOM_USAGE.md) which contains more information about the data format accepted,
+`run` method arguments and custom configuration.
 
- * Each column is a feature (or the label)
- * Each row is a training example
- * The first row is the header row, which contains names for each column of data
- * A single column (the *target* or *label*) is named `class`
+### Command Line
 
-Next, you'll need to use `atm enter_data` to create a `dataset` and `datarun` for your task.
+**ATM** provides a simple command line utility that will allow you to run a process of AutoML over
+a `CSV` file which follows the format specified inside [CUSTOM_USAGE.md](CUSTOM_USAGE.md).
 
-The command line will look for values for each configuration variable in the following places,
-in order:
+In this example, we will use the default values that are provided in the code.
 
-1. Command line arguments
-2. Configuration files
-3. Defaults specified inside the code.
+#### 1. Generate the demo data
 
-That means there are two ways to pass configuration to the command.
+**ATM** command line allows you to generate the demo data that we will be using through this steps
+by running the following command:
 
-1. **Using command line arguments**
+```bash
+atm get_demos
+```
 
-   You can specify each argument individually on the command line. The names of the
-   variables are the same as those in the YAML files. SQL configuration variables must be
-   prepended by `sql-`, and AWS config variables must be prepended by `aws-`.
+A print on your console with the generated demo datasets will appear:
 
-   Using command line arguments is convenient for quick experiments, or for cases where you
-   need to change just a couple of values from the default configuration. For example:
+```bash
+Generating file demos/iris.data.csv
+Generating file demos/pollution_1.csv
+Generating file demos/pitchfork_genres.csv
+```
 
-   ```
-   atm enter_data --train-path ./data/my-custom-data.csv --selector bestkvel
-   ```
+#### 2. Create a dataset and generate it's dataruns
 
-   You can also use a mixture of config files and command line arguments; any command line
-   arguments you specify will override the values found in config files.
+Once you have generated the demo datasets, now it's time to create a `dataset` object inside the
+database. Our command line also triggers the generation of `datarun` objects for this dataset in
+order to automate this process as much as possible:
 
-2. **Using YAML configuration files**
+```bash
+atm enter_data
+```
 
-   You can also save the configuration as YAML files is an easy way to save complicated setups
-   or share them with team members.
+If you run this command, you will create a dataset with the default values, which is using the
+`pollution_1.csv` dataset.
 
-   You should start with the templates provided by the `atm make_config` command:
+A print, with similar information to this, should be printed:
 
-   ```
-   atm make_config
-   ```
+```bash
+method logreg has 6 hyperpartitions
+method dt has 2 hyperpartitions
+method knn has 24 hyperpartitions
+Dataruns created. Summary:
+	Dataset ID: 1
+	Training data: demos/pollution_1.csv
+	Test data: None
+	Datarun ID: 1
+	Hyperpartition selection strategy: uniform
+	Parameter tuning strategy: uniform
+	Budget: 100 (classifier)
+```
 
-   This will generate a folder called `config/templates` in your current working directory which
-   will contain 5 files, which you will need to copy over to the `config` folder and edit according
-   to your needs:
+For more information about the arguments that this command line accepts, please run:
 
-   ```
-   cp config/templates/*.yaml config/
-   vim config/*.yaml
-   ```
+```bash
+atm enter_data --help
+```
 
-   `run.yaml` contains all the settings for a single dataset and datarun. Specify the `train_path`
-   to point to your own dataset.
+#### 3. Start a worker
 
-   `sql.yaml` contains the settings for the ModelHub SQL database. The default configuration will
-   connect to (and create if necessary) a SQLite database at `./atm.db` relative to the directory
-   from which `enter_data.py` is run. If you are using a MySQL database, you will need to change
-   the file to something like this:
+**ATM** requieres a worker to process the dataruns that are not completed and stored inside the
+database. This worker process will be runing until there are no dataruns `pending`.
 
-   ```
-   dialect: mysql
-   database: atm
-   username: username
-   password: password
-   host: localhost
-   port: 3306
-   query:
-   ```
+In order to launch such a process, execute:
 
-   `aws.yaml` should contain the settings for running ATM in the cloud. This is not necessary
-   for local operation.
+```bash
+atm worker
+```
 
-   Once your YAML files have been updated, run the datarun creation command and pass it the paths
-   to your new config files:
+This will start a process that builds classifiers, tests them, and saves them to the `./models/`
+directory. The output should show which hyperparameters are being tested and the performance of
+each classifier (the "judgment metric"), plus the best overall performance so far.
 
-   ```
-   atm enter_data --sql-config config/sql.yaml \
-                  --aws-config config/aws.yaml \
-                  --run-config config/run.yaml
-   ```
+Prints similar to this one will apear repeatedly on your console while the `worker` is processing
+the datarun:
 
-It's important that the SQL configuration used by the worker matches the configuration you
-passed to `enter_data` -- otherwise, the worker will be looking in the wrong ModelHub
-database for its datarun!
-   ```
-   atm worker --sql-config config/sql.yaml \
-              --aws-config config/aws.yaml \
-   ```
+```bash
+Classifier type: classify_logreg
+Params chosen:
+       C = 8904.06127554
+       _scale = True
+       fit_intercept = False
+       penalty = l2
+       tol = 4.60893080631
+       dual = True
+       class_weight = auto
 
+Judgment metric (f1): 0.536 +- 0.067
+Best so far (classifier 21): 0.716 +- 0.035
+```
+
+Occasionally, a worker will encounter an error in the process of building and testing a
+classifier. When this happens, the worker will print error data to the console, log the error in
+the database, and move on to the next classifier.
+
+You can break out of the worker with <kbd>Ctrl</kbd>+<kbd>c</kbd> and restart it with the same
+command; it will pick up right where it left off. You can also run the command simultaneously in
+different terminals to parallelize the work -- all workers will refer to the same ModelHub
+database. When all 100 classifiers in your budget have been built, all workers will exit gracefully.
+
+This command aswell offers more information about the arguments that this command line accepts:
+
+```
+atm worker --help
+```
 
 ## REST API Server
 
@@ -549,6 +393,23 @@ database for its datarun!
 the ModelHub Database via a REST API server that runs over [flask](http://flask.pocoo.org/).
 
 For more details about how to start and use this REST API please check the [API.md](API.md) document.
+
+## Credits
+
+### Contributors
+
+* Bennett Cyphers <bcyphers@mit.edu>
+* Thomas Swearingen <swearin3@msu.edu>
+* Kalyan Veeramachaneni <kalyan@mit.edu>
+* Laura Gustafson <lgustaf@mit.edu>
+* Carles Sala <csala@csail.mit.edu>
+* Plamen Valentinov <plamen@pythiac.com>
+* Micah Smith <micahjsmith@gmail.com>
+* Kiran Karra <kiran.karra@gmail.com>
+* Max Kanter <kmax12@gmail.com>
+* Alfredo Cuesta-Infante <alfredo.cuesta@urjc.es>
+* Favio André Vázquez <favio.vazquezp@gmail.com>
+* Matteo Hoch <minime@hochweb.com>
 
 
 ## Citing ATM
