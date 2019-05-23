@@ -221,8 +221,10 @@ offers.
 #### 3. Saving and loading the best classifier:
 
 ##### Saving the best classifier:
-In order to save the best classifier, the `results` object provides you with a method that
-does it for you:
+
+In order to save the best classifier, the `results` object, provides you with
+`export_best_classifier` method, that takes as an argument the path where you would like to save
+this classifier:
 
 ```python
 results.export_best_classifier('path/to/model.pkl')
@@ -237,10 +239,10 @@ Classifier 94 saved as path/to/model.pkl
 If the path that you provide already exists, you can ovewrite it by adding the argument
 `force=True`.
 
-##### Loading the best classifier:
+##### Loading a saved classifier:
 
 Once it's exported you can load it back by calling the `load` method of `Model` that **ATM**
-provides:
+provides, and takes as an argument the path to where the model has been saved:
 
 ```python
 from atm import Model
