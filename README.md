@@ -4,46 +4,32 @@
 </p>
 
 
-[![CircleCI][circleci-img]][circleci-url]
-[![Travis][travis-img]][travis-url]
-[![Version][pypi-img]][pypi-url]
-[![Coverage Status][codecov-img]][codecov-url]
 
-[circleci-img]: https://circleci.com/gh/HDI-Project/ATM.svg?style=shield
-[circleci-url]: https://circleci.com/gh/HDI-Project/ATM
-[travis-img]: https://travis-ci.org/HDI-Project/ATM.svg?branch=master
-[travis-url]: https://travis-ci.org/HDI-Project/ATM
-[pypi-img]: https://img.shields.io/pypi/v/atm.svg
-[pypi-url]: https://pypi.python.org/pypi/atm
-[codecov-img]: https://codecov.io/gh/HDI-project/ATM/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/HDI-project/ATM
+[![CircleCI](https://circleci.com/gh/HDI-Project/ATM.svg?style=shield)](https://circleci.com/gh/HDI-Project/ATM)
+[![Travis](https://travis-ci.org/HDI-Project/ATM.svg?branch=master)](https://travis-ci.org/HDI-Project/ATM)
+[![PyPi Shield](https://img.shields.io/pypi/v/atm.svg)](https://pypi.python.org/pypi/atm)
+[![Coverage Status](https://codecov.io/gh/HDI-project/ATM/branch/master/graph/badge.svg)](https://codecov.io/gh/HDI-project/ATM)
 
 
 # ATM - Auto Tune Models
 
 - License: MIT
-- Documentation: https://hdi-project.github.io/ATM/
+- Documentation: https://HDI-Project.github.io/ATM/
 - Homepage: https://github.com/HDI-Project/ATM
 
-## Overview
+# Overview
 
-**ATM** is a distributed, scalable AutoML system designed with ease of use in mind.
+Auto Tune Models (ATM) is an AutoML system designed with ease of use in mind. In short, you give
+ATM a classification problem and a dataset as a CSV file, and ATM will try to build the best model
+it can. ATM is based on a [paper](https://dai.lids.mit.edu/wp-content/uploads/2018/02/atm_IEEE_BIgData-9-1.pdf)
+of the same name, and the project is part of the [Human-Data Interaction (HDI) Project](https://hdi-dai.lids.mit.edu/) at MIT.
 
-For a given classification problem, ATM's goal is to find
 
-1. a classification *method*, such as *decision tree*, *support vector machine*,
-or *random forest*, and
-2. a set of *hyperparameters* for that method
+# Install
 
-which generate the best classifier possible.
+## Requirements
 
-## Getting Started
-
-### Requirements
-
-#### Python
-
-**ATM** has been developed and been tested on [Python 2.7, 3.5, and 3.6](https://www.python.org)
+**ATM** has been developed and tested on [Python 2.7, 3.5, and 3.6](https://www.python.org/downloads/)
 
 Also, although it is not strictly required, the usage of a
 [virtualenv](https://virtualenv.pypa.io/en/latest/) is highly recommended in order to avoid
@@ -52,11 +38,22 @@ interfering with other software installed in the system where **ATM** is run.
 It's recommended that you create a virtualenv. In this example, we will create it using
 [VirtualEnvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/):
 
+These are the minimum commands needed to create a virtualenv using python3.6 for **ATM**:
+
 ```bash
-mkvirtualenv -p $(which python3.6) -a $(pwd) ATM
+pip install virtualenv
+virtualenv -p $(which python3.6) atm-venv
 ```
 
-### Install
+Afterwards, you have to execute this command to have the virtualenv activated:
+
+```bash
+source atm-venv/bin/activate
+```
+
+Remember about executing it every time you start a new console to work on **ATM**!
+
+## Install with pip
 
 After creating the virtualenv and activating it, we recommend using
 [pip](https://pip.pypa.io/en/stable/) in order to install **ATM**:
@@ -65,41 +62,69 @@ After creating the virtualenv and activating it, we recommend using
 pip install atm
 ```
 
+This will pull and install the latest stable release from [PyPi](https://pypi.org/).
+
+## Install from source
+
 Alternatively, with your virtualenv activated, you can clone the repository and install it from
-source by running `make install`:
+source by running `make install` on the `stable` branch:
 
 ```bash
 git clone git@github.com:HDI-Project/ATM.git
 cd ATM
+git checkout stable
 make install
 ```
 
-For development, use the following command instead, which will install some additional dependencies
-for code linting and testing.
+## Install for Development
+
+If you want to contribute to the project, a few more steps are required to make the project ready
+for development.
+
+First, please head to [the GitHub page of the project](https://github.com/HDI-Project/ATM)
+and make a fork of the project under you own username by clicking on the **fork** button on the
+upper right corner of the page.
+
+Afterwards, clone your fork and create a branch from master with a descriptive name that includes
+the number of the issue that you are going to work on:
+
+```bash
+git clone git@github.com:{your username}/ATM.git
+cd ATM
+git branch issue-xx-cool-new-feature master
+git checkout issue-xx-cool-new-feature
+```
+
+Finally, install the project with the following command, which will install some additional
+dependencies for code linting and testing.
 
 ```bash
 make install-develop
 ```
 
+Make sure to use them regularly while developing by running the commands `make lint` and `make test`.
 
-## Quickstart
+# Quickstart
 
 In this short tutorial we will guide you through a series of steps that will help you getting
 started with **ATM**.
 
-### Training data
+## Training data
 
 At the moment, **ATM**, works with classification problems, and all it requieres as a training data
 is a dataset with pre-extracted feature vectors and labels as a CSV file.
 
 All you will need to provide to **ATM** in order to generate models, is the path to such a CSV file.
 
-### Using ATM with Python
+## Using ATM with Python API
 
-#### 1. Generate the demo data
+In this first tutorial, we will be executing **ATM** from the Python API that it offers.
 
-In order to get started, you will need some demo data as described before. ATM provides you with
-a simple command that will download a few datasets in order to run this Quickstart guide.
+### 1. Generate the demo data
+
+The first step in order to run **ATM** is to prepare some datasets to be used in ATM.
+ATM provides you withi a few datasets in order to run this Quickstart guide, which can be generated
+by runing the following code:
 
 ```python
 from atm import data
@@ -119,7 +144,7 @@ demo_datasets
 }
 ```
 
-#### 2. Auto Tune Model over a CSV file
+### 2. Auto Tune Model over a CSV file
 
 In order to Auto Tune Models over a CSV file, first you will need to create an instance of `ATM`:
 
@@ -131,9 +156,9 @@ atm = ATM()
 
 This will create an instance with the default settings for `ATM`.
 
-Once you have the instance ready, you can use the method `run` by giving the argument `train_path`
-to where the `CSV` file that contains your dataset (in this case we will use `pollution_1`) is
-located:
+Once you have the instance ready, you can use the function `atm.run` by giving it the argument
+`train_path` to where the `CSV` file that contains your dataset is located (in this case we will
+use `pollution_1`):
 
 ```python
 path_to_csv = demo_datasets.get('pollution_1.csv')  # this is equal to 'demos/pollution_1.csv'
@@ -154,73 +179,74 @@ Datarun 1 has ended.
 Once this process has ended, a message will print that the `Datarun` has ended. Then we can
 explore the `results` object.
 
-#### 2. Explore the results
+### 3. Explore the results
 
 Once the `run` process has finished, we can explore the `results` object with the methods that it
 offers.
 
 - Get a summary of the `Datarun`:
 
-    ```python
-    results.describe()
-    ```
+```python
+results.describe()
+```
+This will print a short description of this `datarun`:
 
-    This will print a short description of this `datarun`:
-
-    ```python
-    Datarun 1 summary:
-        Dataset: 'demos/pollution_1.csv'
-        Column Name: 'class'
-        Judgment Metric: 'f1'
-        Classifiers Tested: 100
-        Elapsed Time: 0:00:07.638668
-    ```
+```python
+Datarun 1 summary:
+    Dataset: 'demos/pollution_1.csv'
+    Column Name: 'class'
+    Judgment Metric: 'f1'
+    Classifiers Tested: 100
+    Elapsed Time: 0:00:07.638668
+```
 
 - Get a summary of the best classifier:
 
-    ```python
-    results.get_best_classifier()
-    ```
+```python
+results.get_best_classifier()
+```
 
-    This will print the best classifier that was found during this run:
+This will print the best classifier that was found during this run:
 
-    ```python
-    Classifier id: 94
-    Classifier type: knn
-    Params chosen:
-        n_neighbors: 13
-        leaf_size: 38
-        weights: uniform
-        algorithm: kd_tree
-        metric: manhattan
-        _scale: True
-    Cross Validation Score: 0.858 +- 0.096
-    Test Score: 0.714
-    ```
+```python
+Classifier id: 94
+Classifier type: knn
+Params chosen:
+    n_neighbors: 13
+    leaf_size: 38
+    weights: uniform
+    algorithm: kd_tree
+    metric: manhattan
+    _scale: True
+Cross Validation Score: 0.858 +- 0.096
+Test Score: 0.714
+```
 
 - Get a dataframe with all the scores:
 
-    ```python
-    scores = results.get_scores()
-    ```
+Here we can explore the dataframe as we would like, where the most important field to have
+in mind is the `id` of this classifier in case we would like to recover it.
 
-    Here we can explore the dataframe as we would like, where the most important field to have
-    in mind is the `id` of this classifier in case we would like to recover it.
+```python
+scores = results.get_scores()
+```
 
-    If we run `scores.head()` we should get the top 5 classifiers:
+If we run `scores.head()` we should get the top 5 classifiers:
 
-    ```python
-      cv_judgment_metric cv_judgment_metric_stdev  id test_judgment_metric  rank
-    0       0.8584126984             0.0960095737  94         0.7142857143   1.0
-    1       0.8222222222             0.0623609564  12         0.6250000000   2.0
-    2       0.8147619048             0.1117618135  64         0.8750000000   3.0
-    3       0.8139393939             0.0588721670  68         0.6086956522   4.0
-    4       0.8067754468             0.0875180564  50         0.6250000000   5.0
-    ```
+```python
+  cv_judgment_metric cv_judgment_metric_stdev  id test_judgment_metric  rank
+0       0.8584126984             0.0960095737  94         0.7142857143   1.0
+1       0.8222222222             0.0623609564  12         0.6250000000   2.0
+2       0.8147619048             0.1117618135  64         0.8750000000   3.0
+3       0.8139393939             0.0588721670  68         0.6086956522   4.0
+4       0.8067754468             0.0875180564  50         0.6250000000   5.0
+```
 
-#### 3. Saving and loading the best classifier:
+### 4. Saving and loading the best classifier:
 
-##### Saving the best classifier:
+The Python API allows you to export and load back the best classifier found in a `datarun`.
+
+#### Saving the best classifier:
 
 In order to save the best classifier, the `results` object, provides you with
 `export_best_classifier` method, that takes as an argument the path where you would like to save
@@ -239,7 +265,7 @@ Classifier 94 saved as path/to/model.pkl
 If the path that you provide already exists, you can ovewrite it by adding the argument
 `force=True`.
 
-##### Loading a saved classifier:
+#### Loading a saved classifier:
 
 Once it's exported you can load it back by calling the `load` method of `Model` that **ATM**
 provides, and takes as an argument the path to where the model has been saved:
@@ -263,7 +289,7 @@ predictions = model.predict(data[0])
 **Note** data is the dataframe that we used to train our model, at this step you should be using
 data that you would like to predict.
 
-##### Load the classifier in memory:
+#### Load the classifier in memory:
 
 In case that you want to use the model without exporting it, you can use the `load_model` from
 the `classifier` directly:
@@ -276,20 +302,15 @@ model = classifier.load_model()
 predictions = model.predict(data[0])
 ```
 
-#### Using your own data with the `run` method
-
-If you would like to use your datasets with **ATM**, please reffer to
-[CUSTOM USAGE](CUSTOM_USAGE.md) which contains more information about the data format accepted,
-`run` method arguments and custom configuration.
-
-### Command Line
+## Command Line
 
 **ATM** provides a simple command line utility that will allow you to run a process of AutoML over
-a `CSV` file which follows the format specified inside [CUSTOM_USAGE.md](CUSTOM_USAGE.md).
+a `CSV` file which contains a `dataset`
 
-In this example, we will use the default values that are provided in the code.
+In this example, we will use the default values that are provided in the code, which will use
+the `pollution_1.csv` that is being generated with the demo datasets by ATM.
 
-#### 1. Generate the demo data
+### 1. Generate the demo data
 
 **ATM** command line allows you to generate the demo data that we will be using through this steps
 by running the following command:
@@ -306,7 +327,7 @@ Generating file demos/pollution_1.csv
 Generating file demos/pitchfork_genres.csv
 ```
 
-#### 2. Create a dataset and generate it's dataruns
+### 2. Create a dataset and generate it's dataruns
 
 Once you have generated the demo datasets, now it's time to create a `dataset` object inside the
 database. Our command line also triggers the generation of `datarun` objects for this dataset in
@@ -317,7 +338,7 @@ atm enter_data
 ```
 
 If you run this command, you will create a dataset with the default values, which is using the
-`pollution_1.csv` dataset.
+`pollution_1.csv` dataset from the demo datasets.
 
 A print, with similar information to this, should be printed:
 
@@ -341,7 +362,7 @@ For more information about the arguments that this command line accepts, please 
 atm enter_data --help
 ```
 
-#### 3. Start a worker
+### 3. Start a worker
 
 **ATM** requieres a worker to process the dataruns that are not completed and stored inside the
 database. This worker process will be runing until there are no dataruns `pending`.
@@ -389,22 +410,78 @@ This command aswell offers more information about the arguments that this comman
 atm worker --help
 ```
 
+## Custom Usage
+
+Nearly every part of ATM is configurable. For example, you can specify which machine-learning
+algorithms ATM should try, which metrics it computes (such as F1 score and ROC/AUC), and which
+method it uses to search through the space of hyperparameters (using another HDI Project library,
+BTB). You can also constrain ATM to find the best model within a limited amount of time or by
+training a limited amount of total models.
+
+For more details about how to configure and customize **ATM**, please check
+[Custom Usage](https://hdi-project.github.io/ATM/custom_usage.html) documentation.
+
+
 ## REST API Server
 
 **ATM** comes with the possibility to start a server process that enables interacting with
 the ModelHub Database via a REST API server that runs over [flask](http://flask.pocoo.org/).
 
-For more details about how to start and use this REST API please check the [API.md](API.md) document.
+### 1. Start the REST API Server
+
+In order to start a REST API server, after installing ATM open a terminal, activate its
+virtualenv, and execute this command:
+
+```bash
+atm start
+```
+
+This will start **ATM** server as a background service. The REST server will be listening at the
+port 5000 of your machine, and if you point your browser at http://127.0.0.1:5000/, you will see
+the documentation website that shows information about all the REST operations allowed by the API.
+
+Optionally, the `--port <port>` can be added to modify the port which the server listents at:
+
+```bash
+atm start --port 1234
+```
+
+If you would like to see the status of the server process you can run:
+
+```bash
+atm status
+```
+
+An output similar to this one will appear:
+
+```bash
+ATM is running with 1 worker
+ATM REST server is listening on http://127.0.0.1:5000
+```
+
+### 2. Stop the REST API Server
+
+In order to stop the server you can run the following command:
+
+```bash
+atm stop
+```
+
+For a detailed information about the API, visit the
+[API documentation](https://hdi-project.github.io/ATM/api.html).
 
 ## Credits
+
+### Development Lead
+
+* Kalyan Veeramachaneni <kalyan@mit.edu>
+* Carles Sala <csala@csail.mit.edu>
 
 ### Contributors
 
 * Bennett Cyphers <bcyphers@mit.edu>
 * Thomas Swearingen <swearin3@msu.edu>
-* Kalyan Veeramachaneni <kalyan@mit.edu>
 * Laura Gustafson <lgustaf@mit.edu>
-* Carles Sala <csala@csail.mit.edu>
 * Plamen Valentinov <plamen@pythiac.com>
 * Micah Smith <micahjsmith@gmail.com>
 * Kiran Karra <kiran.karra@gmail.com>
@@ -414,7 +491,7 @@ For more details about how to start and use this REST API please check the [API.
 * Matteo Hoch <minime@hochweb.com>
 
 
-## Citing ATM
+### Citing ATM
 
 If you use ATM, please consider citing the following paper:
 
@@ -445,9 +522,9 @@ BibTeX entry:
 }
 ```
 
-## Related Projects
+### Related Projects
 
-### BTB
+#### BTB
 
 [BTB](https://github.com/hdi-project/btb), for Bayesian Tuning and Bandits, is the core AutoML
 library in development under the HDI project. BTB exposes several methods for hyperparameter
@@ -456,7 +533,7 @@ and add new ones easily. BTB is a central part of ATM, and the two projects were
 tandem, but it is designed to be implementation-agnostic and should be useful for a wide range
 of hyperparameter selection tasks.
 
-### Featuretools
+#### Featuretools
 
 [Featuretools](https://github.com/featuretools/featuretools) is a python library for automated
 feature engineering. It can be used to prepare raw transactional and relational datasets for ATM.

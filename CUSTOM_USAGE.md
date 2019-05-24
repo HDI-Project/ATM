@@ -1,4 +1,12 @@
-# Using ATM with your own data
+# Custom Usage
+
+Nearly every part of ATM is configurable. For example, you can specify which machine-learning
+algorithms ATM should try, which metrics it computes (such as F1 score and ROC/AUC), and which
+method it uses to search through the space of hyperparameters (using another HDI Project library,
+BTB). You can also constrain ATM to find the best model within a limited amount of time or by
+training a limited amount of total models.
+
+## Using ATM with your own data
 
 If you want to use the system for your own dataset, convert your data to a CSV file with the
 following format:
@@ -10,14 +18,14 @@ following format:
 will have to provide it.
 
 
-# Using custom configuration:
+## Using custom configuration:
 
-## Python
+### Python
 
 If you would like to create a custom instance of **ATM**  you can specify this with arguments
 during instantiation.
 
-### Using a config.yaml file
+#### Using a config.yaml file
 
 You can create and provide a path to a `config.yaml` file that contains all the configuration
 for your **ATM** instance.
@@ -69,7 +77,7 @@ from atm import ATM
 atm = ATM(config_file='config/config.yaml')
 ```
 
-### Using arguments
+#### Using arguments
 
 The ATM initiation accepts the same arguments aswell:
 
@@ -88,7 +96,7 @@ atm = ATM(
 
 This will create the same `ATM` as the one with the `config.yaml`.
 
-### Using the `run` method with your own data
+#### Using the `run` method with your own data
 
 **ATM** `run` method allows you to specify different arguments which have default values, however,
 you may need to change some of them in order to make it work with your dataset.
@@ -166,9 +174,9 @@ the moment is `[uniform, ucb1, bestk, bestkvel, purebestkvel, recentk, hieralg]`
 * `tuner`: Type of [BTB](https://github.com/HDI-Project/BTB/) tuner to use. A list of them at the
 moment is `[uniform, gp, gp_ei, gp_eivel]`. Default is set to `uniform`, type `str`.
 
-## Command Line
+### Command Line
 
-### Using command line arguments
+#### Using command line arguments
 
 You can specify each argument individually on the command line. The names of the
 variables are the same as those in the YAML files. SQL configuration variables must be
@@ -184,7 +192,7 @@ atm enter_data --train-path ./data/my-custom-data.csv --selector bestkvel
 You can also use a mixture of config files and command line arguments; any command line
 arguments you specify will override the values found in config files.
 
-### Using YAML configuration files
+#### Using YAML configuration files
 
 You can also save the configuration as YAML files is an easy way to save complicated setups
 or share them with team members.
