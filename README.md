@@ -410,17 +410,6 @@ This command aswell offers more information about the arguments that this comman
 atm worker --help
 ```
 
-## Custom Usage
-
-Nearly every part of ATM is configurable. For example, you can specify which machine-learning
-algorithms ATM should try, which metrics it computes (such as F1 score and ROC/AUC), and which
-method it uses to search through the space of hyperparameters (using another HDI Project library,
-BTB). You can also constrain ATM to find the best model within a limited amount of time or by
-training a limited amount of total models.
-
-For more details about how to configure and customize **ATM**, please check
-[Custom Usage](https://hdi-project.github.io/ATM/custom_usage.html) documentation.
-
 
 ## REST API Server
 
@@ -469,6 +458,24 @@ atm stop
 
 For a detailed information about the API, visit the
 [API documentation](https://hdi-project.github.io/ATM/api.html).
+
+
+## Whats next?
+
+Nearly every part of ATM is configurable. For example, you can specify which machine-learning
+algorithms ATM should try, which metrics it computes (such as F1 score and ROC/AUC), and which
+method it uses to search through the space of hyperparameters (using another HDI Project library,
+BTB). You can also constrain ATM to find the best model within a limited amount of time or by
+training a limited amount of total models.
+
+For more details about how to configure and customize **ATM**, please check
+[Custom Usage](https://hdi-project.github.io/ATM/custom_usage.html) documentation.
+
+Check out [how to contribute to ATM](https://HDI-Project.github.io/ATM/community/contributing.html)
+in order to help us developing new features or cool ideas.
+Learn more about ATM by browsing the [API Reference](https://HDI-Project.github.io/ATM/api/atm.html).
+Finally, you can check the corresponding sections of the [documentation](https://HDI-Project.github.io/ATM/)
+to learn more about ATM itself!
 
 ## Credits
 
