@@ -9,6 +9,7 @@
 [![Travis](https://travis-ci.org/HDI-Project/ATM.svg?branch=master)](https://travis-ci.org/HDI-Project/ATM)
 [![PyPi Shield](https://img.shields.io/pypi/v/atm.svg)](https://pypi.python.org/pypi/atm)
 [![Coverage Status](https://codecov.io/gh/HDI-project/ATM/branch/master/graph/badge.svg)](https://codecov.io/gh/HDI-project/ATM)
+[![Downloads](https://pepy.tech/badge/atm)](https://pepy.tech/project/atm)
 
 
 # ATM - Auto Tune Models
@@ -34,9 +35,6 @@ of the same name, and the project is part of the [Human-Data Interaction (HDI) P
 Also, although it is not strictly required, the usage of a
 [virtualenv](https://virtualenv.pypa.io/en/latest/) is highly recommended in order to avoid
 interfering with other software installed in the system where **ATM** is run.
-
-It's recommended that you create a virtualenv. In this example, we will create it using
-[VirtualEnvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/):
 
 These are the minimum commands needed to create a virtualenv using python3.6 for **ATM**:
 
@@ -104,27 +102,42 @@ make install-develop
 
 Make sure to use them regularly while developing by running the commands `make lint` and `make test`.
 
+
+# Data Format
+
+ATM input is always a CSV file with the following characteristics:
+
+* It uses a single comma, `,`, as the separator.
+* Its first row is a header that contains the names of the columns.
+* There is a column that contains the target variable that will need to be predicted.
+* The rest of the columns are all variables or features that will be used to predict the target column.
+* Each row corresponds to a single, complete, training sample.
+
+Here are the first 5 rows of a valid CSV with 4 features and one target column called `class` as an example:
+
+```
+feature_01,feature_02,feature_03,feature_04,class
+5.1,3.5,1.4,0.2,Iris-setosa
+4.9,3.0,1.4,0.2,Iris-setosa
+4.7,3.2,1.3,0.2,Iris-setosa
+4.6,3.1,1.5,0.2,Iris-setosa
+```
+
+This CSV can be passed to ATM as local filesystem path but also as a complete AWS S3 Bucket and
+path specification or as a URL.
+
+
 # Quickstart
 
 In this short tutorial we will guide you through a series of steps that will help you getting
-started with **ATM**.
+started with **ATM** by exploring its Python API.
 
-## Training data
+## 1. Get the demo data
 
-At the moment, **ATM**, works with classification problems, and all it requieres as a training data
-is a dataset with pre-extracted feature vectors and labels as a CSV file.
+The first step in order to run **ATM** is to obtain the demo datasets that will used in during
+the rest of the tutorial.
 
-All you will need to provide to **ATM** in order to generate models, is the path to such a CSV file.
-
-## Using ATM with Python API
-
-In this first tutorial, we will be executing **ATM** from the Python API that it offers.
-
-### 1. Generate the demo data
-
-The first step in order to run **ATM** is to prepare some datasets to be used in ATM.
-ATM provides you withi a few datasets in order to run this Quickstart guide, which can be generated
-by runing the following code:
+In order to obtain them, open a python interpreter and execute the following commands
 
 ```python
 from atm import data
@@ -132,21 +145,20 @@ from atm import data
 demo_datasets = data.get_demos()
 ```
 
-Inside the `demo_datasets` variable, we will store the returned paths to this datasets:
+This will return a dictionary that will contain the names and paths of the 3 demo datasets
+included.
 
 ```python
-demo_datasets
-
 {
-    'iris.data.csv': 'demos/iris.data.csv',
-    'pollution_1.csv': 'demos/pollution_1.csv',
-    'pitchfork_genres.csv': 'demos/pitchfork_genres.csv'
+    'iris': 'demos/iris.csv',
+    'pollution': 'demos/pollution.csv',
+    'pitchfork_genres': 'demos/pitchfork_genres.csv'
 }
 ```
 
-### 2. Auto Tune Model over a CSV file
+## 2. Create an ATM instance
 
-In order to Auto Tune Models over a CSV file, first you will need to create an instance of `ATM`:
+The first thing to do after obtaining the demo data is creating an ATM instance.
 
 ```python
 from atm import ATM
@@ -154,42 +166,50 @@ from atm import ATM
 atm = ATM()
 ```
 
-This will create an instance with the default settings for `ATM`.
+By default, if the ATM instance is without any arguments, it will create an SQLite database
+called `atm.db` in your current working directory.
 
-Once you have the instance ready, you can use the function `atm.run` by giving it the argument
-`train_path` to where the `CSV` file that contains your dataset is located (in this case we will
-use `pollution_1`):
+If you want to connect to a SQL database instead, or change the location of your SQLite database,
+please check the [API Reference](https://hdi-project.github.io/ATM/api/atm.core.html)
+for the complete list of available options.
+
+## 3. Search for the best model
+
+Once you have the **ATM** instance ready, you can use the method `atm.run` to start
+searching for the model that better predicts the target column of your CSV file.
+
+This argument expects at least the path to your CSV file, which in this case we will obtain
+from the `demo_datasets` variable that we just created:
 
 ```python
-path_to_csv = demo_datasets.get('pollution_1.csv')  # this is equal to 'demos/pollution_1.csv'
-
+path_to_csv = demo_datasets['pollution']
 results = atm.run(train_path=path_to_csv)
 ```
 
-This process will display a progress bar during it's execution to keep track on the progress that
-**ATM** is doing.
+This will start what is called a `Datarun`, and a progress bar will be displayed
+while the different models are tested and tuned.
 
 ```python
-Processing dataset demos/pollution_1.csv
+Processing dataset demos/pollution.csv
 100%|##########################| 100/100 [00:10<00:00,  6.09it/s]
-Classifier budget has run out!
-Datarun 1 has ended.
 ```
 
 Once this process has ended, a message will print that the `Datarun` has ended. Then we can
 explore the `results` object.
 
-### 3. Explore the results
+## 4. Explore the results
 
-Once the `run` process has finished, we can explore the `results` object with the methods that it
-offers.
+Once the Datarun has finished, we can explore the `results` object in several ways:
 
-- Get a summary of the `Datarun`:
+**a. Get a summary of the Datarun**
+
+The `describe` method will return us a summary of the Datarun execution:
 
 ```python
 results.describe()
 ```
-This will print a short description of this `datarun`:
+
+This will print a short description of this Datarun similar to this:
 
 ```python
 Datarun 1 summary:
@@ -200,13 +220,16 @@ Datarun 1 summary:
     Elapsed Time: 0:00:07.638668
 ```
 
-- Get a summary of the best classifier:
+**b. Get a summary of the best classifier**
+
+The `get_best_classifier` method will print information about the best classifier that was found
+during this Datarun, including the method used and the best hyperparameters found:
 
 ```python
 results.get_best_classifier()
 ```
 
-This will print the best classifier that was found during this run:
+The output will be similar to this:
 
 ```python
 Classifier id: 94
@@ -222,16 +245,17 @@ Cross Validation Score: 0.858 +- 0.096
 Test Score: 0.714
 ```
 
-- Get a dataframe with all the scores:
+**c. Explore the scores**
 
-Here we can explore the dataframe as we would like, where the most important field to have
-in mind is the `id` of this classifier in case we would like to recover it.
+The `get_scores` method will return a `pandas.DataFrame` with information about all the
+classifiers tested during the Datarun, including their cross validation scores and
+the location of their pickled models.
 
 ```python
 scores = results.get_scores()
 ```
 
-If we run `scores.head()` we should get the top 5 classifiers:
+The contents of the scores dataframe should be similar to these:
 
 ```python
   cv_judgment_metric cv_judgment_metric_stdev  id test_judgment_metric  rank
@@ -240,17 +264,19 @@ If we run `scores.head()` we should get the top 5 classifiers:
 2       0.8147619048             0.1117618135  64         0.8750000000   3.0
 3       0.8139393939             0.0588721670  68         0.6086956522   4.0
 4       0.8067754468             0.0875180564  50         0.6250000000   5.0
+...
 ```
 
-### 4. Saving and loading the best classifier:
+## 5. Make predictions
 
-The Python API allows you to export and load back the best classifier found in a `datarun`.
+Once we have found and explored the best classifier, we will want to make predictions with it.
 
-#### Saving the best classifier:
+In order to do this, we need to follow several steps:
 
-In order to save the best classifier, the `results` object, provides you with
-`export_best_classifier` method, that takes as an argument the path where you would like to save
-this classifier:
+**a. Export the best classifier**
+
+The `export_best_classifier` method can be used to serialize and save the best classifier model
+using pickle in the desired location:
 
 ```python
 results.export_best_classifier('path/to/model.pkl')
@@ -265,10 +291,10 @@ Classifier 94 saved as path/to/model.pkl
 If the path that you provide already exists, you can ovewrite it by adding the argument
 `force=True`.
 
-#### Loading a saved classifier:
+**b. Load the exported model**
 
-Once it's exported you can load it back by calling the `load` method of `Model` that **ATM**
-provides, and takes as an argument the path to where the model has been saved:
+Once it is exported you can load it back by calling the `load` method from the `atm.Model`
+class and passing it the path where the model has been saved:
 
 ```python
 from atm import Model
@@ -276,221 +302,41 @@ from atm import Model
 model = Model.load('path/to/model.pkl')
 ```
 
-And once you have loaded your model, you can use it's methods to make predictions:
+Once you have loaded your model, you can pass new data to its `predict` method to make
+predictions:
 
 ```python
 import pandas as pd
 
-data = pd.read_csv(demo_datasets.get('pollution_1.csv'))
+data = pd.read_csv(demo_datasets['pollution'])
 
-predictions = model.predict(data[0])
-```
-
-**Note** data is the dataframe that we used to train our model, at this step you should be using
-data that you would like to predict.
-
-#### Load the classifier in memory:
-
-In case that you want to use the model without exporting it, you can use the `load_model` from
-the `classifier` directly:
-
-```python
-classifier = results.get_best_classifier()
-
-model = classifier.load_model()
-
-predictions = model.predict(data[0])
-```
-
-## Command Line
-
-**ATM** provides a simple command line utility that will allow you to run a process of AutoML over
-a `CSV` file which contains a `dataset`
-
-In this example, we will use the default values that are provided in the code, which will use
-the `pollution_1.csv` that is being generated with the demo datasets by ATM.
-
-### 1. Generate the demo data
-
-**ATM** command line allows you to generate the demo data that we will be using through this steps
-by running the following command:
-
-```bash
-atm get_demos
-```
-
-A print on your console with the generated demo datasets will appear:
-
-```bash
-Generating file demos/iris.data.csv
-Generating file demos/pollution_1.csv
-Generating file demos/pitchfork_genres.csv
-```
-
-### 2. Create a dataset and generate it's dataruns
-
-Once you have generated the demo datasets, now it's time to create a `dataset` object inside the
-database. Our command line also triggers the generation of `datarun` objects for this dataset in
-order to automate this process as much as possible:
-
-```bash
-atm enter_data
-```
-
-If you run this command, you will create a dataset with the default values, which is using the
-`pollution_1.csv` dataset from the demo datasets.
-
-A print, with similar information to this, should be printed:
-
-```bash
-method logreg has 6 hyperpartitions
-method dt has 2 hyperpartitions
-method knn has 24 hyperpartitions
-Dataruns created. Summary:
-	Dataset ID: 1
-	Training data: demos/pollution_1.csv
-	Test data: None
-	Datarun ID: 1
-	Hyperpartition selection strategy: uniform
-	Parameter tuning strategy: uniform
-	Budget: 100 (classifier)
-```
-
-For more information about the arguments that this command line accepts, please run:
-
-```bash
-atm enter_data --help
-```
-
-### 3. Start a worker
-
-**ATM** requieres a worker to process the dataruns that are not completed and stored inside the
-database. This worker process will be runing until there are no dataruns `pending`.
-
-In order to launch such a process, execute:
-
-```bash
-atm worker
-```
-
-This will start a process that builds classifiers, tests them, and saves them to the `./models/`
-directory. The output should show which hyperparameters are being tested and the performance of
-each classifier (the "judgment metric"), plus the best overall performance so far.
-
-Prints similar to this one will apear repeatedly on your console while the `worker` is processing
-the datarun:
-
-```bash
-Classifier type: classify_logreg
-Params chosen:
-       C = 8904.06127554
-       _scale = True
-       fit_intercept = False
-       penalty = l2
-       tol = 4.60893080631
-       dual = True
-       class_weight = auto
-
-Judgment metric (f1): 0.536 +- 0.067
-Best so far (classifier 21): 0.716 +- 0.035
-```
-
-Occasionally, a worker will encounter an error in the process of building and testing a
-classifier. When this happens, the worker will print error data to the console, log the error in
-the database, and move on to the next classifier.
-
-You can break out of the worker with <kbd>Ctrl</kbd>+<kbd>c</kbd> and restart it with the same
-command; it will pick up right where it left off. You can also run the command simultaneously in
-different terminals to parallelize the work -- all workers will refer to the same ModelHub
-database. When all 100 classifiers in your budget have been built, all workers will exit gracefully.
-
-This command aswell offers more information about the arguments that this command line accepts:
-
-```
-atm worker --help
+predictions = model.predict(data.head())
 ```
 
 
-## REST API Server
+# Whats next?
 
-**ATM** comes with the possibility to start a server process that enables interacting with
-the ModelHub Database via a REST API server that runs over [flask](http://flask.pocoo.org/).
+For more details about **ATM** and all its possibilities and features, please check the
+[documentation site](https://HDI-Project.github.io/ATM/).
 
-### 1. Start the REST API Server
-
-In order to start a REST API server, after installing ATM open a terminal, activate its
-virtualenv, and execute this command:
-
-```bash
-atm start
-```
-
-This will start **ATM** server as a background service. The REST server will be listening at the
-port 5000 of your machine, and if you point your browser at http://127.0.0.1:5000/, you will see
-the documentation website that shows information about all the REST operations allowed by the API.
-
-Optionally, the `--port <port>` can be added to modify the port which the server listents at:
-
-```bash
-atm start --port 1234
-```
-
-If you would like to see the status of the server process you can run:
-
-```bash
-atm status
-```
-
-An output similar to this one will appear:
-
-```bash
-ATM is running with 1 worker
-ATM REST server is listening on http://127.0.0.1:5000
-```
-
-### 2. Stop the REST API Server
-
-In order to stop the server you can run the following command:
-
-```bash
-atm stop
-```
-
-For a detailed information about the API, visit the
-[API documentation](https://hdi-project.github.io/ATM/api.html).
-
-
-## Whats next?
-
-Nearly every part of ATM is configurable. For example, you can specify which machine-learning
-algorithms ATM should try, which metrics it computes (such as F1 score and ROC/AUC), and which
-method it uses to search through the space of hyperparameters (using another HDI Project library,
-BTB). You can also constrain ATM to find the best model within a limited amount of time or by
-training a limited amount of total models.
-
-For more details about how to configure and customize **ATM**, please check
-[Custom Usage](https://hdi-project.github.io/ATM/custom_usage.html) documentation.
-
-Check out [how to contribute to ATM](https://HDI-Project.github.io/ATM/community/contributing.html)
+There you can learn about [Configuring ATM](https://hdi-project.github.io/ATM/configuring_atm.html),
+its [Command Line Interface](https://hdi-project.github.io/ATM/command_line_interface.html) or its
+[REST API](https://hdi-project.github.io/ATM/api.html), as well as
+[how to contribute to ATM](https://HDI-Project.github.io/ATM/community/contributing.html)
 in order to help us developing new features or cool ideas.
-Learn more about ATM by browsing the [API Reference](https://HDI-Project.github.io/ATM/api/atm.html).
-Finally, you can check the corresponding sections of the [documentation](https://HDI-Project.github.io/ATM/)
-to learn more about ATM itself!
 
-## Credits
+# Credits
 
-### Development Lead
-
-* Kalyan Veeramachaneni <kalyan@mit.edu>
-* Carles Sala <csala@csail.mit.edu>
-
-### Contributors
+ATM is an open source project from the Data to AI Lab at MIT which has been built and maintained
+over the years by the following team:
 
 * Bennett Cyphers <bcyphers@mit.edu>
 * Thomas Swearingen <swearin3@msu.edu>
-* Laura Gustafson <lgustaf@mit.edu>
+* Carles Sala <csala@csail.mit.edu>
 * Plamen Valentinov <plamen@pythiac.com>
+* Kalyan Veeramachaneni <kalyan@mit.edu>
 * Micah Smith <micahjsmith@gmail.com>
+* Laura Gustafson <lgustaf@mit.edu>
 * Kiran Karra <kiran.karra@gmail.com>
 * Max Kanter <kmax12@gmail.com>
 * Alfredo Cuesta-Infante <alfredo.cuesta@urjc.es>
@@ -498,7 +344,7 @@ to learn more about ATM itself!
 * Matteo Hoch <minime@hochweb.com>
 
 
-### Citing ATM
+## Citing ATM
 
 If you use ATM, please consider citing the following paper:
 
@@ -529,9 +375,9 @@ BibTeX entry:
 }
 ```
 
-### Related Projects
+## Related Projects
 
-#### BTB
+### BTB
 
 [BTB](https://github.com/hdi-project/btb), for Bayesian Tuning and Bandits, is the core AutoML
 library in development under the HDI project. BTB exposes several methods for hyperparameter
@@ -540,7 +386,7 @@ and add new ones easily. BTB is a central part of ATM, and the two projects were
 tandem, but it is designed to be implementation-agnostic and should be useful for a wide range
 of hyperparameter selection tasks.
 
-#### Featuretools
+### Featuretools
 
 [Featuretools](https://github.com/featuretools/featuretools) is a python library for automated
 feature engineering. It can be used to prepare raw transactional and relational datasets for ATM.

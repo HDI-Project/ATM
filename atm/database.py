@@ -133,8 +133,9 @@ class Database(object):
             majority = Column(Numeric(precision=10, scale=9), nullable=False)
             size_kb = Column(Integer, nullable=False)
 
-            def load(self, test_size=0.3, random_state=0, aws_conf=None):
-                data = load_data(self.name, self.train_path, aws_conf)
+            def load(self, test_size=0.3, random_state=0,
+                     aws_access_key=None, aws_secret_key=None):
+                data = load_data(self.name, self.train_path, aws_access_key, aws_secret_key)
 
                 if self.test_path:
                     if self.name.endswith('.csv'):
@@ -142,15 +143,16 @@ class Database(object):
                     else:
                         test_name = self.name + '_test'
 
-                    test_data = load_data(test_name, self.test_path, aws_conf)
+                    test_data = load_data(test_name, self.test_path,
+                                          aws_access_key, aws_secret_key)
                     return data, test_data
 
                 else:
                     return train_test_split(data, test_size=test_size, random_state=random_state)
 
-            def _add_extra_fields(self, aws_conf):
+            def _add_extra_fields(self, aws_access_key=None, aws_secret_key=None):
 
-                data = load_data(self.name, self.train_path, aws_conf)
+                data = load_data(self.name, self.train_path, aws_access_key, aws_secret_key)
 
                 if self.n_examples is None:
                     self.n_examples = len(data)
@@ -178,16 +180,17 @@ class Database(object):
                 md5 = hashlib.md5(path.encode('utf-8'))
                 return md5.hexdigest()
 
-            def __init__(self, class_column, train_path, id=None, name=None, description=None,
-                         test_path=None, aws_conf=None, n_examples=None, majority=None,
-                         k_classes=None, size_kb=None, d_features=None):
+            def __init__(self, train_path, test_path=None, name=None, description=None,
+                         class_column=None, n_examples=None, majority=None, k_classes=None,
+                         size_kb=None, d_features=None, id=None, aws_access_key=None,
+                         aws_secret_key=None):
 
-                self.id = id
-                self.name = name or self._make_name(train_path)
-                self.class_column = class_column
                 self.train_path = train_path
                 self.test_path = test_path
+                self.name = name or self._make_name(train_path)
                 self.description = description or self.name
+                self.class_column = class_column
+                self.id = id
 
                 self.n_examples = n_examples
                 self.d_features = d_features
@@ -195,7 +198,7 @@ class Database(object):
                 self.k_classes = k_classes
                 self.size_kb = size_kb
 
-                self._add_extra_fields(aws_conf)
+                self._add_extra_fields(aws_access_key, aws_secret_key)
 
             def __repr__(self):
                 base = "<%s: %s, %d classes, %d features, %d rows>"
@@ -279,7 +282,7 @@ class Database(object):
                     print('The indicated path already exists. Use `force=True` to overwrite.')
 
                 base_path = os.path.dirname(path)
-                if not os.path.exists(base_path):
+                if base_path and not os.path.exists(base_path):
                     os.makedirs(base_path)
 
                 classifier = self.get_best_classifier()
@@ -444,14 +447,8 @@ class Database(object):
 
                 return '\n'.join(to_print)
 
-            def load_s3_data(self, s3_url, aws_conf=None):
+            def load_s3_data(self, s3_url, aws_access_key=None, aws_secret_key=None):
                 """Returns raw data from S3"""
-                aws_access_key = None
-                aws_secret_key = None
-
-                if aws_conf:
-                    aws_access_key = aws_conf.access_key
-                    aws_secret_key = aws_conf.secret_key
 
                 client = boto3.client(
                     's3',
@@ -467,19 +464,29 @@ class Database(object):
                     data.seek(0)
                     return data
 
-            def load_model(self, aws_conf=None):
+            def load_model(self):
                 """Return the model's insntance."""
                 if self.model_location.startswith('s3'):
-                    return pickle.load(self.load_s3_data(self.model_location, aws_conf))
+                    pickled = self.load_s3_data(
+                        self.model_location,
+                        self.aws_access_key,
+                        self.aws_secret_key,
+                    )
+                    return pickle.load(pickled)
 
                 else:
                     with open(self.model_location, 'rb') as f:
                         return pickle.load(f)
 
-            def load_metrics(self, aws_conf=None):
+            def load_metrics(self):
                 """Return the metrics"""
                 if self.metrics_location.startswith('s3'):
-                    return json.load(self.load_s3_data(self.metrics_location, aws_conf))
+                    pickled = self.load_s3_data(
+                        self.metrics_location,
+                        self.aws_access_key,
+                        self.aws_secret_key,
+                    )
+                    return json.load(pickled)
 
                 else:
                     with open(self.metrics_location, 'rb') as f:

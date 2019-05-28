@@ -31,25 +31,16 @@ def copy_files(pattern, source, target=None):
         target_file = os.path.join(target_dir, file_name)
         print('Generating file {}'.format(target_file))
         shutil.copy(source_file, target_file)
-        datasets[file_name] = target_file
+        datasets[file_name.replace('.csv', '')] = target_file
 
     return datasets
 
 
 def get_demos(args=None):
-    return copy_files('*.csv', ('data', 'test'), 'demos')
+    return copy_files('*.csv', 'demos', 'demos')
 
 
-def download_from_s3(path, local_path, **kwargs):
-
-    aws_conf = kwargs.get('aws_config')
-
-    aws_access_key = None
-    aws_secret_key = None
-
-    if aws_conf:
-        aws_access_key = aws_conf.access_key
-        aws_secret_key = aws_conf.secret_key
+def download_from_s3(path, local_path, aws_access_key=None, aws_secret_key=None, **kwargs):
 
     client = boto3.client(
         's3',
@@ -99,7 +90,7 @@ def download(path, local_path, **kwargs):
     return downloader(path, local_path, **kwargs)
 
 
-def get_local_path(name, path, aws_config):
+def get_local_path(name, path, aws_access_key=None, aws_secret_key=None):
 
     if os.path.isfile(path):
         return path
@@ -119,12 +110,13 @@ def get_local_path(name, path, aws_config):
         if not os.path.exists(data_path):
             os.makedirs(data_path)
 
-        download(path, local_path, aws_config=aws_config)
+        download(path, local_path, aws_access_key=aws_access_key, aws_secret_key=aws_secret_key)
         return local_path
 
 
-def load_data(name, path, aws_config):
-    local_path = get_local_path(name, path, aws_config)
+def load_data(name, path, aws_access_key=None, aws_secret_key=None):
+    local_path = get_local_path(
+        name, path, aws_access_key=aws_access_key, aws_secret_key=aws_secret_key)
 
     # load data as a Pandas dataframe
     return pd.read_csv(local_path).dropna(how='any')

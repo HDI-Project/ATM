@@ -10,18 +10,16 @@
    :caption: Advanced Usage
    :maxdepth: 2
 
-   add_method
-   add_to_btb
-   custom_usage
    database
-   api
+   cli
+   rest
+   add_method
 
 .. toctree::
    :caption: Resources
 
-   contributing
    API Reference <api/atm>
-   authors
+   contributing
    history
 
 Indices and tables

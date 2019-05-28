@@ -12,71 +12,67 @@ import time
 from datetime import datetime, timedelta
 from operator import attrgetter
 
-import yaml
 from tqdm import tqdm
 
-from atm.config import AWSConfig, LogConfig, SQLConfig
 from atm.constants import TIME_FMT, PartitionStatus, RunStatus
 from atm.database import Database
 from atm.method import Method
-from atm.utilities import get_public_ip
 from atm.worker import ClassifierError, Worker
 
 LOGGER = logging.getLogger(__name__)
 
 
-class ATM:
+class ATM(object):
 
     LOOP_WAIT = 5
 
-    def __init__(self, dialect='sqlite', database='atm.db', username=None, password=None,
-                 host=None, port=None, query=None, access_key=None, secret_key=None,
-                 s3_bucket=None, s3_folder=None, config_path=None, model_dir='models',
-                 metric_dir='metrics', verbose_metrics=False,
-                 sql_conf=None, aws_conf=None, log_conf=None, **kwargs):
+    def __init__(
+        self,
 
-        if config_path:
-            with open(config_path, 'rb') as f:
-                args = yaml.load(f)
+        # SQL Conf
+        dialect='sqlite',
+        database='atm.db',
+        username=None,
+        password=None,
+        host=None,
+        port=None,
+        query=None,
 
-            self.db = Database(**SQLConfig(args).to_dict())
-            self.aws_conf = AWSConfig(args)
-            self.log_conf = LogConfig(args)
+        # AWS Conf
+        access_key=None,
+        secret_key=None,
+        s3_bucket=None,
+        s3_folder=None,
 
-        else:
-            # create database with dialect / username / password
-            if sql_conf:
-                self.db = Database(**sql_conf.to_dict())
-            else:
-                self.db = Database(**SQLConfig(locals()).to_dict())
+        # Log Conf
+        models_dir='models',
+        metrics_dir='metrics',
+        verbose_metrics=False,
+    ):
 
-            if aws_conf:
-                self.aws_conf = aws_conf
-            else:
-                self.aws_conf = AWSConfig(locals())
+        self.db = Database(dialect, database, username, host, port, query)
+        self.aws_access_key = access_key
+        self.aws_secret_key = secret_key
+        self.s3_bucket = s3_bucket
+        self.s3_folder = s3_folder
 
-            if log_conf:
-                self.log_conf = log_conf
-            else:
-                self.log_conf = LogConfig(locals())
+        self.models_dir = models_dir
+        self.metrics_dir = metrics_dir
+        self.verbose_metrics = verbose_metrics
 
-    def add_dataset(self, train_path=None, test_path=None, name=None,
-                    description=None, class_column=None, dataset_conf=None):
+    def add_dataset(self, train_path, test_path=None, name=None,
+                    description=None, class_column=None):
+        return self.db.create_dataset(
+            train_path=train_path,
+            test_path=test_path,
+            name=name,
+            description=description,
+            class_column=class_column,
+            aws_access_key=self.aws_access_key,
+            aws_secret_key=self.aws_secret_key,
+        )
 
-        if dataset_conf:
-            return self.db.create_dataset(**dataset_conf.to_dict())
-
-        else:
-            return self.db.create_dataset(
-                name=name,
-                description=description,
-                train_path=train_path,
-                test_path=test_path,
-                class_column=class_column,
-                aws_conf=self.aws_conf
-            )
-
-    def add_datarun(self, dataset_id=None, budget=100, budget_type='classifier',
+    def add_datarun(self, dataset_id, budget=100, budget_type='classifier',
                     gridding=0, k_window=3, metric='f1', methods=['logreg', 'dt', 'knn'],
                     r_minimum=2, run_per_partition=False, score_target='cv', priority=1,
                     selector='uniform', tuner='uniform', deadline=None):
@@ -182,8 +178,7 @@ class ATM:
             this will work on all unfinished dataruns in the database.
         choose_randomly: if True, work on all highest-priority dataruns in random
             order. If False, work on them in sequential order (by ID)
-        cloud_mode: if True, save processed datasets to AWS. If this option is set,
-            aws_config must be supplied.
+        cloud_mode: if True, save processed datasets to AWS.
         total_time (optional): if set to an integer, this worker will only work for
             total_time seconds. Otherwise, it will continue working until all
             dataruns are complete (or indefinitely).
@@ -192,7 +187,6 @@ class ATM:
             complete.
         """
         start_time = datetime.now()
-        public_ip = get_public_ip()
 
         # main loop
         while True:
@@ -222,8 +216,10 @@ class ATM:
             LOGGER.info('Computing on datarun %d' % run.id)
             # actual work happens here
             worker = Worker(self.db, run, save_files=save_files,
-                            cloud_mode=cloud_mode, aws_config=self.aws_conf,
-                            log_config=self.log_conf, public_ip=public_ip)
+                            cloud_mode=cloud_mode, aws_access_key=self.aws_access_key,
+                            aws_secret_key=self.aws_secret_key, s3_bucket=self.s3_bucket,
+                            s3_folder=self.s3_folder, models_dir=self.models_dir,
+                            metrics_dir=self.metrics_dir, verbose_metrics=self.verbose_metrics)
             try:
                 if run.budget_type == 'classifier':
                     pbar = tqdm(
@@ -268,43 +264,30 @@ class ATM:
                 LOGGER.info('Total run time for worker exceeded; exiting.')
                 break
 
-    def run(self, train_path=None, test_path=None, name=None, description=None,
+    def run(self, train_path, test_path=None, name=None, description=None,
             class_column='class', budget=100, budget_type='classifier', gridding=0, k_window=3,
             metric='f1', methods=['logreg', 'dt', 'knn'], r_minimum=2, run_per_partition=False,
             score_target='cv', selector='uniform', tuner='uniform', deadline=None, priority=1,
             save_files=True, choose_randomly=True, cloud_mode=False, total_time=None,
-            wait=True, dataset_conf=None, run_conf=None, verbose=True):
-        """Returns Datarun."""
+            wait=True, verbose=True):
 
-        if train_path is None:
-            raise ValueError('train_path can not be None, please provide a train_path.')
-
-        if dataset_conf:
-            dataset = self.add_dataset(**dataset_conf.to_dict())
-
-        else:
-            dataset = self.add_dataset(train_path, test_path, name, description, class_column)
-
-        if run_conf:
-            datarun = self.add_datarun(**run_conf.to_dict())
-
-        else:
-            datarun = self.add_datarun(
-                dataset.id,
-                budget,
-                budget_type,
-                gridding,
-                k_window,
-                metric,
-                methods,
-                r_minimum,
-                run_per_partition,
-                score_target,
-                priority,
-                selector,
-                tuner,
-                deadline
-            )
+        dataset = self.add_dataset(train_path, test_path, name, description, class_column)
+        datarun = self.add_datarun(
+            dataset.id,
+            budget,
+            budget_type,
+            gridding,
+            k_window,
+            metric,
+            methods,
+            r_minimum,
+            run_per_partition,
+            score_target,
+            priority,
+            selector,
+            tuner,
+            deadline
+        )
 
         if run_per_partition:
             datarun_ids = [_datarun.id for _datarun in datarun]
@@ -338,18 +321,4 @@ class ATM:
             return dataruns[0]
 
     def load_model(self, classifier_id):
-        """Returns a Model instance."""
         return self.db.get_classifier(classifier_id).load_model()
-
-    def enter_data(self, dataset_conf, run_conf):
-        """
-        Generate a datarun, including a dataset if necessary.
-        Returns: Generated Datarun/s
-        """
-        # if the user has provided a dataset id, use that. Otherwise, create a new
-        # dataset based on the arguments we were passed.
-        if run_conf.dataset_id is None:
-            dataset = self.add_dataset(dataset_conf=dataset_conf)
-            run_conf.dataset_id = dataset.id
-
-        return self.add_datarun(**run_conf.to_dict())

@@ -23,7 +23,7 @@ def _get_atm(args):
     aws_conf = AWSConfig(args)
     log_conf = LogConfig(args)
 
-    return ATM(sql_conf=sql_conf, aws_conf=aws_conf, log_conf=log_conf)
+    return ATM(**sql_conf.to_dict(), **aws_conf.to_dict(), **log_conf.to_dict())
 
 
 def _work(args, wait=False):
@@ -194,11 +194,16 @@ def _enter_data(args):
     atm = _get_atm(args)
     run_conf = RunConfig(args)
     dataset_conf = DatasetConfig(args)
-    atm.enter_data(dataset_conf, run_conf)
+
+    if run_conf.dataset_id is None:
+        dataset = atm.add_dataset(**dataset_conf.to_dict())
+        run_conf.dataset_id = dataset.id
+
+    return atm.add_datarun(**run_conf.to_dict())
 
 
 def _make_config(args):
-    copy_files('*.yaml', ('config', 'templates'))
+    copy_files('*.yaml', ('config'))
 
 
 def _get_demos(args):
@@ -323,7 +328,7 @@ def _get_parser():
 
     # Get Demos
     get_demos = subparsers.add_parser('get_demos', parents=[logging_args],
-                                      help='Generate a demos folder with demo CSVs in the cwd.')
+                                      help='Create a demos folder and put the demo CSVs inside.')
     get_demos.set_defaults(action=_get_demos)
 
     return parser

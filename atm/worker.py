@@ -6,6 +6,7 @@ import imp
 import logging
 import os
 import re
+import socket
 import traceback
 import warnings
 from builtins import object, str
@@ -15,8 +16,7 @@ import boto3
 import numpy as np
 
 from atm.classifier import Model
-from atm.config import LogConfig
-from atm.constants import CUSTOM_CLASS_REGEX, SELECTORS_MAP, TUNERS_MAP
+from atm.constants import CUSTOM_CLASS_REGEX, SELECTORS, TUNERS
 from atm.database import ClassifierStatus, db_session
 from atm.utilities import ensure_directory, get_instance, save_metrics, save_model, update_params
 
@@ -29,6 +29,9 @@ os.environ['GNUMPY_IMPLICIT_CONVERSION'] = 'allow'
 # load the library-wide logger
 LOGGER = logging.getLogger('atm')
 
+# Local hostname, for logging.
+HOSTNAME = socket.gethostname()
+
 
 # Exception thrown when something goes wrong for the worker, but the worker
 # handles the error.
@@ -38,27 +41,24 @@ class ClassifierError(Exception):
 
 class Worker(object):
     def __init__(self, database, datarun, save_files=True, cloud_mode=False,
-                 aws_config=None, log_config=None, public_ip='localhost'):
-        """
-        database: Database object with connection information
-        datarun: Datarun ORM object to work on.
-        save_files: if True, save model and metrics files to disk or cloud.
-        cloud_mode: if True, save classifiers to the cloud
-        aws_config: S3Config object with amazon s3 connection info
-        """
+                 aws_access_key=None, aws_secret_key=None, s3_bucket=None, s3_folder=None,
+                 models_dir='models', metrics_dir='metrics', verbose_metrics=False):
+
         self.db = database
         self.datarun = datarun
         self.save_files = save_files
         self.cloud_mode = cloud_mode
-        self.aws_config = aws_config
-        self.public_ip = public_ip
 
-        log_config = log_config or LogConfig({})
-        self.model_dir = log_config.model_dir
-        self.metric_dir = log_config.metric_dir
-        self.verbose_metrics = log_config.verbose_metrics
-        ensure_directory(self.model_dir)
-        ensure_directory(self.metric_dir)
+        self.aws_access_key = aws_access_key
+        self.aws_secret_key = aws_secret_key
+        self.s3_bucket = s3_bucket
+        self.s3_folder = s3_folder
+
+        self.models_dir = models_dir
+        self.metrics_dir = metrics_dir
+        self.verbose_metrics = verbose_metrics
+        ensure_directory(self.models_dir)
+        ensure_directory(self.metrics_dir)
 
         # load the Dataset from the database
         self.dataset = self.db.get_dataset(self.datarun.dataset_id)
@@ -72,10 +72,10 @@ class Worker(object):
         Load and initialize the BTB class which will be responsible for
         selecting hyperpartitions.
         """
-        # selector will either be a key into SELECTORS_MAP or a path to
+        # selector will either be a key into SELECTORS or a path to
         # a file that defines a class called CustomSelector.
-        if self.datarun.selector in SELECTORS_MAP:
-            Selector = SELECTORS_MAP[self.datarun.selector]
+        if self.datarun.selector in SELECTORS:
+            Selector = SELECTORS[self.datarun.selector]
         else:
             path, classname = re.match(CUSTOM_CLASS_REGEX,
                                        self.datarun.selector).groups()
@@ -105,10 +105,10 @@ class Worker(object):
         tuner must be initialized with information about the hyperpartition, so it
         cannot be created until later.
         """
-        # tuner will either be a key into TUNERS_MAP or a path to
+        # tuner will either be a key into TUNERS or a path to
         # a file that defines a class called CustomTuner.
-        if self.datarun.tuner in TUNERS_MAP:
-            self.Tuner = TUNERS_MAP[self.datarun.tuner]
+        if self.datarun.tuner in TUNERS:
+            self.Tuner = TUNERS[self.datarun.tuner]
         else:
             path, classname = re.match(CUSTOM_CLASS_REGEX, self.datarun.tuner).groups()
             mod = imp.load_source('btb.tuning.custom', path)
@@ -248,8 +248,8 @@ class Worker(object):
             # access the linked hyperpartitions and dataruns
             with db_session(self.db):
                 classifier = self.db.get_classifier(classifier_id)
-                model_path = save_model(classifier, self.model_dir, model)
-                metric_path = save_metrics(classifier, self.metric_dir, metrics)
+                model_path = save_model(classifier, self.models_dir, model)
+                metric_path = save_metrics(classifier, self.metrics_dir, metrics)
 
             # if necessary, save model and metrics to Amazon S3 bucket
             if self.cloud_mode:
@@ -277,7 +277,7 @@ class Worker(object):
 
     def save_classifier_cloud(self, local_model_path, local_metric_path, delete_local=False):
         """
-        Save a classifier to the S3 bucket supplied by aws_config. Saves a
+        Save a classifier to the S3 bucket supplied on __init__. Saves a
         serialized representaion of the model as well as a detailed set
         of metrics.
 
@@ -285,34 +285,26 @@ class Worker(object):
         local_metric_path: path to serialized metrics in the local file system
         """
 
-        aws_access_key = None
-        aws_secret_key = None
-
-        if self.aws_config:
-            aws_access_key = self.aws_config.access_key
-            aws_secret_key = self.aws_config.secret_key
-
         client = boto3.client(
             's3',
-            aws_access_key_id=aws_access_key,
-            aws_secret_access_key=aws_secret_key,
+            aws_access_key_id=self.aws_access_key,
+            aws_secret_access_key=self.aws_secret_key,
         )
 
-        if self.aws_config.s3_folder:
-            aws_model_path = os.path.join(self.aws_config.aws_folder, local_model_path)
-            aws_metric_path = os.path.join(self.aws_config.aws_folder, local_metric_path)
-
+        if self.s3_folder:
+            aws_model_path = os.path.join(self.s3_folder, local_model_path)
+            aws_metric_path = os.path.join(self.s3_folder, local_metric_path)
         else:
             aws_model_path = local_model_path
             aws_metric_path = local_metric_path
 
-        client.upload_file(aws_model_path, self.aws_config.s3_bucket, aws_model_path)
-        LOGGER.info('Uploading model at %s to S3 bucket %s',
-                    self.aws_config.s3_bucket, local_model_path)
+        LOGGER.info('Uploading model at %s to s3://%s/%s',
+                    local_model_path, self.s3_bucket, aws_model_path)
+        client.upload_file(local_model_path, self.s3_bucket, aws_model_path)
 
-        client.upload_file(aws_metric_path, self.aws_config.s3_bucket, aws_metric_path)
-        LOGGER.info('Uploading metrics at %s to S3 bucket %s',
-                    self.aws_config.s3_bucket, local_metric_path)
+        LOGGER.info('Uploading metric at %s to s3://%s/%s',
+                    local_metric_path, self.s3_bucket, aws_metric_path)
+        client.upload_file(local_metric_path, self.s3_bucket, aws_metric_path)
 
         if delete_local:
             LOGGER.info('Deleting local copies of %s and %s',
@@ -321,8 +313,8 @@ class Worker(object):
             os.remove(local_metric_path)
 
         return (
-            's3://{}/{}'.format(self.aws_config.s3_bucket, aws_model_path),
-            's3://{}/{}'.format(self.aws_config.s3_bucket, aws_metric_path)
+            's3://{}/{}'.format(self.s3_bucket, aws_model_path),
+            's3://{}/{}'.format(self.s3_bucket, aws_metric_path)
         )
 
     def is_datarun_finished(self):
@@ -397,7 +389,7 @@ class Worker(object):
         LOGGER.debug('Creating classifier...')
         classifier = self.db.start_classifier(hyperpartition_id=hyperpartition.id,
                                               datarun_id=self.datarun.id,
-                                              host=self.public_ip,
+                                              host=HOSTNAME,
                                               hyperparameter_values=params)
 
         try:

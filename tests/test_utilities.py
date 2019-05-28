@@ -1,11 +1,7 @@
-import socket
-
-import pytest
 from btb.selection.selector import Selector
-from mock import patch
 
 from atm import utilities
-from atm.constants import SELECTORS_MAP
+from atm.constants import SELECTORS
 
 
 def test_make_selector():
@@ -15,48 +11,6 @@ def test_make_selector():
         'by_algorithm': {'svm': [1, 2], 'rf': [3, 4]}
     }
 
-    for selector_class in SELECTORS_MAP.values():
+    for selector_class in SELECTORS.values():
         selector = utilities.get_instance(selector_class, **kwargs)
         assert isinstance(selector, Selector)
-
-
-@patch('atm.utilities.requests')
-def test_public_ip_existing(requests_mock):
-    # Set-up
-    utilities.public_ip = '1.2.3.4'
-
-    # run
-    ip = utilities.get_public_ip()
-
-    # asserts
-    assert ip == utilities.public_ip
-    requests_mock.get.assert_not_called()
-
-
-def test_public_ip_success():
-    # Set-up
-    utilities.public_ip = None
-
-    # run
-    ip = utilities.get_public_ip()
-
-    # asserts
-    assert ip == utilities.public_ip
-    try:
-        socket.inet_aton(ip)
-    except socket.error:
-        pytest.fail("Invalid IP address")
-
-
-@patch('atm.utilities.requests.get', side_effect=Exception)
-def test_public_ip_fail(mock_get):
-    # Set-up
-    utilities.public_ip = None
-
-    # run
-    ip = utilities.get_public_ip()
-
-    # asserts
-    assert ip == utilities.public_ip
-    assert ip == 'localhost'
-    mock_get.assert_called_once_with(utilities.PUBLIC_IP_URL)

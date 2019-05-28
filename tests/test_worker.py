@@ -10,16 +10,18 @@ from btb.tuning import GP
 from btb.tuning.tuner import BaseTuner
 from mock import ANY, Mock, patch
 
-from atm import PROJECT_ROOT
 from atm.classifier import Model
-from atm.config import DatasetConfig, LogConfig, RunConfig, SQLConfig
+from atm.config import DatasetConfig, RunConfig
 from atm.constants import METRICS_BINARY, TIME_FMT
 from atm.core import ATM
 from atm.database import Database, db_session
 from atm.utilities import load_metrics, load_model
 from atm.worker import ClassifierError, Worker
 
-DB_CACHE_PATH = os.path.join(PROJECT_ROOT, 'data/modelhub/test/')
+CURDIR = os.path.dirname(__file__)
+DEMOS_PATH = os.path.realpath(os.path.join(CURDIR, os.pardir, 'atm', 'demos'))
+POLLUTION_PATH = os.path.join(DEMOS_PATH, 'pollution.csv')
+DB_CACHE_PATH = os.path.join(CURDIR, 'modelhub')
 DB_PATH = '/tmp/atm.db'
 METRIC_DIR = '/tmp/metrics/'
 MODEL_DIR = '/tmp/models/'
@@ -27,8 +29,15 @@ MODEL_DIR = '/tmp/models/'
 DATASET_ID = 1
 DATARUN_ID = 2
 HYPERPART_ID = 34
-DT_PARAMS = {'criterion': 'gini', 'max_features': 0.5, 'max_depth': 3,
-             'min_samples_split': 2, 'min_samples_leaf': 1}
+DT_PARAMS = {
+    'criterion': 'gini',
+    'max_features': 0.5,
+    'max_depth': 3,
+    'min_samples_split': 2,
+    'min_samples_leaf': 1
+}
+
+TESTS_ROOT = os.path.dirname(__file__)
 
 
 # helper class to allow fuzzy arg matching
@@ -59,7 +68,7 @@ def db():
     os.remove(DB_PATH)
     db = Database(dialect='sqlite', database=DB_PATH)
     # load cached ModelHub state. This database snapshot has one dataset
-    # (pollution_1.csv) and two dataruns, one complete and one with 33/100
+    # (pollution.csv) and two dataruns, one complete and one with 33/100
     # classifiers finished.
     db.from_csv(DB_CACHE_PATH)
     return db
@@ -107,18 +116,17 @@ def worker(db, datarun):
 def get_new_worker(**kwargs):
     kwargs['dataset_id'] = kwargs.get('dataset_id', None)
     kwargs['methods'] = kwargs.get('methods', ['logreg', 'dt'])
-    sql_conf = SQLConfig({'sql_database': DB_PATH})
     run_conf = RunConfig(kwargs)
 
     dataset_conf = DatasetConfig(kwargs)
-    dataset_conf.train_path = os.path.join(
-        os.path.join(os.path.join(PROJECT_ROOT, 'data'), 'test'), 'pollution_1.csv')
+    dataset_conf.train_path = POLLUTION_PATH
 
-    db = Database(**sql_conf.to_dict())
-    atm = ATM(sql_conf=sql_conf)
+    db = Database(dialect='sqlite', database=DB_PATH)
+    atm = ATM(dialect='sqlite', database=DB_PATH)
 
-    datarun = atm.enter_data(dataset_conf, run_conf)
-    # datarun = db.get_datarun(run_id.id)
+    dataset = atm.add_dataset(**dataset_conf.to_dict())
+    run_conf.dataset_id = dataset.id
+    datarun = atm.add_datarun(**run_conf.to_dict())
 
     return Worker(db, datarun)
 
@@ -132,8 +140,8 @@ def test_load_selector_and_tuner(db, dataset):
 
 
 def test_load_custom_selector_and_tuner(db, dataset):
-    tuner_path = os.path.join(PROJECT_ROOT, '../tests/utilities/mytuner.py')
-    selector_path = os.path.join(PROJECT_ROOT, '../tests/utilities/myselector.py')
+    tuner_path = os.path.join(TESTS_ROOT, 'utilities', 'mytuner.py')
+    selector_path = os.path.join(TESTS_ROOT, 'utilities', 'myselector.py')
     worker = get_new_worker(selector=selector_path + ':MySelector',
                             tuner=tuner_path + ':MyTuner')
     assert isinstance(worker.selector, Selector)
@@ -190,8 +198,7 @@ def test_test_classifier(db, dataset):
 
 
 def test_save_classifier(db, datarun, model, metrics):
-    log_conf = LogConfig({'model_dir': MODEL_DIR, 'metric_dir': METRIC_DIR})
-    worker = Worker(db, datarun, log_config=log_conf)
+    worker = Worker(db, datarun, models_dir=MODEL_DIR, metrics_dir=METRIC_DIR)
     hp = db.get_hyperpartitions(datarun_id=worker.datarun.id)[0]
     classifier = worker.db.start_classifier(hyperpartition_id=hp.id,
                                             datarun_id=worker.datarun.id,

@@ -1,7 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
-import os
 from builtins import object
 
 from btb.selection import (
@@ -11,19 +10,11 @@ from btb.selection import Uniform as UniformSelector
 from btb.tuning import GP, GPEi, GPEiVelocity
 from btb.tuning import Uniform as UniformTuner
 
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-
-
 # A bunch of constants which are used throughout the project, mostly for config.
 # TODO: convert these lists and classes to something more elegant, like enums
 SQL_DIALECTS = ['sqlite', 'mysql']
 SCORE_TARGETS = ['cv', 'test', 'mu_sigma']
 BUDGET_TYPES = ['none', 'classifier', 'walltime']
-METHODS = ['logreg', 'svm', 'sgd', 'dt', 'et', 'rf', 'gnb', 'mnb', 'bnb',
-           'gp', 'pa', 'knn', 'mlp', 'ada']
-TUNERS = ['uniform', 'gp', 'gp_ei', 'gp_eivel']
-SELECTORS = ['uniform', 'ucb1', 'bestk', 'bestkvel', 'purebestkvel', 'recentk',
-             'recentkvel', 'hieralg']
 DATARUN_STATUS = ['pending', 'running', 'complete']
 CLASSIFIER_STATUS = ['running', 'errored', 'complete']
 PARTITION_STATUS = ['incomplete', 'errored', 'gridding_done']
@@ -32,9 +23,6 @@ S3_PREFIX = '^s3://'
 HTTP_PREFIX = '^https?://'
 
 TIME_FMT = '%Y-%m-%d %H:%M'
-DATA_TEST_PATH = os.path.join(PROJECT_ROOT, 'data/test')
-DATA_DL_PATH = os.path.join(PROJECT_ROOT, 'data/downloads')
-METHOD_PATH = os.path.join(PROJECT_ROOT, 'methods')
 
 CUSTOM_CLASS_REGEX = r'(.*\.py):(\w+)$'
 JSON_REGEX = r'(.*\.json)$'
@@ -50,14 +38,14 @@ LOG_LEVELS = {
     'NONE': logging.NOTSET
 }
 
-TUNERS_MAP = {
+TUNERS = {
     'uniform': UniformTuner,
     'gp': GP,
     'gp_ei': GPEi,
     'gp_eivel': GPEiVelocity,
 }
 
-SELECTORS_MAP = {
+SELECTORS = {
     'uniform': UniformSelector,
     'ucb1': UCB1,
     'bestk': BestKReward,
@@ -68,7 +56,7 @@ SELECTORS_MAP = {
     'hieralg': HierarchicalByAlgorithm,
 }
 
-METHODS_MAP = {
+METHODS = {
     'logreg': 'logistic_regression.json',
     'svm': 'support_vector_machine.json',
     'sgd': 'stochastic_gradient_descent.json',
