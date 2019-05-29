@@ -6,32 +6,27 @@ from your terminal by simply passing it the path to a CSV file.
 In this example, we will use the default values that are provided in the code, which will use
 the `pollution.csv` that is being generated with the demo datasets by ATM.
 
-## 1. Generate the demo data
+## 1. Get the demo data
 
-**ATM** command line allows you to generate the demo data that we will be using through this steps
-by running the following command:
+The first step in order to run **ATM** is to obtain the demo datasets that will be used in during
+the rest of the tutorial.
 
-```bash
-atm get_demos
-```
+For this demo we will be using the pollution csv from the demos bucket, which you can download from
+[here](https://atm-data.s3.amazonaws.com/pollution_1.csv).
 
-A print on your console with the generated demo datasets will appear:
-
-```bash
-Generating file demos/iris.csv
-Generating file demos/pollution.csv
-Generating file demos/pitchfork_genres.csv
-```
 
 ## 2. Create a dataset and generate it's dataruns
 
-Once you have generated the demo datasets, now it's time to create a `dataset` object inside the
+Once you have obtained your demo dataset, now it's time to create a `dataset` object inside the
 database. Our command line also triggers the generation of `datarun` objects for this dataset in
 order to automate this process as much as possible:
 
 ```bash
-atm enter_data
+atm enter_data --train-path path/to/pollution_1.csv
 ```
+
+Have in mind that `--train-path` argument can be a local path, an URL link to the CSV file or an
+S3 bucket like link.
 
 If you run this command, you will create a dataset with the default values, which is using the
 `pollution_1.csv` dataset from the demo datasets.
