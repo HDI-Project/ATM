@@ -118,8 +118,8 @@ def get_new_worker(**kwargs):
     kwargs['methods'] = kwargs.get('methods', ['logreg', 'dt'])
     run_conf = RunConfig(kwargs)
 
+    kwargs['train_path'] = POLLUTION_PATH
     dataset_conf = DatasetConfig(kwargs)
-    dataset_conf.train_path = POLLUTION_PATH
 
     db = Database(dialect='sqlite', database=DB_PATH)
     atm = ATM(dialect='sqlite', database=DB_PATH)
