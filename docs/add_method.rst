@@ -131,6 +131,7 @@ If ``kernel`` is set to "matern", it means ``nu`` must also be set. If it's set 
 
 The example above defines a conditional parameter tree that looks something like
 this::
+
     kernel-----------------------
     |        \                   \
     matern    rational_quadratic  exp_sine_squared

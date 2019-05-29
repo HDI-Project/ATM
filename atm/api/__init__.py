@@ -2,7 +2,6 @@ from flask import Flask, jsonify, redirect, request
 from flask_restless_swagger import SwagAPIManager as APIManager
 from flask_sqlalchemy import SQLAlchemy
 
-from atm.api.preprocessors import DATASET_PREPROCESSORS
 from atm.api.utils import auto_abort, make_absolute
 from atm.config import RunConfig
 
@@ -37,7 +36,7 @@ def create_app(atm, debug=False):
 
     # Create API endpoints, which will be available at /api/<tablename> by
     # default. Allowed HTTP methods can be specified as well.
-    manager.create_api(db.Dataset, methods=['GET', 'POST'], preprocessors=DATASET_PREPROCESSORS)
+    manager.create_api(db.Dataset, methods=['GET', 'POST'])
     manager.create_api(db.Datarun, methods=['GET'])
     manager.create_api(db.Hyperpartition, methods=['GET'])
     manager.create_api(db.Classifier, methods=['GET'])

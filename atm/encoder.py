@@ -3,36 +3,7 @@ from __future__ import division, unicode_literals
 from builtins import object
 
 import numpy as np
-import pandas as pd
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-
-
-class MetaData(object):
-    def __init__(self, class_column, train_path, test_path=None):
-        """
-        Compute a bunch of metadata about the dataset.
-
-        class_column: name of dataframe column containing labels
-        data_paths: paths to csvs with the same columns
-        """
-        data = pd.read_csv(train_path)
-        if test_path is not None:
-            data = data.append(pd.read_csv(test_path))
-
-        # compute the portion of labels that are the most common value
-        counts = data[class_column].value_counts()
-        total_features = data.shape[1] - 1
-        for c in data.columns:
-            if data[c].dtype == 'object':
-                total_features += len(np.unique(data[c])) - 1
-
-        majority_percentage = float(max(counts)) / float(sum(counts))
-
-        self.n_examples = data.shape[0]
-        self.d_features = total_features
-        self.k_classes = len(np.unique(data[class_column]))
-        self.majority = majority_percentage
-        self.size = int(np.array(data).nbytes / 1000)
 
 
 class DataEncoder(object):
@@ -80,7 +51,8 @@ class DataEncoder(object):
         if self.categorical_columns:
             self.feature_encoder = OneHotEncoder(
                 categorical_features=self.categorical_columns,
-                sparse=False
+                sparse=False,
+                handle_unknown='ignore'
             )
             self.feature_encoder.fit(X)
 

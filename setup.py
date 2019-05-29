@@ -11,10 +11,11 @@ with open('HISTORY.md') as history_file:
 
 install_requires = [
     'baytune==0.2.5',
-    'boto>=2.48.0',
+    'boto3>=1.9.146',
     'future>=0.16.0',
     'joblib>=0.11',
-    'mysqlclient>=1.2',
+    'pymysql>=0.9.3',
+    'cryptography>=2.6.1',
     'numpy>=1.13.1',
     'pandas>=0.22.0',
     'psutil>=5.6.1',
@@ -30,6 +31,7 @@ install_requires = [
     'flask-sqlalchemy>=2.3.2',
     'flask-restless-swagger-2>=0.0.3',
     'simplejson>=3.16.0',
+    'tqdm>=4.31.1',
 ]
 
 setup_requires = [
@@ -55,6 +57,7 @@ development_requires = [
     'm2r>=0.2.0',
     'Sphinx>=1.7.1',
     'sphinx_rtd_theme>=0.2.4',
+    'autodocsumm>=0.1.10',
 
     # style check
     'flake8>=3.7.7',
@@ -110,6 +113,6 @@ setup(
     test_suite='tests',
     tests_require=tests_require,
     url='https://github.com/HDI-project/ATM',
-    version='0.1.2',
+    version='0.2.0-dev',
     zip_safe=False,
 )

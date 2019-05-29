@@ -6,6 +6,8 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import logging
+import os
+import pickle
 import re
 import time
 from builtins import object
@@ -17,12 +19,11 @@ import pandas as pd
 from sklearn import decomposition
 from sklearn.gaussian_process.kernels import (
     RBF, ConstantKernel, ExpSineSquared, Matern, RationalQuadratic)
-from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from atm.constants import Metrics
-from atm.encoder import DataEncoder, MetaData
+from atm.encoder import DataEncoder
 from atm.method import Method
 from atm.metrics import cross_validate_pipeline, test_pipeline
 
@@ -81,14 +82,6 @@ class Model(object):
 
         # persistent random state
         self.random_state = np.random.randint(1e7)
-
-    def load_data(self, path, dropvals=None, sep=','):
-        # load data as a Pandas dataframe
-        data = pd.read_csv(path, skipinitialspace=True,
-                           na_values=dropvals, sep=sep)
-
-        # drop rows with any NA values
-        return data.dropna(how='any')
 
     def make_pipeline(self):
         """
@@ -176,13 +169,10 @@ class Model(object):
 
         return test_scores
 
-    def train_test(self, train_path, test_path=None):
-        # load train and (maybe) test data
-        metadata = MetaData(class_column=self.class_column,
-                            train_path=train_path,
-                            test_path=test_path)
-        self.num_classes = metadata.k_classes
-        self.num_features = metadata.d_features
+    def train_test(self, dataset):
+
+        self.num_classes = dataset.k_classes
+        self.num_features = dataset.d_features
 
         # if necessary, cast judgment metric into its binary/multiary equivalent
         if self.num_classes == 2:
@@ -198,21 +188,11 @@ class Model(object):
                 self.judgment_metric = Metrics.ROC_AUC_MACRO
 
         # load training data
-        train_data = self.load_data(train_path)
-
-        # if necessary, generate permanent train/test split
-        if test_path is not None:
-            test_data = self.load_data(test_path)
-            all_data = pd.concat([train_data, test_data])
-        else:
-            all_data = train_data
-            train_data, test_data = train_test_split(train_data,
-                                                     test_size=self.testing_ratio,
-                                                     random_state=self.random_state)
+        train_data, test_data = dataset.load(self.testing_ratio, self.random_state)
 
         # extract feature matrix and labels from raw data
         self.encoder = DataEncoder(class_column=self.class_column)
-        self.encoder.fit(all_data)
+        self.encoder.fit(train_data)
         X_train, y_train = self.encoder.transform(train_data)
         X_test, y_test = self.encoder.transform(test_data)
 
@@ -289,3 +269,23 @@ class Model(object):
 
         # return the updated parameter vector
         return params
+
+    @classmethod
+    def load(cls, path):
+        """Loads a saved instance from a path."""
+
+        with open(path, 'rb') as classifier:
+            return pickle.load(classifier)
+
+    def save(self, path, force=False):
+        if os.path.exists(path) and not force:
+            print('The indicated path already exists. Use `force=True` to overwrite.')
+
+        base_path = os.path.dirname(path)
+        if not os.path.exists(base_path):
+            os.makedirs(base_path)
+
+        with open(path, 'wb') as pickle_file:
+            pickle.dump(self, pickle_file)
+
+        print("Model saved as {}".format(path))

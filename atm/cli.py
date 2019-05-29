@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import glob
 import logging
 import multiprocessing
 import os
-import shutil
 import time
 
 import psutil
@@ -15,6 +13,7 @@ from lockfile.pidlockfile import PIDLockFile
 from atm.api import create_app
 from atm.config import AWSConfig, DatasetConfig, LogConfig, RunConfig, SQLConfig
 from atm.core import ATM
+from atm.data import copy_files, get_demos
 
 LOGGER = logging.getLogger(__name__)
 
@@ -23,7 +22,8 @@ def _get_atm(args):
     sql_conf = SQLConfig(args)
     aws_conf = AWSConfig(args)
     log_conf = LogConfig(args)
-    return ATM(sql_conf, aws_conf, log_conf)
+
+    return ATM(**sql_conf.to_dict(), **aws_conf.to_dict(), **log_conf.to_dict())
 
 
 def _work(args, wait=False):
@@ -194,34 +194,20 @@ def _enter_data(args):
     atm = _get_atm(args)
     run_conf = RunConfig(args)
     dataset_conf = DatasetConfig(args)
-    atm.enter_data(dataset_conf, run_conf)
 
+    if run_conf.dataset_id is None:
+        dataset = atm.add_dataset(**dataset_conf.to_dict())
+        run_conf.dataset_id = dataset.id
 
-def _copy_files(pattern, source, target=None):
-    if isinstance(source, (list, tuple)):
-        source = os.path.join(*source)
-
-    if target is None:
-        target = source
-
-    source_dir = os.path.join(os.path.dirname(__file__), source)
-    target_dir = os.path.join(os.getcwd(), target)
-
-    if not os.path.exists(target_dir):
-        os.makedirs(target_dir)
-
-    for source_file in glob.glob(os.path.join(source_dir, pattern)):
-        target_file = os.path.join(target_dir, os.path.basename(source_file))
-        print('Generating file {}'.format(target_file))
-        shutil.copy(source_file, target_file)
+    return atm.add_datarun(**run_conf.to_dict())
 
 
 def _make_config(args):
-    _copy_files('*.yaml', ('config', 'templates'))
+    copy_files('*.yaml', ('config'))
 
 
 def _get_demos(args):
-    _copy_files('*.csv', ('data', 'test'), 'demos')
+    get_demos(args)
 
 
 def _get_parser():
@@ -342,7 +328,7 @@ def _get_parser():
 
     # Get Demos
     get_demos = subparsers.add_parser('get_demos', parents=[logging_args],
-                                      help='Generate a demos folder with demo CSVs in the cwd.')
+                                      help='Create a demos folder and put the demo CSVs inside.')
     get_demos.set_defaults(action=_get_demos)
 
     return parser
