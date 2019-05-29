@@ -151,41 +151,41 @@ def make_save_path(dir, classifier, suffix):
     return os.path.join(dir, filename)
 
 
-def save_model(classifier, model_dir, model):
+def save_model(classifier, models_dir, model):
     """
     Save a serialized version of a Model object for a particular classifier.
     The object will be stored at a path generated from the classifier's
     attributes.
     """
-    path = make_save_path(model_dir, classifier, 'model')
+    path = make_save_path(models_dir, classifier, 'model')
     logger.info('Saving model in: %s' % path)
     with open(path, 'wb') as f:
         pickle.dump(model, f, protocol=pickle.HIGHEST_PROTOCOL)
     return path
 
 
-def save_metrics(classifier, metric_dir, metrics):
+def save_metrics(classifier, metrics_dir, metrics):
     """
     Save a JSON-serialized version of a set of performance metrics for a
     particular classifier. The metrics will be stored at a path generated from
     the classifier's attributes.
     """
-    path = make_save_path(metric_dir, classifier, 'metric')
+    path = make_save_path(metrics_dir, classifier, 'metric')
     logger.info('Saving metrics in: %s' % path)
     with open(path, 'w') as f:
         json.dump(metrics, f)
     return path
 
 
-def load_model(classifier, model_dir):
+def load_model(classifier, models_dir):
     """ Load the Model object for a particular classifier """
-    path = make_save_path(model_dir, classifier, 'model')
+    path = make_save_path(models_dir, classifier, 'model')
     with open(path, 'rb') as f:
         return pickle.load(f)
 
 
-def load_metrics(classifier, metric_dir):
+def load_metrics(classifier, metrics_dir):
     """ Load the performance metrics for a particular classifier """
-    path = make_save_path(metric_dir, classifier, 'metric')
+    path = make_save_path(metrics_dir, classifier, 'metric')
     with open(path) as f:
         return json.load(f)

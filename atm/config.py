@@ -156,8 +156,8 @@ class SQLConfig(Config):
 
 
 class LogConfig(Config):
-    model_dir = ('Directory where computed models will be saved', 'models')
-    metric_dir = ('Directory where model metrics will be saved', 'metrics')
+    models_dir = ('Directory where computed models will be saved', 'models')
+    metrics_dir = ('Directory where model metrics will be saved', 'metrics')
     verbose_metrics = {
         'help': (
             'If set, compute full ROC and PR curves and '
