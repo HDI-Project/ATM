@@ -319,8 +319,8 @@ predictions = model.predict(data.head())
 For more details about **ATM** and all its possibilities and features, please check the
 [documentation site](https://HDI-Project.github.io/ATM/).
 
-There you can learn more about its [Command Line Interface](https://hdi-project.github.io/ATM/command_line_interface.html)
-and its [REST API](https://hdi-project.github.io/ATM/api.html), as well as
+There you can learn more about its [Command Line Interface](https://hdi-project.github.io/ATM/cli.html)
+and its [REST API](https://hdi-project.github.io/ATM/rest.html), as well as
 [how to contribute to ATM](https://HDI-Project.github.io/ATM/community/contributing.html)
 in order to help us developing new features or cool ideas.
 
