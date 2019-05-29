@@ -132,7 +132,10 @@ class DatasetConfig(Config):
     _CONFIG = 'run'
 
     name = 'Given name for this dataset.'
-    train_path = 'Path to raw training data'
+    train_path = {
+        'help': 'Path to raw training data',
+        'required': True
+    }
     test_path = 'Path to raw test data (if applicable)'
     description = 'Description of dataset'
     class_column = ('Name of the class column in the input data', 'class')
