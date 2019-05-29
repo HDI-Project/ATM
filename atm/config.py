@@ -8,8 +8,8 @@ from builtins import object, str
 import yaml
 
 from atm.constants import (
-    BUDGET_TYPES, CUSTOM_CLASS_REGEX, DATA_TEST_PATH, JSON_REGEX, METHODS, METRICS, SCORE_TARGETS,
-    SELECTORS, SQL_DIALECTS, TIME_FMT, TUNERS)
+    BUDGET_TYPES, CUSTOM_CLASS_REGEX, JSON_REGEX, METHODS, METRICS, SCORE_TARGETS, SELECTORS,
+    SQL_DIALECTS, TIME_FMT, TUNERS)
 
 
 class Config(object):
@@ -132,9 +132,12 @@ class DatasetConfig(Config):
     _CONFIG = 'run'
 
     name = 'Given name for this dataset.'
-    train_path = ('Path to raw training data', os.path.join(DATA_TEST_PATH, 'pollution_1.csv'))
+    train_path = {
+        'help': 'Path to raw training data',
+        'required': True
+    }
     test_path = 'Path to raw test data (if applicable)'
-    data_description = 'Description of dataset'
+    description = 'Description of dataset'
     class_column = ('Name of the class column in the input data', 'class')
 
 
@@ -156,8 +159,8 @@ class SQLConfig(Config):
 
 
 class LogConfig(Config):
-    model_dir = ('Directory where computed models will be saved', 'models')
-    metric_dir = ('Directory where model metrics will be saved', 'metrics')
+    models_dir = ('Directory where computed models will be saved', 'models')
+    metrics_dir = ('Directory where model metrics will be saved', 'metrics')
     verbose_metrics = {
         'help': (
             'If set, compute full ROC and PR curves and '
@@ -171,7 +174,7 @@ class LogConfig(Config):
 def option_or_path(options, regex=CUSTOM_CLASS_REGEX):
     def type_check(s):
         # first, check whether the argument is one of the preconfigured options
-        if s in options:
+        if s in list(options):
             return s
 
         # otherwise, check it against the regex, and try to pull out a path to a
@@ -229,9 +232,9 @@ class RunConfig(Config):
             'classification. Each method can either be one of the '
             'pre-defined method codes listed below or a path to a '
             'JSON file defining a custom method.\n\nOptions: [{}]'
-        ).format(', '.join(str(s) for s in METHODS)),
+        ).format(', '.join(str(s) for s in METHODS.keys())),
         'default': ['logreg', 'dt', 'knn'],
-        'type': option_or_path(METHODS, JSON_REGEX),
+        'type': option_or_path(METHODS.keys(), JSON_REGEX),
         'nargs': '+'
     }
 
@@ -312,9 +315,9 @@ class RunConfig(Config):
             'Type of BTB tuner to use. Can either be one of the pre-configured '
             'tuners listed below or a path to a custom tuner in the form '
             '"/path/to/tuner.py:ClassName".\n\nOptions: [{}]'
-        ).format(', '.join(str(s) for s in TUNERS)),
+        ).format(', '.join(str(s) for s in TUNERS.keys())),
         'default': 'uniform',
-        'type': option_or_path(TUNERS)
+        'type': option_or_path(TUNERS.keys())
     }
 
     # How should ATM select a particular hyperpartition from the set of all
@@ -335,9 +338,9 @@ class RunConfig(Config):
             'Type of BTB selector to use. Can either be one of the pre-configured '
             'selectors listed below or a path to a custom tuner in the form '
             '"/path/to/selector.py:ClassName".\n\nOptions: [{}]'
-        ).format(', '.join(str(s) for s in SELECTORS)),
+        ).format(', '.join(str(s) for s in SELECTORS.keys())),
         'default': 'uniform',
-        'type': option_or_path(SELECTORS)
+        'type': option_or_path(SELECTORS.keys())
     }
 
     # r_minimum is the number of random runs performed in each hyperpartition before

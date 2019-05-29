@@ -31,6 +31,7 @@ install_requires = [
     'flask-sqlalchemy>=2.3.2',
     'flask-restless-swagger-2>=0.0.3',
     'simplejson>=3.16.0',
+    'tqdm>=4.31.1',
 ]
 
 setup_requires = [
@@ -56,6 +57,7 @@ development_requires = [
     'm2r>=0.2.0',
     'Sphinx>=1.7.1',
     'sphinx_rtd_theme>=0.2.4',
+    'autodocsumm>=0.1.10',
 
     # style check
     'flake8>=3.7.7',

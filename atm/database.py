@@ -6,8 +6,10 @@ import os
 import pickle
 from builtins import object
 from datetime import datetime
+from io import BytesIO
 from operator import attrgetter
 
+import boto3
 import numpy as np
 import pandas as pd
 import pymysql
@@ -110,6 +112,7 @@ class Database(object):
         """
         metadata = MetaData(bind=self.engine)
         Base = declarative_base(metadata=metadata)
+        db = self
 
         class Dataset(Base):
             __tablename__ = 'datasets'
@@ -130,8 +133,9 @@ class Database(object):
             majority = Column(Numeric(precision=10, scale=9), nullable=False)
             size_kb = Column(Integer, nullable=False)
 
-            def load(self, test_size=0.3, random_state=0, aws_conf=None):
-                data = load_data(self.name, self.train_path, aws_conf)
+            def load(self, test_size=0.3, random_state=0,
+                     aws_access_key=None, aws_secret_key=None):
+                data = load_data(self.name, self.train_path, aws_access_key, aws_secret_key)
 
                 if self.test_path:
                     if self.name.endswith('.csv'):
@@ -139,15 +143,16 @@ class Database(object):
                     else:
                         test_name = self.name + '_test'
 
-                    test_data = load_data(test_name, self.test_path, aws_conf)
+                    test_data = load_data(test_name, self.test_path,
+                                          aws_access_key, aws_secret_key)
                     return data, test_data
 
                 else:
                     return train_test_split(data, test_size=test_size, random_state=random_state)
 
-            def _add_extra_fields(self, aws_conf):
+            def _add_extra_fields(self, aws_access_key=None, aws_secret_key=None):
 
-                data = load_data(self.name, self.train_path, aws_conf)
+                data = load_data(self.name, self.train_path, aws_access_key, aws_secret_key)
 
                 if self.n_examples is None:
                     self.n_examples = len(data)
@@ -175,16 +180,17 @@ class Database(object):
                 md5 = hashlib.md5(path.encode('utf-8'))
                 return md5.hexdigest()
 
-            def __init__(self, class_column, train_path, id=None, name=None, description=None,
-                         test_path=None, aws_conf=None, n_examples=None, majority=None,
-                         k_classes=None, size_kb=None, d_features=None):
+            def __init__(self, train_path, test_path=None, name=None, description=None,
+                         class_column=None, n_examples=None, majority=None, k_classes=None,
+                         size_kb=None, d_features=None, id=None, aws_access_key=None,
+                         aws_secret_key=None):
 
-                self.id = id
-                self.name = name or self._make_name(train_path)
-                self.class_column = class_column
                 self.train_path = train_path
                 self.test_path = test_path
+                self.name = name or self._make_name(train_path)
                 self.description = description or self.name
+                self.class_column = class_column
+                self.id = id
 
                 self.n_examples = n_examples
                 self.d_features = d_features
@@ -192,7 +198,7 @@ class Database(object):
                 self.k_classes = k_classes
                 self.size_kb = size_kb
 
-                self._add_extra_fields(aws_conf)
+                self._add_extra_fields(aws_access_key, aws_secret_key)
 
             def __repr__(self):
                 base = "<%s: %s, %d classes, %d features, %d rows>"
@@ -236,6 +242,71 @@ class Database(object):
                 base = "<ID = %d, dataset ID = %s, strategy = %s, budget = %s (%s), status: %s>"
                 return base % (self.id, self.dataset_id, self.description,
                                self.budget_type, self.budget, self.status)
+
+            @property
+            def completed_classifiers(self):
+                return len(self.get_complete_classifiers())
+
+            def get_scores(self):
+                columns = [
+                    'id',
+                    'cv_judgment_metric',
+                    'cv_judgment_metric_stdev',
+                    'test_judgment_metric',
+                ]
+
+                classifiers = db.get_classifiers(datarun_id=self.id)
+                scores = [
+                    {
+                        key: value
+                        for key, value in vars(classifier).items()
+                        if key in columns
+                    }
+                    for classifier in classifiers
+                ]
+
+                scores = pd.DataFrame(scores)
+                scores.sort_values(by='cv_judgment_metric', ascending=False, inplace=True)
+                scores['rank'] = scores['cv_judgment_metric'].rank(ascending=0)
+
+                return scores.reset_index(drop=True)
+
+            def get_best_classifier(self):
+                return db.get_best_classifier(self.score_target, datarun_id=self.id)
+
+            def get_complete_classifiers(self):
+                return db.get_classifiers(datarun_id=self.id, status=ClassifierStatus.COMPLETE)
+
+            def export_best_classifier(self, path, force=False):
+                if os.path.exists(path) and not force:
+                    print('The indicated path already exists. Use `force=True` to overwrite.')
+
+                base_path = os.path.dirname(path)
+                if base_path and not os.path.exists(base_path):
+                    os.makedirs(base_path)
+
+                classifier = self.get_best_classifier()
+                model = classifier.load_model()
+                with open(path, 'wb') as pickle_file:
+                    pickle.dump(model, pickle_file)
+
+                print("Classifier {} saved as {}".format(classifier.id, path))
+
+            def describe(self):
+                dataset = db.get_dataset(self.dataset_id)
+
+                elapsed = self.end_time - self.start_time if self.end_time else 'Not finished yet.'
+
+                to_print = [
+                    'Datarun {} summary:'.format(self.id),
+                    "\tDataset: '{}'".format(dataset.train_path),
+                    "\tColumn Name: '{}'".format(dataset.class_column),
+                    "\tJudgment Metric: '{}'".format(self.metric),
+                    '\tClassifiers Tested: {}'.format(len(db.get_classifiers(datarun_id=self.id))),
+                    '\tElapsed Time: {}'.format(elapsed),
+                ]
+
+                print('\n'.join(to_print))
 
         Dataset.dataruns = relationship('Datarun', order_by='Datarun.id',
                                         back_populates='dataset')
@@ -356,13 +427,75 @@ class Database(object):
                 return (self.cv_judgment_metric - 2 * self.cv_judgment_metric_stdev)
 
             def __repr__(self):
-                params = ', '.join(['%s: %s' % i for i in
-                                    list(self.hyperparameter_values.items())])
-                return "<id=%d, params=(%s)>" % (self.id, params)
+
+                params = '\n'.join(
+                    [
+                        '\t{}: {}'.format(name, value)
+                        for name, value in self.hyperparameter_values.items()
+                    ]
+                )
+
+                to_print = [
+                    'Classifier id: {}'.format(self.id),
+                    'Classifier type: {}'.format(
+                        db.get_hyperpartition(self.hyperpartition_id).method),
+                    'Params chosen: \n{}'.format(params),
+                    'Cross Validation Score: {:.3f} +- {:.3f}'.format(
+                        self.cv_judgment_metric, self.cv_judgment_metric_stdev),
+                    'Test Score: {:.3f}'.format(self.test_judgment_metric),
+                ]
+
+                return '\n'.join(to_print)
+
+            def load_s3_data(self, s3_url, aws_access_key=None, aws_secret_key=None):
+                """Returns raw data from S3"""
+
+                client = boto3.client(
+                    's3',
+                    aws_access_key_id=aws_access_key,
+                    aws_secret_access_key=aws_secret_key,
+                )
+
+                bucket = s3_url.split('/')[2]
+                path_to_read = s3_url.replace('s3://{}/'.format(bucket), '')
+
+                with BytesIO() as data:
+                    client.download_fileobj(bucket, path_to_read, data)
+                    data.seek(0)
+                    return data
+
+            def load_model(self):
+                """Return the model's insntance."""
+                if self.model_location.startswith('s3'):
+                    pickled = self.load_s3_data(
+                        self.model_location,
+                        self.aws_access_key,
+                        self.aws_secret_key,
+                    )
+                    return pickle.load(pickled)
+
+                else:
+                    with open(self.model_location, 'rb') as f:
+                        return pickle.load(f)
+
+            def load_metrics(self):
+                """Return the metrics"""
+                if self.metrics_location.startswith('s3'):
+                    pickled = self.load_s3_data(
+                        self.metrics_location,
+                        self.aws_access_key,
+                        self.aws_secret_key,
+                    )
+                    return json.load(pickled)
+
+                else:
+                    with open(self.metrics_location, 'rb') as f:
+                        return json.load(f)
 
         Datarun.classifiers = relationship('Classifier',
                                            order_by='Classifier.id',
                                            back_populates='datarun')
+
         Hyperpartition.classifiers = relationship('Classifier',
                                                   order_by='Classifier.id',
                                                   back_populates='hyperpartition')

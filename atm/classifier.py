@@ -6,6 +6,8 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import logging
+import os
+import pickle
 import re
 import time
 from builtins import object
@@ -267,3 +269,23 @@ class Model(object):
 
         # return the updated parameter vector
         return params
+
+    @classmethod
+    def load(cls, path):
+        """Loads a saved instance from a path."""
+
+        with open(path, 'rb') as classifier:
+            return pickle.load(classifier)
+
+    def save(self, path, force=False):
+        if os.path.exists(path) and not force:
+            print('The indicated path already exists. Use `force=True` to overwrite.')
+
+        base_path = os.path.dirname(path)
+        if not os.path.exists(base_path):
+            os.makedirs(base_path)
+
+        with open(path, 'wb') as pickle_file:
+            pickle.dump(self, pickle_file)
+
+        print("Model saved as {}".format(path))

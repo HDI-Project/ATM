@@ -124,7 +124,7 @@ coverage: ## check code coverage quickly with the default Python
 
 .PHONY: docs
 docs: clean-docs ## generate Sphinx HTML documentation, including API docs
-	sphinx-apidoc --module-first --separate -o docs/api/ atm
+	sphinx-apidoc --separate -T -o docs/api/ atm
 	$(MAKE) -C docs html
 
 .PHONY: view-docs

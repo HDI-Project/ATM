@@ -34,7 +34,12 @@ extensions = [
     'sphinx.ext.githubpages',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
+    'autodocsumm',
 ]
+
+autodoc_default_options = {
+    'autosummary': True,
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -45,8 +50,6 @@ source_suffix = ['.rst', '.md']
 
 # The master toctree document.
 master_doc = 'index'
-
-
 
 # General information about the project.
 project = 'ATM'
@@ -117,7 +120,9 @@ html_theme_options = {
 # The name of an image file (relative to this directory) to use as a favicon of
 # the docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = 'images/favicon.ico'
+html_favicon = 'images/dai-logo-white.ico'
+
+html_logo = 'images/dai-logo-white-200.png'
 
 # -- Options for HTMLHelp output ---------------------------------------
 
