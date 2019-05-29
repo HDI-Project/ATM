@@ -1,11 +1,6 @@
 atm.api package
 ===============
 
-.. automodule:: atm.api
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Submodules
 ----------
 
@@ -13,3 +8,10 @@ Submodules
 
    atm.api.utils
 
+Module contents
+---------------
+
+.. automodule:: atm.api
+    :members:
+    :undoc-members:
+    :show-inheritance:

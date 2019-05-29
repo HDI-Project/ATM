@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search &mdash; ATM 0.1.3-dev documentation</title>
+  <title>Command Line Interface &mdash; ATM 0.1.3-dev documentation</title>
   
 
   
@@ -27,7 +27,6 @@
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
         <script type="text/javascript" src="_static/language_data.js"></script>
-        <script type="text/javascript" src="_static/searchtools.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -37,7 +36,9 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="#" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="REST API" href="rest.html" />
+    <link rel="prev" title="Guide to the ModelHub database" href="database.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -64,7 +65,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -113,7 +114,7 @@
 </li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usage</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="database.html">Guide to the ModelHub database</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="database.html#datasets">Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="database.html#dataruns">Dataruns</a></li>
@@ -121,10 +122,10 @@
 <li class="toctree-l2"><a class="reference internal" href="database.html#classifiers">Classifiers</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#generate-the-demo-data">1. Generate the demo data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#start-a-worker">3. Start a worker</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#generate-the-demo-data">1. Generate the demo data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#start-a-worker">3. Start a worker</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="rest.html">REST API</a><ul>
@@ -263,14 +264,14 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Search</li>
+      <li>Command Line Interface</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
             
-              <a href="https://github.com/HDI-project/ATM/blob/master/docs/search" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/HDI-project/ATM/blob/master/docs/cli.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -284,24 +285,110 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search
-      functionality.
-    </p>
-  </div>
-  </noscript>
+  <div class="section" id="command-line-interface">
+<h1>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline">¶</a></h1>
+<p><strong>ATM</strong> provides a simple command line client that will allow you to run ATM directly
+from your terminal by simply passing it the path to a CSV file.</p>
+<p>In this example, we will use the default values that are provided in the code, which will use
+the <code class="docutils literal notranslate"><span class="pre">pollution.csv</span></code> that is being generated with the demo datasets by ATM.</p>
+<div class="section" id="generate-the-demo-data">
+<h2>1. Generate the demo data<a class="headerlink" href="#generate-the-demo-data" title="Permalink to this headline">¶</a></h2>
+<p><strong>ATM</strong> command line allows you to generate the demo data that we will be using through this steps
+by running the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm get_demos
+</pre></div>
+</div>
+<p>A print on your console with the generated demo datasets will appear:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Generating file demos/iris.csv
+Generating file demos/pollution.csv
+Generating file demos/pitchfork_genres.csv
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-a-dataset-and-generate-it-s-dataruns">
+<h2>2. Create a dataset and generate it’s dataruns<a class="headerlink" href="#create-a-dataset-and-generate-it-s-dataruns" title="Permalink to this headline">¶</a></h2>
+<p>Once you have generated the demo datasets, now it’s time to create a <code class="docutils literal notranslate"><span class="pre">dataset</span></code> object inside the
+database. Our command line also triggers the generation of <code class="docutils literal notranslate"><span class="pre">datarun</span></code> objects for this dataset in
+order to automate this process as much as possible:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm enter_data
+</pre></div>
+</div>
+<p>If you run this command, you will create a dataset with the default values, which is using the
+<code class="docutils literal notranslate"><span class="pre">pollution_1.csv</span></code> dataset from the demo datasets.</p>
+<p>A print, with similar information to this, should be printed:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>method logreg has <span class="m">6</span> hyperpartitions
+method dt has <span class="m">2</span> hyperpartitions
+method knn has <span class="m">24</span> hyperpartitions
+Dataruns created. Summary:
+    Dataset ID: <span class="m">1</span>
+    Training data: demos/pollution_1.csv
+    Test data: None
+    Datarun ID: <span class="m">1</span>
+    Hyperpartition selection strategy: uniform
+    Parameter tuning strategy: uniform
+    Budget: <span class="m">100</span> <span class="o">(</span>classifier<span class="o">)</span>
+</pre></div>
+</div>
+<p>For more information about the arguments that this command line accepts, please run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm enter_data --help
+</pre></div>
+</div>
+</div>
+<div class="section" id="start-a-worker">
+<h2>3. Start a worker<a class="headerlink" href="#start-a-worker" title="Permalink to this headline">¶</a></h2>
+<p><strong>ATM</strong> requieres a worker to process the dataruns that are not completed and stored inside the
+database. This worker process will be runing until there are no dataruns <code class="docutils literal notranslate"><span class="pre">pending</span></code>.</p>
+<p>In order to launch such a process, execute:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm worker
+</pre></div>
+</div>
+<p>This will start a process that builds classifiers, tests them, and saves them to the <code class="docutils literal notranslate"><span class="pre">./models/</span></code>
+directory. The output should show which hyperparameters are being tested and the performance of
+each classifier (the “judgment metric”), plus the best overall performance so far.</p>
+<p>Prints similar to this one will apear repeatedly on your console while the <code class="docutils literal notranslate"><span class="pre">worker</span></code> is processing
+the datarun:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Classifier type: classify_logreg
+Params chosen:
+       <span class="nv">C</span> <span class="o">=</span> <span class="m">8904</span>.06127554
+       <span class="nv">_scale</span> <span class="o">=</span> True
+       <span class="nv">fit_intercept</span> <span class="o">=</span> False
+       <span class="nv">penalty</span> <span class="o">=</span> l2
+       <span class="nv">tol</span> <span class="o">=</span> <span class="m">4</span>.60893080631
+       <span class="nv">dual</span> <span class="o">=</span> True
+       <span class="nv">class_weight</span> <span class="o">=</span> auto
 
-  
-  <div id="search-results">
-  
-  </div>
+Judgment metric <span class="o">(</span>f1<span class="o">)</span>: <span class="m">0</span>.536 +- <span class="m">0</span>.067
+Best so far <span class="o">(</span>classifier <span class="m">21</span><span class="o">)</span>: <span class="m">0</span>.716 +- <span class="m">0</span>.035
+</pre></div>
+</div>
+<p>Occasionally, a worker will encounter an error in the process of building and testing a
+classifier. When this happens, the worker will print error data to the console, log the error in
+the database, and move on to the next classifier.</p>
+<p>You can break out of the worker with <span class="raw-html-m2r"><kbd>Ctrl</kbd></span>+<span class="raw-html-m2r"><kbd>c</kbd></span> and restart it with the same
+command; it will pick up right where it left off. You can also run the command simultaneously in
+different terminals to parallelize the work – all workers will refer to the same ModelHub
+database. When all 100 classifiers in your budget have been built, all workers will exit gracefully.</p>
+<p>This command aswell offers more information about the arguments that this command line accepts:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">atm</span> <span class="n">worker</span> <span class="c1">--help</span>
+</pre></div>
+</div>
+</div>
+</div>
+
 
            </div>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="rest.html" class="btn btn-neutral float-right" title="REST API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="database.html" class="btn btn-neutral float-left" title="Guide to the ModelHub database" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -334,14 +421,7 @@
   
   
     
-  
-  <script type="text/javascript">
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script type="text/javascript" id="searchindexloader"></script>
    
-
 
 </body>
 </html>

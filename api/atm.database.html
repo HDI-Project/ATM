@@ -13,7 +13,7 @@
 
   
   
-    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="shortcut icon" href="../_static/dai-logo-white.ico"/>
   
   
   
@@ -36,7 +36,9 @@
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="atm.encoder module" href="atm.encoder.html" />
+    <link rel="prev" title="atm.data module" href="atm.data.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -53,6 +55,9 @@
             <a href="../index.html" class="icon icon-home"> ATM
           
 
+          
+            
+            <img src="../_static/dai-logo-white-200.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -77,28 +82,39 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="../introduction.html">ATM: Scalable model selection and tuning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../introduction.html#background">Background</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">ATM - Auto Tune Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#overview">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#install">Install</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#install-with-pip">Install with pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#install-from-source">Install from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#install-for-development">Install for Development</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../setup.html">Setup</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../setup.html#requirements">0. Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../setup.html#install-atm">1. Install ATM</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../setup.html#install-using-pip">Install using pip</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../setup.html#install-from-source">Install from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#data-format">Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#create-an-atm-instance">2. Create an ATM instance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#search-for-the-best-model">3. Search for the best model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#explore-the-results">4. Explore the results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#make-predictions">5. Make predictions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../setup.html#install-a-database-optional">2. Install a database (Optional)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../setup.html#start-using-atm">3. Start using ATM!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#what-s-next">What’s next?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#credits">Credits</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#citing-atm">Citing ATM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#related-projects">Related Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#btb">BTB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#featuretools">Featuretools</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick-start guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#create-a-datarun">Create a datarun</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#execute-the-datarun">Execute the datarun</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Usage</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../database.html">Guide to the ModelHub database</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../database.html#datasets">Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../database.html#dataruns">Dataruns</a></li>
@@ -106,34 +122,32 @@
 <li class="toctree-l2"><a class="reference internal" href="../database.html#classifiers">Classifiers</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">REST API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../api.html#quickstart">Quickstart</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#create-a-dataset">2. Create a Dataset</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#browse-the-results">4. Browse the results</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../api.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api.html#get-a-single-object-by-id">Get a single object by id</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api.html#get-all-the-children-objects">Get all the children objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#generate-the-demo-data">1. Generate the demo data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../rest.html">REST API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../rest.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../rest.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rest.html#create-a-dataset">2. Create a Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rest.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rest.html#browse-the-results">4. Browse the results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../rest.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rest.html#get-a-single-object-by-id">Get a single object by id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rest.html#get-all-the-children-objects">Get all the children objects</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../api.html#additional-information">Additional information</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#restart-the-atm-process">Restart the ATM process</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#stop-the-atm-process">Stop the ATM process</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rest.html#additional-information">Additional information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../rest.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rest.html#restart-the-atm-process">Restart the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rest.html#stop-the-atm-process">Stop the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rest.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to ATM and BTB</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#ways-to-contribute">Ways to contribute</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#style">Style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#tests">Tests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#docs">Docs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../add_method.html">Adding a classification method</a><ul>
@@ -146,7 +160,65 @@
 <li class="toctree-l2"><a class="reference internal" href="../add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Resources</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="atm.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="atm.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="atm.api.html">atm.api package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="atm.api.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="atm.api.html#module-atm.api">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="atm.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="atm.classifier.html">atm.classifier module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.cli.html">atm.cli module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.compat.html">atm.compat module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.config.html">atm.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.constants.html">atm.constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.core.html">atm.core module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.data.html">atm.data module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">atm.database module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.encoder.html">atm.encoder module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.method.html">atm.method module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.metrics.html">atm.metrics module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.utilities.html">atm.utilities module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.worker.html">atm.worker module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="atm.html#module-atm">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#types-of-contributions">Types of Contributions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../contributing.html#report-bugs">Report Bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../contributing.html#fix-bugs">Fix Bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../contributing.html#implement-features">Implement Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../contributing.html#write-documentation">Write Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../contributing.html#submit-feedback">Submit Feedback</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#pull-request-guidelines">Pull Request Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#unit-testing-guidelines">Unit Testing Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#tips">Tips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#release-workflow">Release Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../history.html">History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../history.html#id1">0.1.2 (2019-05-07)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../history.html#new-features">New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../history.html#id6">0.1.1 (2019-04-02)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../history.html#id7">New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../history.html#id8">0.1.0 (2018-05-04)</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -192,6 +264,8 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
+          <li><a href="atm.html">atm package</a> &raquo;</li>
+        
       <li>atm.database module</li>
     
     
@@ -215,10 +289,127 @@
             
   <div class="section" id="module-atm.database">
 <span id="atm-database-module"></span><h1>atm.database module<a class="headerlink" href="#module-atm.database" title="Permalink to this headline">¶</a></h1>
+<p><strong>Classes</strong></p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.Database" title="atm.database.Database"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Database</span></code></a>(dialect, database[, username, …])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.database.db_session" title="atm.database.db_session"><code class="xref py py-obj docutils literal notranslate"><span class="pre">db_session</span></code></a>(db[, commit])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Functions</strong></p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.try_with_session" title="atm.database.try_with_session"><code class="xref py py-obj docutils literal notranslate"><span class="pre">try_with_session</span></code></a>([commit])</p></td>
+<td><p>Decorator for instance methods on Database that need a sqlalchemy session.</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="class">
 <dt id="atm.database.Database">
 <em class="property">class </em><code class="descclassname">atm.database.</code><code class="descname">Database</code><span class="sig-paren">(</span><em>dialect</em>, <em>database</em>, <em>username=None</em>, <em>password=None</em>, <em>host=None</em>, <em>port=None</em>, <em>query=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/database.html#Database"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.database.Database" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p><strong>Methods</strong></p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.Database.complete_classifier" title="atm.database.Database.complete_classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">complete_classifier</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.database.Database.create_classifier" title="atm.database.Database.create_classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_classifier</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.Database.create_datarun" title="atm.database.Database.create_datarun"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_datarun</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.database.Database.create_dataset" title="atm.database.Database.create_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_dataset</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.Database.create_hyperpartition" title="atm.database.Database.create_hyperpartition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_hyperpartition</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.database.Database.from_csv" title="atm.database.Database.from_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_csv</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.Database.get_best_classifier" title="atm.database.Database.get_best_classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_best_classifier</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.database.Database.get_classifier" title="atm.database.Database.get_classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_classifier</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.Database.get_classifiers" title="atm.database.Database.get_classifiers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_classifiers</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.database.Database.get_datarun" title="atm.database.Database.get_datarun"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_datarun</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.Database.get_dataruns" title="atm.database.Database.get_dataruns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dataruns</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.database.Database.get_dataset" title="atm.database.Database.get_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dataset</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.Database.get_hyperpartition" title="atm.database.Database.get_hyperpartition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_hyperpartition</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.database.Database.get_hyperpartitions" title="atm.database.Database.get_hyperpartitions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_hyperpartitions</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.Database.get_maximum_y" title="atm.database.Database.get_maximum_y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_maximum_y</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.database.Database.get_methods" title="atm.database.Database.get_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_methods</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.Database.get_number_of_hyperpartition_errors" title="atm.database.Database.get_number_of_hyperpartition_errors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_number_of_hyperpartition_errors</span></code></a>(*args, …)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.database.Database.is_datatun_gridding_done" title="atm.database.Database.is_datatun_gridding_done"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_datatun_gridding_done</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.Database.load_metrics" title="atm.database.Database.load_metrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_metrics</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.database.Database.load_model" title="atm.database.Database.load_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_model</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.Database.mark_classifier_errored" title="atm.database.Database.mark_classifier_errored"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mark_classifier_errored</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.database.Database.mark_datarun_complete" title="atm.database.Database.mark_datarun_complete"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mark_datarun_complete</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.Database.mark_datarun_running" title="atm.database.Database.mark_datarun_running"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mark_datarun_running</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.database.Database.mark_hyperpartition_errored" title="atm.database.Database.mark_hyperpartition_errored"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mark_hyperpartition_errored</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.Database.mark_hyperpartition_gridding_done" title="atm.database.Database.mark_hyperpartition_gridding_done"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mark_hyperpartition_gridding_done</span></code></a>(*args, …)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.database.Database.start_classifier" title="atm.database.Database.start_classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_classifier</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.Database.to_csv" title="atm.database.Database.to_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_csv</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="atm.database.Database.complete_classifier">
 <code class="descname">complete_classifier</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/database.html#Database.complete_classifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.database.Database.complete_classifier" title="Permalink to this definition">¶</a></dt>
@@ -377,6 +568,15 @@ not, it wraps the function call in a <cite>with db_session():</cite> block.</p>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="atm.encoder.html" class="btn btn-neutral float-right" title="atm.encoder module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="atm.data.html" class="btn btn-neutral float-left" title="atm.data module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

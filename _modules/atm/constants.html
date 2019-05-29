@@ -13,7 +13,7 @@
 
   
   
-    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="shortcut icon" href="../../_static/dai-logo-white.ico"/>
   
   
   
@@ -54,6 +54,9 @@
           
 
           
+            
+            <img src="../../_static/dai-logo-white-200.png" class="logo" alt="Logo"/>
+          
           </a>
 
           
@@ -77,28 +80,39 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">ATM: Scalable model selection and tuning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#background">Background</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">ATM - Auto Tune Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#overview">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#install">Install</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#install-with-pip">Install with pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#install-from-source">Install from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#install-for-development">Install for Development</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Setup</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../setup.html#requirements">0. Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-atm">1. Install ATM</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-using-pip">Install using pip</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-from-source">Install from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#data-format">Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#create-an-atm-instance">2. Create an ATM instance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#search-for-the-best-model">3. Search for the best model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#explore-the-results">4. Explore the results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#make-predictions">5. Make predictions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-a-database-optional">2. Install a database (Optional)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../setup.html#start-using-atm">3. Start using ATM!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#what-s-next">What’s next?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#credits">Credits</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#citing-atm">Citing ATM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#related-projects">Related Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../readme.html#btb">BTB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../readme.html#featuretools">Featuretools</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick-start guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#create-a-datarun">Create a datarun</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#execute-the-datarun">Execute the datarun</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Usage</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../../database.html">Guide to the ModelHub database</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../database.html#datasets">Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../database.html#dataruns">Dataruns</a></li>
@@ -106,34 +120,32 @@
 <li class="toctree-l2"><a class="reference internal" href="../../database.html#classifiers">Classifiers</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../api.html">REST API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#quickstart">Quickstart</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#create-a-dataset">2. Create a Dataset</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#browse-the-results">4. Browse the results</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-a-single-object-by-id">Get a single object by id</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-all-the-children-objects">Get all the children objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../cli.html#generate-the-demo-data">1. Generate the demo data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest.html">REST API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../rest.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html#create-a-dataset">2. Create a Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html#browse-the-results">4. Browse the results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../rest.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../rest.html#get-a-single-object-by-id">Get a single object by id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../rest.html#get-all-the-children-objects">Get all the children objects</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#additional-information">Additional information</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#restart-the-atm-process">Restart the ATM process</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#stop-the-atm-process">Stop the ATM process</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rest.html#additional-information">Additional information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html#restart-the-atm-process">Restart the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html#stop-the-atm-process">Stop the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to ATM and BTB</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#ways-to-contribute">Ways to contribute</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#style">Style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#tests">Tests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#docs">Docs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../add_method.html">Adding a classification method</a><ul>
@@ -146,7 +158,65 @@
 <li class="toctree-l2"><a class="reference internal" href="../../add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/atm.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/atm.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.api.html">atm.api package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/atm.api.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/atm.api.html#module-atm.api">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/atm.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.classifier.html">atm.classifier module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.cli.html">atm.cli module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.compat.html">atm.compat module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.config.html">atm.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.constants.html">atm.constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.core.html">atm.core module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.data.html">atm.data module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.database.html">atm.database module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.encoder.html">atm.encoder module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.method.html">atm.method module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.metrics.html">atm.metrics module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.utilities.html">atm.utilities module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.worker.html">atm.worker module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/atm.html#module-atm">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#types-of-contributions">Types of Contributions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#report-bugs">Report Bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#fix-bugs">Fix Bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#implement-features">Implement Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#write-documentation">Write Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#submit-feedback">Submit Feedback</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#pull-request-guidelines">Pull Request Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#unit-testing-guidelines">Unit Testing Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#tips">Tips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#release-workflow">Release Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../history.html#id1">0.1.2 (2019-05-07)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../history.html#new-features">New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../history.html#id6">0.1.1 (2019-04-02)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../history.html#id7">New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../history.html#id8">0.1.0 (2018-05-04)</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -213,7 +283,6 @@
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">object</span>
 
 <span class="kn">from</span> <span class="nn">btb.selection</span> <span class="k">import</span> <span class="p">(</span>
@@ -223,18 +292,11 @@
 <span class="kn">from</span> <span class="nn">btb.tuning</span> <span class="k">import</span> <span class="n">GP</span><span class="p">,</span> <span class="n">GPEi</span><span class="p">,</span> <span class="n">GPEiVelocity</span>
 <span class="kn">from</span> <span class="nn">btb.tuning</span> <span class="k">import</span> <span class="n">Uniform</span> <span class="k">as</span> <span class="n">UniformTuner</span>
 
-<span class="kn">from</span> <span class="nn">atm</span> <span class="k">import</span> <span class="n">PROJECT_ROOT</span>
-
 <span class="c1"># A bunch of constants which are used throughout the project, mostly for config.</span>
 <span class="c1"># TODO: convert these lists and classes to something more elegant, like enums</span>
 <span class="n">SQL_DIALECTS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sqlite&#39;</span><span class="p">,</span> <span class="s1">&#39;mysql&#39;</span><span class="p">]</span>
 <span class="n">SCORE_TARGETS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cv&#39;</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="s1">&#39;mu_sigma&#39;</span><span class="p">]</span>
 <span class="n">BUDGET_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="s1">&#39;classifier&#39;</span><span class="p">,</span> <span class="s1">&#39;walltime&#39;</span><span class="p">]</span>
-<span class="n">METHODS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;logreg&#39;</span><span class="p">,</span> <span class="s1">&#39;svm&#39;</span><span class="p">,</span> <span class="s1">&#39;sgd&#39;</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">,</span> <span class="s1">&#39;et&#39;</span><span class="p">,</span> <span class="s1">&#39;rf&#39;</span><span class="p">,</span> <span class="s1">&#39;gnb&#39;</span><span class="p">,</span> <span class="s1">&#39;mnb&#39;</span><span class="p">,</span> <span class="s1">&#39;bnb&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;gp&#39;</span><span class="p">,</span> <span class="s1">&#39;pa&#39;</span><span class="p">,</span> <span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="s1">&#39;mlp&#39;</span><span class="p">,</span> <span class="s1">&#39;ada&#39;</span><span class="p">]</span>
-<span class="n">TUNERS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="s1">&#39;gp&#39;</span><span class="p">,</span> <span class="s1">&#39;gp_ei&#39;</span><span class="p">,</span> <span class="s1">&#39;gp_eivel&#39;</span><span class="p">]</span>
-<span class="n">SELECTORS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="s1">&#39;ucb1&#39;</span><span class="p">,</span> <span class="s1">&#39;bestk&#39;</span><span class="p">,</span> <span class="s1">&#39;bestkvel&#39;</span><span class="p">,</span> <span class="s1">&#39;purebestkvel&#39;</span><span class="p">,</span> <span class="s1">&#39;recentk&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;recentkvel&#39;</span><span class="p">,</span> <span class="s1">&#39;hieralg&#39;</span><span class="p">]</span>
 <span class="n">DATARUN_STATUS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;pending&#39;</span><span class="p">,</span> <span class="s1">&#39;running&#39;</span><span class="p">,</span> <span class="s1">&#39;complete&#39;</span><span class="p">]</span>
 <span class="n">CLASSIFIER_STATUS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;running&#39;</span><span class="p">,</span> <span class="s1">&#39;errored&#39;</span><span class="p">,</span> <span class="s1">&#39;complete&#39;</span><span class="p">]</span>
 <span class="n">PARTITION_STATUS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;incomplete&#39;</span><span class="p">,</span> <span class="s1">&#39;errored&#39;</span><span class="p">,</span> <span class="s1">&#39;gridding_done&#39;</span><span class="p">]</span>
@@ -243,9 +305,6 @@
 <span class="n">HTTP_PREFIX</span> <span class="o">=</span> <span class="s1">&#39;^https?://&#39;</span>
 
 <span class="n">TIME_FMT</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M&#39;</span>
-<span class="n">DATA_TEST_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">,</span> <span class="s1">&#39;data/test&#39;</span><span class="p">)</span>
-<span class="n">DATA_DL_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">,</span> <span class="s1">&#39;data/downloads&#39;</span><span class="p">)</span>
-<span class="n">METHOD_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">,</span> <span class="s1">&#39;methods&#39;</span><span class="p">)</span>
 
 <span class="n">CUSTOM_CLASS_REGEX</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(.*\.py):(\w+)$&#39;</span>
 <span class="n">JSON_REGEX</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(.*\.json)$&#39;</span>
@@ -261,14 +320,14 @@
     <span class="s1">&#39;NONE&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span>
 <span class="p">}</span>
 
-<span class="n">TUNERS_MAP</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">TUNERS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;uniform&#39;</span><span class="p">:</span> <span class="n">UniformTuner</span><span class="p">,</span>
     <span class="s1">&#39;gp&#39;</span><span class="p">:</span> <span class="n">GP</span><span class="p">,</span>
     <span class="s1">&#39;gp_ei&#39;</span><span class="p">:</span> <span class="n">GPEi</span><span class="p">,</span>
     <span class="s1">&#39;gp_eivel&#39;</span><span class="p">:</span> <span class="n">GPEiVelocity</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">SELECTORS_MAP</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">SELECTORS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;uniform&#39;</span><span class="p">:</span> <span class="n">UniformSelector</span><span class="p">,</span>
     <span class="s1">&#39;ucb1&#39;</span><span class="p">:</span> <span class="n">UCB1</span><span class="p">,</span>
     <span class="s1">&#39;bestk&#39;</span><span class="p">:</span> <span class="n">BestKReward</span><span class="p">,</span>
@@ -279,7 +338,7 @@
     <span class="s1">&#39;hieralg&#39;</span><span class="p">:</span> <span class="n">HierarchicalByAlgorithm</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">METHODS_MAP</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">METHODS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;logreg&#39;</span><span class="p">:</span> <span class="s1">&#39;logistic_regression.json&#39;</span><span class="p">,</span>
     <span class="s1">&#39;svm&#39;</span><span class="p">:</span> <span class="s1">&#39;support_vector_machine.json&#39;</span><span class="p">,</span>
     <span class="s1">&#39;sgd&#39;</span><span class="p">:</span> <span class="s1">&#39;stochastic_gradient_descent.json&#39;</span><span class="p">,</span>

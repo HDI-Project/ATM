@@ -8,12 +8,12 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Contributing to ATM and BTB &mdash; ATM 0.1.3-dev documentation</title>
+  <title>Contributing &mdash; ATM 0.1.3-dev documentation</title>
   
 
   
   
-    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="shortcut icon" href="_static/dai-logo-white.ico"/>
   
   
   
@@ -37,8 +37,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Adding a classification method" href="add_method.html" />
-    <link rel="prev" title="REST API" href="api.html" /> 
+    <link rel="next" title="History" href="history.html" />
+    <link rel="prev" title="atm.worker module" href="api/atm.worker.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -55,6 +55,9 @@
             <a href="index.html" class="icon icon-home"> ATM
           
 
+          
+            
+            <img src="_static/dai-logo-white-200.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -79,28 +82,39 @@
               
             
             
-              <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="introduction.html">ATM: Scalable model selection and tuning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="introduction.html#background">Background</a></li>
-<li class="toctree-l2"><a class="reference internal" href="introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">ATM - Auto Tune Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#overview">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#install">Install</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#install-with-pip">Install with pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#install-from-source">Install from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#install-for-development">Install for Development</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#requirements">0. Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#install-atm">1. Install ATM</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="setup.html#install-using-pip">Install using pip</a></li>
-<li class="toctree-l3"><a class="reference internal" href="setup.html#install-from-source">Install from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#data-format">Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#create-an-atm-instance">2. Create an ATM instance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#search-for-the-best-model">3. Search for the best model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#explore-the-results">4. Explore the results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#make-predictions">5. Make predictions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#install-a-database-optional">2. Install a database (Optional)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#start-using-atm">3. Start using ATM!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#what-s-next">What’s next?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#credits">Credits</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#citing-atm">Citing ATM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#related-projects">Related Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="readme.html#btb">BTB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="readme.html#featuretools">Featuretools</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick-start guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#create-a-datarun">Create a datarun</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#execute-the-datarun">Execute the datarun</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Usage</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="database.html">Guide to the ModelHub database</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="database.html#datasets">Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="database.html#dataruns">Dataruns</a></li>
@@ -108,34 +122,32 @@
 <li class="toctree-l2"><a class="reference internal" href="database.html#classifiers">Classifiers</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">REST API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api.html#quickstart">Quickstart</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#create-a-dataset">2. Create a Dataset</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#browse-the-results">4. Browse the results</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api.html#get-a-single-object-by-id">Get a single object by id</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api.html#get-all-the-children-objects">Get all the children objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#generate-the-demo-data">1. Generate the demo data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rest.html">REST API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rest.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#create-a-dataset">2. Create a Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#browse-the-results">4. Browse the results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rest.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rest.html#get-a-single-object-by-id">Get a single object by id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rest.html#get-all-the-children-objects">Get all the children objects</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#additional-information">Additional information</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#restart-the-atm-process">Restart the ATM process</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#stop-the-atm-process">Stop the ATM process</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rest.html#additional-information">Additional information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#restart-the-atm-process">Restart the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#stop-the-atm-process">Stop the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing to ATM and BTB</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#ways-to-contribute">Ways to contribute</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#style">Style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#tests">Tests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#docs">Docs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="add_method.html">Adding a classification method</a><ul>
@@ -148,7 +160,65 @@
 <li class="toctree-l2"><a class="reference internal" href="add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Resources</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api/atm.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/atm.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.api.html">atm.api package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/atm.api.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/atm.api.html#module-atm.api">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/atm.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.classifier.html">atm.classifier module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.cli.html">atm.cli module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.compat.html">atm.compat module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.config.html">atm.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.constants.html">atm.constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.core.html">atm.core module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.data.html">atm.data module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.database.html">atm.database module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.encoder.html">atm.encoder module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.method.html">atm.method module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.metrics.html">atm.metrics module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.utilities.html">atm.utilities module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.worker.html">atm.worker module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/atm.html#module-atm">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#types-of-contributions">Types of Contributions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#report-bugs">Report Bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fix-bugs">Fix Bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#implement-features">Implement Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#write-documentation">Write Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#submit-feedback">Submit Feedback</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pull-request-guidelines">Pull Request Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#unit-testing-guidelines">Unit Testing Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tips">Tips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#release-workflow">Release Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="history.html#id1">0.1.2 (2019-05-07)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="history.html#new-features">New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="history.html#id6">0.1.1 (2019-04-02)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="history.html#id7">New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="history.html#id8">0.1.0 (2018-05-04)</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -194,7 +264,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Contributing to ATM and BTB</li>
+      <li>Contributing</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -215,50 +285,196 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="contributing-to-atm-and-btb">
-<h1>Contributing to ATM and BTB<a class="headerlink" href="#contributing-to-atm-and-btb" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="ways-to-contribute">
-<h2>Ways to contribute<a class="headerlink" href="#ways-to-contribute" title="Permalink to this headline">¶</a></h2>
-<p>ATM is a research project under active development, and there’s a <em>ton</em> of work
-to do. To get started helping out, you can browse the <a class="reference external" href="https://github.com/hdi-project/atm/issues">issues</a> page on
-Github and look for issues tagged with “<a class="reference external" href="https://github.com/hdi-project/atm/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22">help wanted</a>” or “<a class="reference external" href="https://github.com/hdi-project/atm/issues?q=is%3Aissue+is%3Aopen+label%3A&quot;good+first+issue&quot;">good first issue</a>.” An easy first pull request might flesh out the documentation for a
-confusing feature or just fix a typo. You can also file an issue to report a
-bug, suggest a feature, or ask a question.</p>
-<p>If you’re looking to make a more in-depth contribution, check out our guides on
-<a class="reference external" href="add_method.html">adding a classification method</a> and <a class="reference external" href="add_to_btb.html">adding a BTB Tuner or Selector</a>.</p>
+  <div class="section" id="contributing">
+<h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h1>
+<p>Contributions are welcome, and they are greatly appreciated! Every little bit
+helps, and credit will always be given.</p>
+<p>You can contribute in many ways:</p>
+<div class="section" id="types-of-contributions">
+<h2>Types of Contributions<a class="headerlink" href="#types-of-contributions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="report-bugs">
+<h3>Report Bugs<a class="headerlink" href="#report-bugs" title="Permalink to this headline">¶</a></h3>
+<p>Report bugs at <a class="reference external" href="https://github.com/HDI-Project/ATM/issues">https://github.com/HDI-Project/ATM/issues</a>.</p>
+<p>If you are reporting a bug, please include:</p>
+<ul class="simple">
+<li><p>Your operating system name and version.</p></li>
+<li><p>Any details about your local setup that might be helpful in troubleshooting.</p></li>
+<li><p>Detailed steps to reproduce the bug.</p></li>
+</ul>
 </div>
-<div class="section" id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
-<p>If you’d like to contribute code or documentation, to have installed the project in
-development mode.</p>
+<div class="section" id="fix-bugs">
+<h3>Fix Bugs<a class="headerlink" href="#fix-bugs" title="Permalink to this headline">¶</a></h3>
+<p>Look through the GitHub issues for bugs. Anything tagged with “bug” and “help
+wanted” is open to whoever wants to implement it.</p>
 </div>
-<div class="section" id="style">
-<h2>Style<a class="headerlink" href="#style" title="Permalink to this headline">¶</a></h2>
-<p>We try to stick to the <a class="reference external" href="https://google.github.io/styleguide/pyguide.html">Google style guide</a> where possible. We also use
-<a class="reference external" href="http://flake8.pycqa.org/en/latest/">flake8</a> (for Python best practices) and
-<a class="reference external" href="https://pypi.python.org/pypi/isort">isort</a> (for organizing imports) to
-enforce general consistency.</p>
-<p>To check if your code passes a style sanity check, run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">lint</span></code> from the
-main directory.</p>
+<div class="section" id="implement-features">
+<h3>Implement Features<a class="headerlink" href="#implement-features" title="Permalink to this headline">¶</a></h3>
+<p>Look through the GitHub issues for features. Anything tagged with “enhancement”
+and “help wanted” is open to whoever wants to implement it.</p>
 </div>
-<div class="section" id="tests">
-<h2>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h2>
-<p>We currently have a limited (for now!) suite of unit tests that ensure at least
-most of ATM is working correctly. You can run the tests locally with <code class="docutils literal notranslate"><span class="pre">pytest</span></code>
-(which will use your local python environment) or <code class="docutils literal notranslate"><span class="pre">tox</span></code> (which will create a
-new one from scratch); All tests should pass for every commit on master – this
-means you’ll have to update the code in <code class="docutils literal notranslate"><span class="pre">atm/tests/unit_tests</span></code> if you modify
-the way anything works. In addition, you should create new tests for any new
-features or functionalities you add. See the <a class="reference external" href="https://pytest.link">pytest documentation</a> and the existing tests for more information.</p>
-<p>All unit and integration tests are run automatically for each pull request and
-each commit on master with <a class="reference external" href="https://circleci.com/">CircleCI</a>. We won’t merge
-anything that doesn’t pass all the tests and style checks.</p>
+<div class="section" id="write-documentation">
+<h3>Write Documentation<a class="headerlink" href="#write-documentation" title="Permalink to this headline">¶</a></h3>
+<p>ATM could always use more documentation, whether as part of the
+official ATM docs, in docstrings, or even on the web in blog posts,
+articles, and such.</p>
 </div>
-<div class="section" id="docs">
-<h2>Docs<a class="headerlink" href="#docs" title="Permalink to this headline">¶</a></h2>
-<p>All documentation source files are in the <code class="docutils literal notranslate"><span class="pre">docs/source/</span></code> directory. To build
-the docs after you’ve made a change, run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code> from the <code class="docutils literal notranslate"><span class="pre">docs/</span></code>
-directory; the compiled HTML files will be in <code class="docutils literal notranslate"><span class="pre">docs/build/</span></code>.</p>
+<div class="section" id="submit-feedback">
+<h3>Submit Feedback<a class="headerlink" href="#submit-feedback" title="Permalink to this headline">¶</a></h3>
+<p>The best way to send feedback is to file an issue at <a class="reference external" href="https://github.com/HDI-Project/ATM/issues">https://github.com/HDI-Project/ATM/issues</a>.</p>
+<p>If you are proposing a feature:</p>
+<ul class="simple">
+<li><p>Explain in detail how it would work.</p></li>
+<li><p>Keep the scope as narrow as possible, to make it easier to implement.</p></li>
+<li><p>Remember that this is a volunteer-driven project, and that contributions
+are welcome :)</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="get-started">
+<h2>Get Started!<a class="headerlink" href="#get-started" title="Permalink to this headline">¶</a></h2>
+<p>Ready to contribute? Here’s how to set up <cite>ATM</cite> for local development.</p>
+<ol class="arabic">
+<li><p>Fork the <cite>ATM</cite> repo on GitHub.</p></li>
+<li><p>Clone your fork locally:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ git clone git@github.com:your_name_here/ATM.git
+</pre></div>
+</div>
+</li>
+<li><p>Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed,
+this is how you set up your fork for local development:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ mkvirtualenv ATM
+$ <span class="nb">cd</span> ATM/
+$ make install-develop
+</pre></div>
+</div>
+</li>
+<li><p>Create a branch for local development:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ git checkout -b name-of-your-bugfix-or-feature
+</pre></div>
+</div>
+<p>Now you can make your changes locally.</p>
+</li>
+<li><p>While hacking your changes, make sure to cover all your developments with the required
+unit tests, and that none of the old tests fail as a consequence of your changes.
+For this, make sure to run the tests suite and check the code coverage:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ make <span class="nb">test</span>       <span class="c1"># Run the tests</span>
+$ make coverage   <span class="c1"># Get the coverage report</span>
+</pre></div>
+</div>
+</li>
+<li><p>When you’re done making changes, check that your changes pass flake8 and the
+tests, including testing other Python versions with tox:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ make lint       <span class="c1"># Check code styling</span>
+$ make test-all   <span class="c1"># Execute tests on all python versions</span>
+</pre></div>
+</div>
+</li>
+<li><p>Make also sure to include the necessary documentation in the code as docstrings following
+the <a class="reference external" href="https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html">google docstring</a> style.
+If you want to view how your documentation will look like when it is published, you can
+generate and view the docs with this command:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ make viewdocs
+</pre></div>
+</div>
+</li>
+<li><p>Commit your changes and push your branch to GitHub:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ git add .
+$ git commit -m <span class="s2">&quot;Your detailed description of your changes.&quot;</span>
+$ git push origin name-of-your-bugfix-or-feature
+</pre></div>
+</div>
+</li>
+<li><p>Submit a pull request through the GitHub website.</p></li>
+</ol>
+</div>
+<div class="section" id="pull-request-guidelines">
+<h2>Pull Request Guidelines<a class="headerlink" href="#pull-request-guidelines" title="Permalink to this headline">¶</a></h2>
+<p>Before you submit a pull request, check that it meets these guidelines:</p>
+<ol class="arabic simple">
+<li><p>It resolves an open GitHub Issue and contains its reference in the title or
+the comment. If there is no associated issue, feel free to create one.</p></li>
+<li><p>Whenever possible, it resolves only <strong>one</strong> issue. If your PR resolves more than
+one issue, try to split it in more than one pull request.</p></li>
+<li><p>The pull request should include unit tests that cover all the changed code</p></li>
+<li><p>If the pull request adds functionality, the docs should be updated. Put
+your new functionality into a function with a docstring, and add the
+feature to the list in README.rst.</p></li>
+<li><p>The pull request should work for Python2.7, 3.4, 3.5 and 3.6. Check
+<a class="reference external" href="https://travis-ci.org/HDI-Project/ATM/pull_requests">https://travis-ci.org/HDI-Project/ATM/pull_requests</a>
+and make sure that all the checks pass.</p></li>
+</ol>
+</div>
+<div class="section" id="unit-testing-guidelines">
+<h2>Unit Testing Guidelines<a class="headerlink" href="#unit-testing-guidelines" title="Permalink to this headline">¶</a></h2>
+<p>All the Unit Tests should comply with the following requirements:</p>
+<ol class="arabic simple">
+<li><p>Unit Tests should be based only in unittest and pytest modules.</p></li>
+<li><p>The tests that cover a module called <code class="docutils literal notranslate"><span class="pre">atm/path/to/a_module.py</span></code> should be
+implemented in a separated module called <code class="docutils literal notranslate"><span class="pre">tests/atm/path/to/test_a_module.py</span></code>.
+Note that the module name has the <code class="docutils literal notranslate"><span class="pre">test_</span></code> prefix and is located in a path similar
+to the one of the tested module, just inside te <code class="docutils literal notranslate"><span class="pre">tests</span></code> folder.</p></li>
+<li><p>Each method of the tested module should have at least one associated test method, and
+each test method should cover only <strong>one</strong> use case or scenario.</p></li>
+<li><p>Test case methods should start with the <code class="docutils literal notranslate"><span class="pre">test_</span></code> prefix and have descriptive names
+that indicate which scenario they cover.
+Names such as <code class="docutils literal notranslate"><span class="pre">test_some_methed_input_none</span></code>, <code class="docutils literal notranslate"><span class="pre">test_some_method_value_error</span></code> or
+<code class="docutils literal notranslate"><span class="pre">test_some_method_timeout</span></code> are right, but names like <code class="docutils literal notranslate"><span class="pre">test_some_method_1</span></code>,
+<code class="docutils literal notranslate"><span class="pre">some_method</span></code> or <code class="docutils literal notranslate"><span class="pre">test_error</span></code> are not.</p></li>
+<li><p>Each test should validate only what the code of the method being tested does, and not
+cover the behavior of any third party package or tool being used, which is assumed to
+work properly as far as it is being passed the right values.</p></li>
+<li><p>Any third party tool that may have any kind of random behavior, such as some Machine
+Learning models, databases or Web APIs, will be mocked using the <code class="docutils literal notranslate"><span class="pre">mock</span></code> library, and
+the only thing that will be tested is that our code passes the right values to them.</p></li>
+<li><p>Unit tests should not use anything from outside the test and the code being tested. This
+includes not reading or writting to any filesystem or database, which will be properly
+mocked.</p></li>
+</ol>
+</div>
+<div class="section" id="tips">
+<h2>Tips<a class="headerlink" href="#tips" title="Permalink to this headline">¶</a></h2>
+<p>To run a subset of tests:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ pytest tests.test_atm
+</pre></div>
+</div>
+</div>
+<div class="section" id="release-workflow">
+<h2>Release Workflow<a class="headerlink" href="#release-workflow" title="Permalink to this headline">¶</a></h2>
+<p>The process of releasing a new version involves several steps combining both <code class="docutils literal notranslate"><span class="pre">git</span></code> and
+<code class="docutils literal notranslate"><span class="pre">bumpversion</span></code> which, briefly:</p>
+<ol class="arabic simple">
+<li><p>Merge what is in <code class="docutils literal notranslate"><span class="pre">master</span></code> branch into <code class="docutils literal notranslate"><span class="pre">stable</span></code> branch.</p></li>
+<li><p>Update the version in <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code>, <code class="docutils literal notranslate"><span class="pre">atm/__init__.py</span></code> and <code class="docutils literal notranslate"><span class="pre">HISTORY.md</span></code> files.</p></li>
+<li><p>Create a new git tag pointing at the corresponding commit in <code class="docutils literal notranslate"><span class="pre">stable</span></code> branch.</p></li>
+<li><p>Merge the new commit from <code class="docutils literal notranslate"><span class="pre">stable</span></code> into <code class="docutils literal notranslate"><span class="pre">master</span></code>.</p></li>
+<li><p>Update the version in <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code> and <code class="docutils literal notranslate"><span class="pre">atm/__init__.py</span></code>
+to open the next development iteration.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Before starting the process, make sure that <code class="docutils literal notranslate"><span class="pre">HISTORY.md</span></code> has been updated with a new
+entry that explains the changes that will be included in the new version.
+Normally this is just a list of the Pull Requests that have been merged to master
+since the last release.</p>
+</div>
+<p>Once this is done, run of the following commands:</p>
+<ol class="arabic">
+<li><p>If you are releasing a patch version:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make release
+</pre></div>
+</div>
+</li>
+<li><p>If you are releasing a minor version:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make release-minor
+</pre></div>
+</div>
+</li>
+<li><p>If you are releasing a major version:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make release-major
+</pre></div>
+</div>
+</li>
+</ol>
 </div>
 </div>
 
@@ -270,10 +486,10 @@ directory; the compiled HTML files will be in <code class="docutils literal notr
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="add_method.html" class="btn btn-neutral float-right" title="Adding a classification method" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="history.html" class="btn btn-neutral float-right" title="History" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="api.html" class="btn btn-neutral float-left" title="REST API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="api/atm.worker.html" class="btn btn-neutral float-left" title="atm.worker module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

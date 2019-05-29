@@ -13,7 +13,7 @@
 
   
   
-    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="shortcut icon" href="../_static/dai-logo-white.ico"/>
   
   
   
@@ -36,7 +36,9 @@
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="atm.constants module" href="atm.constants.html" />
+    <link rel="prev" title="atm.compat module" href="atm.compat.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -53,6 +55,9 @@
             <a href="../index.html" class="icon icon-home"> ATM
           
 
+          
+            
+            <img src="../_static/dai-logo-white-200.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -77,28 +82,39 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="../introduction.html">ATM: Scalable model selection and tuning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../introduction.html#background">Background</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">ATM - Auto Tune Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#overview">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#install">Install</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#install-with-pip">Install with pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#install-from-source">Install from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#install-for-development">Install for Development</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../setup.html">Setup</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../setup.html#requirements">0. Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../setup.html#install-atm">1. Install ATM</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../setup.html#install-using-pip">Install using pip</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../setup.html#install-from-source">Install from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#data-format">Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#create-an-atm-instance">2. Create an ATM instance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#search-for-the-best-model">3. Search for the best model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#explore-the-results">4. Explore the results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#make-predictions">5. Make predictions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../setup.html#install-a-database-optional">2. Install a database (Optional)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../setup.html#start-using-atm">3. Start using ATM!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#what-s-next">What’s next?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#credits">Credits</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#citing-atm">Citing ATM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html#related-projects">Related Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#btb">BTB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#featuretools">Featuretools</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick-start guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#create-a-datarun">Create a datarun</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#execute-the-datarun">Execute the datarun</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Usage</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../database.html">Guide to the ModelHub database</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../database.html#datasets">Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../database.html#dataruns">Dataruns</a></li>
@@ -106,34 +122,32 @@
 <li class="toctree-l2"><a class="reference internal" href="../database.html#classifiers">Classifiers</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">REST API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../api.html#quickstart">Quickstart</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#create-a-dataset">2. Create a Dataset</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#browse-the-results">4. Browse the results</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../api.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api.html#get-a-single-object-by-id">Get a single object by id</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api.html#get-all-the-children-objects">Get all the children objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#generate-the-demo-data">1. Generate the demo data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../rest.html">REST API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../rest.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../rest.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rest.html#create-a-dataset">2. Create a Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rest.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rest.html#browse-the-results">4. Browse the results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../rest.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rest.html#get-a-single-object-by-id">Get a single object by id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rest.html#get-all-the-children-objects">Get all the children objects</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../api.html#additional-information">Additional information</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#restart-the-atm-process">Restart the ATM process</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#stop-the-atm-process">Stop the ATM process</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rest.html#additional-information">Additional information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../rest.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rest.html#restart-the-atm-process">Restart the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rest.html#stop-the-atm-process">Stop the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rest.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to ATM and BTB</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#ways-to-contribute">Ways to contribute</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#style">Style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#tests">Tests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#docs">Docs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../add_method.html">Adding a classification method</a><ul>
@@ -146,7 +160,65 @@
 <li class="toctree-l2"><a class="reference internal" href="../add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Resources</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="atm.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="atm.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="atm.api.html">atm.api package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="atm.api.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="atm.api.html#module-atm.api">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="atm.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="atm.classifier.html">atm.classifier module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.cli.html">atm.cli module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.compat.html">atm.compat module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">atm.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.constants.html">atm.constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.core.html">atm.core module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.data.html">atm.data module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.database.html">atm.database module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.encoder.html">atm.encoder module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.method.html">atm.method module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.metrics.html">atm.metrics module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.utilities.html">atm.utilities module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atm.worker.html">atm.worker module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="atm.html#module-atm">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#types-of-contributions">Types of Contributions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../contributing.html#report-bugs">Report Bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../contributing.html#fix-bugs">Fix Bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../contributing.html#implement-features">Implement Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../contributing.html#write-documentation">Write Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../contributing.html#submit-feedback">Submit Feedback</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#pull-request-guidelines">Pull Request Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#unit-testing-guidelines">Unit Testing Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#tips">Tips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#release-workflow">Release Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../history.html">History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../history.html#id1">0.1.2 (2019-05-07)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../history.html#new-features">New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../history.html#id6">0.1.1 (2019-04-02)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../history.html#id7">New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../history.html#id8">0.1.0 (2018-05-04)</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -192,6 +264,8 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
+          <li><a href="atm.html">atm package</a> &raquo;</li>
+        
       <li>atm.config module</li>
     
     
@@ -215,11 +289,71 @@
             
   <div class="section" id="module-atm.config">
 <span id="atm-config-module"></span><h1>atm.config module<a class="headerlink" href="#module-atm.config" title="Permalink to this headline">¶</a></h1>
+<p><strong>Classes</strong></p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.AWSConfig" title="atm.config.AWSConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AWSConfig</span></code></a>(args[, path])</p></td>
+<td><p>Stores configuration for AWS S3 connections</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.Config" title="atm.config.Config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Config</span></code></a>(args[, path])</p></td>
+<td><p>Class which stores configuration for one aspect of ATM.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.DatasetConfig" title="atm.config.DatasetConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatasetConfig</span></code></a>(args[, path])</p></td>
+<td><p>Stores configuration of a Dataset</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.LogConfig" title="atm.config.LogConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LogConfig</span></code></a>(args[, path])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.RunConfig" title="atm.config.RunConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RunConfig</span></code></a>(args[, path])</p></td>
+<td><p>Stores configuration for Dataset and Datarun setup.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.SQLConfig" title="atm.config.SQLConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQLConfig</span></code></a>(args[, path])</p></td>
+<td><p>Stores configuration for SQL database setup &amp; connection</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Functions</strong></p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.option_or_path" title="atm.config.option_or_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">option_or_path</span></code></a>(options[, regex])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
 <dl class="class">
 <dt id="atm.config.AWSConfig">
 <em class="property">class </em><code class="descclassname">atm.config.</code><code class="descname">AWSConfig</code><span class="sig-paren">(</span><em>args</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#AWSConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.AWSConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#atm.config.Config" title="atm.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">atm.config.Config</span></code></a></p>
 <p>Stores configuration for AWS S3 connections</p>
+<p><strong>Attributes</strong></p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.AWSConfig.access_key" title="atm.config.AWSConfig.access_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">access_key</span></code></a></p></td>
+<td><p>str(object=’‘) -&gt; str</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.AWSConfig.s3_bucket" title="atm.config.AWSConfig.s3_bucket"><code class="xref py py-obj docutils literal notranslate"><span class="pre">s3_bucket</span></code></a></p></td>
+<td><p>str(object=’‘) -&gt; str</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.AWSConfig.s3_folder" title="atm.config.AWSConfig.s3_folder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">s3_folder</span></code></a></p></td>
+<td><p>str(object=’‘) -&gt; str</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.AWSConfig.secret_key" title="atm.config.AWSConfig.secret_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">secret_key</span></code></a></p></td>
+<td><p>str(object=’‘) -&gt; str</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="atm.config.AWSConfig.access_key">
 <code class="descname">access_key</code><em class="property"> = 'AWS access key'</em><a class="headerlink" href="#atm.config.AWSConfig.access_key" title="Permalink to this definition">¶</a></dt>
@@ -252,6 +386,21 @@ default values for those parameters other than None (in PARAMETERS and
 DEFAULTS, respectively). The object can be initialized with any number of
 keyword arguments; only kwargs that are in PARAMETERS will be used. This
 means you can (relatively) safely do things like</p>
+<p><strong>Methods</strong></p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.Config.get_parser" title="atm.config.Config.get_parser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parser</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.Config.to_dict" title="atm.config.Config.to_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
 <blockquote>
 <div><p>args = parser.parse_args()
 conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>vars(args))</p>
@@ -275,14 +424,38 @@ conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>var
 <em class="property">class </em><code class="descclassname">atm.config.</code><code class="descname">DatasetConfig</code><span class="sig-paren">(</span><em>args</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#DatasetConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.DatasetConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#atm.config.Config" title="atm.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">atm.config.Config</span></code></a></p>
 <p>Stores configuration of a Dataset</p>
+<p><strong>Attributes</strong></p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.DatasetConfig.class_column" title="atm.config.DatasetConfig.class_column"><code class="xref py py-obj docutils literal notranslate"><span class="pre">class_column</span></code></a></p></td>
+<td><p>tuple() -&gt; empty tuple</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.DatasetConfig.description" title="atm.config.DatasetConfig.description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">description</span></code></a></p></td>
+<td><p>str(object=’‘) -&gt; str</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.DatasetConfig.name" title="atm.config.DatasetConfig.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<td><p>str(object=’‘) -&gt; str</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.DatasetConfig.test_path" title="atm.config.DatasetConfig.test_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_path</span></code></a></p></td>
+<td><p>str(object=’‘) -&gt; str</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.DatasetConfig.train_path" title="atm.config.DatasetConfig.train_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">train_path</span></code></a></p></td>
+<td><p>dict() -&gt; new empty dictionary</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="atm.config.DatasetConfig.class_column">
 <code class="descname">class_column</code><em class="property"> = ('Name of the class column in the input data', 'class')</em><a class="headerlink" href="#atm.config.DatasetConfig.class_column" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="atm.config.DatasetConfig.data_description">
-<code class="descname">data_description</code><em class="property"> = 'Description of dataset'</em><a class="headerlink" href="#atm.config.DatasetConfig.data_description" title="Permalink to this definition">¶</a></dt>
+<dt id="atm.config.DatasetConfig.description">
+<code class="descname">description</code><em class="property"> = 'Description of dataset'</em><a class="headerlink" href="#atm.config.DatasetConfig.description" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -297,7 +470,7 @@ conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>var
 
 <dl class="attribute">
 <dt id="atm.config.DatasetConfig.train_path">
-<code class="descname">train_path</code><em class="property"> = ('Path to raw training data', '/home/travis/build/HDI-Project/ATM/atm/data/test/pollution_1.csv')</em><a class="headerlink" href="#atm.config.DatasetConfig.train_path" title="Permalink to this definition">¶</a></dt>
+<code class="descname">train_path</code><em class="property"> = {'help': 'Path to raw training data', 'required': True}</em><a class="headerlink" href="#atm.config.DatasetConfig.train_path" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -306,14 +479,32 @@ conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>var
 <dt id="atm.config.LogConfig">
 <em class="property">class </em><code class="descclassname">atm.config.</code><code class="descname">LogConfig</code><span class="sig-paren">(</span><em>args</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#LogConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.LogConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#atm.config.Config" title="atm.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">atm.config.Config</span></code></a></p>
+<p><strong>Attributes</strong></p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.LogConfig.metrics_dir" title="atm.config.LogConfig.metrics_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metrics_dir</span></code></a></p></td>
+<td><p>tuple() -&gt; empty tuple</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.LogConfig.models_dir" title="atm.config.LogConfig.models_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models_dir</span></code></a></p></td>
+<td><p>tuple() -&gt; empty tuple</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.LogConfig.verbose_metrics" title="atm.config.LogConfig.verbose_metrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verbose_metrics</span></code></a></p></td>
+<td><p>dict() -&gt; new empty dictionary</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
-<dt id="atm.config.LogConfig.metric_dir">
-<code class="descname">metric_dir</code><em class="property"> = ('Directory where model metrics will be saved', 'metrics')</em><a class="headerlink" href="#atm.config.LogConfig.metric_dir" title="Permalink to this definition">¶</a></dt>
+<dt id="atm.config.LogConfig.metrics_dir">
+<code class="descname">metrics_dir</code><em class="property"> = ('Directory where model metrics will be saved', 'metrics')</em><a class="headerlink" href="#atm.config.LogConfig.metrics_dir" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="atm.config.LogConfig.model_dir">
-<code class="descname">model_dir</code><em class="property"> = ('Directory where computed models will be saved', 'models')</em><a class="headerlink" href="#atm.config.LogConfig.model_dir" title="Permalink to this definition">¶</a></dt>
+<dt id="atm.config.LogConfig.models_dir">
+<code class="descname">models_dir</code><em class="property"> = ('Directory where computed models will be saved', 'models')</em><a class="headerlink" href="#atm.config.LogConfig.models_dir" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -328,6 +519,57 @@ conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>var
 <em class="property">class </em><code class="descclassname">atm.config.</code><code class="descname">RunConfig</code><span class="sig-paren">(</span><em>args</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#RunConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.RunConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#atm.config.Config" title="atm.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">atm.config.Config</span></code></a></p>
 <p>Stores configuration for Dataset and Datarun setup.</p>
+<p><strong>Attributes</strong></p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.RunConfig.budget" title="atm.config.RunConfig.budget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">budget</span></code></a></p></td>
+<td><p>dict() -&gt; new empty dictionary</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.RunConfig.budget_type" title="atm.config.RunConfig.budget_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">budget_type</span></code></a></p></td>
+<td><p>dict() -&gt; new empty dictionary</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.RunConfig.dataset_id" title="atm.config.RunConfig.dataset_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataset_id</span></code></a></p></td>
+<td><p>dict() -&gt; new empty dictionary</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.RunConfig.deadline" title="atm.config.RunConfig.deadline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deadline</span></code></a></p></td>
+<td><p>str(object=’‘) -&gt; str</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.RunConfig.gridding" title="atm.config.RunConfig.gridding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gridding</span></code></a></p></td>
+<td><p>dict() -&gt; new empty dictionary</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.RunConfig.k_window" title="atm.config.RunConfig.k_window"><code class="xref py py-obj docutils literal notranslate"><span class="pre">k_window</span></code></a></p></td>
+<td><p>dict() -&gt; new empty dictionary</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.RunConfig.methods" title="atm.config.RunConfig.methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">methods</span></code></a></p></td>
+<td><p>dict() -&gt; new empty dictionary</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.RunConfig.metric" title="atm.config.RunConfig.metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric</span></code></a></p></td>
+<td><p>dict() -&gt; new empty dictionary</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.RunConfig.priority" title="atm.config.RunConfig.priority"><code class="xref py py-obj docutils literal notranslate"><span class="pre">priority</span></code></a></p></td>
+<td><p>dict() -&gt; new empty dictionary</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.RunConfig.r_minimum" title="atm.config.RunConfig.r_minimum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">r_minimum</span></code></a></p></td>
+<td><p>dict() -&gt; new empty dictionary</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.RunConfig.run_per_partition" title="atm.config.RunConfig.run_per_partition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_per_partition</span></code></a></p></td>
+<td><p>dict() -&gt; new empty dictionary</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.RunConfig.score_target" title="atm.config.RunConfig.score_target"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_target</span></code></a></p></td>
+<td><p>dict() -&gt; new empty dictionary</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.RunConfig.selector" title="atm.config.RunConfig.selector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">selector</span></code></a></p></td>
+<td><p>dict() -&gt; new empty dictionary</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.RunConfig.tuner" title="atm.config.RunConfig.tuner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuner</span></code></a></p></td>
+<td><p>dict() -&gt; new empty dictionary</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="atm.config.RunConfig.budget">
 <code class="descname">budget</code><em class="property"> = {'default': 100, 'help': 'Value of the budget, either in classifiers or minutes', 'type': &lt;class 'int'&gt;}</em><a class="headerlink" href="#atm.config.RunConfig.budget" title="Permalink to this definition">¶</a></dt>
@@ -365,7 +607,7 @@ conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>var
 
 <dl class="attribute">
 <dt id="atm.config.RunConfig.metric">
-<code class="descname">metric</code><em class="property"> = {'choices': ['roc_auc_macro', 'accuracy', 'rank_accuracy', 'mcc', 'f1', 'cohen_kappa', 'roc_auc', 'f1_micro', 'roc_auc_micro', 'ap', 'f1_macro'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
+<code class="descname">metric</code><em class="property"> = {'choices': ['roc_auc_micro', 'roc_auc_macro', 'f1_micro', 'cohen_kappa', 'f1', 'accuracy', 'mcc', 'f1_macro', 'rank_accuracy', 'ap', 'roc_auc'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -405,6 +647,36 @@ conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>var
 <em class="property">class </em><code class="descclassname">atm.config.</code><code class="descname">SQLConfig</code><span class="sig-paren">(</span><em>args</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#SQLConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.SQLConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#atm.config.Config" title="atm.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">atm.config.Config</span></code></a></p>
 <p>Stores configuration for SQL database setup &amp; connection</p>
+<p><strong>Attributes</strong></p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.SQLConfig.database" title="atm.config.SQLConfig.database"><code class="xref py py-obj docutils literal notranslate"><span class="pre">database</span></code></a></p></td>
+<td><p>tuple() -&gt; empty tuple</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.SQLConfig.dialect" title="atm.config.SQLConfig.dialect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dialect</span></code></a></p></td>
+<td><p>dict() -&gt; new empty dictionary</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.SQLConfig.host" title="atm.config.SQLConfig.host"><code class="xref py py-obj docutils literal notranslate"><span class="pre">host</span></code></a></p></td>
+<td><p>str(object=’‘) -&gt; str</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.SQLConfig.password" title="atm.config.SQLConfig.password"><code class="xref py py-obj docutils literal notranslate"><span class="pre">password</span></code></a></p></td>
+<td><p>str(object=’‘) -&gt; str</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.SQLConfig.port" title="atm.config.SQLConfig.port"><code class="xref py py-obj docutils literal notranslate"><span class="pre">port</span></code></a></p></td>
+<td><p>str(object=’‘) -&gt; str</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.config.SQLConfig.query" title="atm.config.SQLConfig.query"><code class="xref py py-obj docutils literal notranslate"><span class="pre">query</span></code></a></p></td>
+<td><p>str(object=’‘) -&gt; str</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.SQLConfig.username" title="atm.config.SQLConfig.username"><code class="xref py py-obj docutils literal notranslate"><span class="pre">username</span></code></a></p></td>
+<td><p>str(object=’‘) -&gt; str</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="atm.config.SQLConfig.database">
 <code class="descname">database</code><em class="property"> = ('Name of, or path to, SQL database', 'atm.db')</em><a class="headerlink" href="#atm.config.SQLConfig.database" title="Permalink to this definition">¶</a></dt>
@@ -454,6 +726,15 @@ conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>var
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="atm.constants.html" class="btn btn-neutral float-right" title="atm.constants module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="atm.compat.html" class="btn btn-neutral float-left" title="atm.compat module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

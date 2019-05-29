@@ -13,7 +13,7 @@
 
   
   
-    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="shortcut icon" href="../../_static/dai-logo-white.ico"/>
   
   
   
@@ -54,6 +54,9 @@
           
 
           
+            
+            <img src="../../_static/dai-logo-white-200.png" class="logo" alt="Logo"/>
+          
           </a>
 
           
@@ -77,28 +80,39 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">ATM: Scalable model selection and tuning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#background">Background</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">ATM - Auto Tune Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#overview">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#install">Install</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#install-with-pip">Install with pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#install-from-source">Install from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#install-for-development">Install for Development</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Setup</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../setup.html#requirements">0. Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-atm">1. Install ATM</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-using-pip">Install using pip</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../setup.html#install-from-source">Install from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#data-format">Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#create-an-atm-instance">2. Create an ATM instance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#search-for-the-best-model">3. Search for the best model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#explore-the-results">4. Explore the results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#make-predictions">5. Make predictions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../setup.html#install-a-database-optional">2. Install a database (Optional)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../setup.html#start-using-atm">3. Start using ATM!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#what-s-next">What’s next?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#credits">Credits</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#citing-atm">Citing ATM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#related-projects">Related Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../readme.html#btb">BTB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../readme.html#featuretools">Featuretools</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick-start guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#create-a-datarun">Create a datarun</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#execute-the-datarun">Execute the datarun</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Usage</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../../database.html">Guide to the ModelHub database</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../database.html#datasets">Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../database.html#dataruns">Dataruns</a></li>
@@ -106,34 +120,32 @@
 <li class="toctree-l2"><a class="reference internal" href="../../database.html#classifiers">Classifiers</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../api.html">REST API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#quickstart">Quickstart</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#create-a-dataset">2. Create a Dataset</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#browse-the-results">4. Browse the results</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-a-single-object-by-id">Get a single object by id</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api.html#get-all-the-children-objects">Get all the children objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../cli.html#generate-the-demo-data">1. Generate the demo data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest.html">REST API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../rest.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html#create-a-dataset">2. Create a Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html#browse-the-results">4. Browse the results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../rest.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../rest.html#get-a-single-object-by-id">Get a single object by id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../rest.html#get-all-the-children-objects">Get all the children objects</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#additional-information">Additional information</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#restart-the-atm-process">Restart the ATM process</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#stop-the-atm-process">Stop the ATM process</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rest.html#additional-information">Additional information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html#restart-the-atm-process">Restart the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html#stop-the-atm-process">Stop the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to ATM and BTB</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#ways-to-contribute">Ways to contribute</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#style">Style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#tests">Tests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#docs">Docs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../add_method.html">Adding a classification method</a><ul>
@@ -146,7 +158,65 @@
 <li class="toctree-l2"><a class="reference internal" href="../../add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/atm.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/atm.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.api.html">atm.api package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/atm.api.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/atm.api.html#module-atm.api">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/atm.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.classifier.html">atm.classifier module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.cli.html">atm.cli module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.compat.html">atm.compat module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.config.html">atm.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.constants.html">atm.constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.core.html">atm.core module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.data.html">atm.data module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.database.html">atm.database module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.encoder.html">atm.encoder module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.method.html">atm.method module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.metrics.html">atm.metrics module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.utilities.html">atm.utilities module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/atm.worker.html">atm.worker module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/atm.html#module-atm">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#types-of-contributions">Types of Contributions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#report-bugs">Report Bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#fix-bugs">Fix Bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#implement-features">Implement Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#write-documentation">Write Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#submit-feedback">Submit Feedback</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#pull-request-guidelines">Pull Request Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#unit-testing-guidelines">Unit Testing Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#tips">Tips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#release-workflow">Release Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../history.html#id1">0.1.2 (2019-05-07)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../history.html#new-features">New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../history.html#id6">0.1.1 (2019-04-02)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../history.html#id7">New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../history.html#id8">0.1.0 (2018-05-04)</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -220,8 +290,8 @@
 <span class="kn">import</span> <span class="nn">yaml</span>
 
 <span class="kn">from</span> <span class="nn">atm.constants</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">BUDGET_TYPES</span><span class="p">,</span> <span class="n">CUSTOM_CLASS_REGEX</span><span class="p">,</span> <span class="n">DATA_TEST_PATH</span><span class="p">,</span> <span class="n">JSON_REGEX</span><span class="p">,</span> <span class="n">METHODS</span><span class="p">,</span> <span class="n">METRICS</span><span class="p">,</span> <span class="n">SCORE_TARGETS</span><span class="p">,</span>
-    <span class="n">SELECTORS</span><span class="p">,</span> <span class="n">SQL_DIALECTS</span><span class="p">,</span> <span class="n">TIME_FMT</span><span class="p">,</span> <span class="n">TUNERS</span><span class="p">)</span>
+    <span class="n">BUDGET_TYPES</span><span class="p">,</span> <span class="n">CUSTOM_CLASS_REGEX</span><span class="p">,</span> <span class="n">JSON_REGEX</span><span class="p">,</span> <span class="n">METHODS</span><span class="p">,</span> <span class="n">METRICS</span><span class="p">,</span> <span class="n">SCORE_TARGETS</span><span class="p">,</span> <span class="n">SELECTORS</span><span class="p">,</span>
+    <span class="n">SQL_DIALECTS</span><span class="p">,</span> <span class="n">TIME_FMT</span><span class="p">,</span> <span class="n">TUNERS</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Config"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.Config">[docs]</a><span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -344,9 +414,12 @@
     <span class="n">_CONFIG</span> <span class="o">=</span> <span class="s1">&#39;run&#39;</span>
 
     <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Given name for this dataset.&#39;</span>
-    <span class="n">train_path</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Path to raw training data&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_TEST_PATH</span><span class="p">,</span> <span class="s1">&#39;pollution_1.csv&#39;</span><span class="p">))</span>
+    <span class="n">train_path</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Path to raw training data&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
     <span class="n">test_path</span> <span class="o">=</span> <span class="s1">&#39;Path to raw test data (if applicable)&#39;</span>
-    <span class="n">data_description</span> <span class="o">=</span> <span class="s1">&#39;Description of dataset&#39;</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Description of dataset&#39;</span>
     <span class="n">class_column</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Name of the class column in the input data&#39;</span><span class="p">,</span> <span class="s1">&#39;class&#39;</span><span class="p">)</span></div>
 
 
@@ -368,8 +441,8 @@
 
 
 <div class="viewcode-block" id="LogConfig"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.LogConfig">[docs]</a><span class="k">class</span> <span class="nc">LogConfig</span><span class="p">(</span><span class="n">Config</span><span class="p">):</span>
-    <span class="n">model_dir</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Directory where computed models will be saved&#39;</span><span class="p">,</span> <span class="s1">&#39;models&#39;</span><span class="p">)</span>
-    <span class="n">metric_dir</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Directory where model metrics will be saved&#39;</span><span class="p">,</span> <span class="s1">&#39;metrics&#39;</span><span class="p">)</span>
+    <span class="n">models_dir</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Directory where computed models will be saved&#39;</span><span class="p">,</span> <span class="s1">&#39;models&#39;</span><span class="p">)</span>
+    <span class="n">metrics_dir</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Directory where model metrics will be saved&#39;</span><span class="p">,</span> <span class="s1">&#39;metrics&#39;</span><span class="p">)</span>
     <span class="n">verbose_metrics</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span>
             <span class="s1">&#39;If set, compute full ROC and PR curves and &#39;</span>
@@ -383,7 +456,7 @@
 <div class="viewcode-block" id="option_or_path"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.option_or_path">[docs]</a><span class="k">def</span> <span class="nf">option_or_path</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="n">CUSTOM_CLASS_REGEX</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">type_check</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
         <span class="c1"># first, check whether the argument is one of the preconfigured options</span>
-        <span class="k">if</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">options</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">s</span>
 
         <span class="c1"># otherwise, check it against the regex, and try to pull out a path to a</span>
@@ -441,9 +514,9 @@
             <span class="s1">&#39;classification. Each method can either be one of the &#39;</span>
             <span class="s1">&#39;pre-defined method codes listed below or a path to a &#39;</span>
             <span class="s1">&#39;JSON file defining a custom method.</span><span class="se">\n\n</span><span class="s1">Options: [</span><span class="si">{}</span><span class="s1">]&#39;</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">METHODS</span><span class="p">)),</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">METHODS</span><span class="o">.</span><span class="n">keys</span><span class="p">())),</span>
         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;logreg&#39;</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">,</span> <span class="s1">&#39;knn&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">option_or_path</span><span class="p">(</span><span class="n">METHODS</span><span class="p">,</span> <span class="n">JSON_REGEX</span><span class="p">),</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">option_or_path</span><span class="p">(</span><span class="n">METHODS</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">JSON_REGEX</span><span class="p">),</span>
         <span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;+&#39;</span>
     <span class="p">}</span>
 
@@ -524,9 +597,9 @@
             <span class="s1">&#39;Type of BTB tuner to use. Can either be one of the pre-configured &#39;</span>
             <span class="s1">&#39;tuners listed below or a path to a custom tuner in the form &#39;</span>
             <span class="s1">&#39;&quot;/path/to/tuner.py:ClassName&quot;.</span><span class="se">\n\n</span><span class="s1">Options: [</span><span class="si">{}</span><span class="s1">]&#39;</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">TUNERS</span><span class="p">)),</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">TUNERS</span><span class="o">.</span><span class="n">keys</span><span class="p">())),</span>
         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;uniform&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">option_or_path</span><span class="p">(</span><span class="n">TUNERS</span><span class="p">)</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">option_or_path</span><span class="p">(</span><span class="n">TUNERS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="p">}</span>
 
     <span class="c1"># How should ATM select a particular hyperpartition from the set of all</span>
@@ -547,9 +620,9 @@
             <span class="s1">&#39;Type of BTB selector to use. Can either be one of the pre-configured &#39;</span>
             <span class="s1">&#39;selectors listed below or a path to a custom tuner in the form &#39;</span>
             <span class="s1">&#39;&quot;/path/to/selector.py:ClassName&quot;.</span><span class="se">\n\n</span><span class="s1">Options: [</span><span class="si">{}</span><span class="s1">]&#39;</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">SELECTORS</span><span class="p">)),</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">SELECTORS</span><span class="o">.</span><span class="n">keys</span><span class="p">())),</span>
         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;uniform&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">option_or_path</span><span class="p">(</span><span class="n">SELECTORS</span><span class="p">)</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">option_or_path</span><span class="p">(</span><span class="n">SELECTORS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="p">}</span>
 
     <span class="c1"># r_minimum is the number of random runs performed in each hyperpartition before</span>

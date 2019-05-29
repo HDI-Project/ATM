@@ -1,11 +1,6 @@
 atm package
 ===========
 
-.. automodule:: atm
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Subpackages
 -----------
 
@@ -32,3 +27,10 @@ Submodules
    atm.utilities
    atm.worker
 
+Module contents
+---------------
+
+.. automodule:: atm
+    :members:
+    :undoc-members:
+    :show-inheritance:

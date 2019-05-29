@@ -14,7 +14,7 @@
 
   
   
-    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="shortcut icon" href="_static/dai-logo-white.ico"/>
   
   
   
@@ -55,6 +55,9 @@
           
 
           
+            
+            <img src="_static/dai-logo-white-200.png" class="logo" alt="Logo"/>
+          
           </a>
 
           
@@ -78,28 +81,39 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="introduction.html">ATM: Scalable model selection and tuning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="introduction.html#background">Background</a></li>
-<li class="toctree-l2"><a class="reference internal" href="introduction.html#our-goal-flexibility-and-power">Our goal: flexibility and power</a></li>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">ATM - Auto Tune Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#overview">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#install">Install</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#install-with-pip">Install with pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#install-from-source">Install from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#install-for-development">Install for Development</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#requirements">0. Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#install-atm">1. Install ATM</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="setup.html#install-using-pip">Install using pip</a></li>
-<li class="toctree-l3"><a class="reference internal" href="setup.html#install-from-source">Install from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#data-format">Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#create-an-atm-instance">2. Create an ATM instance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#search-for-the-best-model">3. Search for the best model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#explore-the-results">4. Explore the results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#make-predictions">5. Make predictions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#install-a-database-optional">2. Install a database (Optional)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#start-using-atm">3. Start using ATM!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#what-s-next">What’s next?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#credits">Credits</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#citing-atm">Citing ATM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#related-projects">Related Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="readme.html#btb">BTB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="readme.html#featuretools">Featuretools</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick-start guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#create-a-datarun">Create a datarun</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#execute-the-datarun">Execute the datarun</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Usage</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="database.html">Guide to the ModelHub database</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="database.html#datasets">Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="database.html#dataruns">Dataruns</a></li>
@@ -107,34 +121,32 @@
 <li class="toctree-l2"><a class="reference internal" href="database.html#classifiers">Classifiers</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">REST API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api.html#quickstart">Quickstart</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#create-a-dataset">2. Create a Dataset</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#browse-the-results">4. Browse the results</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api.html#get-a-single-object-by-id">Get a single object by id</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api.html#get-all-the-children-objects">Get all the children objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#generate-the-demo-data">1. Generate the demo data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rest.html">REST API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rest.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#create-a-dataset">2. Create a Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#browse-the-results">4. Browse the results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rest.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rest.html#get-a-single-object-by-id">Get a single object by id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rest.html#get-all-the-children-objects">Get all the children objects</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#additional-information">Additional information</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#restart-the-atm-process">Restart the ATM process</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#stop-the-atm-process">Stop the ATM process</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rest.html#additional-information">Additional information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#restart-the-atm-process">Restart the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#stop-the-atm-process">Stop the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to ATM and BTB</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="contributing.html#ways-to-contribute">Ways to contribute</a></li>
-<li class="toctree-l2"><a class="reference internal" href="contributing.html#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="contributing.html#style">Style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="contributing.html#tests">Tests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="contributing.html#docs">Docs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="add_method.html">Adding a classification method</a><ul>
@@ -147,7 +159,65 @@
 <li class="toctree-l2"><a class="reference internal" href="add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="add_to_btb.html">Adding a BTB Selector or Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/atm.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/atm.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.api.html">atm.api package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/atm.api.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/atm.api.html#module-atm.api">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/atm.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.classifier.html">atm.classifier module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.cli.html">atm.cli module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.compat.html">atm.compat module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.config.html">atm.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.constants.html">atm.constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.core.html">atm.core module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.data.html">atm.data module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.database.html">atm.database module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.encoder.html">atm.encoder module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.method.html">atm.method module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.metrics.html">atm.metrics module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.utilities.html">atm.utilities module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.worker.html">atm.worker module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/atm.html#module-atm">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#types-of-contributions">Types of Contributions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#report-bugs">Report Bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#fix-bugs">Fix Bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#implement-features">Implement Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#write-documentation">Write Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#submit-feedback">Submit Feedback</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#pull-request-guidelines">Pull Request Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#unit-testing-guidelines">Unit Testing Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#tips">Tips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#release-workflow">Release Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="history.html#id1">0.1.2 (2019-05-07)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="history.html#new-features">New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="history.html#id6">0.1.1 (2019-04-02)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="history.html#id7">New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="history.html#id8">0.1.0 (2018-05-04)</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -251,6 +321,18 @@
 </li>
       <li><a href="api/atm.constants.html#atm.constants.Metrics.ACCURACY">ACCURACY (atm.constants.Metrics attribute)</a>
 </li>
+      <li><a href="api/atm.html#atm.ATM.add_datarun">add_datarun() (atm.ATM method)</a>
+
+      <ul>
+        <li><a href="api/atm.core.html#atm.core.ATM.add_datarun">(atm.core.ATM method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/atm.html#atm.ATM.add_dataset">add_dataset() (atm.ATM method)</a>
+
+      <ul>
+        <li><a href="api/atm.core.html#atm.core.ATM.add_dataset">(atm.core.ATM method)</a>
+</li>
+      </ul></li>
       <li><a href="api/atm.constants.html#atm.constants.Metrics.AP">AP (atm.constants.Metrics attribute)</a>
 </li>
       <li><a href="api/atm.method.html#atm.method.Categorical.as_tunable">as_tunable() (atm.method.Categorical method)</a>
@@ -259,8 +341,12 @@
         <li><a href="api/atm.method.html#atm.method.Numeric.as_tunable">(atm.method.Numeric method)</a>
 </li>
       </ul></li>
-      <li><a href="api/atm.core.html#atm.core.ATM">ATM (class in atm.core)</a>
+      <li><a href="api/atm.html#atm.ATM">ATM (class in atm)</a>
+
+      <ul>
+        <li><a href="api/atm.core.html#atm.core.ATM">(class in atm.core)</a>
 </li>
+      </ul></li>
       <li><a href="api/atm.html#module-atm">atm (module)</a>
 </li>
       <li><a href="api/atm.api.html#module-atm.api">atm.api (module)</a>
@@ -269,12 +355,12 @@
 </li>
       <li><a href="api/atm.classifier.html#module-atm.classifier">atm.classifier (module)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.cli.html#module-atm.cli">atm.cli (module)</a>
 </li>
       <li><a href="api/atm.compat.html#module-atm.compat">atm.compat (module)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.config.html#module-atm.config">atm.config (module)</a>
 </li>
       <li><a href="api/atm.constants.html#module-atm.constants">atm.constants (module)</a>
@@ -296,7 +382,11 @@
       <li><a href="api/atm.worker.html#module-atm.worker">atm.worker (module)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.ATM_KEYS">ATM_KEYS (atm.classifier.Model attribute)</a>
+
+      <ul>
+        <li><a href="api/atm.html#atm.Model.ATM_KEYS">(atm.Model attribute)</a>
 </li>
+      </ul></li>
       <li><a href="api/atm.api.utils.html#atm.api.utils.auto_abort">auto_abort() (in module atm.api.utils)</a>
 </li>
       <li><a href="api/atm.config.html#atm.config.AWSConfig">AWSConfig (class in atm.config)</a>
@@ -343,28 +433,24 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.data.html#atm.data.copy_files">copy_files() (in module atm.data)</a>
+</li>
       <li><a href="api/atm.api.html#atm.api.create_app">create_app() (in module atm.api)</a>
 </li>
       <li><a href="api/atm.database.html#atm.database.Database.create_classifier">create_classifier() (atm.database.Database method)</a>
 </li>
-      <li><a href="api/atm.core.html#atm.core.ATM.create_datarun">create_datarun() (atm.core.ATM method)</a>
-
-      <ul>
-        <li><a href="api/atm.database.html#atm.database.Database.create_datarun">(atm.database.Database method)</a>
+      <li><a href="api/atm.database.html#atm.database.Database.create_datarun">create_datarun() (atm.database.Database method)</a>
 </li>
-      </ul></li>
-      <li><a href="api/atm.core.html#atm.core.ATM.create_dataruns">create_dataruns() (atm.core.ATM method)</a>
+      <li><a href="api/atm.database.html#atm.database.Database.create_dataset">create_dataset() (atm.database.Database method)</a>
 </li>
-      <li><a href="api/atm.core.html#atm.core.ATM.create_dataset">create_dataset() (atm.core.ATM method)</a>
-
-      <ul>
-        <li><a href="api/atm.database.html#atm.database.Database.create_dataset">(atm.database.Database method)</a>
-</li>
-      </ul></li>
       <li><a href="api/atm.database.html#atm.database.Database.create_hyperpartition">create_hyperpartition() (atm.database.Database method)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.cross_validate">cross_validate() (atm.classifier.Model method)</a>
+
+      <ul>
+        <li><a href="api/atm.html#atm.Model.cross_validate">(atm.Model method)</a>
 </li>
+      </ul></li>
       <li><a href="api/atm.metrics.html#atm.metrics.cross_validate_pipeline">cross_validate_pipeline() (in module atm.metrics)</a>
 </li>
   </ul></td>
@@ -373,8 +459,6 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/atm.config.html#atm.config.DatasetConfig.data_description">data_description (atm.config.DatasetConfig attribute)</a>
-</li>
       <li><a href="api/atm.config.html#atm.config.SQLConfig.database">database (atm.config.SQLConfig attribute)</a>
 </li>
       <li><a href="api/atm.database.html#atm.database.Database">Database (class in atm.database)</a>
@@ -385,11 +469,13 @@
 </li>
       <li><a href="api/atm.config.html#atm.config.DatasetConfig">DatasetConfig (class in atm.config)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.database.html#atm.database.db_session">db_session (class in atm.database)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.config.html#atm.config.RunConfig.deadline">deadline (atm.config.RunConfig attribute)</a>
+</li>
+      <li><a href="api/atm.config.html#atm.config.DatasetConfig.description">description (atm.config.DatasetConfig attribute)</a>
 </li>
       <li><a href="api/atm.config.html#atm.config.SQLConfig.dialect">dialect (atm.config.SQLConfig attribute)</a>
 </li>
@@ -406,8 +492,6 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.utilities.html#atm.utilities.ensure_directory">ensure_directory() (in module atm.utilities)</a>
-</li>
-      <li><a href="api/atm.core.html#atm.core.ATM.enter_data">enter_data() (atm.core.ATM method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -457,6 +541,8 @@
 </li>
       <li><a href="api/atm.database.html#atm.database.Database.get_dataset">get_dataset() (atm.database.Database method)</a>
 </li>
+      <li><a href="api/atm.data.html#atm.data.get_demos">get_demos() (in module atm.data)</a>
+</li>
       <li><a href="api/atm.method.html#atm.method.List.get_elements">get_elements() (atm.method.List method)</a>
 </li>
       <li><a href="api/atm.database.html#atm.database.Database.get_hyperpartition">get_hyperpartition() (atm.database.Database method)</a>
@@ -469,10 +555,10 @@
       </ul></li>
       <li><a href="api/atm.utilities.html#atm.utilities.get_instance">get_instance() (in module atm.utilities)</a>
 </li>
-      <li><a href="api/atm.data.html#atm.data.get_local_path">get_local_path() (in module atm.data)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.data.html#atm.data.get_local_path">get_local_path() (in module atm.data)</a>
+</li>
       <li><a href="api/atm.database.html#atm.database.Database.get_maximum_y">get_maximum_y() (atm.database.Database method)</a>
 </li>
       <li><a href="api/atm.database.html#atm.database.Database.get_methods">get_methods() (atm.database.Database method)</a>
@@ -488,8 +574,6 @@
       <li><a href="api/atm.metrics.html#atm.metrics.get_per_class_matrix">get_per_class_matrix() (in module atm.metrics)</a>
 </li>
       <li><a href="api/atm.metrics.html#atm.metrics.get_pr_roc_curves">get_pr_roc_curves() (in module atm.metrics)</a>
-</li>
-      <li><a href="api/atm.utilities.html#atm.utilities.get_public_ip">get_public_ip() (in module atm.utilities)</a>
 </li>
       <li><a href="api/atm.compat.html#atm.compat.getargs">getargs() (in module atm.compat)</a>
 </li>
@@ -565,6 +649,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.method.html#atm.method.List">List (class in atm.method)</a>
 </li>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model.load">load() (atm.classifier.Model class method)</a>
+
+      <ul>
+        <li><a href="api/atm.html#atm.Model.load">(atm.Model class method)</a>
+</li>
+      </ul></li>
       <li><a href="api/atm.data.html#atm.data.load_data">load_data() (in module atm.data)</a>
 </li>
       <li><a href="api/atm.database.html#atm.database.Database.load_metrics">load_metrics() (atm.database.Database method)</a>
@@ -573,9 +663,13 @@
         <li><a href="api/atm.utilities.html#atm.utilities.load_metrics">(in module atm.utilities)</a>
 </li>
       </ul></li>
-      <li><a href="api/atm.database.html#atm.database.Database.load_model">load_model() (atm.database.Database method)</a>
+      <li><a href="api/atm.html#atm.ATM.load_model">load_model() (atm.ATM method)</a>
 
       <ul>
+        <li><a href="api/atm.core.html#atm.core.ATM.load_model">(atm.core.ATM method)</a>
+</li>
+        <li><a href="api/atm.database.html#atm.database.Database.load_model">(atm.database.Database method)</a>
+</li>
         <li><a href="api/atm.utilities.html#atm.utilities.load_model">(in module atm.utilities)</a>
 </li>
       </ul></li>
@@ -589,8 +683,12 @@
 </li>
       <li><a href="api/atm.config.html#atm.config.LogConfig">LogConfig (class in atm.config)</a>
 </li>
-      <li><a href="api/atm.core.html#atm.core.ATM.LOOP_WAIT">LOOP_WAIT (atm.core.ATM attribute)</a>
+      <li><a href="api/atm.html#atm.ATM.LOOP_WAIT">LOOP_WAIT (atm.ATM attribute)</a>
+
+      <ul>
+        <li><a href="api/atm.core.html#atm.core.ATM.LOOP_WAIT">(atm.core.ATM attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -602,7 +700,11 @@
       <li><a href="api/atm.api.utils.html#atm.api.utils.make_absolute">make_absolute() (in module atm.api.utils)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.make_pipeline">make_pipeline() (atm.classifier.Model method)</a>
+
+      <ul>
+        <li><a href="api/atm.html#atm.Model.make_pipeline">(atm.Model method)</a>
 </li>
+      </ul></li>
       <li><a href="api/atm.utilities.html#atm.utilities.make_save_path">make_save_path() (in module atm.utilities)</a>
 </li>
       <li><a href="api/atm.database.html#atm.database.Database.mark_classifier_errored">mark_classifier_errored() (atm.database.Database method)</a>
@@ -625,15 +727,23 @@
 </li>
       <li><a href="api/atm.config.html#atm.config.RunConfig.metric">metric (atm.config.RunConfig attribute)</a>
 </li>
-      <li><a href="api/atm.config.html#atm.config.LogConfig.metric_dir">metric_dir (atm.config.LogConfig attribute)</a>
-</li>
       <li><a href="api/atm.constants.html#atm.constants.Metrics">Metrics (class in atm.constants)</a>
 </li>
+      <li><a href="api/atm.config.html#atm.config.LogConfig.metrics_dir">metrics_dir (atm.config.LogConfig attribute)</a>
+</li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.MINMAX">MINMAX (atm.classifier.Model attribute)</a>
+
+      <ul>
+        <li><a href="api/atm.html#atm.Model.MINMAX">(atm.Model attribute)</a>
 </li>
-      <li><a href="api/atm.classifier.html#atm.classifier.Model">Model (class in atm.classifier)</a>
+      </ul></li>
+      <li><a href="api/atm.html#atm.Model">Model (class in atm)</a>
+
+      <ul>
+        <li><a href="api/atm.classifier.html#atm.classifier.Model">(class in atm.classifier)</a>
 </li>
-      <li><a href="api/atm.config.html#atm.config.LogConfig.model_dir">model_dir (atm.config.LogConfig attribute)</a>
+      </ul></li>
+      <li><a href="api/atm.config.html#atm.config.LogConfig.models_dir">models_dir (atm.config.LogConfig attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -642,7 +752,11 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.N_FOLDS">N_FOLDS (atm.classifier.Model attribute)</a>
+
+      <ul>
+        <li><a href="api/atm.html#atm.Model.N_FOLDS">(atm.Model attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.config.html#atm.config.DatasetConfig.name">name (atm.config.DatasetConfig attribute)</a>
@@ -676,9 +790,17 @@
       <li><a href="api/atm.config.html#atm.config.SQLConfig.password">password (atm.config.SQLConfig attribute)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.PCA">PCA (atm.classifier.Model attribute)</a>
+
+      <ul>
+        <li><a href="api/atm.html#atm.Model.PCA">(atm.Model attribute)</a>
 </li>
+      </ul></li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.PCA_DIMS">PCA_DIMS (atm.classifier.Model attribute)</a>
+
+      <ul>
+        <li><a href="api/atm.html#atm.Model.PCA_DIMS">(atm.Model attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.constants.html#atm.constants.RunStatus.PENDING">PENDING (atm.constants.RunStatus attribute)</a>
@@ -688,7 +810,11 @@
       <li><a href="api/atm.constants.html#atm.constants.Metrics.PR_CURVE">PR_CURVE (atm.constants.Metrics attribute)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.predict">predict() (atm.classifier.Model method)</a>
+
+      <ul>
+        <li><a href="api/atm.html#atm.Model.predict">(atm.Model method)</a>
 </li>
+      </ul></li>
       <li><a href="api/atm.config.html#atm.config.RunConfig.priority">priority (atm.config.RunConfig attribute)</a>
 </li>
   </ul></td>
@@ -717,10 +843,16 @@
 </li>
       <li><a href="api/atm.constants.html#atm.constants.Metrics.ROC_AUC_MICRO">ROC_AUC_MICRO (atm.constants.Metrics attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.constants.html#atm.constants.Metrics.ROC_CURVE">ROC_CURVE (atm.constants.Metrics attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/atm.html#atm.ATM.run">run() (atm.ATM method)</a>
+
+      <ul>
+        <li><a href="api/atm.core.html#atm.core.ATM.run">(atm.core.ATM method)</a>
+</li>
+      </ul></li>
       <li><a href="api/atm.worker.html#atm.worker.Worker.run_classifier">run_classifier() (atm.worker.Worker method)</a>
 </li>
       <li><a href="api/atm.config.html#atm.config.RunConfig.run_per_partition">run_per_partition (atm.config.RunConfig attribute)</a>
@@ -747,6 +879,12 @@
 </li>
       <li><a href="api/atm.config.html#atm.config.AWSConfig.s3_folder">s3_folder (atm.config.AWSConfig attribute)</a>
 </li>
+      <li><a href="api/atm.classifier.html#atm.classifier.Model.save">save() (atm.classifier.Model method)</a>
+
+      <ul>
+        <li><a href="api/atm.html#atm.Model.save">(atm.Model method)</a>
+</li>
+      </ul></li>
       <li><a href="api/atm.worker.html#atm.worker.Worker.save_classifier">save_classifier() (atm.worker.Worker method)</a>
 </li>
       <li><a href="api/atm.worker.html#atm.worker.Worker.save_classifier_cloud">save_classifier_cloud() (atm.worker.Worker method)</a>
@@ -758,7 +896,11 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.SCALE">SCALE (atm.classifier.Model attribute)</a>
+
+      <ul>
+        <li><a href="api/atm.html#atm.Model.SCALE">(atm.Model attribute)</a>
 </li>
+      </ul></li>
       <li><a href="api/atm.config.html#atm.config.RunConfig.score_target">score_target (atm.config.RunConfig attribute)</a>
 </li>
       <li><a href="api/atm.config.html#atm.config.AWSConfig.secret_key">secret_key (atm.config.AWSConfig attribute)</a>
@@ -768,7 +910,11 @@
       <li><a href="api/atm.config.html#atm.config.RunConfig.selector">selector (atm.config.RunConfig attribute)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.special_conversions">special_conversions() (atm.classifier.Model method)</a>
+
+      <ul>
+        <li><a href="api/atm.html#atm.Model.special_conversions">(atm.Model method)</a>
 </li>
+      </ul></li>
       <li><a href="api/atm.config.html#atm.config.SQLConfig">SQLConfig (class in atm.config)</a>
 </li>
       <li><a href="api/atm.database.html#atm.database.Database.start_classifier">start_classifier() (atm.database.Database method)</a>
@@ -782,7 +928,11 @@
       <li><a href="api/atm.worker.html#atm.worker.Worker.test_classifier">test_classifier() (atm.worker.Worker method)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.test_final_model">test_final_model() (atm.classifier.Model method)</a>
+
+      <ul>
+        <li><a href="api/atm.html#atm.Model.test_final_model">(atm.Model method)</a>
 </li>
+      </ul></li>
       <li><a href="api/atm.config.html#atm.config.DatasetConfig.test_path">test_path (atm.config.DatasetConfig attribute)</a>
 </li>
       <li><a href="api/atm.metrics.html#atm.metrics.test_pipeline">test_pipeline() (in module atm.metrics)</a>
@@ -796,7 +946,11 @@
       <li><a href="api/atm.config.html#atm.config.DatasetConfig.train_path">train_path (atm.config.DatasetConfig attribute)</a>
 </li>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.train_test">train_test() (atm.classifier.Model method)</a>
+
+      <ul>
+        <li><a href="api/atm.html#atm.Model.train_test">(atm.Model method)</a>
 </li>
+      </ul></li>
       <li><a href="api/atm.encoder.html#atm.encoder.DataEncoder.transform">transform() (atm.encoder.DataEncoder method)</a>
 </li>
       <li><a href="api/atm.database.html#atm.database.try_with_session">try_with_session() (in module atm.database)</a>
@@ -832,9 +986,17 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.classifier.html#atm.classifier.Model.WHITEN">WHITEN (atm.classifier.Model attribute)</a>
+
+      <ul>
+        <li><a href="api/atm.html#atm.Model.WHITEN">(atm.Model attribute)</a>
 </li>
-      <li><a href="api/atm.core.html#atm.core.ATM.work">work() (atm.core.ATM method)</a>
+      </ul></li>
+      <li><a href="api/atm.html#atm.ATM.work">work() (atm.ATM method)</a>
+
+      <ul>
+        <li><a href="api/atm.core.html#atm.core.ATM.work">(atm.core.ATM method)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/atm.worker.html#atm.worker.Worker">Worker (class in atm.worker)</a>
