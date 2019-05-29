@@ -123,7 +123,7 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Command Line Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#generate-the-demo-data">1. Generate the demo data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#get-the-demo-data">1. Get the demo data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#start-a-worker">3. Start a worker</a></li>
 </ul>
@@ -295,28 +295,23 @@
 from your terminal by simply passing it the path to a CSV file.</p>
 <p>In this example, we will use the default values that are provided in the code, which will use
 the <code class="docutils literal notranslate"><span class="pre">pollution.csv</span></code> that is being generated with the demo datasets by ATM.</p>
-<div class="section" id="generate-the-demo-data">
-<h2>1. Generate the demo data<a class="headerlink" href="#generate-the-demo-data" title="Permalink to this headline">¶</a></h2>
-<p><strong>ATM</strong> command line allows you to generate the demo data that we will be using through this steps
-by running the following command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm get_demos
-</pre></div>
-</div>
-<p>A print on your console with the generated demo datasets will appear:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Generating file demos/iris.csv
-Generating file demos/pollution.csv
-Generating file demos/pitchfork_genres.csv
-</pre></div>
-</div>
+<div class="section" id="get-the-demo-data">
+<h2>1. Get the demo data<a class="headerlink" href="#get-the-demo-data" title="Permalink to this headline">¶</a></h2>
+<p>The first step in order to run <strong>ATM</strong> is to obtain the demo datasets that will be used in during
+the rest of the tutorial.</p>
+<p>For this demo we will be using the pollution csv from the demos bucket, which you can download from
+<a class="reference external" href="https://atm-data.s3.amazonaws.com/pollution_1.csv">here</a>.</p>
 </div>
 <div class="section" id="create-a-dataset-and-generate-it-s-dataruns">
 <h2>2. Create a dataset and generate it’s dataruns<a class="headerlink" href="#create-a-dataset-and-generate-it-s-dataruns" title="Permalink to this headline">¶</a></h2>
-<p>Once you have generated the demo datasets, now it’s time to create a <code class="docutils literal notranslate"><span class="pre">dataset</span></code> object inside the
+<p>Once you have obtained your demo dataset, now it’s time to create a <code class="docutils literal notranslate"><span class="pre">dataset</span></code> object inside the
 database. Our command line also triggers the generation of <code class="docutils literal notranslate"><span class="pre">datarun</span></code> objects for this dataset in
 order to automate this process as much as possible:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm enter_data
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm enter_data --train-path path/to/pollution_1.csv
 </pre></div>
 </div>
+<p>Have in mind that <code class="docutils literal notranslate"><span class="pre">--train-path</span></code> argument can be a local path, an URL link to the CSV file or an
+S3 bucket like link.</p>
 <p>If you run this command, you will create a dataset with the default values, which is using the
 <code class="docutils literal notranslate"><span class="pre">pollution_1.csv</span></code> dataset from the demo datasets.</p>
 <p>A print, with similar information to this, should be printed:</p>

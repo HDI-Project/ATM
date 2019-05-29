@@ -123,7 +123,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#generate-the-demo-data">1. Generate the demo data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#get-the-demo-data">1. Get the demo data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cli.html#start-a-worker">3. Start a worker</a></li>
 </ul>
@@ -611,7 +611,7 @@ conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>var
 
 <dl class="attribute">
 <dt id="atm.config.RunConfig.metric">
-<code class="descname">metric</code><em class="property"> = {'choices': ['cohen_kappa', 'ap', 'f1_macro', 'accuracy', 'roc_auc', 'f1', 'rank_accuracy', 'roc_auc_micro', 'f1_micro', 'roc_auc_macro', 'mcc'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
+<code class="descname">metric</code><em class="property"> = {'choices': ['rank_accuracy', 'mcc', 'f1_macro', 'ap', 'roc_auc', 'f1_micro', 'accuracy', 'roc_auc_macro', 'f1', 'roc_auc_micro', 'cohen_kappa'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
