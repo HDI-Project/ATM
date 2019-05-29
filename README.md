@@ -134,7 +134,7 @@ started with **ATM** by exploring its Python API.
 
 ## 1. Get the demo data
 
-The first step in order to run **ATM** is to obtain the demo datasets that will used in during
+The first step in order to run **ATM** is to obtain the demo datasets that will be used in during
 the rest of the tutorial.
 
 In order to obtain them, open a python interpreter and execute the following commands
@@ -213,7 +213,7 @@ This will print a short description of this Datarun similar to this:
 
 ```python
 Datarun 1 summary:
-    Dataset: 'demos/pollution_1.csv'
+    Dataset: 'demos/pollution.csv'
     Column Name: 'class'
     Judgment Metric: 'f1'
     Classifiers Tested: 100
@@ -314,14 +314,13 @@ predictions = model.predict(data.head())
 ```
 
 
-# Whats next?
+# What's next?
 
 For more details about **ATM** and all its possibilities and features, please check the
 [documentation site](https://HDI-Project.github.io/ATM/).
 
-There you can learn about [Configuring ATM](https://hdi-project.github.io/ATM/configuring_atm.html),
-its [Command Line Interface](https://hdi-project.github.io/ATM/command_line_interface.html) or its
-[REST API](https://hdi-project.github.io/ATM/api.html), as well as
+There you can learn more about its [Command Line Interface](https://hdi-project.github.io/ATM/command_line_interface.html)
+and its [REST API](https://hdi-project.github.io/ATM/api.html), as well as
 [how to contribute to ATM](https://HDI-Project.github.io/ATM/community/contributing.html)
 in order to help us developing new features or cool ideas.
 
