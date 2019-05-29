@@ -126,6 +126,8 @@ feature_01,feature_02,feature_03,feature_04,class
 This CSV can be passed to ATM as local filesystem path but also as a complete AWS S3 Bucket and
 path specification or as a URL.
 
+You can find a collection of demo datasets [here](https://atm-data.s3.amazonaws.com/index.html).
+
 
 # Quickstart
 
@@ -137,28 +139,12 @@ started with **ATM** by exploring its Python API.
 The first step in order to run **ATM** is to obtain the demo datasets that will be used in during
 the rest of the tutorial.
 
-In order to obtain them, open a python interpreter and execute the following commands
-
-```python
-from atm import data
-
-demo_datasets = data.get_demos()
-```
-
-This will return a dictionary that will contain the names and paths of the 3 demo datasets
-included.
-
-```python
-{
-    'iris': 'demos/iris.csv',
-    'pollution': 'demos/pollution.csv',
-    'pitchfork_genres': 'demos/pitchfork_genres.csv'
-}
-```
+For this demo we will be using the pollution csv from the demos bucket, which you can download from
+[here](https://atm-data.s3.amazonaws.com/pollution_1.csv).
 
 ## 2. Create an ATM instance
 
-The first thing to do after obtaining the demo data is creating an ATM instance.
+The first thing to do after obtaining the demo dataset is creating an ATM instance.
 
 ```python
 from atm import ATM
@@ -178,19 +164,28 @@ for the complete list of available options.
 Once you have the **ATM** instance ready, you can use the method `atm.run` to start
 searching for the model that better predicts the target column of your CSV file.
 
-This argument expects at least the path to your CSV file, which in this case we will obtain
-from the `demo_datasets` variable that we just created:
+This function expects at least the path to your CSV file, which can be a local path, an URL link to
+the CSV file or an S3 bucket like link.
+
+If you would like to use your local file, provide it's path in order to start the `run` process.
 
 ```python
-path_to_csv = demo_datasets['pollution']
+path_to_csv = 'path/to/pollution_1.csv'
 results = atm.run(train_path=path_to_csv)
+```
+The above code, could be replaced with the code below in case we don't want to specify a local path
+but an URL or S3 bucket like URL.
+
+```python
+url_to_csv = 'https://atm-data.s3.amazonaws.com/pollution_1.csv'
+results = atm.run(train_path=url_to_csv)
 ```
 
 This will start what is called a `Datarun`, and a progress bar will be displayed
 while the different models are tested and tuned.
 
 ```python
-Processing dataset demos/pollution.csv
+Processing dataset demos/pollution_1.csv
 100%|##########################| 100/100 [00:10<00:00,  6.09it/s]
 ```
 
@@ -213,7 +208,7 @@ This will print a short description of this Datarun similar to this:
 
 ```python
 Datarun 1 summary:
-    Dataset: 'demos/pollution.csv'
+    Dataset: 'demos/pollution_1.csv'
     Column Name: 'class'
     Judgment Metric: 'f1'
     Classifiers Tested: 100
