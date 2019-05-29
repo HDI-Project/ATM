@@ -394,7 +394,7 @@ dependencies for code linting and testing.</p>
 </div>
 <p>This CSV can be passed to ATM as local filesystem path but also as a complete AWS S3 Bucket and
 path specification or as a URL.</p>
-<p>You can find a collection of demo datasets <a class="reference external" href="https://atm-data.s3.amazonaws.com/index.html">here</a>.</p>
+<p>You can find a collection of demo datasets in the <a class="reference external" href="https://atm-data.s3.amazonaws.com/index.html">atm-data S3 Bucket in AWS</a>.</p>
 </div>
 <div class="section" id="quickstart">
 <h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
@@ -404,8 +404,11 @@ started with <strong>ATM</strong> by exploring its Python API.</p>
 <h2>1. Get the demo data<a class="headerlink" href="#get-the-demo-data" title="Permalink to this headline">¶</a></h2>
 <p>The first step in order to run <strong>ATM</strong> is to obtain the demo datasets that will be used in during
 the rest of the tutorial.</p>
-<p>For this demo we will be using the pollution csv from the demos bucket, which you can download from
-<a class="reference external" href="https://atm-data.s3.amazonaws.com/pollution_1.csv">here</a>.</p>
+<p>For this demo we will be using the pollution csv from the atm-data bucket, which you can download with your browser
+<a class="reference external" href="https://atm-data.s3.amazonaws.com/pollution_1.csv">from here</a>, or using the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget https://atm-data.s3.amazonaws.com/pollution_1.csv
+</pre></div>
+</div>
 </div>
 <div class="section" id="create-an-atm-instance">
 <h2>2. Create an ATM instance<a class="headerlink" href="#create-an-atm-instance" title="Permalink to this headline">¶</a></h2>
@@ -425,20 +428,26 @@ for the complete list of available options.</p>
 <h2>3. Search for the best model<a class="headerlink" href="#search-for-the-best-model" title="Permalink to this headline">¶</a></h2>
 <p>Once you have the <strong>ATM</strong> instance ready, you can use the method <code class="docutils literal notranslate"><span class="pre">atm.run</span></code> to start
 searching for the model that better predicts the target column of your CSV file.</p>
-<p>This function expects at least the path to your CSV file, which can be a local path, an URL link to
-the CSV file or an S3 bucket like link.</p>
-<p>If you would like to use your local file, provide it’s path in order to start the <code class="docutils literal notranslate"><span class="pre">run</span></code> process.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">path_to_csv</span> <span class="o">=</span> <span class="s1">&#39;path/to/pollution_1.csv&#39;</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">train_path</span><span class="o">=</span><span class="n">path_to_csv</span><span class="p">)</span>
+<p>This function has to be given the path to your CSV file, which can be a local filesystem path, an URL to
+and HTTP or S3 resource.</p>
+<p>For example, if we have previously downloaded the <a class="reference external" href="https://atm-data.s3.amazonaws.com/pollution_1.csv">pollution_1.csv</a>
+file inside our current working directory, we can call <code class="docutils literal notranslate"><span class="pre">run</span></code> like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">train_path</span><span class="o">=</span><span class="s1">&#39;pollution_1.csv&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The above code, could be replaced with the code below in case we don’t want to specify a local path
-but an URL or S3 bucket like URL.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">url_to_csv</span> <span class="o">=</span> <span class="s1">&#39;https://atm-data.s3.amazonaws.com/pollution_1.csv&#39;</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">train_path</span><span class="o">=</span><span class="n">url_to_csv</span><span class="p">)</span>
+<p>Alternatively, we can use the HTTPS URL of the file to have ATM download the CSV for us:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">train_path</span><span class="o">=</span><span class="s1">&#39;https://atm-data.s3.amazonaws.com/pollution_1.csv&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This will start what is called a <code class="docutils literal notranslate"><span class="pre">Datarun</span></code>, and a progress bar will be displayed
+<p>As the last option, if we have the file inside an S3 Bucket, we can download it by passing an URI
+in the <code class="docutils literal notranslate"><span class="pre">s3://{bucket}/{key}</span></code> format:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">train_path</span><span class="o">=</span><span class="s1">&#39;s3://atm-data/pollution_1.csv&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In order to make this work with a Private S3 Bucket, please make sure to having configured your
+<a class="reference external" href="https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-credentials.html">AWS credentials file</a>,
+or to having created your <code class="docutils literal notranslate"><span class="pre">ATM</span></code> instance passing it the <code class="docutils literal notranslate"><span class="pre">access_key</span></code> and <code class="docutils literal notranslate"><span class="pre">secret_key</span></code> arguments.</p>
+<p>This <code class="docutils literal notranslate"><span class="pre">run</span></code> call will start what is called a <code class="docutils literal notranslate"><span class="pre">Datarun</span></code>, and a progress bar will be displayed
 while the different models are tested and tuned.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Processing</span> <span class="n">dataset</span> <span class="n">demos</span><span class="o">/</span><span class="n">pollution_1</span><span class="o">.</span><span class="n">csv</span>
 <span class="mi">100</span><span class="o">%|</span><span class="c1">##########################| 100/100 [00:10&lt;00:00,  6.09it/s]</span>
