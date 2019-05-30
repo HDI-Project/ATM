@@ -1,10 +1,225 @@
-# Custom Usage
+# Configuring ATM
 
 Nearly every part of ATM is configurable. For example, you can specify which machine-learning
 algorithms ATM should try, which metrics it computes (such as F1 score and ROC/AUC), and which
 method it uses to search through the space of hyperparameters (using another HDI Project library,
 BTB). You can also constrain ATM to find the best model within a limited amount of time or by
 training a limited amount of total models.
+
+## Arguments
+
+**ATM** accepts a series of arguments that will change its behaviour and we will classify them by
+it's function in the following sections: **SQL, AWS, Log, Dataset and Datrun**
+
+### SQL
+
+This arguments specify the database related configuration. In the following section we will explain
+you how to change the database configuration and how to connect to a different one.
+
+The arguments for **SQL** are:
+* **dialect**, type of the sql database. Choices are sqlite or mysql.
+* **database**, name or path of the database.
+* **username**, username for the database to be used.
+* **password**, password for the username.
+* **host**, IP adress or 'localhost' to where the connection is going to be established.
+* **port**, Port number of where the database is listening.
+* **query**, additional query to be executed for the login process.
+
+An example of creating an instance with `mysql` database:
+
+```python
+from atm import ATM
+
+atm = ATM(
+    dialect='mysql',
+    database='atm',
+    username='admin',
+    password='password',
+    host='localhost',
+    port=3306
+)
+```
+
+### AWS
+
+The following arguments specify the [AWS](https://aws.amazon.com/) configuration. Bear in mind that
+you can have the **access_key** and **secret_key** already configured on your machine if you follow
+the steps [here](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#configuring-credentials).
+[Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) will use
+them by default, however if you specify them during instantiation, this will be the ones used.
+
+* **access_key**, aws access key id provided from amazon.
+* **secret_key**, aws secret key provided from amazon.
+* **s3_bucket**, S3 bucket to be used to store the models and metrics.
+* **s3_folder**, folder inside the bucket where the models and metrics will be saved.
+
+
+An exmaple of creating an instance with `aws` configuration is:
+
+```python
+from atm import ATM
+
+atm = ATM(
+    access_key='my_aws_key_id',
+    secret_key='my_aws_secret_key',
+    s3_bucket='my_bucket',
+    s3_folder='my_folder'
+)
+```
+
+### Log
+
+The following arguments specify the configuration to where the models and metrics will be stored
+and if we would like a verbose version of the metrics.
+
+* **models_dir**, local folder where the models should be saved.
+* **metrics_dir**, local folder where the models should be saved.
+* **verbose_metrics**, whether or not to store verbose metrics.
+
+An example of creating an instance with `log` configuration is:
+
+```python
+from atm import ATM
+
+atm = ATM(
+    models_dir='my_path_to_models',
+    metrics_dir='my_path_to_metrics',
+    verbose_metrics=True
+)
+```
+
+### Dataset
+
+The following arguments are used to specify the `dataset` creation inside the database.
+
+* **train_path**, local path, URL or S3 bucket url, to a CSV file that follows the
+[Data Format](https://hdi-project.github.io/ATM/#data-format) and specifies the traininig data
+for the models.
+
+* **test_path**, local path, URL or S3 bucket url, to a CSV file that follows the
+[Data Format](https://hdi-project.github.io/ATM/#data-format) and specifies the test data for
+the models, if this is `None` the training data will be splited in train and test.
+
+* **name**, a name for the `dataset`, if it's not set an `md5` will be generated from the path.
+* **description**, short description about the dataset.
+* **class_column**, name of the column that is being the target of our predictions.
+
+
+An example of using this arguments in our `atm.run` method is:
+
+```python
+from atm import ATM
+
+atm = ATM()
+
+results = atm.run(
+    train_path='path/to/train.csv',
+    test_path='path/to/test.csv',
+    name='test',
+    description='Test data',
+    class_column='test_column'
+)
+```
+
+### Datarun
+
+The following arguments are used to specify the `datarun` creation inside the database. This
+configuration it's important for the behaviour and metrics of our `classifiers`.
+
+* **budget**, amount of `classifiers` or amount of `minutes` to run, type `int`.
+
+* **budget_type**, Type of the `budget`, by default it's `classifier`, can be changed to `walltime`,
+type `str`.
+
+* **gridding**, Gridding factor, by default set to `0` which means that no gridding will be
+performed, type `int`.
+
+* **k_window**, Number of previous scores considered by `k selector` methods. Default is `3`,
+type `int`
+
+* **methods**, Method or a list of methods to use for classification. Each method can either be one
+of the pre-defined method codes listed below or a path to a JSON file defining a custom method.
+Default is `['logreg', 'dt', 'knn']`, type is `str` or a `list` like. A complete list of the
+default choices in **ATM** are:
+
+    * logreg
+    * svm
+    * sgd
+    * dt
+    * et
+    * rf
+    * gnb
+    * mnb
+    * bnb
+    * gp
+    * pa
+    * knn
+    * mlp
+    * ada
+
+* **metric**, Metric by which **ATM** should evaluate the classifiers. The metric function specified
+here will be used to compute the judgment metric for each classifier. Default `metric` is set to
+`f1`, type `str`. The rest of metrics that we support at the moment is as follows:
+
+    * roc_auc_micro
+    * rank_accuracy
+    * f1_micro
+    * accuracy
+    * roc_auc_macro
+    * ap
+    * cohen_kappa
+    * f1
+    * f1_macro
+    * mcc
+
+
+* **r_minimum**,  Number of random runs to perform before tuning can occur. Default value is `2`,
+type `int`.
+
+* **run_per_partition**, If true, generate a new datarun for each hyperpartition. Default is `False`,
+type `bool`.
+
+* **score_target**, Determines which judgment metric will be used to search the hyperparameter space.
+`cv` will use the mean cross-validated performance, `test` will use the performance on a test
+dataset, and `mu_sigma` will use the lower confidence bound on the CV performance. Default is `cv`,
+type `str`.
+
+* **priority**, the priority for this datarun, the higher value is the most important.
+
+* **selector**, Type of [BTB](https://github.com/HDI-Project/BTB/) selector to use. A list of them at
+the moment is `[uniform, ucb1, bestk, bestkvel, purebestkvel, recentk, hieralg]`. Default is set to
+`uniform`, type `str`.
+
+* **tuner**, Type of [BTB](https://github.com/HDI-Project/BTB/) tuner to use. A list of them at the
+moment is `[uniform, gp, gp_ei, gp_eivel]`. Default is set to `uniform`, type `str`.
+
+An example using `atm.run` method with this arguments is:
+
+```python
+from atm import ATM
+
+atm = ATM()
+
+results = atm.run(
+    budget=200,
+    budget_type='classifier',
+    gridding=1,
+    k_window=3,
+    metric='f1_macro',
+    methods=['logreg', 'dt']
+    r_minimum=2,
+    run_per_partition=True,
+    score_target='cv',
+    priority=1,
+    selector='uniform',
+    tuner='uniform',
+    deadline=None,
+)
+```
+
+
+# Custom Usage
+
 
 ## Using ATM with your own data
 
@@ -74,7 +289,6 @@ Then you can simply instantiate `ATM` giving it the path to this `config.yaml`:
 ```
 from atm import ATM
 
-atm = ATM(config_file='config/config.yaml')
 ```
 
 #### Using arguments
@@ -105,74 +319,6 @@ have to specify the name of it.
 
 Here is a list of the arguments that `run` method accepts:
 
-* `class_column`: The target column that has to be classified. By default it is set to `class`,
-type str.
-
-* `train_path`: Path to a `csv` file that follows the data specifications. This must be specified,
-type `str`.
-
-* `test_path`: Path to a `csv` file that follows the data specifications, this one will be used
-as test data, if this is `None`, **ATM**, will split the train data into train and test. Type `str`.
-
-* `budget`: Amount of `classifiers` or amount of `minutes` to run, type `int`.
-* `budget_type`: Type of the `budget`, by default it's `classifier`, can be changed to `walltime`,
-type `str`
-* `gridding`: Gridding factor, by default set to `0` which means that no gridding will be
-performed, type `int`.
-
-* `k_window`: Number of previous scores considered by `k selector` methods. Default is `3`,
-type `int`
-* `methods`: Method or a list of methods to use for classification. Each method can either be one
-of the pre-defined method codes listed below or a path to a JSON file defining a custom method.
-Default is `['logreg', 'dt', 'knn']`, type is `str` or a `list` like. A complete list of the
-default choices in **ATM** are:
-
-    * logreg
-    * svm
-    * sgd
-    * dt
-    * et
-    * rf
-    * gnb
-    * mnb
-    * bnb
-    * gp
-    * pa
-    * knn
-    * mlp
-    * ada
-
-* `metric`: Metric by which **ATM** should evaluate the classifiers. The metric function specified
-here will be used to compute the judgment metric for each classifier. Default `metric` is set to
-`f1`, type `str`. The rest of metrics that we support at the moment is as follows:
-
-    * roc_auc_micro
-    * rank_accuracy
-    * f1_micro
-    * accuracy
-    * roc_auc_macro
-    * ap
-    * cohen_kappa
-    * f1
-    * f1_macro
-    * mcc
-
-
-* `r_minimum`:  Number of random runs to perform before tuning can occur. Default value is `2`,
-type `int`.
-* `run_per_partition`: If true, generate a new datarun for each hyperpartition. Default is `False`,
-type `bool`.
-* `score_target`: Determines which judgment metric will be used to search the hyperparameter space.
-`cv` will use the mean cross-validated performance, `test` will use the performance on a test
-dataset, and `mu_sigma` will use the lower confidence bound on the CV performance. Default is `cv`,
-type `str`.
-
-* `selector`: Type of [BTB](https://github.com/HDI-Project/BTB/) selector to use. A list of them at
-the moment is `[uniform, ucb1, bestk, bestkvel, purebestkvel, recentk, hieralg]`. Default is set to
-`uniform`, type `str`.
-
-* `tuner`: Type of [BTB](https://github.com/HDI-Project/BTB/) tuner to use. A list of them at the
-moment is `[uniform, gp, gp_ei, gp_eivel]`. Default is set to `uniform`, type `str`.
 
 ### Command Line
 
