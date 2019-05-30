@@ -11,6 +11,7 @@
    :maxdepth: 2
 
    database
+   configuring_atm
    cli
    rest
    add_method
