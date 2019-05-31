@@ -13,7 +13,7 @@ from lockfile.pidlockfile import PIDLockFile
 from atm.api import create_app
 from atm.config import AWSConfig, DatasetConfig, LogConfig, RunConfig, SQLConfig
 from atm.core import ATM
-from atm.data import copy_files, get_demos
+from atm.data import copy_files, download_demo, get_demos
 
 LOGGER = logging.getLogger(__name__)
 
@@ -207,7 +207,15 @@ def _make_config(args):
 
 
 def _get_demos(args):
-    get_demos(args)
+    datasets = get_demos()
+    for dataset in datasets:
+        print(dataset)
+
+
+def _download_demo(args):
+    paths = download_demo(args.dataset, args.path)
+    for path in paths:
+        print('Dataset has been saved to {}'.format(path))
 
 
 def _get_parser():
@@ -328,8 +336,14 @@ def _get_parser():
 
     # Get Demos
     get_demos = subparsers.add_parser('get_demos', parents=[logging_args],
-                                      help='Create a demos folder and put the demo CSVs inside.')
+                                      help='Print a list with the available demo datasets.')
     get_demos.set_defaults(action=_get_demos)
+    download_demo = subparsers.add_parser('download_demo', parents=[logging_args],
+                                          help='Downloads a demo dataset from AWS3.')
+    download_demo.set_defaults(action=_download_demo)
+    download_demo.add_argument('-d', '--dataset', required=True, nargs='+',
+                               help='Name of the dataset to be downloaded.')
+    download_demo.add_argument('--path', help='Directory to be used to store the dataset.')
 
     return parser
 
