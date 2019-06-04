@@ -1,3 +1,5 @@
+"""Configuration Module."""
+
 from __future__ import absolute_import, unicode_literals
 
 import argparse
@@ -80,6 +82,7 @@ class Config(object):
 
     @classmethod
     def get_parser(cls):
+        """Get an ArgumentParser for this config."""
         parser = argparse.ArgumentParser(add_help=False)
 
         # make sure the text for these arguments is formatted correctly
@@ -107,6 +110,7 @@ class Config(object):
         return parser
 
     def to_dict(self):
+        """Get a dict representation of this configuraiton."""
         return {
             name: value
             for name, value in vars(self).items()
@@ -171,7 +175,7 @@ class LogConfig(Config):
     }
 
 
-def option_or_path(options, regex=CUSTOM_CLASS_REGEX):
+def _option_or_path(options, regex=CUSTOM_CLASS_REGEX):
     def type_check(s):
         # first, check whether the argument is one of the preconfigured options
         if s in list(options):
@@ -234,7 +238,7 @@ class RunConfig(Config):
             'JSON file defining a custom method.\n\nOptions: [{}]'
         ).format(', '.join(str(s) for s in METHODS.keys())),
         'default': ['logreg', 'dt', 'knn'],
-        'type': option_or_path(METHODS.keys(), JSON_REGEX),
+        'type': _option_or_path(METHODS.keys(), JSON_REGEX),
         'nargs': '+'
     }
 
@@ -317,7 +321,7 @@ class RunConfig(Config):
             '"/path/to/tuner.py:ClassName".\n\nOptions: [{}]'
         ).format(', '.join(str(s) for s in TUNERS.keys())),
         'default': 'uniform',
-        'type': option_or_path(TUNERS.keys())
+        'type': _option_or_path(TUNERS.keys())
     }
 
     # How should ATM select a particular hyperpartition from the set of all
@@ -340,7 +344,7 @@ class RunConfig(Config):
             '"/path/to/selector.py:ClassName".\n\nOptions: [{}]'
         ).format(', '.join(str(s) for s in SELECTORS.keys())),
         'default': 'uniform',
-        'type': option_or_path(SELECTORS.keys())
+        'type': _option_or_path(SELECTORS.keys())
     }
 
     # r_minimum is the number of random runs performed in each hyperpartition before

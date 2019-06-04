@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""Command Line Interfaced module."""
+
 import argparse
 import logging
 import multiprocessing
@@ -58,7 +60,7 @@ def _get_pid_path(pid):
 
 
 def _get_atm_process(pid_path):
-    """Return `psutil.Process` of the `pid` file. If the pidfile is stale it will release it."""
+    """Return ``psutil.Process`` of the ``pid`` file. Release the pidfile if stale."""
     pid_file = PIDLockFile(pid_path, timeout=1.0)
 
     if pid_file.is_locked():
@@ -123,7 +125,7 @@ def _start_background(args):
 
 
 def _start(args):
-    """Create a new process of ATM pointing the process to a certain `pid` file."""
+    """Create a new process of ATM pointing the process to a certain ``pid`` file."""
     pid_path = _get_pid_path(args.pid)
     process = _get_atm_process(pid_path)
 
@@ -203,11 +205,11 @@ def _enter_data(args):
 
 
 def _make_config(args):
-    copy_files('*.yaml', ('config'))
+    copy_files('yaml', 'config')
 
 
 def _get_demos(args):
-    get_demos(args)
+    get_demos()
 
 
 def _get_parser():

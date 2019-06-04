@@ -17,7 +17,7 @@ import numpy as np
 
 from atm.classifier import Model
 from atm.constants import CUSTOM_CLASS_REGEX, SELECTORS, TUNERS
-from atm.database import ClassifierStatus, db_session
+from atm.database import ClassifierStatus, DBSession
 from atm.utilities import ensure_directory, get_instance, save_metrics, save_model, update_params
 
 # shhh
@@ -246,7 +246,7 @@ class Worker(object):
         if self.save_files:
             # keep a database session open so that the utility functions can
             # access the linked hyperpartitions and dataruns
-            with db_session(self.db):
+            with DBSession(self.db):
                 classifier = self.db.get_classifier(classifier_id)
                 model_path = save_model(classifier, self.models_dir, model)
                 metric_path = save_metrics(classifier, self.metrics_dir, metrics)

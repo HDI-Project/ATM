@@ -10,8 +10,8 @@
    :caption: Advanced Usage
    :maxdepth: 2
 
-   database
-   configuring_atm
+   modelhub
+   configuration
    cli
    rest
    add_method

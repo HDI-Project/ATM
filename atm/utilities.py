@@ -85,11 +85,16 @@ def update_params(params, categoricals, constants):
 
 
 def get_instance(class_, **kwargs):
-    """Instantiate an instance of the given class with unused kwargs
+    """Create an instance of the given class with required kwargs.
+
+    The exact keyword arguments that the given ``class_`` expects
+    will be taken from ``kwargs`` and the rest will be ignored.
 
     Args:
-        class_ (type): class to instantiate
-        **kwargs: keyword arguments to specific selector class
+        class_ (type):
+            class to instantiate
+        **kwargs:
+            keyword arguments
 
     Returns:
         instance of specific class with the args that accepts.

@@ -34,31 +34,7 @@ from atm.utilities import base_64_to_object, object_to_base_64
 MAX_HYPERPARTITION_ERRORS = 3
 
 
-def try_with_session(commit=False):
-    """
-    Decorator for instance methods on Database that need a sqlalchemy session.
-
-    This wrapping function checks if the Database has an active session yet. If
-    not, it wraps the function call in a `with db_session():` block.
-    """
-    def wrap(func):
-        def call(db, *args, **kwargs):
-            # if the Database has an active session, don't create a new one
-            if db.session is not None:
-                result = func(db, *args, **kwargs)
-                if commit:
-                    db.session.commit()
-            else:
-                # otherwise, use the session generator
-                with db_session(db, commit=commit):
-                    result = func(db, *args, **kwargs)
-
-            return result
-        return call
-    return wrap
-
-
-class db_session(object):
+class DBSession(object):
     def __init__(self, db, commit=False):
         self.db = db
         self.commit = commit
@@ -74,6 +50,30 @@ class db_session(object):
 
         self.db.session.close()
         self.db.session = None
+
+
+def try_with_session(commit=False):
+    """
+    Decorator for instance methods on Database that need a sqlalchemy session.
+
+    This wrapping function checks if the Database has an active session yet. If
+    not, it wraps the function call in a ``with DBSession():`` block.
+    """
+    def wrap(func):
+        def call(db, *args, **kwargs):
+            # if the Database has an active session, don't create a new one
+            if db.session is not None:
+                result = func(db, *args, **kwargs)
+                if commit:
+                    db.session.commit()
+            else:
+                # otherwise, use the session generator
+                with DBSession(db, commit=commit):
+                    result = func(db, *args, **kwargs)
+
+            return result
+        return call
+    return wrap
 
 
 class Database(object):
