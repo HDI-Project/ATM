@@ -214,8 +214,12 @@ def _get_demos(args):
 
 def _download_demo(args):
     paths = download_demo(args.dataset, args.path)
-    for path in paths:
-        print('Dataset has been saved to {}'.format(path))
+    if isinstance(paths, list):
+        for path in paths:
+            print('Dataset has been saved to {}'.format(path))
+
+    else:
+        print('Dataset has been saved to {}'.format(paths))
 
 
 def _get_parser():
@@ -341,8 +345,7 @@ def _get_parser():
     download_demo = subparsers.add_parser('download_demo', parents=[logging_args],
                                           help='Downloads a demo dataset from AWS3.')
     download_demo.set_defaults(action=_download_demo)
-    download_demo.add_argument('-d', '--dataset', required=True, nargs='+',
-                               help='Name of the dataset to be downloaded.')
+    download_demo.add_argument('dataset', nargs='+', help='Name of the dataset to be downloaded.')
     download_demo.add_argument('--path', help='Directory to be used to store the dataset.')
 
     return parser
