@@ -294,7 +294,7 @@
   <div class="section" id="module-atm.metrics">
 <span id="atm-metrics-module"></span><h1>atm.metrics module<a class="headerlink" href="#module-atm.metrics" title="Permalink to this headline">¶</a></h1>
 <p><strong>Functions</strong></p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -325,7 +325,7 @@
 </table>
 <dl class="function">
 <dt id="atm.metrics.cross_validate_pipeline">
-<code class="descclassname">atm.metrics.</code><code class="descname">cross_validate_pipeline</code><span class="sig-paren">(</span><em>pipeline</em>, <em>X</em>, <em>y</em>, <em>binary=True</em>, <em>n_folds=10</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#cross_validate_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.cross_validate_pipeline" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">atm.metrics.</code><code class="sig-name descname">cross_validate_pipeline</code><span class="sig-paren">(</span><em class="sig-param">pipeline</em>, <em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">binary=True</em>, <em class="sig-param">n_folds=10</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#cross_validate_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.cross_validate_pipeline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute metrics for each of <cite>n_folds</cite> folds of the training data in (X, y).</p>
 <p>pipeline: the sklearn Pipeline to train and test
 X: feature matrix
@@ -339,17 +339,17 @@ n_folds: number of non-overlapping “folds” of the data to make for</p>
 
 <dl class="function">
 <dt id="atm.metrics.get_metrics_binary">
-<code class="descclassname">atm.metrics.</code><code class="descname">get_metrics_binary</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em>, <em>y_pred_probs</em>, <em>include_curves=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#get_metrics_binary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.get_metrics_binary" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">atm.metrics.</code><code class="sig-name descname">get_metrics_binary</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">y_pred_probs</em>, <em class="sig-param">include_curves=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#get_metrics_binary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.get_metrics_binary" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="atm.metrics.get_metrics_multiclass">
-<code class="descclassname">atm.metrics.</code><code class="descname">get_metrics_multiclass</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em>, <em>y_pred_probs</em>, <em>include_per_class=False</em>, <em>include_curves=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#get_metrics_multiclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.get_metrics_multiclass" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">atm.metrics.</code><code class="sig-name descname">get_metrics_multiclass</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">y_pred_probs</em>, <em class="sig-param">include_per_class=False</em>, <em class="sig-param">include_curves=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#get_metrics_multiclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.get_metrics_multiclass" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="atm.metrics.get_per_class_matrix">
-<code class="descclassname">atm.metrics.</code><code class="descname">get_per_class_matrix</code><span class="sig-paren">(</span><em>y</em>, <em>classes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#get_per_class_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.get_per_class_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">atm.metrics.</code><code class="sig-name descname">get_per_class_matrix</code><span class="sig-paren">(</span><em class="sig-param">y</em>, <em class="sig-param">classes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#get_per_class_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.get_per_class_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a (num_classes x num_examples) binary matrix representation of the
 true and predicted y values.
 If classes is None, class values will be extracted from y. Values that are
@@ -359,7 +359,7 @@ of per-class roc_auc scores without error.</p>
 
 <dl class="function">
 <dt id="atm.metrics.get_pr_roc_curves">
-<code class="descclassname">atm.metrics.</code><code class="descname">get_pr_roc_curves</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred_probs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#get_pr_roc_curves"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.get_pr_roc_curves" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">atm.metrics.</code><code class="sig-name descname">get_pr_roc_curves</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred_probs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#get_pr_roc_curves"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.get_pr_roc_curves" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute precision/recall and receiver operating characteristic metrics for a
 binary class label.</p>
 <p>y_true: series of true class labels (only 1 or 0)
@@ -371,7 +371,7 @@ y_pred_probs: series of probabilities generated by the model for the label</p>
 
 <dl class="function">
 <dt id="atm.metrics.rank_n_accuracy">
-<code class="descclassname">atm.metrics.</code><code class="descname">rank_n_accuracy</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_prob_mat</em>, <em>n=0.33</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#rank_n_accuracy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.rank_n_accuracy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">atm.metrics.</code><code class="sig-name descname">rank_n_accuracy</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_prob_mat</em>, <em class="sig-param">n=0.33</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#rank_n_accuracy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.rank_n_accuracy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute how often the true label is one of the top n predicted classes
 for each training example.
 If n is an integer, consider the top n predictions for each example.
@@ -381,7 +381,7 @@ This metric is only really useful when the total number of classes is large.</p>
 
 <dl class="function">
 <dt id="atm.metrics.test_pipeline">
-<code class="descclassname">atm.metrics.</code><code class="descname">test_pipeline</code><span class="sig-paren">(</span><em>pipeline</em>, <em>X</em>, <em>y</em>, <em>binary</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#test_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.test_pipeline" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">atm.metrics.</code><code class="sig-name descname">test_pipeline</code><span class="sig-paren">(</span><em class="sig-param">pipeline</em>, <em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">binary</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/metrics.html#test_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.metrics.test_pipeline" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

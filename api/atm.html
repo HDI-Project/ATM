@@ -331,7 +331,7 @@
 <p>Auto Tune Models
 A multi-user, multi-data AutoML framework.</p>
 <p><strong>Classes</strong></p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -347,10 +347,10 @@ A multi-user, multi-data AutoML framework.</p>
 </table>
 <dl class="class">
 <dt id="atm.ATM">
-<em class="property">class </em><code class="descclassname">atm.</code><code class="descname">ATM</code><span class="sig-paren">(</span><em>dialect='sqlite'</em>, <em>database='atm.db'</em>, <em>username=None</em>, <em>password=None</em>, <em>host=None</em>, <em>port=None</em>, <em>query=None</em>, <em>access_key=None</em>, <em>secret_key=None</em>, <em>s3_bucket=None</em>, <em>s3_folder=None</em>, <em>models_dir='models'</em>, <em>metrics_dir='metrics'</em>, <em>verbose_metrics=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.ATM" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">atm.</code><code class="sig-name descname">ATM</code><span class="sig-paren">(</span><em class="sig-param">dialect='sqlite'</em>, <em class="sig-param">database='atm.db'</em>, <em class="sig-param">username=None</em>, <em class="sig-param">password=None</em>, <em class="sig-param">host=None</em>, <em class="sig-param">port=None</em>, <em class="sig-param">query=None</em>, <em class="sig-param">access_key=None</em>, <em class="sig-param">secret_key=None</em>, <em class="sig-param">s3_bucket=None</em>, <em class="sig-param">s3_folder=None</em>, <em class="sig-param">models_dir='models'</em>, <em class="sig-param">metrics_dir='metrics'</em>, <em class="sig-param">verbose_metrics=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.ATM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p><strong>Attributes</strong></p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -362,7 +362,7 @@ A multi-user, multi-data AutoML framework.</p>
 </tbody>
 </table>
 <p><strong>Methods</strong></p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -387,32 +387,32 @@ A multi-user, multi-data AutoML framework.</p>
 </table>
 <dl class="attribute">
 <dt id="atm.ATM.LOOP_WAIT">
-<code class="descname">LOOP_WAIT</code><em class="property"> = 5</em><a class="headerlink" href="#atm.ATM.LOOP_WAIT" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">LOOP_WAIT</code><em class="property"> = 5</em><a class="headerlink" href="#atm.ATM.LOOP_WAIT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="atm.ATM.add_datarun">
-<code class="descname">add_datarun</code><span class="sig-paren">(</span><em>dataset_id, budget=100, budget_type='classifier', gridding=0, k_window=3, metric='f1', methods=['logreg', 'dt', 'knn'], r_minimum=2, run_per_partition=False, score_target='cv', priority=1, selector='uniform', tuner='uniform', deadline=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.add_datarun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.ATM.add_datarun" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_datarun</code><span class="sig-paren">(</span><em class="sig-param">dataset_id, budget=100, budget_type='classifier', gridding=0, k_window=3, metric='f1', methods=['logreg', 'dt', 'knn'], r_minimum=2, run_per_partition=False, score_target='cv', priority=1, selector='uniform', tuner='uniform', deadline=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.add_datarun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.ATM.add_datarun" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="atm.ATM.add_dataset">
-<code class="descname">add_dataset</code><span class="sig-paren">(</span><em>train_path</em>, <em>test_path=None</em>, <em>name=None</em>, <em>description=None</em>, <em>class_column=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.add_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.ATM.add_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_dataset</code><span class="sig-paren">(</span><em class="sig-param">train_path</em>, <em class="sig-param">test_path=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">description=None</em>, <em class="sig-param">class_column=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.add_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.ATM.add_dataset" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="atm.ATM.load_model">
-<code class="descname">load_model</code><span class="sig-paren">(</span><em>classifier_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.load_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.ATM.load_model" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">load_model</code><span class="sig-paren">(</span><em class="sig-param">classifier_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.load_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.ATM.load_model" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="atm.ATM.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>train_path, test_path=None, name=None, description=None, class_column='class', budget=100, budget_type='classifier', gridding=0, k_window=3, metric='f1', methods=['logreg', 'dt', 'knn'], r_minimum=2, run_per_partition=False, score_target='cv', selector='uniform', tuner='uniform', deadline=None, priority=1, save_files=True, choose_randomly=True, cloud_mode=False, total_time=None, wait=True, verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.ATM.run" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">train_path, test_path=None, name=None, description=None, class_column='class', budget=100, budget_type='classifier', gridding=0, k_window=3, metric='f1', methods=['logreg', 'dt', 'knn'], r_minimum=2, run_per_partition=False, score_target='cv', selector='uniform', tuner='uniform', deadline=None, priority=1, save_files=True, choose_randomly=True, cloud_mode=False, total_time=None, wait=True, verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.ATM.run" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="atm.ATM.work">
-<code class="descname">work</code><span class="sig-paren">(</span><em>datarun_ids=None</em>, <em>save_files=True</em>, <em>choose_randomly=True</em>, <em>cloud_mode=False</em>, <em>total_time=None</em>, <em>wait=True</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.work"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.ATM.work" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">work</code><span class="sig-paren">(</span><em class="sig-param">datarun_ids=None</em>, <em class="sig-param">save_files=True</em>, <em class="sig-param">choose_randomly=True</em>, <em class="sig-param">cloud_mode=False</em>, <em class="sig-param">total_time=None</em>, <em class="sig-param">wait=True</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.work"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.ATM.work" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check the ModelHub database for unfinished dataruns, and spawn workers to
 work on them as they are added. This process will continue to run until it
 exceeds total_time or is broken with ctrl-C.</p>
@@ -439,14 +439,14 @@ complete.</p>
 
 <dl class="class">
 <dt id="atm.Model">
-<em class="property">class </em><code class="descclassname">atm.</code><code class="descname">Model</code><span class="sig-paren">(</span><em>method</em>, <em>params</em>, <em>judgment_metric</em>, <em>class_column</em>, <em>testing_ratio=0.3</em>, <em>verbose_metrics=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">atm.</code><code class="sig-name descname">Model</code><span class="sig-paren">(</span><em class="sig-param">method</em>, <em class="sig-param">params</em>, <em class="sig-param">judgment_metric</em>, <em class="sig-param">class_column</em>, <em class="sig-param">testing_ratio=0.3</em>, <em class="sig-param">verbose_metrics=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class contains everything needed to run an end-to-end ATM classifier
 pipeline. It is initialized with a set of parameters and trained like a
 normal sklearn model. This class can be pickled and saved to disk, then
 unpickled outside of ATM and used to classify new datasets.</p>
 <p><strong>Attributes</strong></p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -476,7 +476,7 @@ unpickled outside of ATM and used to classify new datasets.</p>
 </tbody>
 </table>
 <p><strong>Methods</strong></p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -510,59 +510,59 @@ unpickled outside of ATM and used to classify new datasets.</p>
 </table>
 <dl class="attribute">
 <dt id="atm.Model.ATM_KEYS">
-<code class="descname">ATM_KEYS</code><em class="property"> = ['_scale', '_whiten', '_scale_minmax', '_pca', '_pca_dimensions']</em><a class="headerlink" href="#atm.Model.ATM_KEYS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ATM_KEYS</code><em class="property"> = ['_scale', '_whiten', '_scale_minmax', '_pca', '_pca_dimensions']</em><a class="headerlink" href="#atm.Model.ATM_KEYS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="atm.Model.MINMAX">
-<code class="descname">MINMAX</code><em class="property"> = '_scale_minmax'</em><a class="headerlink" href="#atm.Model.MINMAX" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">MINMAX</code><em class="property"> = '_scale_minmax'</em><a class="headerlink" href="#atm.Model.MINMAX" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="atm.Model.N_FOLDS">
-<code class="descname">N_FOLDS</code><em class="property"> = 5</em><a class="headerlink" href="#atm.Model.N_FOLDS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">N_FOLDS</code><em class="property"> = 5</em><a class="headerlink" href="#atm.Model.N_FOLDS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="atm.Model.PCA">
-<code class="descname">PCA</code><em class="property"> = '_pca'</em><a class="headerlink" href="#atm.Model.PCA" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">PCA</code><em class="property"> = '_pca'</em><a class="headerlink" href="#atm.Model.PCA" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="atm.Model.PCA_DIMS">
-<code class="descname">PCA_DIMS</code><em class="property"> = '_pca_dimensions'</em><a class="headerlink" href="#atm.Model.PCA_DIMS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">PCA_DIMS</code><em class="property"> = '_pca_dimensions'</em><a class="headerlink" href="#atm.Model.PCA_DIMS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="atm.Model.SCALE">
-<code class="descname">SCALE</code><em class="property"> = '_scale'</em><a class="headerlink" href="#atm.Model.SCALE" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">SCALE</code><em class="property"> = '_scale'</em><a class="headerlink" href="#atm.Model.SCALE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="atm.Model.WHITEN">
-<code class="descname">WHITEN</code><em class="property"> = '_whiten'</em><a class="headerlink" href="#atm.Model.WHITEN" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">WHITEN</code><em class="property"> = '_whiten'</em><a class="headerlink" href="#atm.Model.WHITEN" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="atm.Model.cross_validate">
-<code class="descname">cross_validate</code><span class="sig-paren">(</span><em>X</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.cross_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model.cross_validate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cross_validate</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.cross_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model.cross_validate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="classmethod">
+<dl class="method">
 <dt id="atm.Model.load">
-<em class="property">classmethod </em><code class="descname">load</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model.load" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads a saved instance from a path.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="atm.Model.make_pipeline">
-<code class="descname">make_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.make_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model.make_pipeline" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">make_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.make_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model.make_pipeline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes the classifier as well as scaling or dimension reduction steps.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="atm.Model.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use the trained encoder and pipeline to transform training data into
 predicted labels</p>
 <p>data: pd.DataFrame of data for which to predict classes</p>
@@ -571,18 +571,18 @@ predicted labels</p>
 
 <dl class="method">
 <dt id="atm.Model.save">
-<code class="descname">save</code><span class="sig-paren">(</span><em>path</em>, <em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model.save" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">path</em>, <em class="sig-param">force=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model.save" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="atm.Model.special_conversions">
-<code class="descname">special_conversions</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.special_conversions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model.special_conversions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">special_conversions</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.special_conversions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model.special_conversions" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO: replace this logic with something better</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="atm.Model.test_final_model">
-<code class="descname">test_final_model</code><span class="sig-paren">(</span><em>X</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.test_final_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model.test_final_model" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">test_final_model</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.test_final_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model.test_final_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test the (already trained) model pipeline on the provided test data
 (X and y). Store the test judgment metric and return the rest of the
 metrics as a hierarchical dictionary.</p>
@@ -590,7 +590,7 @@ metrics as a hierarchical dictionary.</p>
 
 <dl class="method">
 <dt id="atm.Model.train_test">
-<code class="descname">train_test</code><span class="sig-paren">(</span><em>dataset</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.train_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model.train_test" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">train_test</code><span class="sig-paren">(</span><em class="sig-param">dataset</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.train_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.Model.train_test" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

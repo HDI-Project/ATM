@@ -2,6 +2,6 @@ atm.config module
 =================
 
 .. automodule:: atm.config
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

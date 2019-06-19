@@ -2,6 +2,6 @@ atm.data module
 ===============
 
 .. automodule:: atm.data
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

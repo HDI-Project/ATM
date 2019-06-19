@@ -2,6 +2,6 @@ atm.core module
 ===============
 
 .. automodule:: atm.core
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

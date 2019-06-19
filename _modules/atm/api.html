@@ -301,6 +301,13 @@
     <span class="c1"># Create the Flask-Restless API manager.</span>
     <span class="n">manager</span> <span class="o">=</span> <span class="n">APIManager</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">flask_sqlalchemy_db</span><span class="o">=</span><span class="n">SQLAlchemy</span><span class="p">(</span><span class="n">app</span><span class="p">))</span>
 
+    <span class="c1"># Allow the CORS header</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">after_request</span>
+    <span class="k">def</span> <span class="nf">add_cors_headers</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Access-Control-Allow-Origin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Access-Control-Allow-Credentials&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;true&#39;</span>
+        <span class="k">return</span> <span class="n">response</span>
+
     <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/api/run&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
     <span class="nd">@auto_abort</span><span class="p">((</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">))</span>
     <span class="k">def</span> <span class="nf">atm_run</span><span class="p">():</span>

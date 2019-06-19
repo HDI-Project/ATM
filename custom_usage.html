@@ -339,16 +339,16 @@ that you would like to use.</p>
 </pre></div>
 </div>
 <p>An example, using mysql, would be:</p>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">dialect</span><span class="o">:</span> <span class="n">mysql</span>
-<span class="n">database</span><span class="o">:</span> <span class="n">atm</span>
-<span class="n">username</span><span class="o">:</span> <span class="n">username</span>
-<span class="n">password</span><span class="o">:</span> <span class="n">password</span>
-<span class="n">host</span><span class="o">:</span> <span class="n">localhost</span>
-<span class="n">port</span><span class="o">:</span> <span class="mi">3306</span>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">dialect</span><span class="p">:</span> <span class="n">mysql</span>
+<span class="k">database</span><span class="p">:</span> <span class="n">atm</span>
+<span class="n">username</span><span class="p">:</span> <span class="n">username</span>
+<span class="n">password</span><span class="p">:</span> <span class="n">password</span>
+<span class="k">host</span><span class="p">:</span> <span class="n">localhost</span>
+<span class="n">port</span><span class="p">:</span> <span class="mi">3306</span>
 </pre></div>
 </div>
 <p>Then you can simply instantiate <code class="docutils literal notranslate"><span class="pre">ATM</span></code> giving it the path to this <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code>:</p>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">atm</span> <span class="kn">import</span> <span class="n">ATM</span>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="k">from</span> <span class="n">atm</span> <span class="n">import</span> <span class="n">ATM</span>
 
 <span class="n">atm</span> <span class="o">=</span> <span class="n">ATM</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="s1">&#39;config/config.yaml&#39;</span><span class="p">)</span>
 </pre></div>
@@ -481,13 +481,13 @@ to point to your own dataset.</p>
 connect to (and create if necessary) a SQLite database at <code class="docutils literal notranslate"><span class="pre">./atm.db</span></code> relative to the directory
 from which <code class="docutils literal notranslate"><span class="pre">enter_data.py</span></code> is run. If you are using a MySQL database, you will need to change
 the file to something like this:</p>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">dialect</span><span class="o">:</span> <span class="n">mysql</span>
-<span class="n">database</span><span class="o">:</span> <span class="n">atm</span>
-<span class="n">username</span><span class="o">:</span> <span class="n">username</span>
-<span class="n">password</span><span class="o">:</span> <span class="n">password</span>
-<span class="n">host</span><span class="o">:</span> <span class="n">localhost</span>
-<span class="n">port</span><span class="o">:</span> <span class="mi">3306</span>
-<span class="n">query</span><span class="o">:</span>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">dialect</span><span class="p">:</span> <span class="n">mysql</span>
+<span class="k">database</span><span class="p">:</span> <span class="n">atm</span>
+<span class="n">username</span><span class="p">:</span> <span class="n">username</span>
+<span class="n">password</span><span class="p">:</span> <span class="n">password</span>
+<span class="k">host</span><span class="p">:</span> <span class="n">localhost</span>
+<span class="n">port</span><span class="p">:</span> <span class="mi">3306</span>
+<span class="n">query</span><span class="p">:</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">aws.yaml</span></code> should contain the settings for running ATM in the cloud. This is not necessary

@@ -6,7 +6,7 @@ Subpackages
 
 .. toctree::
 
-    atm.api
+   atm.api
 
 Submodules
 ----------
@@ -31,6 +31,6 @@ Module contents
 ---------------
 
 .. automodule:: atm
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

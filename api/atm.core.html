@@ -297,7 +297,7 @@
 <p>This module contains the ATM class, which is the one responsible for
 executing and orchestrating the main ATM functionalities.</p>
 <p><strong>Classes</strong></p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -310,10 +310,10 @@ executing and orchestrating the main ATM functionalities.</p>
 </table>
 <dl class="class">
 <dt id="atm.core.ATM">
-<em class="property">class </em><code class="descclassname">atm.core.</code><code class="descname">ATM</code><span class="sig-paren">(</span><em>dialect='sqlite'</em>, <em>database='atm.db'</em>, <em>username=None</em>, <em>password=None</em>, <em>host=None</em>, <em>port=None</em>, <em>query=None</em>, <em>access_key=None</em>, <em>secret_key=None</em>, <em>s3_bucket=None</em>, <em>s3_folder=None</em>, <em>models_dir='models'</em>, <em>metrics_dir='metrics'</em>, <em>verbose_metrics=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">atm.core.</code><code class="sig-name descname">ATM</code><span class="sig-paren">(</span><em class="sig-param">dialect='sqlite'</em>, <em class="sig-param">database='atm.db'</em>, <em class="sig-param">username=None</em>, <em class="sig-param">password=None</em>, <em class="sig-param">host=None</em>, <em class="sig-param">port=None</em>, <em class="sig-param">query=None</em>, <em class="sig-param">access_key=None</em>, <em class="sig-param">secret_key=None</em>, <em class="sig-param">s3_bucket=None</em>, <em class="sig-param">s3_folder=None</em>, <em class="sig-param">models_dir='models'</em>, <em class="sig-param">metrics_dir='metrics'</em>, <em class="sig-param">verbose_metrics=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p><strong>Attributes</strong></p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -325,7 +325,7 @@ executing and orchestrating the main ATM functionalities.</p>
 </tbody>
 </table>
 <p><strong>Methods</strong></p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -350,32 +350,32 @@ executing and orchestrating the main ATM functionalities.</p>
 </table>
 <dl class="attribute">
 <dt id="atm.core.ATM.LOOP_WAIT">
-<code class="descname">LOOP_WAIT</code><em class="property"> = 5</em><a class="headerlink" href="#atm.core.ATM.LOOP_WAIT" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">LOOP_WAIT</code><em class="property"> = 5</em><a class="headerlink" href="#atm.core.ATM.LOOP_WAIT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="atm.core.ATM.add_datarun">
-<code class="descname">add_datarun</code><span class="sig-paren">(</span><em>dataset_id, budget=100, budget_type='classifier', gridding=0, k_window=3, metric='f1', methods=['logreg', 'dt', 'knn'], r_minimum=2, run_per_partition=False, score_target='cv', priority=1, selector='uniform', tuner='uniform', deadline=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.add_datarun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.add_datarun" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_datarun</code><span class="sig-paren">(</span><em class="sig-param">dataset_id, budget=100, budget_type='classifier', gridding=0, k_window=3, metric='f1', methods=['logreg', 'dt', 'knn'], r_minimum=2, run_per_partition=False, score_target='cv', priority=1, selector='uniform', tuner='uniform', deadline=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.add_datarun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.add_datarun" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="atm.core.ATM.add_dataset">
-<code class="descname">add_dataset</code><span class="sig-paren">(</span><em>train_path</em>, <em>test_path=None</em>, <em>name=None</em>, <em>description=None</em>, <em>class_column=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.add_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.add_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_dataset</code><span class="sig-paren">(</span><em class="sig-param">train_path</em>, <em class="sig-param">test_path=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">description=None</em>, <em class="sig-param">class_column=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.add_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.add_dataset" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="atm.core.ATM.load_model">
-<code class="descname">load_model</code><span class="sig-paren">(</span><em>classifier_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.load_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.load_model" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">load_model</code><span class="sig-paren">(</span><em class="sig-param">classifier_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.load_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.load_model" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="atm.core.ATM.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>train_path, test_path=None, name=None, description=None, class_column='class', budget=100, budget_type='classifier', gridding=0, k_window=3, metric='f1', methods=['logreg', 'dt', 'knn'], r_minimum=2, run_per_partition=False, score_target='cv', selector='uniform', tuner='uniform', deadline=None, priority=1, save_files=True, choose_randomly=True, cloud_mode=False, total_time=None, wait=True, verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.run" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">train_path, test_path=None, name=None, description=None, class_column='class', budget=100, budget_type='classifier', gridding=0, k_window=3, metric='f1', methods=['logreg', 'dt', 'knn'], r_minimum=2, run_per_partition=False, score_target='cv', selector='uniform', tuner='uniform', deadline=None, priority=1, save_files=True, choose_randomly=True, cloud_mode=False, total_time=None, wait=True, verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.run" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="atm.core.ATM.work">
-<code class="descname">work</code><span class="sig-paren">(</span><em>datarun_ids=None</em>, <em>save_files=True</em>, <em>choose_randomly=True</em>, <em>cloud_mode=False</em>, <em>total_time=None</em>, <em>wait=True</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.work"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.work" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">work</code><span class="sig-paren">(</span><em class="sig-param">datarun_ids=None</em>, <em class="sig-param">save_files=True</em>, <em class="sig-param">choose_randomly=True</em>, <em class="sig-param">cloud_mode=False</em>, <em class="sig-param">total_time=None</em>, <em class="sig-param">wait=True</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.work"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.work" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check the ModelHub database for unfinished dataruns, and spawn workers to
 work on them as they are added. This process will continue to run until it
 exceeds total_time or is broken with ctrl-C.</p>

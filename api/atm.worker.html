@@ -294,7 +294,7 @@
   <div class="section" id="module-atm.worker">
 <span id="atm-worker-module"></span><h1>atm.worker module<a class="headerlink" href="#module-atm.worker" title="Permalink to this headline">¶</a></h1>
 <p><strong>Exceptions</strong></p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -306,7 +306,7 @@
 </tbody>
 </table>
 <p><strong>Classes</strong></p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -319,16 +319,16 @@
 </table>
 <dl class="exception">
 <dt id="atm.worker.ClassifierError">
-<em class="property">exception </em><code class="descclassname">atm.worker.</code><code class="descname">ClassifierError</code><a class="reference internal" href="../_modules/atm/worker.html#ClassifierError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.ClassifierError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="sig-prename descclassname">atm.worker.</code><code class="sig-name descname">ClassifierError</code><a class="reference internal" href="../_modules/atm/worker.html#ClassifierError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.ClassifierError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
 <dl class="class">
 <dt id="atm.worker.Worker">
-<em class="property">class </em><code class="descclassname">atm.worker.</code><code class="descname">Worker</code><span class="sig-paren">(</span><em>database</em>, <em>datarun</em>, <em>save_files=True</em>, <em>cloud_mode=False</em>, <em>aws_access_key=None</em>, <em>aws_secret_key=None</em>, <em>s3_bucket=None</em>, <em>s3_folder=None</em>, <em>models_dir='models'</em>, <em>metrics_dir='metrics'</em>, <em>verbose_metrics=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">atm.worker.</code><code class="sig-name descname">Worker</code><span class="sig-paren">(</span><em class="sig-param">database</em>, <em class="sig-param">datarun</em>, <em class="sig-param">save_files=True</em>, <em class="sig-param">cloud_mode=False</em>, <em class="sig-param">aws_access_key=None</em>, <em class="sig-param">aws_secret_key=None</em>, <em class="sig-param">s3_bucket=None</em>, <em class="sig-param">s3_folder=None</em>, <em class="sig-param">models_dir='models'</em>, <em class="sig-param">metrics_dir='metrics'</em>, <em class="sig-param">verbose_metrics=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p><strong>Methods</strong></p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -365,21 +365,21 @@
 </table>
 <dl class="method">
 <dt id="atm.worker.Worker.is_datarun_finished">
-<code class="descname">is_datarun_finished</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.is_datarun_finished"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.is_datarun_finished" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">is_datarun_finished</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.is_datarun_finished"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.is_datarun_finished" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check to see whether the datarun is finished. This could be due to the
 budget being exhausted or due to hyperparameter gridding being done.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="atm.worker.Worker.load_selector">
-<code class="descname">load_selector</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.load_selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.load_selector" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">load_selector</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.load_selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.load_selector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load and initialize the BTB class which will be responsible for
 selecting hyperpartitions.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="atm.worker.Worker.load_tuner">
-<code class="descname">load_tuner</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.load_tuner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.load_tuner" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">load_tuner</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.load_tuner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.load_tuner" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load, but don’t initialize, the BTB class which will be responsible for
 choosing non-hyperpartition hyperparameter values (a subclass of Tuner). The
 tuner must be initialized with information about the hyperpartition, so it
@@ -388,13 +388,13 @@ cannot be created until later.</p>
 
 <dl class="method">
 <dt id="atm.worker.Worker.run_classifier">
-<code class="descname">run_classifier</code><span class="sig-paren">(</span><em>hyperpartition_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.run_classifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.run_classifier" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">run_classifier</code><span class="sig-paren">(</span><em class="sig-param">hyperpartition_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.run_classifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.run_classifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Choose hyperparameters, then use them to test and save a Classifier.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="atm.worker.Worker.save_classifier">
-<code class="descname">save_classifier</code><span class="sig-paren">(</span><em>classifier_id</em>, <em>model</em>, <em>metrics</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.save_classifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.save_classifier" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">save_classifier</code><span class="sig-paren">(</span><em class="sig-param">classifier_id</em>, <em class="sig-param">model</em>, <em class="sig-param">metrics</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.save_classifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.save_classifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update a classifier with metrics and model information and mark it as
 “complete”</p>
 <p>classifier_id: ID of the classifier to save
@@ -410,7 +410,7 @@ model: Model object containing a serializable representation of the</p>
 
 <dl class="method">
 <dt id="atm.worker.Worker.save_classifier_cloud">
-<code class="descname">save_classifier_cloud</code><span class="sig-paren">(</span><em>local_model_path</em>, <em>local_metric_path</em>, <em>delete_local=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.save_classifier_cloud"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.save_classifier_cloud" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">save_classifier_cloud</code><span class="sig-paren">(</span><em class="sig-param">local_model_path</em>, <em class="sig-param">local_metric_path</em>, <em class="sig-param">delete_local=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.save_classifier_cloud"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.save_classifier_cloud" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save a classifier to the S3 bucket supplied on __init__. Saves a
 serialized representaion of the model as well as a detailed set
 of metrics.</p>
@@ -420,7 +420,7 @@ local_metric_path: path to serialized metrics in the local file system</p>
 
 <dl class="method">
 <dt id="atm.worker.Worker.select_hyperpartition">
-<code class="descname">select_hyperpartition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.select_hyperpartition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.select_hyperpartition" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">select_hyperpartition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.select_hyperpartition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.select_hyperpartition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use the hyperpartition selection method specified by our datarun to choose a
 hyperpartition of hyperparameters from the ModelHub. Only consider
 partitions for which gridding is not complete.</p>
@@ -428,7 +428,7 @@ partitions for which gridding is not complete.</p>
 
 <dl class="method">
 <dt id="atm.worker.Worker.test_classifier">
-<code class="descname">test_classifier</code><span class="sig-paren">(</span><em>method</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.test_classifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.test_classifier" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">test_classifier</code><span class="sig-paren">(</span><em class="sig-param">method</em>, <em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.test_classifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.test_classifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a set of fully-qualified hyperparameters, create and test a
 classifier model.
 Returns: Model object and metrics dictionary</p>
@@ -436,7 +436,7 @@ Returns: Model object and metrics dictionary</p>
 
 <dl class="method">
 <dt id="atm.worker.Worker.tune_hyperparameters">
-<code class="descname">tune_hyperparameters</code><span class="sig-paren">(</span><em>hyperpartition</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.tune_hyperparameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.tune_hyperparameters" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">tune_hyperparameters</code><span class="sig-paren">(</span><em class="sig-param">hyperpartition</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/worker.html#Worker.tune_hyperparameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.worker.Worker.tune_hyperparameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use the hyperparameter tuning method specified by our datarun to choose
 a set of hyperparameters from the potential space.</p>
 </dd></dl>

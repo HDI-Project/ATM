@@ -294,7 +294,7 @@
   <div class="section" id="module-atm.encoder">
 <span id="atm-encoder-module"></span><h1>atm.encoder module<a class="headerlink" href="#module-atm.encoder" title="Permalink to this headline">¶</a></h1>
 <p><strong>Classes</strong></p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -307,10 +307,10 @@
 </table>
 <dl class="class">
 <dt id="atm.encoder.DataEncoder">
-<em class="property">class </em><code class="descclassname">atm.encoder.</code><code class="descname">DataEncoder</code><span class="sig-paren">(</span><em>class_column='class'</em>, <em>feature_columns=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/encoder.html#DataEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.encoder.DataEncoder" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">atm.encoder.</code><code class="sig-name descname">DataEncoder</code><span class="sig-paren">(</span><em class="sig-param">class_column='class'</em>, <em class="sig-param">feature_columns=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/encoder.html#DataEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.encoder.DataEncoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p><strong>Methods</strong></p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -329,7 +329,7 @@
 </table>
 <dl class="method">
 <dt id="atm.encoder.DataEncoder.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/encoder.html#DataEncoder.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.encoder.DataEncoder.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/encoder.html#DataEncoder.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.encoder.DataEncoder.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit one-hot encoders for categorical features and an integer encoder for
 the label. These can be used later to transform raw data into a form
 that ATM can work with.</p>
@@ -338,13 +338,13 @@ that ATM can work with.</p>
 
 <dl class="method">
 <dt id="atm.encoder.DataEncoder.fit_transform">
-<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/encoder.html#DataEncoder.fit_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.encoder.DataEncoder.fit_transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/encoder.html#DataEncoder.fit_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.encoder.DataEncoder.fit_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Process data into a form that ATM can use.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="atm.encoder.DataEncoder.transform">
-<code class="descname">transform</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/encoder.html#DataEncoder.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.encoder.DataEncoder.transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/encoder.html#DataEncoder.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.encoder.DataEncoder.transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a DataFrame of labeled data to a feature matrix in the form
 that ATM can use.</p>
 </dd></dl>
