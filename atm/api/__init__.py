@@ -15,6 +15,13 @@ def create_app(atm, debug=False):
     # Create the Flask-Restless API manager.
     manager = APIManager(app, flask_sqlalchemy_db=SQLAlchemy(app))
 
+    # Allow the CORS header
+    @app.after_request
+    def add_cors_headers(response):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        return response
+
     @app.route('/api/run', methods=['POST'])
     @auto_abort((KeyError, ValueError))
     def atm_run():
