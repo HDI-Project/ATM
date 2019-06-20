@@ -23,7 +23,13 @@ def _get_atm(args):
     aws_conf = AWSConfig(args)
     log_conf = LogConfig(args)
 
-    return ATM(**sql_conf.to_dict(), **aws_conf.to_dict(), **log_conf.to_dict())
+    # As py27 does not accept multiple star operators in one statement
+    config = dict()
+    config.update(sql_conf.to_dict())
+    config.update(aws_conf.to_dict())
+    config.update(log_conf.to_dict())
+
+    return ATM(config)
 
 
 def _work(args, wait=False):
