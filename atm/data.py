@@ -24,7 +24,7 @@ def copy_files(extension, source, target=None):
     code folder, and ``target`` will be interpreted as a path relative to
     the user's current working directory.
 
-    If ``target`` is ``None``, ``source`` will be used, and if the ``target`
+    If ``target`` is ``None``, ``source`` will be used, and if the ``target``
     directory does not exist, it will be created.
 
     Args:

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """Configuration Module."""
 
 from __future__ import absolute_import, unicode_literals
@@ -21,10 +23,8 @@ class Config(object):
     default values for those parameters other than None (in PARAMETERS and
     DEFAULTS, respectively). The object can be initialized with any number of
     keyword arguments; only kwargs that are in PARAMETERS will be used. This
-    means you can (relatively) safely do things like
-        args = parser.parse_args()
-        conf = Config(**vars(args))
-    and only relevant parameters will be set.
+    means you can (relatively) safely do things like ``args = parser.parse_args()``
+    ``conf = Config(**vars(args))`` and only relevant parameters will be set.
 
     Subclasses do not need to define __init__ or any other methods.
     """

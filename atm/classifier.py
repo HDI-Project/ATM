@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 .. module:: wrapper
    :synopsis: Model around classification method.
@@ -58,10 +60,10 @@ class Model(object):
         Parameters:
             method: the short method code (as defined in constants.py) or path
                 to method json
+            params: parameters passed to the sklearn classifier constructor
             judgment_metric: string that indicates which metric should be
                 optimized for.
-            params: parameters passed to the sklearn classifier constructor
-            class_: sklearn classifier class
+            class_column: sklearn classifier class
         """
         # configuration & database
         self.method = method

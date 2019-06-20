@@ -57,7 +57,6 @@ them by default, however if you specify them during instantiation, this will be 
 
 **Note** all this arguments are `None` by default, and they should be passed as a `string`.
 
-
 An exmaple of creating an instance with `aws` configuration is:
 
 ```python
@@ -164,7 +163,7 @@ default choices in **ATM** are:
 
 * `metric`: Metric by which **ATM** should evaluate the classifiers. The metric function specified
 here will be used to compute the judgment metric for each classifier. Default `metric` is set to
-`f1`, type `str`. The rest of metrics that we support at the moment is as follows:
+`f1`, type `str`. The rest of metrics that we support at the moment are as follow:
 
     * `roc_auc_micro`
     * `rank_accuracy`

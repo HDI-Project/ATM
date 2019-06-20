@@ -385,7 +385,7 @@ class ATM(object):
                 Budget amount. Optional. Defaults to ``100``.
             budget_type (str):
                 Budget Type. Can be 'classifier' or 'walltime'.
-                Optional. Defaults to ``'classifier'`
+                Optional. Defaults to ``'classifier'``.
             gridding (int):
                 ``gridding`` setting for the Tuner. Optional. Defaults to ``0``.
             k_window (int):

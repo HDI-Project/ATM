@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """Backwards compaitibility module.
 
 This module contains functions to ensure compatibility with
