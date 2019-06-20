@@ -1,5 +1,3 @@
-
-
 from mock import Mock, call, patch
 
 from atm import data
