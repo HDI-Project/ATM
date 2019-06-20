@@ -1,4 +1,4 @@
-from mock import Mock, call, patch
+from mock import Mock, patch
 
 from atm import cli
 
