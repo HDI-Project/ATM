@@ -14,7 +14,7 @@ from atm.classifier import Model
 from atm.config import DatasetConfig, RunConfig
 from atm.constants import METRICS_BINARY, TIME_FMT
 from atm.core import ATM
-from atm.database import Database, db_session
+from atm.database import Database, DBSession
 from atm.utilities import load_metrics, load_model
 from atm.worker import ClassifierError, Worker
 
@@ -209,7 +209,7 @@ def test_save_classifier(db, datarun, model, metrics):
     worker.save_classifier(classifier.id, model, metrics)
     worker.db.complete_classifier.assert_called()
 
-    with db_session(worker.db):
+    with DBSession(worker.db):
         clf = db.get_classifier(classifier.id)
 
         loaded = load_model(clf, MODEL_DIR)

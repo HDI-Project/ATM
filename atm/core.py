@@ -24,7 +24,7 @@ LOGGER = logging.getLogger(__name__)
 
 class ATM(object):
 
-    LOOP_WAIT = 5
+    _LOOP_WAIT = 5
 
     def __init__(
         self,
@@ -62,6 +62,33 @@ class ATM(object):
 
     def add_dataset(self, train_path, test_path=None, name=None,
                     description=None, class_column=None):
+        """Add a new dataset to the Database.
+
+        Args:
+            train_path (str):
+                Path to the training CSV file. It can be a local filesystem path,
+                absolute or relative, or an HTTP or HTTPS URL, or an S3 path in the
+                format ``s3://{bucket_name}/{key}``. Required.
+            test_path (str):
+                Path to the testing CSV file. It can be a local filesystem path,
+                absolute or relative, or an HTTP or HTTPS URL, or an S3 path in the
+                format ``s3://{bucket_name}/{key}``.
+                Optional. If not given, the training CSV will be split in two parts,
+                train and test.
+            name (str):
+                Name given to this dataset. Optional. If not given, a hash will be
+                generated from the training_path and used as the Dataset name.
+            description (str):
+                Human friendly description of the Dataset. Optional.
+            class_column (str):
+                Name of the column that will be used as the target variable.
+                Optional. Defaults to ``'class'``.
+
+        Returns:
+            Dataset:
+                The created dataset.
+        """
+
         return self.db.create_dataset(
             train_path=train_path,
             test_path=test_path,
@@ -77,7 +104,51 @@ class ATM(object):
                     r_minimum=2, run_per_partition=False, score_target='cv', priority=1,
                     selector='uniform', tuner='uniform', deadline=None):
 
-        dataruns = list()
+        """Register one or more Dataruns to the Database.
+
+        The methods hyperparameters will be analyzed and Hyperpartitions generated
+        from them.
+        If ``run_per_partition`` is ``True``, one Datarun will be created for each
+        Hyperpartition. Otherwise, a single one will be created for all of them.
+
+        Args:
+            dataset_id (int):
+                Id of the Dataset which this Datarun will belong to.
+            budget (int):
+                Budget amount. Optional. Defaults to ``100``.
+            budget_type (str):
+                Budget Type. Can be 'classifier' or 'walltime'.
+                Optional. Defaults to ``'classifier'``.
+            gridding (int):
+                ``gridding`` setting for the Tuner. Optional. Defaults to ``0``.
+            k_window (int):
+                ``k`` setting for the Selector. Optional. Defaults to ``3``.
+            metric (str):
+                Metric to use for the tuning and selection. Optional. Defaults to ``'f1'``.
+            methods (list):
+                List of methods to try. Optional. Defaults to ``['logreg', 'dt', 'knn']``.
+            r_minimum (int):
+                ``r_minimum`` setting for the Tuner. Optional. Defaults to ``2``.
+            run_per_partition (bool):
+                whether to create a separated Datarun for each Hyperpartition or not.
+                Optional. Defaults to ``False``.
+            score_target (str):
+                Which score to use for the tuning and selection process. It can be ``'cv'`` or
+                ``'test'``. Optional. Defaults to ``'cv'``.
+            priority (int):
+                Priority of this Datarun. The higher the better. Optional. Defaults to ``1``.
+            selector (str):
+                Type of selector to use. Optional. Defaults to ``'uniform'``.
+            tuner (str):
+                Type of tuner to use. Optional. Defaults to ``'uniform'``.
+            deadline (str):
+                Time deadline. It must be a string representing a datetime in the format
+                ``'%Y-%m-%d %H:%M'``. If given, ``budget_type`` will be set to ``'walltime'``.
+
+        Returns:
+            Datarun:
+                The created Datarun or list of Dataruns.
+        """
 
         if deadline:
             deadline = datetime.strptime(deadline, TIME_FMT)
@@ -98,6 +169,7 @@ class ATM(object):
             LOGGER.info('method {} has {} hyperpartitions'.format(
                 method, len(method_parts[method])))
 
+        dataruns = list()
         if not run_per_partition:
             datarun = self.db.create_datarun(
                 dataset_id=dataset_id,
@@ -169,22 +241,38 @@ class ATM(object):
 
     def work(self, datarun_ids=None, save_files=True, choose_randomly=True,
              cloud_mode=False, total_time=None, wait=True, verbose=False):
-        """
-        Check the ModelHub database for unfinished dataruns, and spawn workers to
-        work on them as they are added. This process will continue to run until it
-        exceeds total_time or is broken with ctrl-C.
+        """Get unfinished Dataruns from the database and work on them.
 
-        datarun_ids (optional): list of IDs of dataruns to compute on. If None,
-            this will work on all unfinished dataruns in the database.
-        choose_randomly: if True, work on all highest-priority dataruns in random
-            order. If False, work on them in sequential order (by ID)
-        cloud_mode: if True, save processed datasets to AWS.
-        total_time (optional): if set to an integer, this worker will only work for
-            total_time seconds. Otherwise, it will continue working until all
-            dataruns are complete (or indefinitely).
-        wait: if True, once all dataruns in the database are complete, keep spinning
-            and wait for new runs to be added. If False, exit once all dataruns are
-            complete.
+        Check the ModelHub Database for unfinished Dataruns, and work on them
+        as they are added. This process will continue to run until it exceeds
+        total_time or there are no more Dataruns to process or it is killed.
+
+        Args:
+            datarun_ids (list):
+                list of IDs of Dataruns to work on. If ``None``, this will work on any
+                unfinished Dataruns found in the database. Optional. Defaults to ``None``.
+            save_files (bool):
+                Whether to save the fitted classifiers and their metrics or not.
+                Optional. Defaults to True.
+            choose_randomly (bool):
+                If ``True``, work on all the highest-priority dataruns in random order.
+                Otherwise, work on them in sequential order (by ID).
+                Optional. Defaults to ``True``.
+            cloud_mode (bool):
+                Save the models and metrics in AWS S3 instead of locally. This option
+                works only if S3 configuration has been provided on initialization.
+                Optional. Defaults to ``False``.
+            total_time (int):
+                Total time to run the work process, in seconds. If ``None``, continue to
+                run until interrupted or there are no more Dataruns to process.
+                Optional. Defaults to ``None``.
+            wait (bool):
+                If ``True``, wait for more Dataruns to be inserted into the Database
+                once all have been processed. Otherwise, exit the worker loop
+                when they run out.
+                Optional. Defaults to ``False``.
+            verbose (bool):
+                Whether to be verbose about the process. Optional. Defaults to ``True``.
         """
         start_time = datetime.now()
 
@@ -196,8 +284,8 @@ class ATM(object):
             if not dataruns:
                 if wait:
                     LOGGER.debug('No dataruns found. Sleeping %d seconds and trying again.',
-                                 ATM.LOOP_WAIT)
-                    time.sleep(ATM.LOOP_WAIT)
+                                 self._LOOP_WAIT)
+                    time.sleep(self._LOOP_WAIT)
                     continue
 
                 else:
@@ -220,6 +308,7 @@ class ATM(object):
                             aws_secret_key=self.aws_secret_key, s3_bucket=self.s3_bucket,
                             s3_folder=self.s3_folder, models_dir=self.models_dir,
                             metrics_dir=self.metrics_dir, verbose_metrics=self.verbose_metrics)
+
             try:
                 if run.budget_type == 'classifier':
                     pbar = tqdm(
@@ -256,8 +345,8 @@ class ATM(object):
             except ClassifierError:
                 # the exception has already been handled; just wait a sec so we
                 # don't go out of control reporting errors
-                LOGGER.error('Something went wrong. Sleeping %d seconds.', ATM.LOOP_WAIT)
-                time.sleep(ATM.LOOP_WAIT)
+                LOGGER.error('Something went wrong. Sleeping %d seconds.', self._LOOP_WAIT)
+                time.sleep(self._LOOP_WAIT)
 
             elapsed_time = (datetime.now() - start_time).total_seconds()
             if total_time is not None and elapsed_time >= total_time:
@@ -269,7 +358,66 @@ class ATM(object):
             metric='f1', methods=['logreg', 'dt', 'knn'], r_minimum=2, run_per_partition=False,
             score_target='cv', selector='uniform', tuner='uniform', deadline=None, priority=1,
             save_files=True, choose_randomly=True, cloud_mode=False, total_time=None,
-            wait=True, verbose=True):
+            verbose=True):
+
+        """Create a Dataset and a Datarun and then work on it.
+
+        Args:
+            train_path (str):
+                Path to the training CSV file. It can be a local filesystem path,
+                absolute or relative, or an HTTP or HTTPS URL, or an S3 path in the
+                format ``s3://{bucket_name}/{key}``. Required.
+            test_path (str):
+                Path to the testing CSV file. It can be a local filesystem path,
+                absolute or relative, or an HTTP or HTTPS URL, or an S3 path in the
+                format ``s3://{bucket_name}/{key}``.
+                Optional. If not given, the training CSV will be split in two parts,
+                train and test.
+            name (str):
+                Name given to this dataset. Optional. If not given, a hash will be
+                generated from the training_path and used as the Dataset name.
+            description (str):
+                Human friendly description of the Dataset. Optional.
+            class_column (str):
+                Name of the column that will be used as the target variable.
+                Optional. Defaults to ``'class'``.
+            budget (int):
+                Budget amount. Optional. Defaults to ``100``.
+            budget_type (str):
+                Budget Type. Can be 'classifier' or 'walltime'.
+                Optional. Defaults to ``'classifier'``.
+            gridding (int):
+                ``gridding`` setting for the Tuner. Optional. Defaults to ``0``.
+            k_window (int):
+                ``k`` setting for the Selector. Optional. Defaults to ``3``.
+            metric (str):
+                Metric to use for the tuning and selection. Optional. Defaults to ``'f1'``.
+            methods (list):
+                List of methods to try. Optional. Defaults to ``['logreg', 'dt', 'knn']``.
+            r_minimum (int):
+                ``r_minimum`` setting for the Tuner. Optional. Defaults to ``2``.
+            run_per_partition (bool):
+                whether to create a separated Datarun for each Hyperpartition or not.
+                Optional. Defaults to ``False``.
+            score_target (str):
+                Which score to use for the tuning and selection process. It can be ``'cv'`` or
+                ``'test'``. Optional. Defaults to ``'cv'``.
+            priority (int):
+                Priority of this Datarun. The higher the better. Optional. Defaults to ``1``.
+            selector (str):
+                Type of selector to use. Optional. Defaults to ``'uniform'``.
+            tuner (str):
+                Type of tuner to use. Optional. Defaults to ``'uniform'``.
+            deadline (str):
+                Time deadline. It must be a string representing a datetime in the format
+                ``'%Y-%m-%d %H:%M'``. If given, ``budget_type`` will be set to ``'walltime'``.
+            verbose (bool):
+                Whether to be verbose about the process. Optional. Defaults to ``True``.
+
+        Returns:
+            Datarun:
+                The created Datarun or list of Dataruns.
+        """
 
         dataset = self.add_dataset(train_path, test_path, name, description, class_column)
         datarun = self.add_datarun(
@@ -321,4 +469,14 @@ class ATM(object):
             return dataruns[0]
 
     def load_model(self, classifier_id):
+        """Load a Model from the Database.
+
+        Args:
+            classifier_id (int):
+                Id of the Model to load.
+
+        Returns:
+            Model:
+                The loaded model instance.
+        """
         return self.db.get_classifier(classifier_id).load_model()
