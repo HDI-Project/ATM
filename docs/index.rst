@@ -10,7 +10,8 @@
    :caption: Advanced Usage
    :maxdepth: 2
 
-   database
+   modelhub
+   configuration
    cli
    rest
    add_method

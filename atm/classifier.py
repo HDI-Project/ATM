@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 .. module:: wrapper
    :synopsis: Model around classification method.
@@ -58,10 +60,10 @@ class Model(object):
         Parameters:
             method: the short method code (as defined in constants.py) or path
                 to method json
+            params: parameters passed to the sklearn classifier constructor
             judgment_metric: string that indicates which metric should be
                 optimized for.
-            params: parameters passed to the sklearn classifier constructor
-            class_: sklearn classifier class
+            class_column: sklearn classifier class
         """
         # configuration & database
         self.method = method
@@ -83,7 +85,7 @@ class Model(object):
         # persistent random state
         self.random_state = np.random.randint(1e7)
 
-    def make_pipeline(self):
+    def _make_pipeline(self):
         """
         Makes the classifier as well as scaling or dimension reduction steps.
         """
@@ -97,7 +99,7 @@ class Model(object):
                       if k in Model.ATM_KEYS}
 
         # do special conversions
-        hyperparameters = self.special_conversions(hyperparameters)
+        hyperparameters = self._special_conversions(hyperparameters)
         classifier = self.class_(**hyperparameters)
 
         if Model.PCA in atm_params and atm_params[Model.PCA]:
@@ -122,7 +124,7 @@ class Model(object):
         steps.append((self.method, classifier))
         self.pipeline = Pipeline(steps)
 
-    def cross_validate(self, X, y):
+    def _cross_validate(self, X, y):
         # TODO: this is hacky. See https://github.com/HDI-Project/ATM/issues/48
         binary = self.num_classes == 2
         kwargs = {}
@@ -142,7 +144,7 @@ class Model(object):
 
         return cv_scores
 
-    def test_final_model(self, X, y):
+    def _test_final_model(self, X, y):
         """
         Test the (already trained) model pipeline on the provided test data
         (X and y). Store the test judgment metric and return the rest of the
@@ -170,7 +172,18 @@ class Model(object):
         return test_scores
 
     def train_test(self, dataset):
+        """Train and test this model using Cross Validation and Holdout.
 
+        Args:
+            dataset (Dataset):
+                Dataset object from database.
+
+        Returns:
+            dict:
+                Dictionary containing:
+                    * cv (list): The cross validation scores array
+                    * test (dict): The test scores dictionary
+        """
         self.num_classes = dataset.k_classes
         self.num_features = dataset.d_features
 
@@ -197,22 +210,24 @@ class Model(object):
         X_test, y_test = self.encoder.transform(test_data)
 
         # create and cross-validate pipeline
-        self.make_pipeline()
-        cv_scores = self.cross_validate(X_train, y_train)
+        self._make_pipeline()
+        cv_scores = self._cross_validate(X_train, y_train)
 
         # train and test the final model
         self.pipeline.fit(X_train, y_train)
-        test_scores = self.test_final_model(X_test, y_test)
+        test_scores = self._test_final_model(X_test, y_test)
         return {'cv': cv_scores, 'test': test_scores}
 
     def predict(self, data):
-        """
-        Use the trained encoder and pipeline to transform training data into
-        predicted labels
+        """Generate predictions from new data.
 
-        data: pd.DataFrame of data for which to predict classes
+        Args:
+            data (pandas.DataFrame):
+                Data for which to predict classes
 
-        returns: pd.Series populated with predictions, with index matching data.
+        Returns:
+            pandas.Series:
+                Vector of predictions
         """
         X, _ = self.encoder.transform(data)
         predictions = self.pipeline.predict(X)
@@ -220,10 +235,8 @@ class Model(object):
         labels = pd.Series(labels, index=data.index)
         return labels
 
-    def special_conversions(self, params):
-        """
-        TODO: replace this logic with something better
-        """
+    def _special_conversions(self, params):
+        # TODO: replace this logic with something better
         # create list parameters
         lists = defaultdict(list)
         element_regex = re.compile(r'(.*)\[(\d)\]')
@@ -272,12 +285,31 @@ class Model(object):
 
     @classmethod
     def load(cls, path):
-        """Loads a saved instance from a path."""
+        """Loads a saved Model instance from a path.
+
+        Args:
+            path (str):
+                path where the model is saved.
+
+        Returns:
+            Model:
+                New model instance.
+        """
 
         with open(path, 'rb') as classifier:
             return pickle.load(classifier)
 
     def save(self, path, force=False):
+        """Save this Model using pickle.
+
+        Args:
+            path (str):
+                Path where the model should be saved.
+
+            force (bool):
+                If True, overwrite the model if it already exists.
+        """
+
         if os.path.exists(path) and not force:
             print('The indicated path already exists. Use `force=True` to overwrite.')
 
