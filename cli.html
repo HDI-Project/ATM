@@ -38,7 +38,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="REST API" href="rest.html" />
-    <link rel="prev" title="Guide to the ModelHub database" href="database.html" /> 
+    <link rel="prev" title="Configuring ATM" href="configuration.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -115,17 +115,44 @@
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usage</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="database.html">Guide to the ModelHub database</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="database.html#datasets">Datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="database.html#dataruns">Dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="database.html#hyperpartitions">Hyperpartitions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="database.html#classifiers">Classifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modelhub.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modelhub.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelhub.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelhub.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelhub.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuring ATM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#arguments">Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#database-configuration">Database Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#aws">AWS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#log">Log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#dataset">Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#datarun">Datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#using-atm-with-your-own-data">Using ATM with your own data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#setting-up-a-distributed-database">Setting up a distributed Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#install-mysql-server">1. Install mysql-server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#log-into-your-mysql-instance-as-root">2. Log into your MySQL instance as root</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#create-a-new-database-for-atm">3. Create a new Database for ATM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#test-your-settings">4. Test your settings</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Command Line Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#get-the-demo-data">1. Get the demo data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#start-a-worker">3. Start a worker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#command-line-arguments">Command Line Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#using-command-line-arguments">Using command line arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-yaml-configuration-files">Using YAML configuration files</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="rest.html">REST API</a><ul>
@@ -293,25 +320,28 @@
 <h1>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline">¶</a></h1>
 <p><strong>ATM</strong> provides a simple command line client that will allow you to run ATM directly
 from your terminal by simply passing it the path to a CSV file.</p>
-<p>In this example, we will use the default values that are provided in the code, which will use
-the <code class="docutils literal notranslate"><span class="pre">pollution.csv</span></code> that is being generated with the demo datasets by ATM.</p>
+<div class="section" id="quickstart">
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h2>
+<p>In this example, we will use the default values that are provided in the code in order to generate
+classifiers.</p>
 <div class="section" id="get-the-demo-data">
-<h2>1. Get the demo data<a class="headerlink" href="#get-the-demo-data" title="Permalink to this headline">¶</a></h2>
+<h3>1. Get the demo data<a class="headerlink" href="#get-the-demo-data" title="Permalink to this headline">¶</a></h3>
 <p>The first step in order to run <strong>ATM</strong> is to obtain the demo datasets that will be used in during
 the rest of the tutorial.</p>
-<p>For this demo we will be using the pollution csv from the demos bucket, which you can download from
+<p>For this demo we will be using the pollution csv from the
+<a class="reference external" href="https://atm-data.s3.amazonaws.com/index.html">demos bucket</a>, which you can download from
 <a class="reference external" href="https://atm-data.s3.amazonaws.com/pollution_1.csv">here</a>.</p>
 </div>
 <div class="section" id="create-a-dataset-and-generate-it-s-dataruns">
-<h2>2. Create a dataset and generate it’s dataruns<a class="headerlink" href="#create-a-dataset-and-generate-it-s-dataruns" title="Permalink to this headline">¶</a></h2>
+<h3>2. Create a dataset and generate it’s dataruns<a class="headerlink" href="#create-a-dataset-and-generate-it-s-dataruns" title="Permalink to this headline">¶</a></h3>
 <p>Once you have obtained your demo dataset, now it’s time to create a <code class="docutils literal notranslate"><span class="pre">dataset</span></code> object inside the
 database. Our command line also triggers the generation of <code class="docutils literal notranslate"><span class="pre">datarun</span></code> objects for this dataset in
 order to automate this process as much as possible:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm enter_data --train-path path/to/pollution_1.csv
 </pre></div>
 </div>
-<p>Have in mind that <code class="docutils literal notranslate"><span class="pre">--train-path</span></code> argument can be a local path, an URL link to the CSV file or an
-S3 bucket like link.</p>
+<p>Bear in mind that <code class="docutils literal notranslate"><span class="pre">--train-path</span></code> argument can be a local path, an URL link to the CSV file or an
+complete S3 Bucket path.</p>
 <p>If you run this command, you will create a dataset with the default values, which is using the
 <code class="docutils literal notranslate"><span class="pre">pollution_1.csv</span></code> dataset from the demo datasets.</p>
 <p>A print, with similar information to this, should be printed:</p>
@@ -320,7 +350,7 @@ method dt has <span class="m">2</span> hyperpartitions
 method knn has <span class="m">24</span> hyperpartitions
 Dataruns created. Summary:
     Dataset ID: <span class="m">1</span>
-    Training data: demos/pollution_1.csv
+    Training data: path/to/pollution_1.csv
     Test data: None
     Datarun ID: <span class="m">1</span>
     Hyperpartition selection strategy: uniform
@@ -334,7 +364,7 @@ Dataruns created. Summary:
 </div>
 </div>
 <div class="section" id="start-a-worker">
-<h2>3. Start a worker<a class="headerlink" href="#start-a-worker" title="Permalink to this headline">¶</a></h2>
+<h3>3. Start a worker<a class="headerlink" href="#start-a-worker" title="Permalink to this headline">¶</a></h3>
 <p><strong>ATM</strong> requieres a worker to process the dataruns that are not completed and stored inside the
 database. This worker process will be runing until there are no dataruns <code class="docutils literal notranslate"><span class="pre">pending</span></code>.</p>
 <p>In order to launch such a process, execute:</p>
@@ -373,6 +403,73 @@ database. When all 100 classifiers in your budget have been built, all workers w
 </div>
 </div>
 </div>
+<div class="section" id="command-line-arguments">
+<h2>Command Line Arguments<a class="headerlink" href="#command-line-arguments" title="Permalink to this headline">¶</a></h2>
+<p>You can specify each argument individually on the command line. The names of the
+variables are the same as those described <a class="reference external" href="https://hdi-project.github.io/ATM/configuring_atm.html#arguments">here</a>.
+SQL configuration variables must be prepended by <code class="docutils literal notranslate"><span class="pre">sql-</span></code>, and AWS config variables must be
+prepended by <code class="docutils literal notranslate"><span class="pre">aws-</span></code>.</p>
+<div class="section" id="using-command-line-arguments">
+<h3>Using command line arguments<a class="headerlink" href="#using-command-line-arguments" title="Permalink to this headline">¶</a></h3>
+<p>Using command line arguments is convenient for quick experiments, or for cases where you
+need to change just a couple of values from the default configuration. For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm enter_data --train-path ./data/my-custom-data.csv <span class="se">\</span>
+              --test-path ./data/my-custom-test-data.csv <span class="se">\</span>
+              --selector bestkvel
+</pre></div>
+</div>
+<p>You can also use a mixture of config files and command line arguments; any command line
+arguments you specify will override the values found in config files.</p>
+</div>
+<div class="section" id="using-yaml-configuration-files">
+<h3>Using YAML configuration files<a class="headerlink" href="#using-yaml-configuration-files" title="Permalink to this headline">¶</a></h3>
+<p>You can also save the configuration as YAML files is an easy way to save complicated setups
+or share them with team members.</p>
+<p>You should start with the templates provided by the <code class="docutils literal notranslate"><span class="pre">atm</span> <span class="pre">make_config</span></code> command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm make_config
+</pre></div>
+</div>
+<p>This will generate a folder called <code class="docutils literal notranslate"><span class="pre">config/templates</span></code> in your current working directory which
+will contain 5 files, which you will need to copy over to the <code class="docutils literal notranslate"><span class="pre">config</span></code> folder and edit according
+to your needs:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp config/templates/*.yaml config/
+vim config/*.yaml
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">run.yaml</span></code> contains all the settings for a single dataset and datarun. Specify the <code class="docutils literal notranslate"><span class="pre">train_path</span></code>
+to point to your own dataset.</p>
+<p><code class="docutils literal notranslate"><span class="pre">sql.yaml</span></code> contains the settings for the ModelHub SQL database. The default configuration will
+connect to (and create if necessary) a SQLite database at <code class="docutils literal notranslate"><span class="pre">./atm.db</span></code> relative to the directory
+from which <code class="docutils literal notranslate"><span class="pre">enter_data.py</span></code> is run. If you are using a MySQL database, you will need to change
+the file to something like this:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">dialect</span><span class="p">:</span> <span class="n">mysql</span>
+<span class="k">database</span><span class="p">:</span> <span class="n">atm</span>
+<span class="n">username</span><span class="p">:</span> <span class="n">username</span>
+<span class="n">password</span><span class="p">:</span> <span class="n">password</span>
+<span class="k">host</span><span class="p">:</span> <span class="n">localhost</span>
+<span class="n">port</span><span class="p">:</span> <span class="mi">3306</span>
+<span class="n">query</span><span class="p">:</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">aws.yaml</span></code> should contain the settings for running ATM in the cloud. This is not necessary
+for local operation.</p>
+<p>Once your YAML files have been updated, run the datarun creation command and pass it the paths
+to your new config files:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>atm enter_data --sql-config config/sql.yaml <span class="se">\</span>
+              --aws-config config/aws.yaml <span class="se">\</span>
+              --run-config config/run.yaml
+</pre></div>
+</div>
+<p>It’s important that the SQL configuration used by the worker matches the configuration you
+passed to <code class="docutils literal notranslate"><span class="pre">enter_data</span></code> – otherwise, the worker will be looking in the wrong ModelHub
+database for its datarun!</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">atm</span> <span class="n">worker</span> <span class="c1">--sql-config config/sql.yaml \</span>
+          <span class="c1">--aws-config config/aws.yaml \</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
 
 
            </div>
@@ -385,7 +482,7 @@ database. When all 100 classifiers in your budget have been built, all workers w
         <a href="rest.html" class="btn btn-neutral float-right" title="REST API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="database.html" class="btn btn-neutral float-left" title="Guide to the ModelHub database" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="configuration.html" class="btn btn-neutral float-left" title="Configuring ATM" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

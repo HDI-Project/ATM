@@ -113,17 +113,44 @@
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usage</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../database.html">Guide to the ModelHub database</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../database.html#datasets">Datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../database.html#dataruns">Dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../database.html#hyperpartitions">Hyperpartitions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../database.html#classifiers">Classifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modelhub.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modelhub.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modelhub.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modelhub.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modelhub.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration.html">Configuring ATM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../configuration.html#arguments">Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#database-configuration">Database Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#aws">AWS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#log">Log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#dataset">Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#datarun">Datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../configuration.html#using-atm-with-your-own-data">Using ATM with your own data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../configuration.html#setting-up-a-distributed-database">Setting up a distributed Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#install-mysql-server">1. Install mysql-server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#log-into-your-mysql-instance-as-root">2. Log into your MySQL instance as root</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#create-a-new-database-for-atm">3. Create a new Database for ATM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#test-your-settings">4. Test your settings</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../cli.html#get-the-demo-data">1. Get the demo data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../cli.html#start-a-worker">3. Start a worker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../cli.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../cli.html#command-line-arguments">Command Line Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#using-command-line-arguments">Using command line arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#using-yaml-configuration-files">Using YAML configuration files</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../rest.html">REST API</a><ul>
@@ -284,7 +311,11 @@
            <div itemprop="articleBody">
             
   <h1>Source code for atm.config</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;Configuration Module.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
 
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -305,10 +336,8 @@
 <span class="sd">    default values for those parameters other than None (in PARAMETERS and</span>
 <span class="sd">    DEFAULTS, respectively). The object can be initialized with any number of</span>
 <span class="sd">    keyword arguments; only kwargs that are in PARAMETERS will be used. This</span>
-<span class="sd">    means you can (relatively) safely do things like</span>
-<span class="sd">        args = parser.parse_args()</span>
-<span class="sd">        conf = Config(**vars(args))</span>
-<span class="sd">    and only relevant parameters will be set.</span>
+<span class="sd">    means you can (relatively) safely do things like ``args = parser.parse_args()``</span>
+<span class="sd">    ``conf = Config(**vars(args))`` and only relevant parameters will be set.</span>
 
 <span class="sd">    Subclasses do not need to define __init__ or any other methods.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -366,6 +395,7 @@
 
 <div class="viewcode-block" id="Config.get_parser"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.Config.get_parser">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_parser</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get an ArgumentParser for this config.&quot;&quot;&quot;</span>
         <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">add_help</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="c1"># make sure the text for these arguments is formatted correctly</span>
@@ -393,6 +423,7 @@
         <span class="k">return</span> <span class="n">parser</span></div>
 
 <div class="viewcode-block" id="Config.to_dict"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.Config.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a dict representation of this configuraiton.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="n">name</span><span class="p">:</span> <span class="n">value</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
@@ -457,7 +488,7 @@
     <span class="p">}</span></div>
 
 
-<div class="viewcode-block" id="option_or_path"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.option_or_path">[docs]</a><span class="k">def</span> <span class="nf">option_or_path</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="n">CUSTOM_CLASS_REGEX</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_option_or_path</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="n">CUSTOM_CLASS_REGEX</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">type_check</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
         <span class="c1"># first, check whether the argument is one of the preconfigured options</span>
         <span class="k">if</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">options</span><span class="p">):</span>
@@ -472,7 +503,7 @@
         <span class="c1"># if both of those fail, there&#39;s something wrong</span>
         <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> is not a valid option or path!&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">type_check</span></div>
+    <span class="k">return</span> <span class="n">type_check</span>
 
 
 <div class="viewcode-block" id="RunConfig"><a class="viewcode-back" href="../../api/atm.config.html#atm.config.RunConfig">[docs]</a><span class="k">class</span> <span class="nc">RunConfig</span><span class="p">(</span><span class="n">Config</span><span class="p">):</span>
@@ -520,7 +551,7 @@
             <span class="s1">&#39;JSON file defining a custom method.</span><span class="se">\n\n</span><span class="s1">Options: [</span><span class="si">{}</span><span class="s1">]&#39;</span>
         <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">METHODS</span><span class="o">.</span><span class="n">keys</span><span class="p">())),</span>
         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;logreg&#39;</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">,</span> <span class="s1">&#39;knn&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">option_or_path</span><span class="p">(</span><span class="n">METHODS</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">JSON_REGEX</span><span class="p">),</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_option_or_path</span><span class="p">(</span><span class="n">METHODS</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">JSON_REGEX</span><span class="p">),</span>
         <span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;+&#39;</span>
     <span class="p">}</span>
 
@@ -603,7 +634,7 @@
             <span class="s1">&#39;&quot;/path/to/tuner.py:ClassName&quot;.</span><span class="se">\n\n</span><span class="s1">Options: [</span><span class="si">{}</span><span class="s1">]&#39;</span>
         <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">TUNERS</span><span class="o">.</span><span class="n">keys</span><span class="p">())),</span>
         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;uniform&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">option_or_path</span><span class="p">(</span><span class="n">TUNERS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_option_or_path</span><span class="p">(</span><span class="n">TUNERS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="p">}</span>
 
     <span class="c1"># How should ATM select a particular hyperpartition from the set of all</span>
@@ -626,7 +657,7 @@
             <span class="s1">&#39;&quot;/path/to/selector.py:ClassName&quot;.</span><span class="se">\n\n</span><span class="s1">Options: [</span><span class="si">{}</span><span class="s1">]&#39;</span>
         <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">SELECTORS</span><span class="o">.</span><span class="n">keys</span><span class="p">())),</span>
         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;uniform&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">option_or_path</span><span class="p">(</span><span class="n">SELECTORS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_option_or_path</span><span class="p">(</span><span class="n">SELECTORS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="p">}</span>
 
     <span class="c1"># r_minimum is the number of random runs performed in each hyperpartition before</span>

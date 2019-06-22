@@ -115,17 +115,44 @@
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usage</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../database.html">Guide to the ModelHub database</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#datasets">Datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#dataruns">Dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#hyperpartitions">Hyperpartitions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#classifiers">Classifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modelhub.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuring ATM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#arguments">Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#database-configuration">Database Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#aws">AWS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#log">Log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#dataset">Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#datarun">Datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#using-atm-with-your-own-data">Using ATM with your own data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#setting-up-a-distributed-database">Setting up a distributed Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#install-mysql-server">1. Install mysql-server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#log-into-your-mysql-instance-as-root">2. Log into your MySQL instance as root</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#create-a-new-database-for-atm">3. Create a new Database for ATM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#test-your-settings">4. Test your settings</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#get-the-demo-data">1. Get the demo data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#start-a-worker">3. Start a worker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#command-line-arguments">Command Line Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#using-command-line-arguments">Using command line arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#using-yaml-configuration-files">Using YAML configuration files</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../rest.html">REST API</a><ul>
@@ -300,63 +327,77 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#atm.data.copy_files" title="atm.data.copy_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_files</span></code></a>(pattern, source[, target])</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.data.copy_files" title="atm.data.copy_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_files</span></code></a>(extension, source[, target])</p></td>
+<td><p>Copy matching files from source to target.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#atm.data.download" title="atm.data.download"><code class="xref py py-obj docutils literal notranslate"><span class="pre">download</span></code></a>(path, local_path, **kwargs)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#atm.data.download_from_s3" title="atm.data.download_from_s3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">download_from_s3</span></code></a>(path, local_path[, …])</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#atm.data.download_from_url" title="atm.data.download_from_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">download_from_url</span></code></a>(url, local_path, **kwargs)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#atm.data.get_demos" title="atm.data.get_demos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_demos</span></code></a>([args])</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#atm.data.get_local_path" title="atm.data.get_local_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_local_path</span></code></a>(name, path[, aws_access_key, …])</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.data.get_demos" title="atm.data.get_demos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_demos</span></code></a>()</p></td>
+<td><p>Copy the demo CSV files to the <code class="docutils literal notranslate"><span class="pre">{cwd}/demos</span></code> folder.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#atm.data.load_data" title="atm.data.load_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_data</span></code></a>(name, path[, aws_access_key, …])</p></td>
-<td><p></p></td>
+<td><p>Load data from the given path.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="function">
 <dt id="atm.data.copy_files">
-<code class="sig-prename descclassname">atm.data.</code><code class="sig-name descname">copy_files</code><span class="sig-paren">(</span><em class="sig-param">pattern</em>, <em class="sig-param">source</em>, <em class="sig-param">target=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/data.html#copy_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.data.copy_files" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="atm.data.download">
-<code class="sig-prename descclassname">atm.data.</code><code class="sig-name descname">download</code><span class="sig-paren">(</span><em class="sig-param">path</em>, <em class="sig-param">local_path</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/data.html#download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.data.download" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="atm.data.download_from_s3">
-<code class="sig-prename descclassname">atm.data.</code><code class="sig-name descname">download_from_s3</code><span class="sig-paren">(</span><em class="sig-param">path</em>, <em class="sig-param">local_path</em>, <em class="sig-param">aws_access_key=None</em>, <em class="sig-param">aws_secret_key=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/data.html#download_from_s3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.data.download_from_s3" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="atm.data.download_from_url">
-<code class="sig-prename descclassname">atm.data.</code><code class="sig-name descname">download_from_url</code><span class="sig-paren">(</span><em class="sig-param">url</em>, <em class="sig-param">local_path</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/data.html#download_from_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.data.download_from_url" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-prename descclassname">atm.data.</code><code class="sig-name descname">copy_files</code><span class="sig-paren">(</span><em class="sig-param">extension</em>, <em class="sig-param">source</em>, <em class="sig-param">target=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/data.html#copy_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.data.copy_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy matching files from source to target.</p>
+<p>Scan the <code class="docutils literal notranslate"><span class="pre">source</span></code> folder and copy any file that end with
+the given <code class="docutils literal notranslate"><span class="pre">extension</span></code> to the <code class="docutils literal notranslate"><span class="pre">target</span></code> folder.</p>
+<p>Both <code class="docutils literal notranslate"><span class="pre">source</span></code> and <code class="docutils literal notranslate"><span class="pre">target</span></code> are expected to be either a <code class="docutils literal notranslate"><span class="pre">str</span></code> or a
+list or tuple of strings to be joined using <code class="docutils literal notranslate"><span class="pre">os.path.join</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">sourec</span></code> will be interpreted as a path relative to the <code class="docutils literal notranslate"><span class="pre">atm</span></code> root
+code folder, and <code class="docutils literal notranslate"><span class="pre">target</span></code> will be interpreted as a path relative to
+the user’s current working directory.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">target</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">source</span></code> will be used, and if the <code class="docutils literal notranslate"><span class="pre">target</span></code>
+directory does not exist, it will be created.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>extension</strong> (<em>str</em>) – File extension to copy.</p></li>
+<li><p><strong>source</strong> (<em>str</em><em> or </em><em>iterabe</em>) – Source directory.</p></li>
+<li><p><strong>target</strong> (<em>str</em><em> or </em><em>iterabe</em><em> or </em><em>None</em>) – Target directory. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary containing the file names without extension as keys
+and the new paths as values.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="function">
 <dt id="atm.data.get_demos">
-<code class="sig-prename descclassname">atm.data.</code><code class="sig-name descname">get_demos</code><span class="sig-paren">(</span><em class="sig-param">args=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/data.html#get_demos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.data.get_demos" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="atm.data.get_local_path">
-<code class="sig-prename descclassname">atm.data.</code><code class="sig-name descname">get_local_path</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">path</em>, <em class="sig-param">aws_access_key=None</em>, <em class="sig-param">aws_secret_key=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/data.html#get_local_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.data.get_local_path" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-prename descclassname">atm.data.</code><code class="sig-name descname">get_demos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/data.html#get_demos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.data.get_demos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy the demo CSV files to the <code class="docutils literal notranslate"><span class="pre">{cwd}/demos</span></code> folder.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="atm.data.load_data">
 <code class="sig-prename descclassname">atm.data.</code><code class="sig-name descname">load_data</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">path</em>, <em class="sig-param">aws_access_key=None</em>, <em class="sig-param">aws_secret_key=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/data.html#load_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.data.load_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Load data from the given path.</p>
+<p>If the path is an URL or an S3 path, download it and make a local copy
+of it to avoid having to dowload it later again.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – Name of the dataset. Used to cache the data locally.</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – Local path or S3 path or URL.</p></li>
+<li><p><strong>aws_access_key</strong> (<em>str</em>) – AWS access key. Optional.</p></li>
+<li><p><strong>aws_secret_key</strong> (<em>str</em>) – AWS secret key. Optional.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The loaded data.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
 
 </div>
 

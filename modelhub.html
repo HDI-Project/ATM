@@ -37,7 +37,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Command Line Interface" href="cli.html" />
+    <link rel="next" title="Configuring ATM" href="configuration.html" />
     <link rel="prev" title="ATM - Auto Tune Models" href="readme.html" /> 
 </head>
 
@@ -122,10 +122,37 @@
 <li class="toctree-l2"><a class="reference internal" href="#classifiers">Classifiers</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuring ATM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#arguments">Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#database-configuration">Database Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#aws">AWS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#log">Log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#dataset">Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#datarun">Datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#using-atm-with-your-own-data">Using ATM with your own data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#setting-up-a-distributed-database">Setting up a distributed Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#install-mysql-server">1. Install mysql-server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#log-into-your-mysql-instance-as-root">2. Log into your MySQL instance as root</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#create-a-new-database-for-atm">3. Create a new Database for ATM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#test-your-settings">4. Test your settings</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#get-the-demo-data">1. Get the demo data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#start-a-worker">3. Start a worker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#command-line-arguments">Command Line Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#using-command-line-arguments">Using command line arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#using-yaml-configuration-files">Using YAML configuration files</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="rest.html">REST API</a><ul>
@@ -275,7 +302,7 @@
         
             
             
-              <a href="https://github.com/HDI-project/ATM/blob/master/docs/database.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/HDI-project/ATM/blob/master/docs/modelhub.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -543,7 +570,7 @@ the Python stack trace from the caught exception.</p></li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="cli.html" class="btn btn-neutral float-right" title="Command Line Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="configuration.html" class="btn btn-neutral float-right" title="Configuring ATM" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="readme.html" class="btn btn-neutral float-left" title="ATM - Auto Tune Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

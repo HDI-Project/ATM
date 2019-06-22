@@ -113,17 +113,44 @@
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usage</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../database.html">Guide to the ModelHub database</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../database.html#datasets">Datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../database.html#dataruns">Dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../database.html#hyperpartitions">Hyperpartitions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../database.html#classifiers">Classifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modelhub.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modelhub.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modelhub.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modelhub.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modelhub.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration.html">Configuring ATM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../configuration.html#arguments">Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#database-configuration">Database Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#aws">AWS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#log">Log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#dataset">Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#datarun">Datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../configuration.html#using-atm-with-your-own-data">Using ATM with your own data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../configuration.html#setting-up-a-distributed-database">Setting up a distributed Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#install-mysql-server">1. Install mysql-server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#log-into-your-mysql-instance-as-root">2. Log into your MySQL instance as root</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#create-a-new-database-for-atm">3. Create a new Database for ATM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#test-your-settings">4. Test your settings</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../cli.html#get-the-demo-data">1. Get the demo data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../cli.html#start-a-worker">3. Start a worker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../cli.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../cli.html#command-line-arguments">Command Line Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#using-command-line-arguments">Using command line arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#using-yaml-configuration-files">Using YAML configuration files</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../rest.html">REST API</a><ul>
@@ -310,7 +337,7 @@
 
 <div class="viewcode-block" id="ATM"><a class="viewcode-back" href="../../api/atm.core.html#atm.ATM">[docs]</a><span class="k">class</span> <span class="nc">ATM</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
-    <span class="n">LOOP_WAIT</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">_LOOP_WAIT</span> <span class="o">=</span> <span class="mi">5</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -348,6 +375,33 @@
 
 <div class="viewcode-block" id="ATM.add_dataset"><a class="viewcode-back" href="../../api/atm.core.html#atm.ATM.add_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">add_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_path</span><span class="p">,</span> <span class="n">test_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">class_column</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a new dataset to the Database.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            train_path (str):</span>
+<span class="sd">                Path to the training CSV file. It can be a local filesystem path,</span>
+<span class="sd">                absolute or relative, or an HTTP or HTTPS URL, or an S3 path in the</span>
+<span class="sd">                format ``s3://{bucket_name}/{key}``. Required.</span>
+<span class="sd">            test_path (str):</span>
+<span class="sd">                Path to the testing CSV file. It can be a local filesystem path,</span>
+<span class="sd">                absolute or relative, or an HTTP or HTTPS URL, or an S3 path in the</span>
+<span class="sd">                format ``s3://{bucket_name}/{key}``.</span>
+<span class="sd">                Optional. If not given, the training CSV will be split in two parts,</span>
+<span class="sd">                train and test.</span>
+<span class="sd">            name (str):</span>
+<span class="sd">                Name given to this dataset. Optional. If not given, a hash will be</span>
+<span class="sd">                generated from the training_path and used as the Dataset name.</span>
+<span class="sd">            description (str):</span>
+<span class="sd">                Human friendly description of the Dataset. Optional.</span>
+<span class="sd">            class_column (str):</span>
+<span class="sd">                Name of the column that will be used as the target variable.</span>
+<span class="sd">                Optional. Defaults to ``&#39;class&#39;``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dataset:</span>
+<span class="sd">                The created dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span>
             <span class="n">train_path</span><span class="o">=</span><span class="n">train_path</span><span class="p">,</span>
             <span class="n">test_path</span><span class="o">=</span><span class="n">test_path</span><span class="p">,</span>
@@ -363,7 +417,51 @@
                     <span class="n">r_minimum</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">run_per_partition</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">score_target</span><span class="o">=</span><span class="s1">&#39;cv&#39;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                     <span class="n">selector</span><span class="o">=</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="n">tuner</span><span class="o">=</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="n">deadline</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-        <span class="n">dataruns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="sd">&quot;&quot;&quot;Register one or more Dataruns to the Database.</span>
+
+<span class="sd">        The methods hyperparameters will be analyzed and Hyperpartitions generated</span>
+<span class="sd">        from them.</span>
+<span class="sd">        If ``run_per_partition`` is ``True``, one Datarun will be created for each</span>
+<span class="sd">        Hyperpartition. Otherwise, a single one will be created for all of them.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataset_id (int):</span>
+<span class="sd">                Id of the Dataset which this Datarun will belong to.</span>
+<span class="sd">            budget (int):</span>
+<span class="sd">                Budget amount. Optional. Defaults to ``100``.</span>
+<span class="sd">            budget_type (str):</span>
+<span class="sd">                Budget Type. Can be &#39;classifier&#39; or &#39;walltime&#39;.</span>
+<span class="sd">                Optional. Defaults to ``&#39;classifier&#39;``.</span>
+<span class="sd">            gridding (int):</span>
+<span class="sd">                ``gridding`` setting for the Tuner. Optional. Defaults to ``0``.</span>
+<span class="sd">            k_window (int):</span>
+<span class="sd">                ``k`` setting for the Selector. Optional. Defaults to ``3``.</span>
+<span class="sd">            metric (str):</span>
+<span class="sd">                Metric to use for the tuning and selection. Optional. Defaults to ``&#39;f1&#39;``.</span>
+<span class="sd">            methods (list):</span>
+<span class="sd">                List of methods to try. Optional. Defaults to ``[&#39;logreg&#39;, &#39;dt&#39;, &#39;knn&#39;]``.</span>
+<span class="sd">            r_minimum (int):</span>
+<span class="sd">                ``r_minimum`` setting for the Tuner. Optional. Defaults to ``2``.</span>
+<span class="sd">            run_per_partition (bool):</span>
+<span class="sd">                whether to create a separated Datarun for each Hyperpartition or not.</span>
+<span class="sd">                Optional. Defaults to ``False``.</span>
+<span class="sd">            score_target (str):</span>
+<span class="sd">                Which score to use for the tuning and selection process. It can be ``&#39;cv&#39;`` or</span>
+<span class="sd">                ``&#39;test&#39;``. Optional. Defaults to ``&#39;cv&#39;``.</span>
+<span class="sd">            priority (int):</span>
+<span class="sd">                Priority of this Datarun. The higher the better. Optional. Defaults to ``1``.</span>
+<span class="sd">            selector (str):</span>
+<span class="sd">                Type of selector to use. Optional. Defaults to ``&#39;uniform&#39;``.</span>
+<span class="sd">            tuner (str):</span>
+<span class="sd">                Type of tuner to use. Optional. Defaults to ``&#39;uniform&#39;``.</span>
+<span class="sd">            deadline (str):</span>
+<span class="sd">                Time deadline. It must be a string representing a datetime in the format</span>
+<span class="sd">                ``&#39;%Y-%m-%d %H:%M&#39;``. If given, ``budget_type`` will be set to ``&#39;walltime&#39;``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Datarun:</span>
+<span class="sd">                The created Datarun or list of Dataruns.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">deadline</span><span class="p">:</span>
             <span class="n">deadline</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">deadline</span><span class="p">,</span> <span class="n">TIME_FMT</span><span class="p">)</span>
@@ -384,6 +482,7 @@
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;method </span><span class="si">{}</span><span class="s1"> has </span><span class="si">{}</span><span class="s1"> hyperpartitions&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">method</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">method_parts</span><span class="p">[</span><span class="n">method</span><span class="p">])))</span>
 
+        <span class="n">dataruns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">run_per_partition</span><span class="p">:</span>
             <span class="n">datarun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">create_datarun</span><span class="p">(</span>
                 <span class="n">dataset_id</span><span class="o">=</span><span class="n">dataset_id</span><span class="p">,</span>
@@ -455,22 +554,38 @@
 
 <div class="viewcode-block" id="ATM.work"><a class="viewcode-back" href="../../api/atm.core.html#atm.ATM.work">[docs]</a>    <span class="k">def</span> <span class="nf">work</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datarun_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_files</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choose_randomly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
              <span class="n">cloud_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">total_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check the ModelHub database for unfinished dataruns, and spawn workers to</span>
-<span class="sd">        work on them as they are added. This process will continue to run until it</span>
-<span class="sd">        exceeds total_time or is broken with ctrl-C.</span>
+        <span class="sd">&quot;&quot;&quot;Get unfinished Dataruns from the database and work on them.</span>
 
-<span class="sd">        datarun_ids (optional): list of IDs of dataruns to compute on. If None,</span>
-<span class="sd">            this will work on all unfinished dataruns in the database.</span>
-<span class="sd">        choose_randomly: if True, work on all highest-priority dataruns in random</span>
-<span class="sd">            order. If False, work on them in sequential order (by ID)</span>
-<span class="sd">        cloud_mode: if True, save processed datasets to AWS.</span>
-<span class="sd">        total_time (optional): if set to an integer, this worker will only work for</span>
-<span class="sd">            total_time seconds. Otherwise, it will continue working until all</span>
-<span class="sd">            dataruns are complete (or indefinitely).</span>
-<span class="sd">        wait: if True, once all dataruns in the database are complete, keep spinning</span>
-<span class="sd">            and wait for new runs to be added. If False, exit once all dataruns are</span>
-<span class="sd">            complete.</span>
+<span class="sd">        Check the ModelHub Database for unfinished Dataruns, and work on them</span>
+<span class="sd">        as they are added. This process will continue to run until it exceeds</span>
+<span class="sd">        total_time or there are no more Dataruns to process or it is killed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            datarun_ids (list):</span>
+<span class="sd">                list of IDs of Dataruns to work on. If ``None``, this will work on any</span>
+<span class="sd">                unfinished Dataruns found in the database. Optional. Defaults to ``None``.</span>
+<span class="sd">            save_files (bool):</span>
+<span class="sd">                Whether to save the fitted classifiers and their metrics or not.</span>
+<span class="sd">                Optional. Defaults to True.</span>
+<span class="sd">            choose_randomly (bool):</span>
+<span class="sd">                If ``True``, work on all the highest-priority dataruns in random order.</span>
+<span class="sd">                Otherwise, work on them in sequential order (by ID).</span>
+<span class="sd">                Optional. Defaults to ``True``.</span>
+<span class="sd">            cloud_mode (bool):</span>
+<span class="sd">                Save the models and metrics in AWS S3 instead of locally. This option</span>
+<span class="sd">                works only if S3 configuration has been provided on initialization.</span>
+<span class="sd">                Optional. Defaults to ``False``.</span>
+<span class="sd">            total_time (int):</span>
+<span class="sd">                Total time to run the work process, in seconds. If ``None``, continue to</span>
+<span class="sd">                run until interrupted or there are no more Dataruns to process.</span>
+<span class="sd">                Optional. Defaults to ``None``.</span>
+<span class="sd">            wait (bool):</span>
+<span class="sd">                If ``True``, wait for more Dataruns to be inserted into the Database</span>
+<span class="sd">                once all have been processed. Otherwise, exit the worker loop</span>
+<span class="sd">                when they run out.</span>
+<span class="sd">                Optional. Defaults to ``False``.</span>
+<span class="sd">            verbose (bool):</span>
+<span class="sd">                Whether to be verbose about the process. Optional. Defaults to ``True``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 
@@ -482,8 +597,8 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">dataruns</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">wait</span><span class="p">:</span>
                     <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;No dataruns found. Sleeping </span><span class="si">%d</span><span class="s1"> seconds and trying again.&#39;</span><span class="p">,</span>
-                                 <span class="n">ATM</span><span class="o">.</span><span class="n">LOOP_WAIT</span><span class="p">)</span>
-                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">ATM</span><span class="o">.</span><span class="n">LOOP_WAIT</span><span class="p">)</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">_LOOP_WAIT</span><span class="p">)</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_LOOP_WAIT</span><span class="p">)</span>
                     <span class="k">continue</span>
 
                 <span class="k">else</span><span class="p">:</span>
@@ -506,6 +621,7 @@
                             <span class="n">aws_secret_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aws_secret_key</span><span class="p">,</span> <span class="n">s3_bucket</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">s3_bucket</span><span class="p">,</span>
                             <span class="n">s3_folder</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">s3_folder</span><span class="p">,</span> <span class="n">models_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">models_dir</span><span class="p">,</span>
                             <span class="n">metrics_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_dir</span><span class="p">,</span> <span class="n">verbose_metrics</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose_metrics</span><span class="p">)</span>
+
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">run</span><span class="o">.</span><span class="n">budget_type</span> <span class="o">==</span> <span class="s1">&#39;classifier&#39;</span><span class="p">:</span>
                     <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span>
@@ -542,8 +658,8 @@
             <span class="k">except</span> <span class="n">ClassifierError</span><span class="p">:</span>
                 <span class="c1"># the exception has already been handled; just wait a sec so we</span>
                 <span class="c1"># don&#39;t go out of control reporting errors</span>
-                <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Something went wrong. Sleeping </span><span class="si">%d</span><span class="s1"> seconds.&#39;</span><span class="p">,</span> <span class="n">ATM</span><span class="o">.</span><span class="n">LOOP_WAIT</span><span class="p">)</span>
-                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">ATM</span><span class="o">.</span><span class="n">LOOP_WAIT</span><span class="p">)</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Something went wrong. Sleeping </span><span class="si">%d</span><span class="s1"> seconds.&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LOOP_WAIT</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_LOOP_WAIT</span><span class="p">)</span>
 
             <span class="n">elapsed_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">total_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">elapsed_time</span> <span class="o">&gt;=</span> <span class="n">total_time</span><span class="p">:</span>
@@ -555,7 +671,66 @@
             <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;f1&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;logreg&#39;</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">,</span> <span class="s1">&#39;knn&#39;</span><span class="p">],</span> <span class="n">r_minimum</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">run_per_partition</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">score_target</span><span class="o">=</span><span class="s1">&#39;cv&#39;</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="n">tuner</span><span class="o">=</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="n">deadline</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="n">save_files</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choose_randomly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cloud_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">total_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Create a Dataset and a Datarun and then work on it.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            train_path (str):</span>
+<span class="sd">                Path to the training CSV file. It can be a local filesystem path,</span>
+<span class="sd">                absolute or relative, or an HTTP or HTTPS URL, or an S3 path in the</span>
+<span class="sd">                format ``s3://{bucket_name}/{key}``. Required.</span>
+<span class="sd">            test_path (str):</span>
+<span class="sd">                Path to the testing CSV file. It can be a local filesystem path,</span>
+<span class="sd">                absolute or relative, or an HTTP or HTTPS URL, or an S3 path in the</span>
+<span class="sd">                format ``s3://{bucket_name}/{key}``.</span>
+<span class="sd">                Optional. If not given, the training CSV will be split in two parts,</span>
+<span class="sd">                train and test.</span>
+<span class="sd">            name (str):</span>
+<span class="sd">                Name given to this dataset. Optional. If not given, a hash will be</span>
+<span class="sd">                generated from the training_path and used as the Dataset name.</span>
+<span class="sd">            description (str):</span>
+<span class="sd">                Human friendly description of the Dataset. Optional.</span>
+<span class="sd">            class_column (str):</span>
+<span class="sd">                Name of the column that will be used as the target variable.</span>
+<span class="sd">                Optional. Defaults to ``&#39;class&#39;``.</span>
+<span class="sd">            budget (int):</span>
+<span class="sd">                Budget amount. Optional. Defaults to ``100``.</span>
+<span class="sd">            budget_type (str):</span>
+<span class="sd">                Budget Type. Can be &#39;classifier&#39; or &#39;walltime&#39;.</span>
+<span class="sd">                Optional. Defaults to ``&#39;classifier&#39;``.</span>
+<span class="sd">            gridding (int):</span>
+<span class="sd">                ``gridding`` setting for the Tuner. Optional. Defaults to ``0``.</span>
+<span class="sd">            k_window (int):</span>
+<span class="sd">                ``k`` setting for the Selector. Optional. Defaults to ``3``.</span>
+<span class="sd">            metric (str):</span>
+<span class="sd">                Metric to use for the tuning and selection. Optional. Defaults to ``&#39;f1&#39;``.</span>
+<span class="sd">            methods (list):</span>
+<span class="sd">                List of methods to try. Optional. Defaults to ``[&#39;logreg&#39;, &#39;dt&#39;, &#39;knn&#39;]``.</span>
+<span class="sd">            r_minimum (int):</span>
+<span class="sd">                ``r_minimum`` setting for the Tuner. Optional. Defaults to ``2``.</span>
+<span class="sd">            run_per_partition (bool):</span>
+<span class="sd">                whether to create a separated Datarun for each Hyperpartition or not.</span>
+<span class="sd">                Optional. Defaults to ``False``.</span>
+<span class="sd">            score_target (str):</span>
+<span class="sd">                Which score to use for the tuning and selection process. It can be ``&#39;cv&#39;`` or</span>
+<span class="sd">                ``&#39;test&#39;``. Optional. Defaults to ``&#39;cv&#39;``.</span>
+<span class="sd">            priority (int):</span>
+<span class="sd">                Priority of this Datarun. The higher the better. Optional. Defaults to ``1``.</span>
+<span class="sd">            selector (str):</span>
+<span class="sd">                Type of selector to use. Optional. Defaults to ``&#39;uniform&#39;``.</span>
+<span class="sd">            tuner (str):</span>
+<span class="sd">                Type of tuner to use. Optional. Defaults to ``&#39;uniform&#39;``.</span>
+<span class="sd">            deadline (str):</span>
+<span class="sd">                Time deadline. It must be a string representing a datetime in the format</span>
+<span class="sd">                ``&#39;%Y-%m-%d %H:%M&#39;``. If given, ``budget_type`` will be set to ``&#39;walltime&#39;``.</span>
+<span class="sd">            verbose (bool):</span>
+<span class="sd">                Whether to be verbose about the process. Optional. Defaults to ``True``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Datarun:</span>
+<span class="sd">                The created Datarun or list of Dataruns.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_dataset</span><span class="p">(</span><span class="n">train_path</span><span class="p">,</span> <span class="n">test_path</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">class_column</span><span class="p">)</span>
         <span class="n">datarun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_datarun</span><span class="p">(</span>
@@ -607,6 +782,16 @@
             <span class="k">return</span> <span class="n">dataruns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="ATM.load_model"><a class="viewcode-back" href="../../api/atm.core.html#atm.ATM.load_model">[docs]</a>    <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">classifier_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load a Model from the Database.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            classifier_id (int):</span>
+<span class="sd">                Id of the Model to load.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Model:</span>
+<span class="sd">                The loaded model instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_classifier</span><span class="p">(</span><span class="n">classifier_id</span><span class="p">)</span><span class="o">.</span><span class="n">load_model</span><span class="p">()</span></div></div>
 </pre></div>
 

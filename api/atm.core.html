@@ -115,17 +115,44 @@
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usage</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../database.html">Guide to the ModelHub database</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#datasets">Datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#dataruns">Dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#hyperpartitions">Hyperpartitions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#classifiers">Classifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modelhub.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuring ATM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#arguments">Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#database-configuration">Database Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#aws">AWS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#log">Log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#dataset">Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#datarun">Datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#using-atm-with-your-own-data">Using ATM with your own data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#setting-up-a-distributed-database">Setting up a distributed Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#install-mysql-server">1. Install mysql-server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#log-into-your-mysql-instance-as-root">2. Log into your MySQL instance as root</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#create-a-new-database-for-atm">3. Create a new Database for ATM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#test-your-settings">4. Test your settings</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#get-the-demo-data">1. Get the demo data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#start-a-worker">3. Start a worker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#command-line-arguments">Command Line Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#using-command-line-arguments">Using command line arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#using-yaml-configuration-files">Using YAML configuration files</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../rest.html">REST API</a><ul>
@@ -312,18 +339,6 @@ executing and orchestrating the main ATM functionalities.</p>
 <dt id="atm.core.ATM">
 <em class="property">class </em><code class="sig-prename descclassname">atm.core.</code><code class="sig-name descname">ATM</code><span class="sig-paren">(</span><em class="sig-param">dialect='sqlite'</em>, <em class="sig-param">database='atm.db'</em>, <em class="sig-param">username=None</em>, <em class="sig-param">password=None</em>, <em class="sig-param">host=None</em>, <em class="sig-param">port=None</em>, <em class="sig-param">query=None</em>, <em class="sig-param">access_key=None</em>, <em class="sig-param">secret_key=None</em>, <em class="sig-param">s3_bucket=None</em>, <em class="sig-param">s3_folder=None</em>, <em class="sig-param">models_dir='models'</em>, <em class="sig-param">metrics_dir='metrics'</em>, <em class="sig-param">verbose_metrics=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p><strong>Attributes</strong></p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#atm.core.ATM.LOOP_WAIT" title="atm.core.ATM.LOOP_WAIT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LOOP_WAIT</span></code></a></p></td>
-<td><p>int(x=0) -&gt; integer</p></td>
-</tr>
-</tbody>
-</table>
 <p><strong>Methods</strong></p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -332,68 +347,188 @@ executing and orchestrating the main ATM functionalities.</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#atm.core.ATM.add_datarun" title="atm.core.ATM.add_datarun"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_datarun</span></code></a>(dataset_id[, budget, …])</p></td>
-<td><p></p></td>
+<td><p>Register one or more Dataruns to the Database.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#atm.core.ATM.add_dataset" title="atm.core.ATM.add_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_dataset</span></code></a>(train_path[, test_path, name, …])</p></td>
-<td><p></p></td>
+<td><p>Add a new dataset to the Database.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#atm.core.ATM.load_model" title="atm.core.ATM.load_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_model</span></code></a>(classifier_id)</p></td>
-<td><p></p></td>
+<td><p>Load a Model from the Database.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#atm.core.ATM.run" title="atm.core.ATM.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>(train_path[, test_path, name, …])</p></td>
-<td><p></p></td>
+<td><p>Create a Dataset and a Datarun and then work on it.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#atm.core.ATM.work" title="atm.core.ATM.work"><code class="xref py py-obj docutils literal notranslate"><span class="pre">work</span></code></a>([datarun_ids, save_files, …])</p></td>
-<td><p>Check the ModelHub database for unfinished dataruns, and spawn workers to work on them as they are added.</p></td>
+<td><p>Get unfinished Dataruns from the database and work on them.</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="attribute">
-<dt id="atm.core.ATM.LOOP_WAIT">
-<code class="sig-name descname">LOOP_WAIT</code><em class="property"> = 5</em><a class="headerlink" href="#atm.core.ATM.LOOP_WAIT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="method">
 <dt id="atm.core.ATM.add_datarun">
 <code class="sig-name descname">add_datarun</code><span class="sig-paren">(</span><em class="sig-param">dataset_id, budget=100, budget_type='classifier', gridding=0, k_window=3, metric='f1', methods=['logreg', 'dt', 'knn'], r_minimum=2, run_per_partition=False, score_target='cv', priority=1, selector='uniform', tuner='uniform', deadline=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.add_datarun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.add_datarun" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Register one or more Dataruns to the Database.</p>
+<p>The methods hyperparameters will be analyzed and Hyperpartitions generated
+from them.
+If <code class="docutils literal notranslate"><span class="pre">run_per_partition</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, one Datarun will be created for each
+Hyperpartition. Otherwise, a single one will be created for all of them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset_id</strong> (<em>int</em>) – Id of the Dataset which this Datarun will belong to.</p></li>
+<li><p><strong>budget</strong> (<em>int</em>) – Budget amount. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">100</span></code>.</p></li>
+<li><p><strong>budget_type</strong> (<em>str</em>) – Budget Type. Can be ‘classifier’ or ‘walltime’.
+Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">'classifier'</span></code>.</p></li>
+<li><p><strong>gridding</strong> (<em>int</em>) – <code class="docutils literal notranslate"><span class="pre">gridding</span></code> setting for the Tuner. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p><strong>k_window</strong> (<em>int</em>) – <code class="docutils literal notranslate"><span class="pre">k</span></code> setting for the Selector. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p></li>
+<li><p><strong>metric</strong> (<em>str</em>) – Metric to use for the tuning and selection. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">'f1'</span></code>.</p></li>
+<li><p><strong>methods</strong> (<em>list</em>) – List of methods to try. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">['logreg',</span> <span class="pre">'dt',</span> <span class="pre">'knn']</span></code>.</p></li>
+<li><p><strong>r_minimum</strong> (<em>int</em>) – <code class="docutils literal notranslate"><span class="pre">r_minimum</span></code> setting for the Tuner. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">2</span></code>.</p></li>
+<li><p><strong>run_per_partition</strong> (<em>bool</em>) – whether to create a separated Datarun for each Hyperpartition or not.
+Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>score_target</strong> (<em>str</em>) – Which score to use for the tuning and selection process. It can be <code class="docutils literal notranslate"><span class="pre">'cv'</span></code> or
+<code class="docutils literal notranslate"><span class="pre">'test'</span></code>. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">'cv'</span></code>.</p></li>
+<li><p><strong>priority</strong> (<em>int</em>) – Priority of this Datarun. The higher the better. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><strong>selector</strong> (<em>str</em>) – Type of selector to use. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">'uniform'</span></code>.</p></li>
+<li><p><strong>tuner</strong> (<em>str</em>) – Type of tuner to use. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">'uniform'</span></code>.</p></li>
+<li><p><strong>deadline</strong> (<em>str</em>) – Time deadline. It must be a string representing a datetime in the format
+<code class="docutils literal notranslate"><span class="pre">'%Y-%m-%d</span> <span class="pre">%H:%M'</span></code>. If given, <code class="docutils literal notranslate"><span class="pre">budget_type</span></code> will be set to <code class="docutils literal notranslate"><span class="pre">'walltime'</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The created Datarun or list of Dataruns.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Datarun</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="atm.core.ATM.add_dataset">
 <code class="sig-name descname">add_dataset</code><span class="sig-paren">(</span><em class="sig-param">train_path</em>, <em class="sig-param">test_path=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">description=None</em>, <em class="sig-param">class_column=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.add_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.add_dataset" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Add a new dataset to the Database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_path</strong> (<em>str</em>) – Path to the training CSV file. It can be a local filesystem path,
+absolute or relative, or an HTTP or HTTPS URL, or an S3 path in the
+format <code class="docutils literal notranslate"><span class="pre">s3://{bucket_name}/{key}</span></code>. Required.</p></li>
+<li><p><strong>test_path</strong> (<em>str</em>) – Path to the testing CSV file. It can be a local filesystem path,
+absolute or relative, or an HTTP or HTTPS URL, or an S3 path in the
+format <code class="docutils literal notranslate"><span class="pre">s3://{bucket_name}/{key}</span></code>.
+Optional. If not given, the training CSV will be split in two parts,
+train and test.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Name given to this dataset. Optional. If not given, a hash will be
+generated from the training_path and used as the Dataset name.</p></li>
+<li><p><strong>description</strong> (<em>str</em>) – Human friendly description of the Dataset. Optional.</p></li>
+<li><p><strong>class_column</strong> (<em>str</em>) – Name of the column that will be used as the target variable.
+Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">'class'</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The created dataset.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Dataset</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="atm.core.ATM.load_model">
 <code class="sig-name descname">load_model</code><span class="sig-paren">(</span><em class="sig-param">classifier_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.load_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.load_model" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Load a Model from the Database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>classifier_id</strong> (<em>int</em>) – Id of the Model to load.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The loaded model instance.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="atm.html#atm.Model" title="atm.Model">Model</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="atm.core.ATM.run">
-<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">train_path, test_path=None, name=None, description=None, class_column='class', budget=100, budget_type='classifier', gridding=0, k_window=3, metric='f1', methods=['logreg', 'dt', 'knn'], r_minimum=2, run_per_partition=False, score_target='cv', selector='uniform', tuner='uniform', deadline=None, priority=1, save_files=True, choose_randomly=True, cloud_mode=False, total_time=None, wait=True, verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">train_path, test_path=None, name=None, description=None, class_column='class', budget=100, budget_type='classifier', gridding=0, k_window=3, metric='f1', methods=['logreg', 'dt', 'knn'], r_minimum=2, run_per_partition=False, score_target='cv', selector='uniform', tuner='uniform', deadline=None, priority=1, save_files=True, choose_randomly=True, cloud_mode=False, total_time=None, verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Dataset and a Datarun and then work on it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_path</strong> (<em>str</em>) – Path to the training CSV file. It can be a local filesystem path,
+absolute or relative, or an HTTP or HTTPS URL, or an S3 path in the
+format <code class="docutils literal notranslate"><span class="pre">s3://{bucket_name}/{key}</span></code>. Required.</p></li>
+<li><p><strong>test_path</strong> (<em>str</em>) – Path to the testing CSV file. It can be a local filesystem path,
+absolute or relative, or an HTTP or HTTPS URL, or an S3 path in the
+format <code class="docutils literal notranslate"><span class="pre">s3://{bucket_name}/{key}</span></code>.
+Optional. If not given, the training CSV will be split in two parts,
+train and test.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Name given to this dataset. Optional. If not given, a hash will be
+generated from the training_path and used as the Dataset name.</p></li>
+<li><p><strong>description</strong> (<em>str</em>) – Human friendly description of the Dataset. Optional.</p></li>
+<li><p><strong>class_column</strong> (<em>str</em>) – Name of the column that will be used as the target variable.
+Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">'class'</span></code>.</p></li>
+<li><p><strong>budget</strong> (<em>int</em>) – Budget amount. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">100</span></code>.</p></li>
+<li><p><strong>budget_type</strong> (<em>str</em>) – Budget Type. Can be ‘classifier’ or ‘walltime’.
+Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">'classifier'</span></code>.</p></li>
+<li><p><strong>gridding</strong> (<em>int</em>) – <code class="docutils literal notranslate"><span class="pre">gridding</span></code> setting for the Tuner. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p><strong>k_window</strong> (<em>int</em>) – <code class="docutils literal notranslate"><span class="pre">k</span></code> setting for the Selector. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p></li>
+<li><p><strong>metric</strong> (<em>str</em>) – Metric to use for the tuning and selection. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">'f1'</span></code>.</p></li>
+<li><p><strong>methods</strong> (<em>list</em>) – List of methods to try. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">['logreg',</span> <span class="pre">'dt',</span> <span class="pre">'knn']</span></code>.</p></li>
+<li><p><strong>r_minimum</strong> (<em>int</em>) – <code class="docutils literal notranslate"><span class="pre">r_minimum</span></code> setting for the Tuner. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">2</span></code>.</p></li>
+<li><p><strong>run_per_partition</strong> (<em>bool</em>) – whether to create a separated Datarun for each Hyperpartition or not.
+Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>score_target</strong> (<em>str</em>) – Which score to use for the tuning and selection process. It can be <code class="docutils literal notranslate"><span class="pre">'cv'</span></code> or
+<code class="docutils literal notranslate"><span class="pre">'test'</span></code>. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">'cv'</span></code>.</p></li>
+<li><p><strong>priority</strong> (<em>int</em>) – Priority of this Datarun. The higher the better. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><strong>selector</strong> (<em>str</em>) – Type of selector to use. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">'uniform'</span></code>.</p></li>
+<li><p><strong>tuner</strong> (<em>str</em>) – Type of tuner to use. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">'uniform'</span></code>.</p></li>
+<li><p><strong>deadline</strong> (<em>str</em>) – Time deadline. It must be a string representing a datetime in the format
+<code class="docutils literal notranslate"><span class="pre">'%Y-%m-%d</span> <span class="pre">%H:%M'</span></code>. If given, <code class="docutils literal notranslate"><span class="pre">budget_type</span></code> will be set to <code class="docutils literal notranslate"><span class="pre">'walltime'</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Whether to be verbose about the process. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The created Datarun or list of Dataruns.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Datarun</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="atm.core.ATM.work">
 <code class="sig-name descname">work</code><span class="sig-paren">(</span><em class="sig-param">datarun_ids=None</em>, <em class="sig-param">save_files=True</em>, <em class="sig-param">choose_randomly=True</em>, <em class="sig-param">cloud_mode=False</em>, <em class="sig-param">total_time=None</em>, <em class="sig-param">wait=True</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/core.html#ATM.work"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.core.ATM.work" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check the ModelHub database for unfinished dataruns, and spawn workers to
-work on them as they are added. This process will continue to run until it
-exceeds total_time or is broken with ctrl-C.</p>
-<dl class="simple">
-<dt>datarun_ids (optional): list of IDs of dataruns to compute on. If None,</dt><dd><p>this will work on all unfinished dataruns in the database.</p>
-</dd>
-<dt>choose_randomly: if True, work on all highest-priority dataruns in random</dt><dd><p>order. If False, work on them in sequential order (by ID)</p>
-</dd>
-</dl>
-<p>cloud_mode: if True, save processed datasets to AWS.
-total_time (optional): if set to an integer, this worker will only work for</p>
-<blockquote>
-<div><p>total_time seconds. Otherwise, it will continue working until all
-dataruns are complete (or indefinitely).</p>
-</div></blockquote>
-<dl class="simple">
-<dt>wait: if True, once all dataruns in the database are complete, keep spinning</dt><dd><p>and wait for new runs to be added. If False, exit once all dataruns are
-complete.</p>
+<dd><p>Get unfinished Dataruns from the database and work on them.</p>
+<p>Check the ModelHub Database for unfinished Dataruns, and work on them
+as they are added. This process will continue to run until it exceeds
+total_time or there are no more Dataruns to process or it is killed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>datarun_ids</strong> (<em>list</em>) – list of IDs of Dataruns to work on. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, this will work on any
+unfinished Dataruns found in the database. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>save_files</strong> (<em>bool</em>) – Whether to save the fitted classifiers and their metrics or not.
+Optional. Defaults to True.</p></li>
+<li><p><strong>choose_randomly</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, work on all the highest-priority dataruns in random order.
+Otherwise, work on them in sequential order (by ID).
+Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>cloud_mode</strong> (<em>bool</em>) – Save the models and metrics in AWS S3 instead of locally. This option
+works only if S3 configuration has been provided on initialization.
+Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>total_time</strong> (<em>int</em>) – Total time to run the work process, in seconds. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, continue to
+run until interrupted or there are no more Dataruns to process.
+Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>wait</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, wait for more Dataruns to be inserted into the Database
+once all have been processed. Otherwise, exit the worker loop
+when they run out.
+Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Whether to be verbose about the process. Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

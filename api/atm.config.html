@@ -115,17 +115,44 @@
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usage</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../database.html">Guide to the ModelHub database</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#datasets">Datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#dataruns">Dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#hyperpartitions">Hyperpartitions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#classifiers">Classifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modelhub.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuring ATM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#arguments">Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#database-configuration">Database Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#aws">AWS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#log">Log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#dataset">Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#datarun">Datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#using-atm-with-your-own-data">Using ATM with your own data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#setting-up-a-distributed-database">Setting up a distributed Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#install-mysql-server">1. Install mysql-server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#log-into-your-mysql-instance-as-root">2. Log into your MySQL instance as root</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#create-a-new-database-for-atm">3. Create a new Database for ATM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#test-your-settings">4. Test your settings</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#get-the-demo-data">1. Get the demo data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#start-a-worker">3. Start a worker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#command-line-arguments">Command Line Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#using-command-line-arguments">Using command line arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#using-yaml-configuration-files">Using YAML configuration files</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../rest.html">REST API</a><ul>
@@ -293,6 +320,7 @@
             
   <div class="section" id="module-atm.config">
 <span id="atm-config-module"></span><h1>atm.config module<a class="headerlink" href="#module-atm.config" title="Permalink to this headline">¶</a></h1>
+<p>Configuration Module.</p>
 <p><strong>Classes</strong></p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -317,18 +345,6 @@
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#atm.config.SQLConfig" title="atm.config.SQLConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQLConfig</span></code></a>(args[, path])</p></td>
 <td><p>Stores configuration for SQL database setup &amp; connection</p></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Functions</strong></p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.option_or_path" title="atm.config.option_or_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">option_or_path</span></code></a>(options[, regex])</p></td>
-<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -389,7 +405,9 @@ Config should define the list of all configurable parameters and any
 default values for those parameters other than None (in PARAMETERS and
 DEFAULTS, respectively). The object can be initialized with any number of
 keyword arguments; only kwargs that are in PARAMETERS will be used. This
-means you can (relatively) safely do things like</p>
+means you can (relatively) safely do things like <code class="docutils literal notranslate"><span class="pre">args</span> <span class="pre">=</span> <span class="pre">parser.parse_args()</span></code>
+<code class="docutils literal notranslate"><span class="pre">conf</span> <span class="pre">=</span> <span class="pre">Config(**vars(args))</span></code> and only relevant parameters will be set.</p>
+<p>Subclasses do not need to define __init__ or any other methods.</p>
 <p><strong>Methods</strong></p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -398,28 +416,24 @@ means you can (relatively) safely do things like</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.Config.get_parser" title="atm.config.Config.get_parser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parser</span></code></a>()</p></td>
-<td><p></p></td>
+<td><p>Get an ArgumentParser for this config.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#atm.config.Config.to_dict" title="atm.config.Config.to_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code></a>()</p></td>
-<td><p></p></td>
+<td><p>Get a dict representation of this configuraiton.</p></td>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<div><p>args = parser.parse_args()
-conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>vars(args))</p>
-</div></blockquote>
-<p>and only relevant parameters will be set.</p>
-<p>Subclasses do not need to define __init__ or any other methods.</p>
 <dl class="method">
 <dt id="atm.config.Config.get_parser">
 <em class="property">classmethod </em><code class="sig-name descname">get_parser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#Config.get_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.Config.get_parser" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get an ArgumentParser for this config.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="atm.config.Config.to_dict">
 <code class="sig-name descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#Config.to_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.Config.to_dict" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get a dict representation of this configuraiton.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -606,12 +620,12 @@ conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>var
 
 <dl class="attribute">
 <dt id="atm.config.RunConfig.methods">
-<code class="sig-name descname">methods</code><em class="property"> = {'default': ['logreg', 'dt', 'knn'], 'help': 'Method or list of methods to use for classification. Each method can either be one of the pre-defined method codes listed below or a path to a JSON file defining a custom method.\n\nOptions: [logreg, svm, sgd, dt, et, rf, gnb, mnb, bnb, gp, pa, knn, mlp, ada]', 'nargs': '+', 'type': &lt;function option_or_path.&lt;locals&gt;.type_check&gt;}</em><a class="headerlink" href="#atm.config.RunConfig.methods" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">methods</code><em class="property"> = {'default': ['logreg', 'dt', 'knn'], 'help': 'Method or list of methods to use for classification. Each method can either be one of the pre-defined method codes listed below or a path to a JSON file defining a custom method.\n\nOptions: [logreg, svm, sgd, dt, et, rf, gnb, mnb, bnb, gp, pa, knn, mlp, ada]', 'nargs': '+', 'type': &lt;function _option_or_path.&lt;locals&gt;.type_check&gt;}</em><a class="headerlink" href="#atm.config.RunConfig.methods" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="atm.config.RunConfig.metric">
-<code class="sig-name descname">metric</code><em class="property"> = {'choices': ['roc_auc_macro', 'ap', 'rank_accuracy', 'f1', 'mcc', 'accuracy', 'roc_auc', 'cohen_kappa', 'f1_micro', 'f1_macro', 'roc_auc_micro'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">metric</code><em class="property"> = {'choices': ['cohen_kappa', 'mcc', 'rank_accuracy', 'f1_macro', 'roc_auc_micro', 'f1_micro', 'accuracy', 'ap', 'roc_auc', 'roc_auc_macro', 'f1'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -636,12 +650,12 @@ conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>var
 
 <dl class="attribute">
 <dt id="atm.config.RunConfig.selector">
-<code class="sig-name descname">selector</code><em class="property"> = {'default': 'uniform', 'help': 'Type of BTB selector to use. Can either be one of the pre-configured selectors listed below or a path to a custom tuner in the form &quot;/path/to/selector.py:ClassName&quot;.\n\nOptions: [uniform, ucb1, bestk, bestkvel, purebestkvel, recentk, recentkvel, hieralg]', 'type': &lt;function option_or_path.&lt;locals&gt;.type_check&gt;}</em><a class="headerlink" href="#atm.config.RunConfig.selector" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">selector</code><em class="property"> = {'default': 'uniform', 'help': 'Type of BTB selector to use. Can either be one of the pre-configured selectors listed below or a path to a custom tuner in the form &quot;/path/to/selector.py:ClassName&quot;.\n\nOptions: [uniform, ucb1, bestk, bestkvel, purebestkvel, recentk, recentkvel, hieralg]', 'type': &lt;function _option_or_path.&lt;locals&gt;.type_check&gt;}</em><a class="headerlink" href="#atm.config.RunConfig.selector" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="atm.config.RunConfig.tuner">
-<code class="sig-name descname">tuner</code><em class="property"> = {'default': 'uniform', 'help': 'Type of BTB tuner to use. Can either be one of the pre-configured tuners listed below or a path to a custom tuner in the form &quot;/path/to/tuner.py:ClassName&quot;.\n\nOptions: [uniform, gp, gp_ei, gp_eivel]', 'type': &lt;function option_or_path.&lt;locals&gt;.type_check&gt;}</em><a class="headerlink" href="#atm.config.RunConfig.tuner" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">tuner</code><em class="property"> = {'default': 'uniform', 'help': 'Type of BTB tuner to use. Can either be one of the pre-configured tuners listed below or a path to a custom tuner in the form &quot;/path/to/tuner.py:ClassName&quot;.\n\nOptions: [uniform, gp, gp_ei, gp_eivel]', 'type': &lt;function _option_or_path.&lt;locals&gt;.type_check&gt;}</em><a class="headerlink" href="#atm.config.RunConfig.tuner" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -717,11 +731,6 @@ conf = Config(<a href="#id1"><span class="problematic" id="id2">**</span></a>var
 <dd></dd></dl>
 
 </dd></dl>
-
-<dl class="function">
-<dt id="atm.config.option_or_path">
-<code class="sig-prename descclassname">atm.config.</code><code class="sig-name descname">option_or_path</code><span class="sig-paren">(</span><em class="sig-param">options</em>, <em class="sig-param">regex='(.*\\.py):(\\w+)$'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/config.html#option_or_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.config.option_or_path" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </div>
 

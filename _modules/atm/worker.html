@@ -113,17 +113,44 @@
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usage</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../database.html">Guide to the ModelHub database</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../database.html#datasets">Datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../database.html#dataruns">Dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../database.html#hyperpartitions">Hyperpartitions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../database.html#classifiers">Classifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modelhub.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modelhub.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modelhub.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modelhub.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modelhub.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration.html">Configuring ATM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../configuration.html#arguments">Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#database-configuration">Database Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#aws">AWS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#log">Log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#dataset">Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#datarun">Datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../configuration.html#using-atm-with-your-own-data">Using ATM with your own data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../configuration.html#setting-up-a-distributed-database">Setting up a distributed Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#install-mysql-server">1. Install mysql-server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#log-into-your-mysql-instance-as-root">2. Log into your MySQL instance as root</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#create-a-new-database-for-atm">3. Create a new Database for ATM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#test-your-settings">4. Test your settings</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../cli.html#get-the-demo-data">1. Get the demo data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../cli.html#start-a-worker">3. Start a worker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../cli.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../cli.html#command-line-arguments">Command Line Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#using-command-line-arguments">Using command line arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#using-yaml-configuration-files">Using YAML configuration files</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../rest.html">REST API</a><ul>
@@ -303,7 +330,7 @@
 
 <span class="kn">from</span> <span class="nn">atm.classifier</span> <span class="k">import</span> <span class="n">Model</span>
 <span class="kn">from</span> <span class="nn">atm.constants</span> <span class="k">import</span> <span class="n">CUSTOM_CLASS_REGEX</span><span class="p">,</span> <span class="n">SELECTORS</span><span class="p">,</span> <span class="n">TUNERS</span>
-<span class="kn">from</span> <span class="nn">atm.database</span> <span class="k">import</span> <span class="n">ClassifierStatus</span><span class="p">,</span> <span class="n">db_session</span>
+<span class="kn">from</span> <span class="nn">atm.database</span> <span class="k">import</span> <span class="n">ClassifierStatus</span><span class="p">,</span> <span class="n">DBSession</span>
 <span class="kn">from</span> <span class="nn">atm.utilities</span> <span class="k">import</span> <span class="n">ensure_directory</span><span class="p">,</span> <span class="n">get_instance</span><span class="p">,</span> <span class="n">save_metrics</span><span class="p">,</span> <span class="n">save_model</span><span class="p">,</span> <span class="n">update_params</span>
 
 <span class="c1"># shhh</span>
@@ -523,8 +550,10 @@
 <span class="sd">        &quot;complete&quot;</span>
 
 <span class="sd">        classifier_id: ID of the classifier to save</span>
+
 <span class="sd">        model: Model object containing a serializable representation of the</span>
 <span class="sd">            final model generated by this classifier.</span>
+
 <span class="sd">        metrics: Dictionary containing cross-validation and test metrics data</span>
 <span class="sd">            for the model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -532,7 +561,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_files</span><span class="p">:</span>
             <span class="c1"># keep a database session open so that the utility functions can</span>
             <span class="c1"># access the linked hyperpartitions and dataruns</span>
-            <span class="k">with</span> <span class="n">db_session</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">DBSession</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">):</span>
                 <span class="n">classifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_classifier</span><span class="p">(</span><span class="n">classifier_id</span><span class="p">)</span>
                 <span class="n">model_path</span> <span class="o">=</span> <span class="n">save_model</span><span class="p">(</span><span class="n">classifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">models_dir</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
                 <span class="n">metric_path</span> <span class="o">=</span> <span class="n">save_metrics</span><span class="p">(</span><span class="n">classifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics_dir</span><span class="p">,</span> <span class="n">metrics</span><span class="p">)</span>

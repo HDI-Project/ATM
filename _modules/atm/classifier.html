@@ -113,17 +113,44 @@
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usage</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../database.html">Guide to the ModelHub database</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../database.html#datasets">Datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../database.html#dataruns">Dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../database.html#hyperpartitions">Hyperpartitions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../database.html#classifiers">Classifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modelhub.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modelhub.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modelhub.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modelhub.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modelhub.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration.html">Configuring ATM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../configuration.html#arguments">Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#database-configuration">Database Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#aws">AWS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#log">Log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#dataset">Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#datarun">Datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../configuration.html#using-atm-with-your-own-data">Using ATM with your own data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../configuration.html#setting-up-a-distributed-database">Setting up a distributed Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#install-mysql-server">1. Install mysql-server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#log-into-your-mysql-instance-as-root">2. Log into your MySQL instance as root</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#create-a-new-database-for-atm">3. Create a new Database for ATM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../configuration.html#test-your-settings">4. Test your settings</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../cli.html#get-the-demo-data">1. Get the demo data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../cli.html#start-a-worker">3. Start a worker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../cli.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../cli.html#command-line-arguments">Command Line Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#using-command-line-arguments">Using command line arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#using-yaml-configuration-files">Using YAML configuration files</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../rest.html">REST API</a><ul>
@@ -284,7 +311,9 @@
            <div itemprop="articleBody">
             
   <h1>Source code for atm.classifier</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">.. module:: wrapper</span>
 <span class="sd">   :synopsis: Model around classification method.</span>
 
@@ -344,10 +373,10 @@
 <span class="sd">        Parameters:</span>
 <span class="sd">            method: the short method code (as defined in constants.py) or path</span>
 <span class="sd">                to method json</span>
+<span class="sd">            params: parameters passed to the sklearn classifier constructor</span>
 <span class="sd">            judgment_metric: string that indicates which metric should be</span>
 <span class="sd">                optimized for.</span>
-<span class="sd">            params: parameters passed to the sklearn classifier constructor</span>
-<span class="sd">            class_: sklearn classifier class</span>
+<span class="sd">            class_column: sklearn classifier class</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># configuration &amp; database</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
@@ -369,7 +398,7 @@
         <span class="c1"># persistent random state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mf">1e7</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Model.make_pipeline"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.Model.make_pipeline">[docs]</a>    <span class="k">def</span> <span class="nf">make_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_make_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Makes the classifier as well as scaling or dimension reduction steps.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -383,7 +412,7 @@
                       <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">Model</span><span class="o">.</span><span class="n">ATM_KEYS</span><span class="p">}</span>
 
         <span class="c1"># do special conversions</span>
-        <span class="n">hyperparameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">special_conversions</span><span class="p">(</span><span class="n">hyperparameters</span><span class="p">)</span>
+        <span class="n">hyperparameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_special_conversions</span><span class="p">(</span><span class="n">hyperparameters</span><span class="p">)</span>
         <span class="n">classifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_</span><span class="p">(</span><span class="o">**</span><span class="n">hyperparameters</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">Model</span><span class="o">.</span><span class="n">PCA</span> <span class="ow">in</span> <span class="n">atm_params</span> <span class="ow">and</span> <span class="n">atm_params</span><span class="p">[</span><span class="n">Model</span><span class="o">.</span><span class="n">PCA</span><span class="p">]:</span>
@@ -406,9 +435,9 @@
 
         <span class="c1"># add the classifier as the final step in the pipeline</span>
         <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">classifier</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Model.cross_validate"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.Model.cross_validate">[docs]</a>    <span class="k">def</span> <span class="nf">cross_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_cross_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="c1"># TODO: this is hacky. See https://github.com/HDI-Project/ATM/issues/48</span>
         <span class="n">binary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">==</span> <span class="mi">2</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
@@ -426,9 +455,9 @@
         <span class="n">cv_stdev</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_judgment_metric_stdev</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mu_sigma_judgment_metric</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_judgment_metric</span> <span class="o">-</span> <span class="n">cv_stdev</span>
 
-        <span class="k">return</span> <span class="n">cv_scores</span></div>
+        <span class="k">return</span> <span class="n">cv_scores</span>
 
-<div class="viewcode-block" id="Model.test_final_model"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.Model.test_final_model">[docs]</a>    <span class="k">def</span> <span class="nf">test_final_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_test_final_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Test the (already trained) model pipeline on the provided test data</span>
 <span class="sd">        (X and y). Store the test judgment metric and return the rest of the</span>
@@ -453,10 +482,21 @@
         <span class="c1"># save meta-metrics</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_judgment_metric</span> <span class="o">=</span> <span class="n">test_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">judgment_metric</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">test_scores</span></div>
+        <span class="k">return</span> <span class="n">test_scores</span>
 
 <div class="viewcode-block" id="Model.train_test"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.Model.train_test">[docs]</a>    <span class="k">def</span> <span class="nf">train_test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Train and test this model using Cross Validation and Holdout.</span>
 
+<span class="sd">        Args:</span>
+<span class="sd">            dataset (Dataset):</span>
+<span class="sd">                Dataset object from database.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict:</span>
+<span class="sd">                Dictionary containing:</span>
+<span class="sd">                    * cv (list): The cross validation scores array</span>
+<span class="sd">                    * test (dict): The test scores dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">k_classes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_features</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">d_features</span>
 
@@ -483,22 +523,24 @@
         <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
 
         <span class="c1"># create and cross-validate pipeline</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">make_pipeline</span><span class="p">()</span>
-        <span class="n">cv_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cross_validate</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_make_pipeline</span><span class="p">()</span>
+        <span class="n">cv_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cross_validate</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 
         <span class="c1"># train and test the final model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-        <span class="n">test_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_final_model</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+        <span class="n">test_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_final_model</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;cv&#39;</span><span class="p">:</span> <span class="n">cv_scores</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="n">test_scores</span><span class="p">}</span></div>
 
 <div class="viewcode-block" id="Model.predict"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.Model.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Use the trained encoder and pipeline to transform training data into</span>
-<span class="sd">        predicted labels</span>
+        <span class="sd">&quot;&quot;&quot;Generate predictions from new data.</span>
 
-<span class="sd">        data: pd.DataFrame of data for which to predict classes</span>
+<span class="sd">        Args:</span>
+<span class="sd">            data (pandas.DataFrame):</span>
+<span class="sd">                Data for which to predict classes</span>
 
-<span class="sd">        returns: pd.Series populated with predictions, with index matching data.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            pandas.Series:</span>
+<span class="sd">                Vector of predictions</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">X</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
@@ -506,10 +548,8 @@
         <span class="n">labels</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">labels</span></div>
 
-<div class="viewcode-block" id="Model.special_conversions"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.Model.special_conversions">[docs]</a>    <span class="k">def</span> <span class="nf">special_conversions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        TODO: replace this logic with something better</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_special_conversions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="c1"># TODO: replace this logic with something better</span>
         <span class="c1"># create list parameters</span>
         <span class="n">lists</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
         <span class="n">element_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(.*)\[(\d)\]&#39;</span><span class="p">)</span>
@@ -554,16 +594,35 @@
                 <span class="k">del</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;periodicity&quot;</span><span class="p">]</span>
 
         <span class="c1"># return the updated parameter vector</span>
-        <span class="k">return</span> <span class="n">params</span></div>
+        <span class="k">return</span> <span class="n">params</span>
 
 <div class="viewcode-block" id="Model.load"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.Model.load">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Loads a saved instance from a path.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Loads a saved Model instance from a path.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path (str):</span>
+<span class="sd">                path where the model is saved.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Model:</span>
+<span class="sd">                New model instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">classifier</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">classifier</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Model.save"><a class="viewcode-back" href="../../api/atm.classifier.html#atm.Model.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save this Model using pickle.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path (str):</span>
+<span class="sd">                Path where the model should be saved.</span>
+
+<span class="sd">            force (bool):</span>
+<span class="sd">                If True, overwrite the model if it already exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The indicated path already exists. Use `force=True` to overwrite.&#39;</span><span class="p">)</span>
 

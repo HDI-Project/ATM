@@ -115,17 +115,44 @@
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usage</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../database.html">Guide to the ModelHub database</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#datasets">Datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#dataruns">Dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#hyperpartitions">Hyperpartitions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#classifiers">Classifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modelhub.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuring ATM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#arguments">Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#database-configuration">Database Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#aws">AWS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#log">Log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#dataset">Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#datarun">Datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#using-atm-with-your-own-data">Using ATM with your own data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#setting-up-a-distributed-database">Setting up a distributed Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#install-mysql-server">1. Install mysql-server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#log-into-your-mysql-instance-as-root">2. Log into your MySQL instance as root</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#create-a-new-database-for-atm">3. Create a new Database for ATM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#test-your-settings">4. Test your settings</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#get-the-demo-data">1. Get the demo data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#start-a-worker">3. Start a worker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#command-line-arguments">Command Line Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#using-command-line-arguments">Using command line arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#using-yaml-configuration-files">Using YAML configuration files</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../rest.html">REST API</a><ul>
@@ -350,29 +377,17 @@ unpickled outside of ATM and used to classify new datasets.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#atm.classifier.Model.cross_validate" title="atm.classifier.Model.cross_validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cross_validate</span></code></a>(X, y)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#atm.classifier.Model.load" title="atm.classifier.Model.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code></a>(path)</p></td>
-<td><p>Loads a saved instance from a path.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#atm.classifier.Model.make_pipeline" title="atm.classifier.Model.make_pipeline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_pipeline</span></code></a>()</p></td>
-<td><p>Makes the classifier as well as scaling or dimension reduction steps.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.classifier.Model.load" title="atm.classifier.Model.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code></a>(path)</p></td>
+<td><p>Loads a saved Model instance from a path.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#atm.classifier.Model.predict" title="atm.classifier.Model.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(data)</p></td>
-<td><p>Use the trained encoder and pipeline to transform training data into</p></td>
+<td><p>Generate predictions from new data.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#atm.classifier.Model.save" title="atm.classifier.Model.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(path[, force])</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#atm.classifier.Model.special_conversions" title="atm.classifier.Model.special_conversions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">special_conversions</span></code></a>(params)</p></td>
-<td><p>TODO: replace this logic with something better</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#atm.classifier.Model.test_final_model" title="atm.classifier.Model.test_final_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_final_model</span></code></a>(X, y)</p></td>
-<td><p>Test the (already trained) model pipeline on the provided test data (X and y).</p></td>
+<td><p>Save this Model using pickle.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#atm.classifier.Model.train_test" title="atm.classifier.Model.train_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">train_test</span></code></a>(dataset)</p></td>
-<td><p></p></td>
+<td><p>Train and test this model using Cross Validation and Holdout.</p></td>
 </tr>
 </tbody>
 </table>
@@ -412,54 +427,76 @@ unpickled outside of ATM and used to classify new datasets.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="atm.classifier.Model.cross_validate">
-<code class="sig-name descname">cross_validate</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.cross_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.classifier.Model.cross_validate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="atm.classifier.Model.load">
 <em class="property">classmethod </em><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.classifier.Model.load" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loads a saved instance from a path.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="atm.classifier.Model.make_pipeline">
-<code class="sig-name descname">make_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.make_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.classifier.Model.make_pipeline" title="Permalink to this definition">¶</a></dt>
-<dd><p>Makes the classifier as well as scaling or dimension reduction steps.</p>
+<dd><p>Loads a saved Model instance from a path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – path where the model is saved.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>New model instance.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="atm.html#atm.Model" title="atm.Model">Model</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="atm.classifier.Model.predict">
 <code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.classifier.Model.predict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Use the trained encoder and pipeline to transform training data into
-predicted labels</p>
-<p>data: pd.DataFrame of data for which to predict classes</p>
-<p>returns: pd.Series populated with predictions, with index matching data.</p>
+<dd><p>Generate predictions from new data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>pandas.DataFrame</em>) – Data for which to predict classes</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Vector of predictions</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.Series</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="atm.classifier.Model.save">
 <code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">path</em>, <em class="sig-param">force=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.classifier.Model.save" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="atm.classifier.Model.special_conversions">
-<code class="sig-name descname">special_conversions</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.special_conversions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.classifier.Model.special_conversions" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO: replace this logic with something better</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="atm.classifier.Model.test_final_model">
-<code class="sig-name descname">test_final_model</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.test_final_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.classifier.Model.test_final_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test the (already trained) model pipeline on the provided test data
-(X and y). Store the test judgment metric and return the rest of the
-metrics as a hierarchical dictionary.</p>
+<dd><p>Save this Model using pickle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – Path where the model should be saved.</p></li>
+<li><p><strong>force</strong> (<em>bool</em>) – If True, overwrite the model if it already exists.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="atm.classifier.Model.train_test">
 <code class="sig-name descname">train_test</code><span class="sig-paren">(</span><em class="sig-param">dataset</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/classifier.html#Model.train_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.classifier.Model.train_test" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Train and test this model using Cross Validation and Holdout.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataset</strong> (<em>Dataset</em>) – Dataset object from database.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary containing:</dt><dd><ul class="simple">
+<li><p>cv (list): The cross validation scores array</p></li>
+<li><p>test (dict): The test scores dictionary</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

@@ -115,17 +115,44 @@
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usage</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../database.html">Guide to the ModelHub database</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#datasets">Datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#dataruns">Dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#hyperpartitions">Hyperpartitions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database.html#classifiers">Classifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modelhub.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modelhub.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuring ATM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#arguments">Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#database-configuration">Database Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#aws">AWS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#log">Log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#dataset">Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#datarun">Datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#using-atm-with-your-own-data">Using ATM with your own data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration.html#setting-up-a-distributed-database">Setting up a distributed Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#install-mysql-server">1. Install mysql-server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#log-into-your-mysql-instance-as-root">2. Log into your MySQL instance as root</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#create-a-new-database-for-atm">3. Create a new Database for ATM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../configuration.html#test-your-settings">4. Test your settings</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#get-the-demo-data">1. Get the demo data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#start-a-worker">3. Start a worker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#command-line-arguments">Command Line Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#using-command-line-arguments">Using command line arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#using-yaml-configuration-files">Using YAML configuration files</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../rest.html">REST API</a><ul>
@@ -300,10 +327,10 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.Database" title="atm.database.Database"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Database</span></code></a>(dialect, database[, username, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.database.DBSession" title="atm.database.DBSession"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DBSession</span></code></a>(db[, commit])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#atm.database.db_session" title="atm.database.db_session"><code class="xref py py-obj docutils literal notranslate"><span class="pre">db_session</span></code></a>(db[, commit])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.database.Database" title="atm.database.Database"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Database</span></code></a>(dialect, database[, username, …])</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -320,6 +347,12 @@
 </tr>
 </tbody>
 </table>
+<dl class="class">
+<dt id="atm.database.DBSession">
+<em class="property">class </em><code class="sig-prename descclassname">atm.database.</code><code class="sig-name descname">DBSession</code><span class="sig-paren">(</span><em class="sig-param">db</em>, <em class="sig-param">commit=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/database.html#DBSession"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.database.DBSession" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
 <dl class="class">
 <dt id="atm.database.Database">
 <em class="property">class </em><code class="sig-prename descclassname">atm.database.</code><code class="sig-name descname">Database</code><span class="sig-paren">(</span><em class="sig-param">dialect</em>, <em class="sig-param">database</em>, <em class="sig-param">username=None</em>, <em class="sig-param">password=None</em>, <em class="sig-param">host=None</em>, <em class="sig-param">port=None</em>, <em class="sig-param">query=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/database.html#Database"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.database.Database" title="Permalink to this definition">¶</a></dt>
@@ -551,18 +584,12 @@
 
 </dd></dl>
 
-<dl class="class">
-<dt id="atm.database.db_session">
-<em class="property">class </em><code class="sig-prename descclassname">atm.database.</code><code class="sig-name descname">db_session</code><span class="sig-paren">(</span><em class="sig-param">db</em>, <em class="sig-param">commit=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/database.html#db_session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.database.db_session" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-</dd></dl>
-
 <dl class="function">
 <dt id="atm.database.try_with_session">
 <code class="sig-prename descclassname">atm.database.</code><code class="sig-name descname">try_with_session</code><span class="sig-paren">(</span><em class="sig-param">commit=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/database.html#try_with_session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.database.try_with_session" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorator for instance methods on Database that need a sqlalchemy session.</p>
 <p>This wrapping function checks if the Database has an active session yet. If
-not, it wraps the function call in a <cite>with db_session():</cite> block.</p>
+not, it wraps the function call in a <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">DBSession():</span></code> block.</p>
 </dd></dl>
 
 </div>

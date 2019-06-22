@@ -1,0 +1,636 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Configuring ATM &mdash; ATM 0.2.1-dev documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/dai-logo-white.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Command Line Interface" href="cli.html" />
+    <link rel="prev" title="Guide to the ModelHub database" href="modelhub.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ATM
+          
+
+          
+            
+            <img src="_static/dai-logo-white-200.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">ATM - Auto Tune Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#overview">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#install">Install</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#install-with-pip">Install with pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#install-from-source">Install from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#install-for-development">Install for Development</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#data-format">Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#create-an-atm-instance">2. Create an ATM instance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#search-for-the-best-model">3. Search for the best model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#explore-the-results">4. Explore the results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#make-predictions">5. Make predictions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#what-s-next">What’s next?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#credits">Credits</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#citing-atm">Citing ATM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#related-projects">Related Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="readme.html#btb">BTB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="readme.html#featuretools">Featuretools</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Usage</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modelhub.html">Guide to the ModelHub database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modelhub.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelhub.html#dataruns">Dataruns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelhub.html#hyperpartitions">Hyperpartitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelhub.html#classifiers">Classifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuring ATM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#arguments">Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#database-configuration">Database Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#aws">AWS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#log">Log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dataset">Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#datarun">Datarun</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#using-atm-with-your-own-data">Using ATM with your own data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-a-distributed-database">Setting up a distributed Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#install-mysql-server">1. Install mysql-server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#log-into-your-mysql-instance-as-root">2. Log into your MySQL instance as root</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-new-database-for-atm">3. Create a new Database for ATM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#test-your-settings">4. Test your settings</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#get-the-demo-data">1. Get the demo data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#create-a-dataset-and-generate-it-s-dataruns">2. Create a dataset and generate it’s dataruns</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#start-a-worker">3. Start a worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#command-line-arguments">Command Line Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#using-command-line-arguments">Using command line arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#using-yaml-configuration-files">Using YAML configuration files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rest.html">REST API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rest.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#start-the-rest-api-server">1. Start the REST API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#create-a-dataset">2. Create a Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#trigger-a-datarun">3. Trigger a Datarun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#browse-the-results">4. Browse the results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rest.html#get-all-objects-from-a-model">Get all objects from a model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rest.html#get-a-single-object-by-id">Get a single object by id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rest.html#get-all-the-children-objects">Get all the children objects</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rest.html#additional-information">Additional information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#start-additional-process-with-different-pid-file">Start additional process with different pid file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#restart-the-atm-process">Restart the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#stop-the-atm-process">Stop the ATM process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rest.html#start-the-atm-rest-api-server-in-foreground">Start the ATM REST API server in foreground</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="add_method.html">Adding a classification method</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="add_method.html#valid-method-classes">1. Valid method classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="add_method.html#creating-the-json-file">2. Creating the JSON file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="add_method.html#defining-hyperparameters">Defining hyperparameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="add_method.html#defining-the-conditional-parameter-tree">Defining the Conditional Parameter Tree</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="add_method.html#optional-adding-a-new-method-to-the-atm-library">3. (Optional) Adding a new method to the ATM library</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/atm.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/atm.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.api.html">atm.api package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/atm.api.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/atm.api.html#module-atm.api">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/atm.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.classifier.html">atm.classifier module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.cli.html">atm.cli module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.compat.html">atm.compat module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.config.html">atm.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.constants.html">atm.constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.core.html">atm.core module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.data.html">atm.data module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.database.html">atm.database module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.encoder.html">atm.encoder module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.method.html">atm.method module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.metrics.html">atm.metrics module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.utilities.html">atm.utilities module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/atm.worker.html">atm.worker module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/atm.html#module-atm">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#types-of-contributions">Types of Contributions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#report-bugs">Report Bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#fix-bugs">Fix Bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#implement-features">Implement Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#write-documentation">Write Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#submit-feedback">Submit Feedback</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#pull-request-guidelines">Pull Request Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#unit-testing-guidelines">Unit Testing Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#tips">Tips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#release-workflow">Release Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="history.html#id1">0.2.0 (2019-05-29)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="history.html#new-features">New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="history.html#id3">0.1.2 (2019-05-07)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="history.html#id4">New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="history.html#id7">0.1.1 (2019-04-02)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="history.html#id8">New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="history.html#id9">0.1.0 (2018-05-04)</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ATM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Configuring ATM</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/HDI-project/ATM/blob/master/docs/configuration.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="configuring-atm">
+<h1>Configuring ATM<a class="headerlink" href="#configuring-atm" title="Permalink to this headline">¶</a></h1>
+<p>Nearly every part of ATM is configurable. For example, you can specify which machine-learning
+algorithms ATM should try, which metrics it computes (such as F1 score and ROC/AUC), and which
+method it uses to search through the space of hyperparameters (using another HDI Project library,
+BTB). You can also constrain ATM to find the best model within a limited amount of time or by
+training a limited amount of total models.</p>
+<div class="section" id="arguments">
+<h2>Arguments<a class="headerlink" href="#arguments" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">atm.ATM</span></code> class accepts a series of arguments to configure the environment where
+ATM is run.</p>
+<div class="section" id="database-configuration">
+<h3>Database Configuration<a class="headerlink" href="#database-configuration" title="Permalink to this headline">¶</a></h3>
+<p>These arguments specify the database configuration, including which type of database is being
+used and how to connect to it.</p>
+<p>The arguments for <strong>SQL</strong> are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dialect</span></code>: type of the sql database. Choices are sqlite or mysql. The default is <code class="docutils literal notranslate"><span class="pre">sqlite</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">database</span></code>: name or path of the database. The default is <code class="docutils literal notranslate"><span class="pre">atm.db</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">username</span></code>: username for the database to be used. The default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">password</span></code>: password for the username. The default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">host</span></code>: IP adress or ‘localhost’ to where the connection is going to be established. The
+default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">port</span></code>: Port number of where the database is listening, default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">query</span></code>: additional query to be executed for the login process, default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+</ul>
+<p>An example of creating an instance with <code class="docutils literal notranslate"><span class="pre">mysql</span></code> database:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">atm</span> <span class="kn">import</span> <span class="n">ATM</span>
+
+<span class="n">atm</span> <span class="o">=</span> <span class="n">ATM</span><span class="p">(</span>
+    <span class="n">dialect</span><span class="o">=</span><span class="s1">&#39;mysql&#39;</span><span class="p">,</span>
+    <span class="n">database</span><span class="o">=</span><span class="s1">&#39;atm&#39;</span><span class="p">,</span>
+    <span class="n">username</span><span class="o">=</span><span class="s1">&#39;admin&#39;</span><span class="p">,</span>
+    <span class="n">password</span><span class="o">=</span><span class="s1">&#39;password&#39;</span><span class="p">,</span>
+    <span class="n">host</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span>
+    <span class="n">port</span><span class="o">=</span><span class="mi">3306</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="aws">
+<h3>AWS<a class="headerlink" href="#aws" title="Permalink to this headline">¶</a></h3>
+<p>The following arguments specify the <a class="reference external" href="https://aws.amazon.com/">AWS</a> configuration. Bear in mind that
+you can have the <code class="docutils literal notranslate"><span class="pre">access_key</span></code> and <code class="docutils literal notranslate"><span class="pre">secret_key</span></code> already configured on your machine if you follow
+the steps <a class="reference external" href="https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#configuring-credentials">here</a>.
+<a class="reference external" href="https://boto3.amazonaws.com/v1/documentation/api/latest/index.html">Boto3</a> will use
+them by default, however if you specify them during instantiation, this will be the ones used.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">access_key</span></code>: aws access key id provided from amazon.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">secret_key</span></code>: aws secret key provided from amazon.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">s3_bucket</span></code>: S3 bucket to be used to store the models and metrics.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">s3_folder</span></code>: folder inside the bucket where the models and metrics will be saved.</p></li>
+</ul>
+<p><strong>Note</strong> all this arguments are <code class="docutils literal notranslate"><span class="pre">None</span></code> by default, and they should be passed as a <code class="docutils literal notranslate"><span class="pre">string</span></code>.</p>
+<p>An exmaple of creating an instance with <code class="docutils literal notranslate"><span class="pre">aws</span></code> configuration is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">atm</span> <span class="kn">import</span> <span class="n">ATM</span>
+
+<span class="n">atm</span> <span class="o">=</span> <span class="n">ATM</span><span class="p">(</span>
+    <span class="n">access_key</span><span class="o">=</span><span class="s1">&#39;my_aws_key_id&#39;</span><span class="p">,</span>
+    <span class="n">secret_key</span><span class="o">=</span><span class="s1">&#39;my_aws_secret_key&#39;</span><span class="p">,</span>
+    <span class="n">s3_bucket</span><span class="o">=</span><span class="s1">&#39;my_bucket&#39;</span><span class="p">,</span>
+    <span class="n">s3_folder</span><span class="o">=</span><span class="s1">&#39;my_folder&#39;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="log">
+<h3>Log<a class="headerlink" href="#log" title="Permalink to this headline">¶</a></h3>
+<p>The following arguments specify the configuration to where the models and metrics will be stored
+and if we would like a verbose version of the metrics.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">models_dir</span></code>: local folder where the models should be saved, default is <code class="docutils literal notranslate"><span class="pre">models</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metrics_dir</span></code>: local folder where the models should be saved, default is <code class="docutils literal notranslate"><span class="pre">metrics</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">verbose_metrics</span></code>: whether or not to store verbose metrics, default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+<p>An example of creating an instance with <code class="docutils literal notranslate"><span class="pre">log</span></code> configuration is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">atm</span> <span class="kn">import</span> <span class="n">ATM</span>
+
+<span class="n">atm</span> <span class="o">=</span> <span class="n">ATM</span><span class="p">(</span>
+    <span class="n">models_dir</span><span class="o">=</span><span class="s1">&#39;my_path_to_models&#39;</span><span class="p">,</span>
+    <span class="n">metrics_dir</span><span class="o">=</span><span class="s1">&#39;my_path_to_metrics&#39;</span><span class="p">,</span>
+    <span class="n">verbose_metrics</span><span class="o">=</span><span class="bp">True</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="dataset">
+<h3>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h3>
+<p>The following arguments are used to specify the <code class="docutils literal notranslate"><span class="pre">dataset</span></code> creation inside the database.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">train_path</span></code>: local path, URL or S3 bucket URL, to a CSV file that follows the
+<a class="reference external" href="https://hdi-project.github.io/ATM/#data-format">Data Format</a> and specifies the traininig data
+for the models.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test_path</span></code>: local path, URL or S3 bucket URL, to a CSV file that follows the
+<a class="reference external" href="https://hdi-project.github.io/ATM/#data-format">Data Format</a> and specifies the test data for
+the models, if this is <code class="docutils literal notranslate"><span class="pre">None</span></code> the training data will be splited in train and test.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: a name for the <code class="docutils literal notranslate"><span class="pre">dataset</span></code>, if it’s not set an <code class="docutils literal notranslate"><span class="pre">md5</span></code> will be generated from the path.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">description</span></code>: short description about the dataset, default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">class_column</span></code>: name of the column that is being the target of our predictions,
+default is <code class="docutils literal notranslate"><span class="pre">class</span></code>.</p></li>
+</ul>
+<p>An example of using this arguments in our <code class="docutils literal notranslate"><span class="pre">atm.run</span></code> method is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">atm</span> <span class="kn">import</span> <span class="n">ATM</span>
+
+<span class="n">atm</span> <span class="o">=</span> <span class="n">ATM</span><span class="p">()</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="n">train_path</span><span class="o">=</span><span class="s1">&#39;path/to/train.csv&#39;</span><span class="p">,</span>
+    <span class="n">test_path</span><span class="o">=</span><span class="s1">&#39;path/to/test.csv&#39;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Test data&#39;</span><span class="p">,</span>
+    <span class="n">class_column</span><span class="o">=</span><span class="s1">&#39;test_column&#39;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="datarun">
+<h3>Datarun<a class="headerlink" href="#datarun" title="Permalink to this headline">¶</a></h3>
+<p>The following arguments are used to specify the <code class="docutils literal notranslate"><span class="pre">datarun</span></code> creation inside the database. This
+configuration it’s important for the behaviour and metrics of our <code class="docutils literal notranslate"><span class="pre">classifiers</span></code>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">budget</span></code>: amount of <code class="docutils literal notranslate"><span class="pre">classifiers</span></code> or amount of <code class="docutils literal notranslate"><span class="pre">minutes</span></code> to run, type <code class="docutils literal notranslate"><span class="pre">int</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">budget_type</span></code>: Type of the <code class="docutils literal notranslate"><span class="pre">budget</span></code>, by default it’s <code class="docutils literal notranslate"><span class="pre">classifier</span></code>, can be changed to <code class="docutils literal notranslate"><span class="pre">walltime</span></code>,
+type <code class="docutils literal notranslate"><span class="pre">str</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gridding</span></code>: Gridding factor, by default set to <code class="docutils literal notranslate"><span class="pre">0</span></code> which means that no gridding will be
+performed, type <code class="docutils literal notranslate"><span class="pre">int</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">k_window</span></code>: Number of previous scores considered by <code class="docutils literal notranslate"><span class="pre">k</span> <span class="pre">selector</span></code> methods. Default is <code class="docutils literal notranslate"><span class="pre">3</span></code>,
+type <code class="docutils literal notranslate"><span class="pre">int</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">methods</span></code>: Method or a list of methods to use for classification. Each method can either be one
+of the pre-defined method codes listed below or a path to a JSON file defining a custom method.
+Default is <code class="docutils literal notranslate"><span class="pre">['logreg',</span> <span class="pre">'dt',</span> <span class="pre">'knn']</span></code>, type is <code class="docutils literal notranslate"><span class="pre">str</span></code> or a <code class="docutils literal notranslate"><span class="pre">list</span></code> like. A complete list of the
+default choices in <strong>ATM</strong> are:</p>
+<ul>
+<li><p>logreg</p></li>
+<li><p>svm</p></li>
+<li><p>sgd</p></li>
+<li><p>dt</p></li>
+<li><p>et</p></li>
+<li><p>rf</p></li>
+<li><p>gnb</p></li>
+<li><p>mnb</p></li>
+<li><p>bnb</p></li>
+<li><p>gp</p></li>
+<li><p>pa</p></li>
+<li><p>knn</p></li>
+<li><p>mlp</p></li>
+<li><p>ada</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metric</span></code>: Metric by which <strong>ATM</strong> should evaluate the classifiers. The metric function specified
+here will be used to compute the judgment metric for each classifier. Default <code class="docutils literal notranslate"><span class="pre">metric</span></code> is set to
+<code class="docutils literal notranslate"><span class="pre">f1</span></code>, type <code class="docutils literal notranslate"><span class="pre">str</span></code>. The rest of metrics that we support at the moment are as follow:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">roc_auc_micro</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rank_accuracy</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">f1_micro</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">accuracy</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">roc_auc_macro</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ap</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cohen_kappa</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">f1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">f1_macro</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mcc</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r_minimum</span></code>:  Number of random runs to perform before tuning can occur. Default value is <code class="docutils literal notranslate"><span class="pre">2</span></code>,
+type <code class="docutils literal notranslate"><span class="pre">int</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_per_partition</span></code>: If true, generate a new datarun for each hyperpartition. Default is
+<code class="docutils literal notranslate"><span class="pre">False</span></code>, type <code class="docutils literal notranslate"><span class="pre">bool</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">score_target</span></code>: Determines which judgment metric will be used to search the hyperparameter
+space. <code class="docutils literal notranslate"><span class="pre">cv</span></code> will use the mean cross-validated performance, <code class="docutils literal notranslate"><span class="pre">test</span></code> will use the performance on a
+test dataset, and <code class="docutils literal notranslate"><span class="pre">mu_sigma</span></code> will use the lower confidence bound on the CV performance. Default is
+<code class="docutils literal notranslate"><span class="pre">cv</span></code>, type <code class="docutils literal notranslate"><span class="pre">str</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">priority</span></code>: the priority for this datarun, the higher value is the most important.</p></li>
+<li><p><cite>selector</cite>: Type of [BTB](<a class="reference external" href="https://github.com/HDI-Project/BTB/">https://github.com/HDI-Project/BTB/</a>) selector to use. A list of them
+at the moment is <code class="docutils literal notranslate"><span class="pre">[uniform,</span> <span class="pre">ucb1,</span> <span class="pre">bestk,</span> <span class="pre">bestkvel,</span> <span class="pre">purebestkvel,</span> <span class="pre">recentk,</span> <span class="pre">hieralg]</span></code>. Default is
+set to <code class="docutils literal notranslate"><span class="pre">uniform</span></code>, type <code class="docutils literal notranslate"><span class="pre">str</span></code>.</p></li>
+<li><p><cite>tuner</cite>: Type of [BTB](<a class="reference external" href="https://github.com/HDI-Project/BTB/">https://github.com/HDI-Project/BTB/</a>) tuner to use. A list of them at the
+moment is <code class="docutils literal notranslate"><span class="pre">[uniform,</span> <span class="pre">gp,</span> <span class="pre">gp_ei,</span> <span class="pre">gp_eivel]</span></code>. Default is set to <code class="docutils literal notranslate"><span class="pre">uniform</span></code>, type <code class="docutils literal notranslate"><span class="pre">str</span></code>.</p></li>
+</ul>
+<p>An example using <code class="docutils literal notranslate"><span class="pre">atm.run</span></code> method with this arguments is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">atm</span> <span class="kn">import</span> <span class="n">ATM</span>
+
+<span class="n">atm</span> <span class="o">=</span> <span class="n">ATM</span><span class="p">()</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="n">budget</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">budget_type</span><span class="o">=</span><span class="s1">&#39;classifier&#39;</span><span class="p">,</span>
+    <span class="n">gridding</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">k_window</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;f1_macro&#39;</span><span class="p">,</span>
+    <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;logreg&#39;</span><span class="p">]</span>
+    <span class="n">r_minimum</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">run_per_partition</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">score_target</span><span class="o">=</span><span class="s1">&#39;cv&#39;</span><span class="p">,</span>
+    <span class="n">priority</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
+    <span class="n">selector</span><span class="o">=</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span>
+    <span class="n">tuner</span><span class="o">=</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span>
+    <span class="n">deadline</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="using-atm-with-your-own-data">
+<h2>Using ATM with your own data<a class="headerlink" href="#using-atm-with-your-own-data" title="Permalink to this headline">¶</a></h2>
+<p>If you would like to use the system for your own dataset, convert your data to a csv file with
+the specified <a class="reference external" href="https://hdi-project.github.io/ATM/#data-format">data format</a>.</p>
+<p>Once having your dataset ready to use, you will simply have to provide the path to this CSV in one
+of the supported formats (local path, URL, or a complete AWS S3 Bucket path). <strong>Bear in mind</strong> that
+if you specify an S3 Bucket path, the propper access keys should be configured.</p>
+</div>
+<div class="section" id="setting-up-a-distributed-database">
+<h2>Setting up a distributed Database<a class="headerlink" href="#setting-up-a-distributed-database" title="Permalink to this headline">¶</a></h2>
+<p>ATM uses a database to store information about datasets, dataruns and classifiers.
+It’s currently compatible with the SQLite3 and MySQL dialects.</p>
+<p>For first-time and casual users, the SQLite3 is used by default without any required
+step from the user.</p>
+<p>However, if you’re planning on running large, distributed, or performance-intensive jobs,
+you might prefer using MySQL.</p>
+<p>If you do not have a MySQL database already prepared, you can follow the next steps in order
+install it and parepare it for ATM:</p>
+<div class="section" id="install-mysql-server">
+<h3>1. Install mysql-server<a class="headerlink" href="#install-mysql-server" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt-get install mysql-server
+</pre></div>
+</div>
+<p>In the latest versions of MySQL no input for the user is required for this step, but
+in older versions the installation process will require the user to input a password
+for the MySQL root user.</p>
+<p>If this happens, keep track of the password that you set, as you will need it in the
+next step.</p>
+</div>
+<div class="section" id="log-into-your-mysql-instance-as-root">
+<h3>2. Log into your MySQL instance as root<a class="headerlink" href="#log-into-your-mysql-instance-as-root" title="Permalink to this headline">¶</a></h3>
+<p>If no password was required during the installation of MySQL, you should be able to
+log in with the following command.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo mysql
+</pre></div>
+</div>
+<p>If a MySQL Root password was required, you will need to execute this other command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo mysql -u root -p
+</pre></div>
+</div>
+<p>and input the password that you used during the installation when prompted.</p>
+</div>
+<div class="section" id="create-a-new-database-for-atm">
+<h3>3. Create a new Database for ATM<a class="headerlink" href="#create-a-new-database-for-atm" title="Permalink to this headline">¶</a></h3>
+<p>Once you are logged in, execute the following three commands to create a database
+called <code class="docutils literal notranslate"><span class="pre">atm</span></code> and a user also called <code class="docutils literal notranslate"><span class="pre">atm</span></code> with write permissions on it:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ mysql&gt; CREATE DATABASE atm<span class="p">;</span>
+$ mysql&gt; CREATE USER <span class="s1">&#39;atm&#39;</span>@<span class="s1">&#39;localhost&#39;</span> IDENTIFIED BY <span class="s1">&#39;set-your-own-password-here&#39;</span><span class="p">;</span>
+$ mysql&gt; GRANT ALL PRIVILEGES ON atm.* TO <span class="s1">&#39;atm&#39;</span>@<span class="s1">&#39;localhost&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="test-your-settings">
+<h3>4. Test your settings<a class="headerlink" href="#test-your-settings" title="Permalink to this headline">¶</a></h3>
+<p>After you have executed the previous three commands and exited the mysql prompt,
+you can test your settings by executing the following command and inputing the
+password that you used in the previous step when prompted:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mysql -u atm -p
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cli.html" class="btn btn-neutral float-right" title="Command Line Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="modelhub.html" class="btn btn-neutral float-left" title="Guide to the ModelHub database" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, MIT Data to AI Lab
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
