@@ -1,5 +1,11 @@
 # History
 
+## 0.2.1 (2019-06-24)
+
+### New Features
+
+* Rest API Cross-origin resource sharing (CORS) - [Issue #146](https://github.com/HDI-Project/ATM/issues/146) by @pvk-developer
+
 ## 0.2.0 (2019-05-29)
 
 New Python API

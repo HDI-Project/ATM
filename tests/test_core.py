@@ -3,7 +3,7 @@ import os
 import pytest
 
 from atm.core import ATM
-from atm.data import get_local_path
+from atm.data import _get_local_path
 from atm.database import Database
 
 DB_PATH = '/tmp/atm.db'
@@ -51,11 +51,11 @@ def test_create_dataset(db):
     train_url = DATA_URL + 'pollution_1_train.csv'
     test_url = DATA_URL + 'pollution_1_test.csv'
 
-    train_path_local = get_local_path('pollution_test.csv', train_url, None)
+    train_path_local = _get_local_path('pollution_test.csv', train_url, None)
     if os.path.exists(train_path_local):
         os.remove(train_path_local)
 
-    test_path_local = get_local_path('pollution_test_test.csv', test_url, None)
+    test_path_local = _get_local_path('pollution_test_test.csv', test_url, None)
     if os.path.exists(test_path_local):
         os.remove(test_path_local)
 
