@@ -332,7 +332,7 @@
 <span class="kn">from</span> <span class="nn">atm.api</span> <span class="k">import</span> <span class="n">create_app</span>
 <span class="kn">from</span> <span class="nn">atm.config</span> <span class="k">import</span> <span class="n">AWSConfig</span><span class="p">,</span> <span class="n">DatasetConfig</span><span class="p">,</span> <span class="n">LogConfig</span><span class="p">,</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">SQLConfig</span>
 <span class="kn">from</span> <span class="nn">atm.core</span> <span class="k">import</span> <span class="n">ATM</span>
-<span class="kn">from</span> <span class="nn">atm.data</span> <span class="k">import</span> <span class="n">copy_files</span><span class="p">,</span> <span class="n">get_demos</span>
+<span class="kn">from</span> <span class="nn">atm.data</span> <span class="k">import</span> <span class="n">copy_files</span><span class="p">,</span> <span class="n">download_demo</span><span class="p">,</span> <span class="n">get_demos</span>
 
 <span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -342,7 +342,13 @@
     <span class="n">aws_conf</span> <span class="o">=</span> <span class="n">AWSConfig</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
     <span class="n">log_conf</span> <span class="o">=</span> <span class="n">LogConfig</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">ATM</span><span class="p">(</span><span class="o">**</span><span class="n">sql_conf</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="o">**</span><span class="n">aws_conf</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="o">**</span><span class="n">log_conf</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+    <span class="c1"># Build params dictionary to pass to ATM.</span>
+    <span class="c1"># Needed because Python 2.7 does not support multiple star operators in a single statement.</span>
+    <span class="n">atm_args</span> <span class="o">=</span> <span class="n">sql_conf</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="n">atm_args</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">aws_conf</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+    <span class="n">atm_args</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">log_conf</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">ATM</span><span class="p">(</span><span class="o">**</span><span class="n">atm_args</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_work</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -526,7 +532,19 @@
 
 
 <span class="k">def</span> <span class="nf">_get_demos</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
-    <span class="n">get_demos</span><span class="p">()</span>
+    <span class="n">datasets</span> <span class="o">=</span> <span class="n">get_demos</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_download_demo</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">download_demo</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Dataset has been saved to </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Dataset has been saved to </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">paths</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">_get_parser</span><span class="p">():</span>
@@ -647,8 +665,13 @@
 
     <span class="c1"># Get Demos</span>
     <span class="n">get_demos</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;get_demos&#39;</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="n">logging_args</span><span class="p">],</span>
-                                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Create a demos folder and put the demo CSVs inside.&#39;</span><span class="p">)</span>
+                                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Print a list with the available demo datasets.&#39;</span><span class="p">)</span>
     <span class="n">get_demos</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">_get_demos</span><span class="p">)</span>
+    <span class="n">download_demo</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;download_demo&#39;</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="n">logging_args</span><span class="p">],</span>
+                                          <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Downloads a demo dataset from AWS3.&#39;</span><span class="p">)</span>
+    <span class="n">download_demo</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">_download_demo</span><span class="p">)</span>
+    <span class="n">download_demo</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;dataset&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Name of the dataset to be downloaded.&#39;</span><span class="p">)</span>
+    <span class="n">download_demo</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--path&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Directory to be used to store the dataset.&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">parser</span>
 

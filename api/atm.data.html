@@ -334,10 +334,13 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#atm.data.copy_files" title="atm.data.copy_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_files</span></code></a>(extension, source[, target])</p></td>
 <td><p>Copy matching files from source to target.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#atm.data.get_demos" title="atm.data.get_demos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_demos</span></code></a>()</p></td>
-<td><p>Copy the demo CSV files to the <code class="docutils literal notranslate"><span class="pre">{cwd}/demos</span></code> folder.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.data.download_demo" title="atm.data.download_demo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">download_demo</span></code></a>(datasets[, path])</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#atm.data.load_data" title="atm.data.load_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_data</span></code></a>(name, path[, aws_access_key, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#atm.data.get_demos" title="atm.data.get_demos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_demos</span></code></a>([args])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#atm.data.load_data" title="atm.data.load_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_data</span></code></a>(name, path[, aws_access_key, …])</p></td>
 <td><p>Load data from the given path.</p></td>
 </tr>
 </tbody>
@@ -374,10 +377,14 @@ and the new paths as values.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="atm.data.download_demo">
+<code class="sig-prename descclassname">atm.data.</code><code class="sig-name descname">download_demo</code><span class="sig-paren">(</span><em class="sig-param">datasets</em>, <em class="sig-param">path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/data.html#download_demo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.data.download_demo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="atm.data.get_demos">
-<code class="sig-prename descclassname">atm.data.</code><code class="sig-name descname">get_demos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/data.html#get_demos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.data.get_demos" title="Permalink to this definition">¶</a></dt>
-<dd><p>Copy the demo CSV files to the <code class="docutils literal notranslate"><span class="pre">{cwd}/demos</span></code> folder.</p>
-</dd></dl>
+<code class="sig-prename descclassname">atm.data.</code><code class="sig-name descname">get_demos</code><span class="sig-paren">(</span><em class="sig-param">args=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/atm/data.html#get_demos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#atm.data.get_demos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="atm.data.load_data">
