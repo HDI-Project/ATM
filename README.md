@@ -3,6 +3,7 @@
 <i>An open source project from Data to AI Lab at MIT.</i>
 </p>
 
+# ATM - Auto Tune Models
 
 
 [![CircleCI](https://circleci.com/gh/HDI-Project/ATM.svg?style=shield)](https://circleci.com/gh/HDI-Project/ATM)
@@ -12,7 +13,7 @@
 [![Downloads](https://pepy.tech/badge/atm)](https://pepy.tech/project/atm)
 
 
-# ATM - Auto Tune Models
+
 
 - License: MIT
 - Documentation: https://HDI-Project.github.io/ATM/
