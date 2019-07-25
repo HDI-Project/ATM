@@ -72,7 +72,7 @@ def test_get_dataset(client):
 def test_post_dataset(client):
     res = client.post(
         'api/datasets',
-        json={'train_path': 's3://atm-data/wind_1.csv', 'class_column': 'class'}
+        json={'train_path': 'https://atm-data.s3.amazonaws.com/pollution_1.csv', 'class_column': 'class'}
     )
 
     assert res.status == '201 CREATED'
