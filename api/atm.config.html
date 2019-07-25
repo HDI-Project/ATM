@@ -365,16 +365,16 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.AWSConfig.access_key" title="atm.config.AWSConfig.access_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">access_key</span></code></a></p></td>
-<td><p>str(object=’‘) -&gt; str</p></td>
+<td><p>str(object=’’) -&gt; str</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#atm.config.AWSConfig.s3_bucket" title="atm.config.AWSConfig.s3_bucket"><code class="xref py py-obj docutils literal notranslate"><span class="pre">s3_bucket</span></code></a></p></td>
-<td><p>str(object=’‘) -&gt; str</p></td>
+<td><p>str(object=’’) -&gt; str</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.AWSConfig.s3_folder" title="atm.config.AWSConfig.s3_folder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">s3_folder</span></code></a></p></td>
-<td><p>str(object=’‘) -&gt; str</p></td>
+<td><p>str(object=’’) -&gt; str</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#atm.config.AWSConfig.secret_key" title="atm.config.AWSConfig.secret_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">secret_key</span></code></a></p></td>
-<td><p>str(object=’‘) -&gt; str</p></td>
+<td><p>str(object=’’) -&gt; str</p></td>
 </tr>
 </tbody>
 </table>
@@ -457,13 +457,13 @@ means you can (relatively) safely do things like <code class="docutils literal n
 <td><p>tuple() -&gt; empty tuple</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#atm.config.DatasetConfig.description" title="atm.config.DatasetConfig.description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">description</span></code></a></p></td>
-<td><p>str(object=’‘) -&gt; str</p></td>
+<td><p>str(object=’’) -&gt; str</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.DatasetConfig.name" title="atm.config.DatasetConfig.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
-<td><p>str(object=’‘) -&gt; str</p></td>
+<td><p>str(object=’’) -&gt; str</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#atm.config.DatasetConfig.test_path" title="atm.config.DatasetConfig.test_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_path</span></code></a></p></td>
-<td><p>str(object=’‘) -&gt; str</p></td>
+<td><p>str(object=’’) -&gt; str</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.DatasetConfig.train_path" title="atm.config.DatasetConfig.train_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">train_path</span></code></a></p></td>
 <td><p>dict() -&gt; new empty dictionary</p></td>
@@ -558,7 +558,7 @@ means you can (relatively) safely do things like <code class="docutils literal n
 <td><p>dict() -&gt; new empty dictionary</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#atm.config.RunConfig.deadline" title="atm.config.RunConfig.deadline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deadline</span></code></a></p></td>
-<td><p>str(object=’‘) -&gt; str</p></td>
+<td><p>str(object=’’) -&gt; str</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.RunConfig.gridding" title="atm.config.RunConfig.gridding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gridding</span></code></a></p></td>
 <td><p>dict() -&gt; new empty dictionary</p></td>
@@ -629,7 +629,7 @@ means you can (relatively) safely do things like <code class="docutils literal n
 
 <dl class="attribute">
 <dt id="atm.config.RunConfig.metric">
-<code class="sig-name descname">metric</code><em class="property"> = {'choices': ['ap', 'mcc', 'roc_auc', 'f1', 'roc_auc_micro', 'cohen_kappa', 'f1_macro', 'rank_accuracy', 'roc_auc_macro', 'f1_micro', 'accuracy'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">metric</code><em class="property"> = {'choices': ['roc_auc_macro', 'cohen_kappa', 'rank_accuracy', 'f1', 'ap', 'mcc', 'f1_micro', 'accuracy', 'f1_macro', 'roc_auc_micro', 'roc_auc'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -683,19 +683,19 @@ means you can (relatively) safely do things like <code class="docutils literal n
 <td><p>dict() -&gt; new empty dictionary</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.SQLConfig.host" title="atm.config.SQLConfig.host"><code class="xref py py-obj docutils literal notranslate"><span class="pre">host</span></code></a></p></td>
-<td><p>str(object=’‘) -&gt; str</p></td>
+<td><p>str(object=’’) -&gt; str</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#atm.config.SQLConfig.password" title="atm.config.SQLConfig.password"><code class="xref py py-obj docutils literal notranslate"><span class="pre">password</span></code></a></p></td>
-<td><p>str(object=’‘) -&gt; str</p></td>
+<td><p>str(object=’’) -&gt; str</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.SQLConfig.port" title="atm.config.SQLConfig.port"><code class="xref py py-obj docutils literal notranslate"><span class="pre">port</span></code></a></p></td>
-<td><p>str(object=’‘) -&gt; str</p></td>
+<td><p>str(object=’’) -&gt; str</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#atm.config.SQLConfig.query" title="atm.config.SQLConfig.query"><code class="xref py py-obj docutils literal notranslate"><span class="pre">query</span></code></a></p></td>
-<td><p>str(object=’‘) -&gt; str</p></td>
+<td><p>str(object=’’) -&gt; str</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#atm.config.SQLConfig.username" title="atm.config.SQLConfig.username"><code class="xref py py-obj docutils literal notranslate"><span class="pre">username</span></code></a></p></td>
-<td><p>str(object=’‘) -&gt; str</p></td>
+<td><p>str(object=’’) -&gt; str</p></td>
 </tr>
 </tbody>
 </table>
