@@ -74,7 +74,6 @@ def test_post_dataset(client):
         'api/datasets',
         json={'train_path': 's3://atm-data/wind_1.csv', 'class_column': 'class'}
     )
-    data = json.loads(res.data.decode('utf-8'))
 
     assert res.status == '201 CREATED'
 
