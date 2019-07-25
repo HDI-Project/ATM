@@ -54,14 +54,14 @@ def test_create_app_debug(atm):
     assert app.config['DEBUG']
 
 
-def test_home(client):
+def test_get_home(client):
     res = client.get('/', follow_redirects=False)
 
     assert res.status == '302 FOUND'
     assert res.location == 'http://localhost/static/swagger/swagger-ui/index.html'
 
 
-def test_dataset(client):
+def test_get_dataset(client):
     res = client.get('api/datasets')
     data = json.loads(res.data.decode('utf-8'))
 
@@ -69,7 +69,30 @@ def test_dataset(client):
     assert data.get('num_results') == 1
 
 
-def test_datarun(client):
+def test_post_dataset(client):
+    res = client.post(
+        'api/datasets',
+        json={'train_path': 's3://atm-data/wind_1.csv', 'class_column': 'class'}
+    )
+    data = json.loads(res.data.decode('utf-8'))
+
+    assert res.status == '201 CREATED'
+
+
+def test_options_dataset(client):
+    res = client.options('api/datasets')
+
+    expected_headers = [
+        ('Content-Type', 'text/html; charset=utf-8'),
+        ('Access-Control-Allow-Headers', 'Content-Type, Authorization'),
+        ('Access-Control-Allow-Origin', '*'),
+        ('Access-Control-Allow-Credentials', 'true'),
+    ]
+
+    assert set(expected_headers).issubset(set(res.headers.to_list()))
+
+
+def test_get_datarun(client):
     res = client.get('api/dataruns')
     data = json.loads(res.data.decode('utf-8'))
 
@@ -77,7 +100,7 @@ def test_datarun(client):
     assert data.get('num_results') == 2
 
 
-def test_hyperpartition(client):
+def test_get_hyperpartition(client):
     res = client.get('api/hyperpartitions')
     data = json.loads(res.data.decode('utf-8'))
 
@@ -85,7 +108,7 @@ def test_hyperpartition(client):
     assert data.get('num_results') == 40
 
 
-def test_classifier(client):
+def test_get_classifier(client):
     res = client.get('api/classifiers')
     data = json.loads(res.data.decode('utf-8'))
 
