@@ -69,18 +69,6 @@ def test_get_dataset(client):
     assert data.get('num_results') == 1
 
 
-def test_post_dataset(client):
-    res = client.post(
-        'api/datasets',
-        json={
-            'train_path': 'https://atm-data.s3.amazonaws.com/pollution_1.csv',
-            'class_column': 'class'
-        }
-    )
-
-    assert res.status == '201 CREATED'
-
-
 def test_options_dataset(client):
     res = client.options('api/datasets')
 
