@@ -335,6 +335,7 @@
     <span class="c1"># Allow the CORS header</span>
     <span class="nd">@app</span><span class="o">.</span><span class="n">after_request</span>
     <span class="k">def</span> <span class="nf">add_cors_headers</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Access-Control-Allow-Headers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Content-Type, Authorization&#39;</span>
         <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Access-Control-Allow-Origin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
         <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Access-Control-Allow-Credentials&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;true&#39;</span>
         <span class="k">return</span> <span class="n">response</span>
@@ -345,7 +346,9 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span>
         <span class="n">run_conf</span> <span class="o">=</span> <span class="n">RunConfig</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-        <span class="n">dataruns</span> <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">create_dataruns</span><span class="p">(</span><span class="n">run_conf</span><span class="p">)</span>
+        <span class="n">dataruns</span> <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">add_datarun</span><span class="p">(</span><span class="o">**</span><span class="n">run_conf</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataruns</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">dataruns</span> <span class="o">=</span> <span class="p">[</span><span class="n">dataruns</span><span class="p">]</span>
 
         <span class="n">response</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
