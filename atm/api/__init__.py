@@ -18,6 +18,7 @@ def create_app(atm, debug=False):
     # Allow the CORS header
     @app.after_request
     def add_cors_headers(response):
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
         response.headers['Access-Control-Allow-Origin'] = '*'
         response.headers['Access-Control-Allow-Credentials'] = 'true'
         return response
@@ -28,7 +29,9 @@ def create_app(atm, debug=False):
         data = request.json
         run_conf = RunConfig(data)
 
-        dataruns = atm.create_dataruns(run_conf)
+        dataruns = atm.add_datarun(**run_conf.to_dict())
+        if not isinstance(dataruns, list):
+            dataruns = [dataruns]
 
         response = {
             'status': 200,

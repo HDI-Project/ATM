@@ -17,7 +17,7 @@ install_requires = [
     'pymysql>=0.9.3',
     'cryptography>=2.6.1',
     'numpy>=1.13.1',
-    'pandas>=0.22.0',
+    'pandas>=0.22.0,<0.25',
     'psutil>=5.6.1',
     'python-daemon>=2.2.3',
     'pyyaml>=3.12',
@@ -32,6 +32,7 @@ install_requires = [
     'flask-restless-swagger-2>=0.0.3',
     'simplejson>=3.16.0',
     'tqdm>=4.31.1',
+    'docutils>=0.10,<0.15',
 ]
 
 setup_requires = [
