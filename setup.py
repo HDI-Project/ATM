@@ -32,6 +32,7 @@ install_requires = [
     'flask-restless-swagger-2>=0.0.3',
     'simplejson>=3.16.0',
     'tqdm>=4.31.1',
+    'pylzma>=0.5.0',
 ]
 
 setup_requires = [
