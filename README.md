@@ -3,6 +3,7 @@
 <i>An open source project from Data to AI Lab at MIT.</i>
 </p>
 
+# ATM - Auto Tune Models
 
 
 [![CircleCI](https://circleci.com/gh/HDI-Project/ATM.svg?style=shield)](https://circleci.com/gh/HDI-Project/ATM)
@@ -12,7 +13,7 @@
 [![Downloads](https://pepy.tech/badge/atm)](https://pepy.tech/project/atm)
 
 
-# ATM - Auto Tune Models
+
 
 - License: MIT
 - Documentation: https://HDI-Project.github.io/ATM/
@@ -143,7 +144,7 @@ For this demo we will be using the pollution csv from the atm-data bucket, which
 [from here](https://atm-data.s3.amazonaws.com/pollution_1.csv), or using the following command:
 
 ```bash
-wget https://atm-data.s3.amazonaws.com/pollution_1.csv
+atm download_demo pollution_1.csv
 ```
 
 ## 2. Create an ATM instance

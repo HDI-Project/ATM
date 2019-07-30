@@ -1,5 +1,12 @@
 # History
 
+## 0.2.2 (2019-07-30)
+
+### New Features
+
+* Curate dependencies - [Issue #152](https://github.com/HDI-Project/ATM/issues/152) by @csala
+* POST request blocked by CORS policy - [Issue #151](https://github.com/HDI-Project/ATM/issues/151) by @pvk-developer
+
 ## 0.2.1 (2019-06-24)
 
 ### New Features

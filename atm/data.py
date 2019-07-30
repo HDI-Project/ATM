@@ -6,6 +6,8 @@ import shutil
 import boto3
 import pandas as pd
 import requests
+from botocore import UNSIGNED
+from botocore.client import Config
 from botocore.exceptions import ClientError
 
 LOGGER = logging.getLogger('atm')
@@ -66,9 +68,40 @@ def copy_files(extension, source, target=None):
     return file_paths
 
 
-def get_demos():
-    """Copy the demo CSV files to the ``{cwd}/demos`` folder."""
-    return copy_files('csv', 'demos')
+def download_demo(datasets, path=None):
+
+    if not isinstance(datasets, list):
+        datasets = [datasets]
+
+    if path is None:
+        path = os.path.join(os.getcwd(), 'demos')
+
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    client = boto3.client('s3', config=Config(signature_version=UNSIGNED))
+
+    paths = list()
+
+    for dataset in datasets:
+        save_path = os.path.join(path, dataset)
+
+        try:
+            LOGGER.info('Downloading {}'.format(dataset))
+            client.download_file('atm-data', dataset, save_path)
+            paths.append(save_path)
+
+        except ClientError as e:
+            LOGGER.error('An error occurred trying to download from AWS3.'
+                         'The following error has been returned: {}'.format(e))
+
+    return paths[0] if len(paths) == 1 else paths
+
+
+def get_demos(args=None):
+    client = boto3.client('s3', config=Config(signature_version=UNSIGNED))
+    available_datasets = [obj['Key'] for obj in client.list_objects(Bucket='atm-data')['Contents']]
+    return available_datasets
 
 
 def _download_from_s3(path, local_path, aws_access_key=None, aws_secret_key=None, **kwargs):
