@@ -10,7 +10,7 @@ from atm.core import ATM
 
 __author__ = """MIT Data To AI Lab"""
 __email__ = 'dailabmit@gmail.com'
-__version__ = '0.2.2'
+__version__ = '0.2.3-dev'
 
 # this defines which modules will be imported by "from atm import *"
 __all__ = ['ATM', 'Model', 'config', 'constants', 'data', 'database',
