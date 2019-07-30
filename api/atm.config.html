@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>atm.config module &mdash; ATM 0.2.2-dev documentation</title>
+  <title>atm.config module &mdash; ATM 0.2.3-dev documentation</title>
   
 
   
@@ -235,23 +235,27 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../history.html">History</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../history.html#id1">0.2.1 (2019-06-24)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../history.html#id1">0.2.2 (2019-07-30)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../history.html#new-features">New Features</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../history.html#id2">0.2.0 (2019-05-29)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../history.html#id2">0.2.1 (2019-06-24)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../history.html#id3">New Features</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../history.html#id5">0.1.2 (2019-05-07)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../history.html#id6">New Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../history.html#id4">0.2.0 (2019-05-29)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../history.html#id5">New Features</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../history.html#id9">0.1.1 (2019-04-02)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../history.html#id10">New Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../history.html#id7">0.1.2 (2019-05-07)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../history.html#id8">New Features</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../history.html#id11">0.1.0 (2018-05-04)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../history.html#id11">0.1.1 (2019-04-02)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../history.html#id12">New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../history.html#id13">0.1.0 (2018-05-04)</a></li>
 </ul>
 </li>
 </ul>
@@ -629,7 +633,7 @@ means you can (relatively) safely do things like <code class="docutils literal n
 
 <dl class="attribute">
 <dt id="atm.config.RunConfig.metric">
-<code class="sig-name descname">metric</code><em class="property"> = {'choices': ['rank_accuracy', 'accuracy', 'cohen_kappa', 'f1', 'ap', 'roc_auc_macro', 'mcc', 'roc_auc_micro', 'f1_macro', 'f1_micro', 'roc_auc'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">metric</code><em class="property"> = {'choices': ['ap', 'roc_auc', 'mcc', 'rank_accuracy', 'roc_auc_macro', 'cohen_kappa', 'f1', 'accuracy', 'roc_auc_micro', 'f1_micro', 'f1_macro'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
