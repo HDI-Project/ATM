@@ -5,6 +5,7 @@
 
 # ATM - Auto Tune Models
 
+[![Development Status](https://img.shields.io/badge/Development%20Status-2%20--%20Pre--Alpha-yellow)](https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha)
 [![PyPi Shield](https://img.shields.io/pypi/v/atm.svg)](https://pypi.python.org/pypi/atm)
 [![Travis](https://travis-ci.org/HDI-Project/ATM.svg?branch=master)](https://travis-ci.org/HDI-Project/ATM)
 [![CircleCI](https://circleci.com/gh/HDI-Project/ATM.svg?style=shield)](https://circleci.com/gh/HDI-Project/ATM)
@@ -12,6 +13,7 @@
 [![Downloads](https://pepy.tech/badge/atm)](https://pepy.tech/project/atm)
 
 - License: MIT
+- Development Status: [Pre-Alpha](https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha)
 - Documentation: https://HDI-Project.github.io/ATM/
 - Homepage: https://github.com/HDI-Project/ATM
 
