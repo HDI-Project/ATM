@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -319,35 +319,35 @@
            <div itemprop="articleBody">
             
   <h1>Source code for atm.database</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
 
 <span class="kn">import</span> <span class="nn">hashlib</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">object</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">BytesIO</span>
-<span class="kn">from</span> <span class="nn">operator</span> <span class="k">import</span> <span class="n">attrgetter</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="kn">import</span> <span class="nb">object</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">attrgetter</span>
 
 <span class="kn">import</span> <span class="nn">boto3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">pymysql</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
-<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Column</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">MetaData</span><span class="p">,</span> <span class="n">Numeric</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="n">and_</span><span class="p">,</span>
     <span class="n">create_engine</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">inspect</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">sqlalchemy.engine.url</span> <span class="k">import</span> <span class="n">URL</span>
-<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">declarative_base</span>
-<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">relationship</span><span class="p">,</span> <span class="n">sessionmaker</span>
-<span class="kn">from</span> <span class="nn">sqlalchemy.orm.properties</span> <span class="k">import</span> <span class="n">ColumnProperty</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.engine.url</span> <span class="kn">import</span> <span class="n">URL</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">relationship</span><span class="p">,</span> <span class="n">sessionmaker</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm.properties</span> <span class="kn">import</span> <span class="n">ColumnProperty</span>
 
-<span class="kn">from</span> <span class="nn">atm.constants</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">atm.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BUDGET_TYPES</span><span class="p">,</span> <span class="n">CLASSIFIER_STATUS</span><span class="p">,</span> <span class="n">DATARUN_STATUS</span><span class="p">,</span> <span class="n">METRICS</span><span class="p">,</span> <span class="n">PARTITION_STATUS</span><span class="p">,</span> <span class="n">SCORE_TARGETS</span><span class="p">,</span>
     <span class="n">ClassifierStatus</span><span class="p">,</span> <span class="n">PartitionStatus</span><span class="p">,</span> <span class="n">RunStatus</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">atm.data</span> <span class="k">import</span> <span class="n">load_data</span>
-<span class="kn">from</span> <span class="nn">atm.utilities</span> <span class="k">import</span> <span class="n">base_64_to_object</span><span class="p">,</span> <span class="n">object_to_base_64</span>
+<span class="kn">from</span> <span class="nn">atm.data</span> <span class="kn">import</span> <span class="n">load_data</span>
+<span class="kn">from</span> <span class="nn">atm.utilities</span> <span class="kn">import</span> <span class="n">base_64_to_object</span><span class="p">,</span> <span class="n">object_to_base_64</span>
 
 <span class="c1"># The maximum number of errors allowed in a single hyperpartition. If more than</span>
 <span class="c1"># this many classifiers using a hyperpartition error, the hyperpartition will be</span>
@@ -356,14 +356,14 @@
 
 
 <div class="viewcode-block" id="DBSession"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.DBSession">[docs]</a><span class="k">class</span> <span class="nc">DBSession</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">commit</span> <span class="o">=</span> <span class="n">commit</span>
 
-    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_session</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">commit</span><span class="p">:</span>
@@ -398,7 +398,7 @@
 
 
 <div class="viewcode-block" id="Database"><a class="viewcode-back" href="../../api/atm.database.html#atm.database.Database">[docs]</a><span class="k">class</span> <span class="nc">Database</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialect</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialect</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Accepts configuration for a database connection, and defines SQLAlchemy</span>
@@ -501,7 +501,7 @@
                 <span class="n">md5</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
                 <span class="k">return</span> <span class="n">md5</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
 
-            <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_path</span><span class="p">,</span> <span class="n">test_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_path</span><span class="p">,</span> <span class="n">test_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                          <span class="n">class_column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_examples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">majority</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">k_classes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                          <span class="n">size_kb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">d_features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aws_access_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                          <span class="n">aws_secret_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -521,7 +521,7 @@
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">_add_extra_fields</span><span class="p">(</span><span class="n">aws_access_key</span><span class="p">,</span> <span class="n">aws_secret_key</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="n">base</span> <span class="o">=</span> <span class="s2">&quot;&lt;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">, </span><span class="si">%d</span><span class="s2"> classes, </span><span class="si">%d</span><span class="s2"> features, </span><span class="si">%d</span><span class="s2"> rows&gt;&quot;</span>
                 <span class="k">return</span> <span class="n">base</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_classes</span><span class="p">,</span>
                                <span class="bp">self</span><span class="o">.</span><span class="n">d_features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_examples</span><span class="p">)</span>
@@ -559,7 +559,7 @@
             <span class="n">end_time</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">)</span>
             <span class="n">status</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Enum</span><span class="p">(</span><span class="o">*</span><span class="n">DATARUN_STATUS</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="n">RunStatus</span><span class="o">.</span><span class="n">PENDING</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="n">base</span> <span class="o">=</span> <span class="s2">&quot;&lt;ID = </span><span class="si">%d</span><span class="s2">, dataset ID = </span><span class="si">%s</span><span class="s2">, strategy = </span><span class="si">%s</span><span class="s2">, budget = </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">), status: </span><span class="si">%s</span><span class="s2">&gt;&quot;</span>
                 <span class="k">return</span> <span class="n">base</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
                                <span class="bp">self</span><span class="o">.</span><span class="n">budget_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">budget</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
@@ -693,7 +693,7 @@
             <span class="k">def</span> <span class="nf">constants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">constant_hyperparameters_64</span> <span class="o">=</span> <span class="n">object_to_base_64</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">categoricals</span><span class="p">)</span>
 
         <span class="n">Datarun</span><span class="o">.</span><span class="n">hyperpartitions</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s1">&#39;Hyperpartition&#39;</span><span class="p">,</span>
@@ -747,7 +747,7 @@
                     <span class="k">return</span> <span class="kc">None</span>
                 <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cv_judgment_metric</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_judgment_metric_stdev</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
                 <span class="n">params</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                     <span class="p">[</span>

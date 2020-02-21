@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -330,15 +330,15 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
-<span class="kn">from</span> <span class="nn">operator</span> <span class="k">import</span> <span class="n">attrgetter</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">attrgetter</span>
 
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
-<span class="kn">from</span> <span class="nn">atm.constants</span> <span class="k">import</span> <span class="n">TIME_FMT</span><span class="p">,</span> <span class="n">PartitionStatus</span><span class="p">,</span> <span class="n">RunStatus</span>
-<span class="kn">from</span> <span class="nn">atm.database</span> <span class="k">import</span> <span class="n">Database</span>
-<span class="kn">from</span> <span class="nn">atm.method</span> <span class="k">import</span> <span class="n">Method</span>
-<span class="kn">from</span> <span class="nn">atm.worker</span> <span class="k">import</span> <span class="n">ClassifierError</span><span class="p">,</span> <span class="n">Worker</span>
+<span class="kn">from</span> <span class="nn">atm.constants</span> <span class="kn">import</span> <span class="n">TIME_FMT</span><span class="p">,</span> <span class="n">PartitionStatus</span><span class="p">,</span> <span class="n">RunStatus</span>
+<span class="kn">from</span> <span class="nn">atm.database</span> <span class="kn">import</span> <span class="n">Database</span>
+<span class="kn">from</span> <span class="nn">atm.method</span> <span class="kn">import</span> <span class="n">Method</span>
+<span class="kn">from</span> <span class="nn">atm.worker</span> <span class="kn">import</span> <span class="n">ClassifierError</span><span class="p">,</span> <span class="n">Worker</span>
 
 <span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -347,7 +347,7 @@
 
     <span class="n">_LOOP_WAIT</span> <span class="o">=</span> <span class="mi">5</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
 
         <span class="c1"># SQL Conf</span>

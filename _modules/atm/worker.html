@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -320,7 +320,7 @@
             
   <h1>Source code for atm.worker</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/python2.7</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
 
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">imp</span>
@@ -330,16 +330,16 @@
 <span class="kn">import</span> <span class="nn">socket</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">str</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="kn">import</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">str</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 
 <span class="kn">import</span> <span class="nn">boto3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">atm.classifier</span> <span class="k">import</span> <span class="n">Model</span>
-<span class="kn">from</span> <span class="nn">atm.constants</span> <span class="k">import</span> <span class="n">CUSTOM_CLASS_REGEX</span><span class="p">,</span> <span class="n">SELECTORS</span><span class="p">,</span> <span class="n">TUNERS</span>
-<span class="kn">from</span> <span class="nn">atm.database</span> <span class="k">import</span> <span class="n">ClassifierStatus</span><span class="p">,</span> <span class="n">DBSession</span>
-<span class="kn">from</span> <span class="nn">atm.utilities</span> <span class="k">import</span> <span class="n">ensure_directory</span><span class="p">,</span> <span class="n">get_instance</span><span class="p">,</span> <span class="n">save_metrics</span><span class="p">,</span> <span class="n">save_model</span><span class="p">,</span> <span class="n">update_params</span>
+<span class="kn">from</span> <span class="nn">atm.classifier</span> <span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">from</span> <span class="nn">atm.constants</span> <span class="kn">import</span> <span class="n">CUSTOM_CLASS_REGEX</span><span class="p">,</span> <span class="n">SELECTORS</span><span class="p">,</span> <span class="n">TUNERS</span>
+<span class="kn">from</span> <span class="nn">atm.database</span> <span class="kn">import</span> <span class="n">ClassifierStatus</span><span class="p">,</span> <span class="n">DBSession</span>
+<span class="kn">from</span> <span class="nn">atm.utilities</span> <span class="kn">import</span> <span class="n">ensure_directory</span><span class="p">,</span> <span class="n">get_instance</span><span class="p">,</span> <span class="n">save_metrics</span><span class="p">,</span> <span class="n">save_model</span><span class="p">,</span> <span class="n">update_params</span>
 
 <span class="c1"># shhh</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
@@ -361,7 +361,7 @@
 
 
 <div class="viewcode-block" id="Worker"><a class="viewcode-back" href="../../api/atm.worker.html#atm.worker.Worker">[docs]</a><span class="k">class</span> <span class="nc">Worker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">datarun</span><span class="p">,</span> <span class="n">save_files</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cloud_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">datarun</span><span class="p">,</span> <span class="n">save_files</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cloud_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">aws_access_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aws_secret_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">s3_bucket</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">s3_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">models_dir</span><span class="o">=</span><span class="s1">&#39;models&#39;</span><span class="p">,</span> <span class="n">metrics_dir</span><span class="o">=</span><span class="s1">&#39;metrics&#39;</span><span class="p">,</span> <span class="n">verbose_metrics</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 

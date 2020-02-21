@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -443,7 +443,7 @@ run the following <code class="docutils literal notranslate"><span class="pre">P
 <li><p><code class="docutils literal notranslate"><span class="pre">total_pages</span></code>: The number of pages</p></li>
 </ul>
 <p>For example, you can get all the datasets using:</p>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="k">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">datasets</span> <span class="n">HTTP</span><span class="o">/</span><span class="mi">1</span><span class="p">.</span><span class="mi">1</span>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>GET /api/datasets HTTP/1.1
 </pre></div>
 </div>
 <p>And the output will be:</p>
@@ -497,7 +497,7 @@ run the following <code class="docutils literal notranslate"><span class="pre">P
 <code class="docutils literal notranslate"><span class="pre">/api/&lt;model&gt;/&lt;id&gt;</span></code>.</p>
 <p>The output will be the document representing the corresponding object.</p>
 <p>For example, you can get the dataset with id 1 using:</p>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="k">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">datasets</span><span class="o">/</span><span class="mi">1</span> <span class="n">HTTP</span><span class="o">/</span><span class="mi">1</span><span class="p">.</span><span class="mi">1</span>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>GET /api/datasets/1 HTTP/1.1
 </pre></div>
 </div>
 <p>And the output will be:</p>
@@ -545,7 +545,7 @@ run the following <code class="docutils literal notranslate"><span class="pre">P
 <p>The output will be in the same format as if you had requested all the elements from the
 children model, but with the results filtered by the parent one.</p>
 <p>So, for example, in order to get all the dataruns that use the dataset with id 1, you can use:</p>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="k">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">datasets</span><span class="o">/</span><span class="mi">1</span><span class="o">/</span><span class="n">dataruns</span> <span class="n">HTTP</span><span class="o">/</span><span class="mi">1</span><span class="p">.</span><span class="mi">1</span>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>GET /api/datasets/1/dataruns HTTP/1.1
 </pre></div>
 </div>
 <p>And the output will be (note that some parts have been cut):</p>

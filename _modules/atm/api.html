@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -319,12 +319,12 @@
            <div itemprop="articleBody">
             
   <h1>Source code for atm.api</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">request</span>
-<span class="kn">from</span> <span class="nn">flask_restless_swagger</span> <span class="k">import</span> <span class="n">SwagAPIManager</span> <span class="k">as</span> <span class="n">APIManager</span>
-<span class="kn">from</span> <span class="nn">flask_sqlalchemy</span> <span class="k">import</span> <span class="n">SQLAlchemy</span>
+<span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">request</span>
+<span class="kn">from</span> <span class="nn">flask_restless_swagger</span> <span class="kn">import</span> <span class="n">SwagAPIManager</span> <span class="k">as</span> <span class="n">APIManager</span>
+<span class="kn">from</span> <span class="nn">flask_sqlalchemy</span> <span class="kn">import</span> <span class="n">SQLAlchemy</span>
 
-<span class="kn">from</span> <span class="nn">atm.api.utils</span> <span class="k">import</span> <span class="n">auto_abort</span><span class="p">,</span> <span class="n">make_absolute</span>
-<span class="kn">from</span> <span class="nn">atm.config</span> <span class="k">import</span> <span class="n">RunConfig</span>
+<span class="kn">from</span> <span class="nn">atm.api.utils</span> <span class="kn">import</span> <span class="n">auto_abort</span><span class="p">,</span> <span class="n">make_absolute</span>
+<span class="kn">from</span> <span class="nn">atm.config</span> <span class="kn">import</span> <span class="n">RunConfig</span>
 
 
 <div class="viewcode-block" id="create_app"><a class="viewcode-back" href="../../api/atm.api.html#atm.api.create_app">[docs]</a><span class="k">def</span> <span class="nf">create_app</span><span class="p">(</span><span class="n">atm</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>

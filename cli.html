@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -406,7 +406,7 @@ command; it will pick up right where it left off. You can also run the command s
 different terminals to parallelize the work – all workers will refer to the same ModelHub
 database. When all 100 classifiers in your budget have been built, all workers will exit gracefully.</p>
 <p>This command aswell offers more information about the arguments that this command line accepts:</p>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">atm</span> <span class="n">worker</span> <span class="c1">--help</span>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>atm worker --help
 </pre></div>
 </div>
 </div>
@@ -450,13 +450,13 @@ to point to your own dataset.</p>
 connect to (and create if necessary) a SQLite database at <code class="docutils literal notranslate"><span class="pre">./atm.db</span></code> relative to the directory
 from which <code class="docutils literal notranslate"><span class="pre">enter_data.py</span></code> is run. If you are using a MySQL database, you will need to change
 the file to something like this:</p>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">dialect</span><span class="p">:</span> <span class="n">mysql</span>
-<span class="k">database</span><span class="p">:</span> <span class="n">atm</span>
-<span class="n">username</span><span class="p">:</span> <span class="n">username</span>
-<span class="n">password</span><span class="p">:</span> <span class="n">password</span>
-<span class="k">host</span><span class="p">:</span> <span class="n">localhost</span>
-<span class="n">port</span><span class="p">:</span> <span class="mi">3306</span>
-<span class="n">query</span><span class="p">:</span>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="c">dialect: mysql</span>
+<span class="c">database: atm</span>
+<span class="c">username: username</span>
+<span class="c">password: password</span>
+<span class="c">host: localhost</span>
+<span class="c">port: 3306</span>
+<span class="c">query:</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">aws.yaml</span></code> should contain the settings for running ATM in the cloud. This is not necessary
@@ -471,8 +471,8 @@ to your new config files:</p>
 <p>It’s important that the SQL configuration used by the worker matches the configuration you
 passed to <code class="docutils literal notranslate"><span class="pre">enter_data</span></code> – otherwise, the worker will be looking in the wrong ModelHub
 database for its datarun!</p>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">atm</span> <span class="n">worker</span> <span class="c1">--sql-config config/sql.yaml \</span>
-          <span class="c1">--aws-config config/aws.yaml \</span>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>atm worker --sql-config config/sql.yaml \
+          --aws-config config/aws.yaml \
 </pre></div>
 </div>
 </div>

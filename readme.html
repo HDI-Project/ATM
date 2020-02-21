@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -329,6 +329,7 @@
 <i>An open source project from Data to AI Lab at MIT.</i>
 </p><div class="section" id="atm-auto-tune-models">
 <h1>ATM - Auto Tune Models<a class="headerlink" href="#atm-auto-tune-models" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha"><img alt="Development Status" src="https://img.shields.io/badge/Development%20Status-2%20--%20Pre--Alpha-yellow" /></a>
 <a class="reference external image-reference" href="https://pypi.python.org/pypi/atm"><img alt="PyPi Shield" src="https://img.shields.io/pypi/v/atm.svg" /></a>
 <a class="reference external image-reference" href="https://travis-ci.org/HDI-Project/ATM"><img alt="Travis" src="https://travis-ci.org/HDI-Project/ATM.svg?branch=master" /></a>
 <a class="reference external image-reference" href="https://circleci.com/gh/HDI-Project/ATM"><img alt="CircleCI" src="https://circleci.com/gh/HDI-Project/ATM.svg?style=shield" /></a>
@@ -336,6 +337,7 @@
 <a class="reference external image-reference" href="https://pepy.tech/project/atm"><img alt="Downloads" src="https://pepy.tech/badge/atm" /></a>
 <ul class="simple">
 <li><p>License: MIT</p></li>
+<li><p>Development Status: <a class="reference external" href="https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha">Pre-Alpha</a></p></li>
 <li><p>Documentation: <a class="reference external" href="https://HDI-Project.github.io/ATM/">https://HDI-Project.github.io/ATM/</a></p></li>
 <li><p>Homepage: <a class="reference external" href="https://github.com/HDI-Project/ATM">https://github.com/HDI-Project/ATM</a></p></li>
 </ul>
@@ -420,11 +422,11 @@ dependencies for code linting and testing.</p>
 <li><p>Each row corresponds to a single, complete, training sample.</p></li>
 </ul>
 <p>Here are the first 5 rows of a valid CSV with 4 features and one target column called <code class="docutils literal notranslate"><span class="pre">class</span></code> as an example:</p>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">feature_01</span><span class="p">,</span><span class="n">feature_02</span><span class="p">,</span><span class="n">feature_03</span><span class="p">,</span><span class="n">feature_04</span><span class="p">,</span><span class="k">class</span>
-<span class="mi">5</span><span class="p">.</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">.</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">.</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">.</span><span class="mi">2</span><span class="p">,</span><span class="n">Iris</span><span class="o">-</span><span class="n">setosa</span>
-<span class="mi">4</span><span class="p">.</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">.</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">.</span><span class="mi">2</span><span class="p">,</span><span class="n">Iris</span><span class="o">-</span><span class="n">setosa</span>
-<span class="mi">4</span><span class="p">.</span><span class="mi">7</span><span class="p">,</span><span class="mi">3</span><span class="p">.</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">.</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">.</span><span class="mi">2</span><span class="p">,</span><span class="n">Iris</span><span class="o">-</span><span class="n">setosa</span>
-<span class="mi">4</span><span class="p">.</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">.</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">.</span><span class="mi">5</span><span class="p">,</span><span class="mi">0</span><span class="p">.</span><span class="mi">2</span><span class="p">,</span><span class="n">Iris</span><span class="o">-</span><span class="n">setosa</span>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>feature_01,feature_02,feature_03,feature_04,class
+5.1,3.5,1.4,0.2,Iris-setosa
+4.9,3.0,1.4,0.2,Iris-setosa
+4.7,3.2,1.3,0.2,Iris-setosa
+4.6,3.1,1.5,0.2,Iris-setosa
 </pre></div>
 </div>
 <p>This CSV can be passed to ATM as local filesystem path but also as a complete AWS S3 Bucket and
@@ -505,7 +507,7 @@ explore the <code class="docutils literal notranslate"><span class="pre">results
     <span class="n">Column</span> <span class="n">Name</span><span class="p">:</span> <span class="s1">&#39;class&#39;</span>
     <span class="n">Judgment</span> <span class="n">Metric</span><span class="p">:</span> <span class="s1">&#39;f1&#39;</span>
     <span class="n">Classifiers</span> <span class="n">Tested</span><span class="p">:</span> <span class="mi">100</span>
-    <span class="n">Elapsed</span> <span class="n">Time</span><span class="p">:</span> <span class="mi">0</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mf">07.638668</span>
+    <span class="n">Elapsed</span> <span class="n">Time</span><span class="p">:</span> <span class="mi">0</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">07.638668</span>
 </pre></div>
 </div>
 <p><strong>b. Get a summary of the best classifier</strong></p>
@@ -523,7 +525,7 @@ during this Datarun, including the method used and the best hyperparameters foun
     <span class="n">weights</span><span class="p">:</span> <span class="n">uniform</span>
     <span class="n">algorithm</span><span class="p">:</span> <span class="n">kd_tree</span>
     <span class="n">metric</span><span class="p">:</span> <span class="n">manhattan</span>
-    <span class="n">_scale</span><span class="p">:</span> <span class="bp">True</span>
+    <span class="n">_scale</span><span class="p">:</span> <span class="kc">True</span>
 <span class="n">Cross</span> <span class="n">Validation</span> <span class="n">Score</span><span class="p">:</span> <span class="mf">0.858</span> <span class="o">+-</span> <span class="mf">0.096</span>
 <span class="n">Test</span> <span class="n">Score</span><span class="p">:</span> <span class="mf">0.714</span>
 </pre></div>
@@ -572,7 +574,7 @@ class and passing it the path where the model has been saved:</p>
 </div>
 <p>Once you have loaded your model, you can pass new data to its <code class="docutils literal notranslate"><span class="pre">predict</span></code> method to make
 predictions:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">demo_datasets</span><span class="p">[</span><span class="s1">&#39;pollution&#39;</span><span class="p">])</span>
 

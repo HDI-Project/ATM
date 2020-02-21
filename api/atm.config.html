@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -633,7 +633,7 @@ means you can (relatively) safely do things like <code class="docutils literal n
 
 <dl class="attribute">
 <dt id="atm.config.RunConfig.metric">
-<code class="sig-name descname">metric</code><em class="property"> = {'choices': ['roc_auc_micro', 'roc_auc_macro', 'f1_micro', 'accuracy', 'f1', 'rank_accuracy', 'roc_auc', 'mcc', 'ap', 'f1_macro', 'cohen_kappa'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">metric</code><em class="property"> = {'choices': ['ap', 'f1_macro', 'f1', 'f1_micro', 'cohen_kappa', 'roc_auc', 'mcc', 'roc_auc_macro', 'roc_auc_micro', 'accuracy', 'rank_accuracy'], 'default': 'f1', 'help': 'Metric by which ATM should evaluate classifiers. The metric function specified here will be used to compute the &quot;judgment metric&quot; for each classifier.'}</em><a class="headerlink" href="#atm.config.RunConfig.metric" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">

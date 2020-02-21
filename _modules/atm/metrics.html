@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -319,18 +319,18 @@
            <div itemprop="articleBody">
             
   <h1>Source code for atm.metrics</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">unicode_literals</span>
 
-<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="kn">import</span> <span class="nb">range</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">average_precision_score</span><span class="p">,</span> <span class="n">cohen_kappa_score</span><span class="p">,</span> <span class="n">f1_score</span><span class="p">,</span> <span class="n">matthews_corrcoef</span><span class="p">,</span>
     <span class="n">precision_recall_curve</span><span class="p">,</span> <span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">roc_curve</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">StratifiedKFold</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedKFold</span>
 
-<span class="kn">from</span> <span class="nn">atm.constants</span> <span class="k">import</span> <span class="n">METRICS_BINARY</span><span class="p">,</span> <span class="n">METRICS_MULTICLASS</span><span class="p">,</span> <span class="n">N_FOLDS_DEFAULT</span><span class="p">,</span> <span class="n">Metrics</span>
+<span class="kn">from</span> <span class="nn">atm.constants</span> <span class="kn">import</span> <span class="n">METRICS_BINARY</span><span class="p">,</span> <span class="n">METRICS_MULTICLASS</span><span class="p">,</span> <span class="n">N_FOLDS_DEFAULT</span><span class="p">,</span> <span class="n">Metrics</span>
 
 
 <div class="viewcode-block" id="rank_n_accuracy"><a class="viewcode-back" href="../../api/atm.metrics.html#atm.metrics.rank_n_accuracy">[docs]</a><span class="k">def</span> <span class="nf">rank_n_accuracy</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_prob_mat</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mf">0.33</span><span class="p">):</span>

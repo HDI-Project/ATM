@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -323,17 +323,17 @@
 
 <span class="sd">&quot;&quot;&quot;Constants module.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">object</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="kn">import</span> <span class="nb">object</span>
 
-<span class="kn">from</span> <span class="nn">btb.selection</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">btb.selection</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">UCB1</span><span class="p">,</span> <span class="n">BestKReward</span><span class="p">,</span> <span class="n">BestKVelocity</span><span class="p">,</span> <span class="n">HierarchicalByAlgorithm</span><span class="p">,</span> <span class="n">PureBestKVelocity</span><span class="p">,</span> <span class="n">RecentKReward</span><span class="p">,</span>
     <span class="n">RecentKVelocity</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">btb.selection</span> <span class="k">import</span> <span class="n">Uniform</span> <span class="k">as</span> <span class="n">UniformSelector</span>
-<span class="kn">from</span> <span class="nn">btb.tuning</span> <span class="k">import</span> <span class="n">GP</span><span class="p">,</span> <span class="n">GPEi</span><span class="p">,</span> <span class="n">GPEiVelocity</span>
-<span class="kn">from</span> <span class="nn">btb.tuning</span> <span class="k">import</span> <span class="n">Uniform</span> <span class="k">as</span> <span class="n">UniformTuner</span>
+<span class="kn">from</span> <span class="nn">btb.selection</span> <span class="kn">import</span> <span class="n">Uniform</span> <span class="k">as</span> <span class="n">UniformSelector</span>
+<span class="kn">from</span> <span class="nn">btb.tuning</span> <span class="kn">import</span> <span class="n">GP</span><span class="p">,</span> <span class="n">GPEi</span><span class="p">,</span> <span class="n">GPEiVelocity</span>
+<span class="kn">from</span> <span class="nn">btb.tuning</span> <span class="kn">import</span> <span class="n">Uniform</span> <span class="k">as</span> <span class="n">UniformTuner</span>
 
 <span class="c1"># A bunch of constants which are used throughout the project, mostly for config.</span>
 <span class="c1"># TODO: convert these lists and classes to something more elegant, like enums</span>

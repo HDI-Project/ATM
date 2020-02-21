@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -330,13 +330,13 @@
 <span class="kn">import</span> <span class="nn">time</span>
 
 <span class="kn">import</span> <span class="nn">psutil</span>
-<span class="kn">from</span> <span class="nn">daemon</span> <span class="k">import</span> <span class="n">DaemonContext</span>
-<span class="kn">from</span> <span class="nn">lockfile.pidlockfile</span> <span class="k">import</span> <span class="n">PIDLockFile</span>
+<span class="kn">from</span> <span class="nn">daemon</span> <span class="kn">import</span> <span class="n">DaemonContext</span>
+<span class="kn">from</span> <span class="nn">lockfile.pidlockfile</span> <span class="kn">import</span> <span class="n">PIDLockFile</span>
 
-<span class="kn">from</span> <span class="nn">atm.api</span> <span class="k">import</span> <span class="n">create_app</span>
-<span class="kn">from</span> <span class="nn">atm.config</span> <span class="k">import</span> <span class="n">AWSConfig</span><span class="p">,</span> <span class="n">DatasetConfig</span><span class="p">,</span> <span class="n">LogConfig</span><span class="p">,</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">SQLConfig</span>
-<span class="kn">from</span> <span class="nn">atm.core</span> <span class="k">import</span> <span class="n">ATM</span>
-<span class="kn">from</span> <span class="nn">atm.data</span> <span class="k">import</span> <span class="n">copy_files</span><span class="p">,</span> <span class="n">download_demo</span><span class="p">,</span> <span class="n">get_demos</span>
+<span class="kn">from</span> <span class="nn">atm.api</span> <span class="kn">import</span> <span class="n">create_app</span>
+<span class="kn">from</span> <span class="nn">atm.config</span> <span class="kn">import</span> <span class="n">AWSConfig</span><span class="p">,</span> <span class="n">DatasetConfig</span><span class="p">,</span> <span class="n">LogConfig</span><span class="p">,</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">SQLConfig</span>
+<span class="kn">from</span> <span class="nn">atm.core</span> <span class="kn">import</span> <span class="n">ATM</span>
+<span class="kn">from</span> <span class="nn">atm.data</span> <span class="kn">import</span> <span class="n">copy_files</span><span class="p">,</span> <span class="n">download_demo</span><span class="p">,</span> <span class="n">get_demos</span>
 
 <span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
